@@ -1,0 +1,375 @@
+const PROPOSAL_FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLScoWgLBxNmZwAWGkEsFzV_0me3M2DeaBsV79szLmenXAlDdkQ/viewform';
+
+const JOIN_PROJECT_MAILTO_URL =
+  'mailto:info@kouheikosehira.com?subject=%E3%80%90AIueo%E3%80%91%E4%BC%81%E7%94%BB%E3%81%B8%E3%81%AE%E5%8F%82%E5%8A%A0%E7%94%B3%E3%81%97%E8%BE%BC%E3%81%BF&body=%E3%80%90AIueo%20%E4%BC%81%E7%94%BB%E5%8F%82%E5%8A%A0%E7%94%B3%E3%81%97%E8%BE%BC%E3%81%BF%E3%80%91%0D%0A%E3%83%BB%E3%81%8A%E5%90%8D%E5%89%8D%EF%BC%88%E3%83%8B%E3%83%83%E3%82%AF%E3%83%8D%E3%83%BC%E3%83%A0%E5%8F%AF%EF%BC%89%EF%BC%9A%0D%0A%E3%83%BB%E5%8F%82%E5%8A%A0%E5%B8%8C%E6%9C%9B%E3%81%AE%E4%BC%81%E7%94%BB%E5%90%8D%EF%BC%9A%0D%0A%E3%83%BB%E4%B8%80%E8%A8%80%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%EF%BC%9A';
+
+const JOIN_AIUEO_MAILTO_URL =
+  'mailto:info@kouheikosehira.com?subject=%E3%80%90AIueo%E3%80%91AIueo%E3%81%B8%E3%81%AE%E5%8F%82%E5%8A%A0%E7%94%B3%E3%81%97%E8%BE%BC%E3%81%BF&body=%E3%80%90AIueo%20%E5%8F%82%E5%8A%A0%E7%94%B3%E3%81%97%E8%BE%BC%E3%81%BF%E3%80%91%0D%0A%E3%83%BB%E3%81%8A%E5%90%8D%E5%89%8D%EF%BC%88%E3%83%8B%E3%83%83%E3%82%AF%E3%83%8D%E3%83%BC%E3%83%A0%E5%8F%AF%EF%BC%89%EF%BC%9A%0D%0A%E3%83%BB%E8%88%88%E5%91%B3%E3%81%AE%E3%81%82%E3%82%8B%E3%83%86%E3%83%BC%E3%83%9E%E3%83%BB%E3%82%84%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F%E3%81%84%E3%81%93%E3%81%A8%EF%BC%9A%0D%0A%E3%83%BB%E4%B8%80%E8%A8%80%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%EF%BC%9A';
+
+function closeHeaderMenuIfOpen() {
+  const menu = document.getElementById('header-menu');
+  const menuBtn = document.getElementById('header-right-menu-btn');
+  if (menu && menu.classList.contains('--opened') && menuBtn) {
+    menuBtn.click();
+  }
+}
+
+function smoothScrollToSection(selector) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  const headerEl = document.getElementById('header');
+  const headerHeight = headerEl ? Math.round(headerEl.getBoundingClientRect().height) : 76;
+  const offset = selector === '#end-section' ? 0 : headerHeight + 18;
+  const sm = window.scrollManager;
+  if (sm && typeof sm.scrollToPixel === 'function') {
+    if (typeof sm.scrollPixel === 'number') {
+      const targetPixel = sm.scrollPixel + el.getBoundingClientRect().top - offset;
+      sm.scrollToPixel(Math.max(0, targetPixel));
+      return;
+    }
+    if (typeof sm.getDomRange === 'function') {
+      const range = sm.getDomRange(el);
+      if (range && Number.isFinite(range.top)) {
+        sm.scrollToPixel(Math.max(0, range.top - offset));
+        return;
+      }
+    }
+    if (typeof sm.scrollTo === 'function') {
+      sm.scrollTo(el);
+      return;
+    }
+  }
+  const rect = el.getBoundingClientRect();
+  const targetY = window.scrollY + rect.top - offset;
+  window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+}
+
+function initProposalModal() {
+  const modal = document.getElementById('proposal-guidelines-modal');
+  const trigger = document.getElementById('home-featured-cta');
+  const checkbox = document.getElementById('proposal-agree-checkbox');
+  const approveBtn = document.getElementById('proposal-modal-approve');
+  const cancelBtn = document.getElementById('proposal-modal-cancel');
+  const closeBtn = document.getElementById('proposal-modal-close');
+  const dialog = modal ? modal.querySelector('.proposal-modal-dialog') : null;
+
+  const endTitleTrigger = document.getElementById('end-section-title-link');
+  const endTitleBox = document.getElementById('end-section-title');
+
+  // Mark internal SPA links that lack separate HTML files as external before RouteManager binds
+  document
+    .querySelectorAll(
+      '#home-reel-cta, .header-menu-link[data-page="about"], .header-menu-link[data-page="projects"], #home .project-item'
+    )
+    .forEach((a) => {
+      a.setAttribute('data-link-type', 'external');
+    });
+
+  if (!modal || !trigger || !checkbox || !approveBtn) return;
+
+  const openModal = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    checkbox.checked = false;
+    approveBtn.disabled = true;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    if (closeBtn) closeBtn.focus({ preventScroll: true });
+  };
+
+  const closeModal = () => {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  const handleEndTitleClick = (e) => {
+    const lines = endTitleTrigger
+      ? Array.from(
+          endTitleTrigger.querySelectorAll('.end-section-title-link-line')
+        )
+      : [];
+    const clickedLine =
+      e.target && e.target.closest
+        ? e.target.closest('.end-section-title-link-line')
+        : null;
+
+    if (lines.length >= 2 && clickedLine === lines[1]) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.location.href = JOIN_PROJECT_MAILTO_URL;
+      return;
+    }
+
+    if (lines.length >= 3 && clickedLine === lines[2]) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.location.href = JOIN_AIUEO_MAILTO_URL;
+      return;
+    }
+
+    if (lines.length === 0 && endTitleTrigger) {
+      const rect = endTitleTrigger.getBoundingClientRect();
+      const relY = e.clientY - rect.top;
+      if (relY > rect.height * 0.66) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = JOIN_AIUEO_MAILTO_URL;
+        return;
+      }
+      if (relY > rect.height * 0.33) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = JOIN_PROJECT_MAILTO_URL;
+        return;
+      }
+    }
+
+    openModal(e);
+  };
+
+  trigger.addEventListener('click', openModal, { capture: true });
+  if (endTitleBox) {
+    endTitleBox.addEventListener('click', handleEndTitleClick, {
+      capture: true,
+    });
+  } else if (endTitleTrigger) {
+    endTitleTrigger.addEventListener('click', handleEndTitleClick, {
+      capture: true,
+    });
+  }
+
+  const endTopBtn = document.getElementById('end-ascii-top-btn');
+  if (endTopBtn) {
+    endTopBtn.addEventListener(
+      'click',
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (
+          window.scrollManager &&
+          typeof window.scrollManager.scrollToPixel === 'function'
+        ) {
+          window.scrollManager.scrollToPixel(0);
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      },
+      { capture: true }
+    );
+  }
+
+  // Safe navigation for Reel CTA, Menu Links, and Project Items (prevents SPA router crash on /about or /projects/*)
+  const reelCta = document.getElementById('home-reel-cta');
+  if (reelCta) {
+    reelCta.addEventListener(
+      'click',
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        smoothScrollToSection('#home-featured');
+      },
+      { capture: true }
+    );
+  }
+
+  document.querySelectorAll('#home .project-item').forEach((card) => {
+    card.addEventListener(
+      'click',
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        smoothScrollToSection('.initiatives-cta-group');
+      },
+      { capture: true }
+    );
+  });
+
+  const homeMenuLink = document.querySelector(
+    '.header-menu-link[data-page="home"]'
+  );
+  if (homeMenuLink) {
+    homeMenuLink.addEventListener(
+      'click',
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closeHeaderMenuIfOpen();
+        if (
+          window.scrollManager &&
+          typeof window.scrollManager.scrollToPixel === 'function'
+        ) {
+          window.scrollManager.scrollToPixel(0);
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      },
+      { capture: true }
+    );
+  }
+
+  const aboutMenuLink = document.querySelector(
+    '.header-menu-link[data-page="about"]'
+  );
+  if (aboutMenuLink) {
+    aboutMenuLink.addEventListener(
+      'click',
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closeHeaderMenuIfOpen();
+        smoothScrollToSection('#home-members');
+      },
+      { capture: true }
+    );
+  }
+
+  const eventsMenuLink = document.querySelector(
+    '.header-menu-link[data-page="projects"]'
+  );
+  if (eventsMenuLink) {
+    eventsMenuLink.addEventListener(
+      'click',
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closeHeaderMenuIfOpen();
+        smoothScrollToSection('#home-featured');
+      },
+      { capture: true }
+    );
+  }
+
+  const contactMenuLink = document.querySelector(
+    '.header-menu-link[data-scroll-to="contact"]'
+  );
+  if (contactMenuLink) {
+    contactMenuLink.addEventListener(
+      'click',
+      (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closeHeaderMenuIfOpen();
+        smoothScrollToSection('#end-section');
+      },
+      { capture: true }
+    );
+  }
+
+  checkbox.addEventListener('change', () => {
+    approveBtn.disabled = !checkbox.checked;
+  });
+
+  approveBtn.addEventListener('click', () => {
+    if (!checkbox.checked) return;
+    window.open(PROPOSAL_FORM_URL, '_blank', 'noopener,noreferrer');
+    closeModal();
+  });
+
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Intercept wheel/touch in capture phase while modal is open so Lusion's ScrollPane cannot hijack dialog scrolling
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      if (!modal.classList.contains('is-open')) return;
+      e.stopImmediatePropagation();
+      if (dialog && dialog.contains(e.target) && dialog.scrollHeight > dialog.clientHeight) {
+        dialog.scrollTop += e.deltaY;
+      }
+      e.preventDefault();
+    },
+    { capture: true, passive: false }
+  );
+
+  if (dialog) {
+    ['touchstart', 'touchmove'].forEach((evtName) => {
+      dialog.addEventListener(
+        evtName,
+        (e) => {
+          e.stopPropagation();
+        },
+        { passive: true }
+      );
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+      closeModal();
+    }
+  });
+}
+
+function initHeaderContrastSync() {
+  const membersEl = document.getElementById('home-members');
+  const headerEl = document.getElementById('header');
+  if (!membersEl) return;
+
+  let burstFrames = 0;
+  let rafId = null;
+
+  const sync = () => {
+    const hdrBottom = headerEl ? Math.max(64, Math.ceil(headerEl.getBoundingClientRect().bottom)) : 92;
+    const rect = membersEl.getBoundingClientRect();
+    const isDarkZone = rect.top <= hdrBottom + 6 && rect.bottom > Math.round(hdrBottom * 0.5);
+    document.documentElement.classList.toggle('is-members-header-dark', isDarkZone);
+  };
+
+  const loop = () => {
+    sync();
+    burstFrames--;
+    if (burstFrames > 0) {
+      rafId = requestAnimationFrame(loop);
+    } else {
+      rafId = null;
+    }
+  };
+
+  const triggerSyncBurst = (frames = 45) => {
+    sync();
+    burstFrames = Math.max(burstFrames, frames);
+    if (rafId === null) {
+      rafId = requestAnimationFrame(loop);
+    }
+  };
+
+  sync();
+
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver(
+      () => triggerSyncBurst(30),
+      { root: null, threshold: [0, 0.1, 0.5, 1] }
+    );
+    obs.observe(membersEl);
+  }
+
+  const pageContainer = document.getElementById('page-container');
+  if (pageContainer && 'MutationObserver' in window) {
+    const pcObs = new MutationObserver(sync);
+    pcObs.observe(pageContainer, { attributes: true, attributeFilter: ['style'] });
+  }
+
+  window.addEventListener('wheel', () => triggerSyncBurst(55), { passive: true });
+  window.addEventListener('touchmove', () => triggerSyncBurst(55), { passive: true });
+  window.addEventListener('scroll', () => triggerSyncBurst(20), { passive: true });
+  window.addEventListener('resize', sync, { passive: true });
+  window.addEventListener('click', () => triggerSyncBurst(65), { passive: true });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initProposalModal();
+    initHeaderContrastSync();
+  });
+} else {
+  initProposalModal();
+  initHeaderContrastSync();
+}

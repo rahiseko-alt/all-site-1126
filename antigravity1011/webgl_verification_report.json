@@ -1,0 +1,152 @@
+{
+  "t0": {
+    "preloaderVisible": true,
+    "digitsContainerOpacity": "1",
+    "digitCount": 3,
+    "digitText": "000",
+    "hasStarted": false
+  },
+  "t1": {
+    "warpActive": true,
+    "warpProgress": 0.0914666666686535,
+    "currentStage3D": "GoalTunnels",
+    "isBlackTunnelActive": true,
+    "isWhiteTunnelActive": false,
+    "blackContainerVisible": true,
+    "whiteContainerVisible": false,
+    "blackChildrenCount": 2,
+    "meshCount": 2,
+    "sampleMeshes": [
+      {
+        "type": "Mesh",
+        "hasGeometry": true,
+        "vertexCount": 16,
+        "hasMaterial": true,
+        "materialType": "ShaderMaterial"
+      },
+      {
+        "type": "Mesh",
+        "hasGeometry": true,
+        "vertexCount": 1280,
+        "hasMaterial": true,
+        "materialType": "ShaderMaterial"
+      }
+    ],
+    "bloomAmount": 35.90107526894539,
+    "tunnelTime": 1.2097277661562744
+  },
+  "t2": {
+    "warpActive": true,
+    "warpProgress": 0.7476333333353202,
+    "currentStage3D": "GoalTunnels",
+    "isBlackTunnelActive": false,
+    "isWhiteTunnelActive": true,
+    "blackContainerVisible": false,
+    "whiteContainerVisible": true,
+    "whiteChildrenCount": 2,
+    "meshCount": 2,
+    "sampleMeshes": [
+      {
+        "type": "Mesh",
+        "hasGeometry": true,
+        "vertexCount": 142,
+        "hasMaterial": true
+      },
+      {
+        "type": "Mesh",
+        "hasGeometry": true,
+        "vertexCount": 5865,
+        "hasMaterial": true
+      }
+    ],
+    "whiteTunnelRatio": 0.16281348876928647,
+    "bloomAmount": 31.275089348910562,
+    "bgColor": "ffffff"
+  },
+  "t2_5": {
+    "warpHasCompleted": true,
+    "currentStage3D": "HomeBalloons",
+    "isHomeBalloonsActive": true,
+    "stageChildrenCount": 51,
+    "balloonsCount": 24,
+    "sampleBalloons": [
+      {
+        "name": "unnamed",
+        "hasMesh": true,
+        "visible": true,
+        "vertexCount": 660,
+        "radius": 1,
+        "color": "#ff0055",
+        "position": {
+          "x": 3.113643231298778,
+          "y": -1.9329449917070451,
+          "z": 0.6601183690596615
+        }
+      },
+      {
+        "name": "unnamed",
+        "hasMesh": true,
+        "visible": true,
+        "vertexCount": 228,
+        "radius": 1,
+        "color": "#ffaa00",
+        "position": {
+          "x": -0.8473797977488021,
+          "y": -0.07908159944245133,
+          "z": -1.9092099706386452
+        }
+      },
+      {
+        "name": "unnamed",
+        "hasMesh": true,
+        "visible": true,
+        "vertexCount": 2868,
+        "radius": 1,
+        "color": "#00c0ff",
+        "position": {
+          "x": 2.2384015115889113,
+          "y": -2.2185139760651604,
+          "z": -1.225759146665828
+        }
+      },
+      {
+        "name": "unnamed",
+        "hasMesh": true,
+        "visible": true,
+        "vertexCount": 4680,
+        "radius": 1,
+        "color": "#ff0080",
+        "position": {
+          "x": 2.116886707785218,
+          "y": -1.533144792452703,
+          "z": 2.6185481833306943
+        }
+      },
+      {
+        "name": "unnamed",
+        "hasMesh": true,
+        "visible": true,
+        "vertexCount": 4800,
+        "radius": 1,
+        "color": "#f5a623",
+        "position": {
+          "x": 0.14245432680042291,
+          "y": 1.842935030536115,
+          "z": -1.6877071190238395
+        }
+      }
+    ],
+    "headerOpacity": "1",
+    "pageContainerOpacity": "1",
+    "heroTitleText": "Host events more casually, more\nfreely! AI expands your world.",
+    "cameraPosition": {
+      "x": 0,
+      "y": 0,
+      "z": 7.0285201579922685
+    },
+    "scrollManagerActive": true
+  },
+  "consoleErrors": [],
+  "webglWarnings": [],
+  "failedRequests": []
+}

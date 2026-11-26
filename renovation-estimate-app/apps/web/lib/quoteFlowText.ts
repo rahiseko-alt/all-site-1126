@@ -1,0 +1,240 @@
+// 新設計（見積依頼グループ → 下請の回答 → 比較表と採用）の画面の文言。
+//
+// lib/content.ts が300行を超えたので、**後から単独で直したくなる塊**として
+// ここに分けた（AGENTS.md「結合を増やさない」：行数で割らず、塊ごとに分ける）。
+// 文言の置き場所は lib/content.ts のままにするため、あちらから re-export している。
+//
+// 紙に印字される文字はここに置かない。それはテンプレート（lib/doc/templates/）が持つ
+// （docs/design.md 7章「文言の住所を1つに決める規則」）。
+
+import { MAX_SUBCONTRACTORS_PER_OWNER } from "./limits";
+
+/**
+ * 下請の回答画面（/q/[token]。ログイン不要）の文言。作り直した版。
+ *
+ * 明細ごとに数量・単価を入れさせ、依頼全体に必要経費の内訳欄を出す
+ * （docs/design.md 3章「下請が返す見積書に求められる内訳」。単価1つだけの形は
+ * ガイドラインが望ましくない行為事例として名指ししている）。
+ */
+export const QUOTE_GROUP_RESPONSE_TEXT = {
+  heading: "御見積のご依頼",
+  description:
+    "下記の工事について、数量と単価をご記入ください。必要経費の内訳もご記入いただけます。",
+  workNameLabel: "工事名称",
+  siteAddressLabel: "施工場所",
+  dueAtLabel: "見積回答期限",
+  linesHeading: "工事内容",
+  quantityLabel: "数量",
+  costUnitPriceLabel: "単価（円）",
+  breakdownHeading: "必要経費の内訳",
+  /** 努力義務であることを、書かせる前に明示する。 */
+  breakdownNote:
+    "建設業法にもとづき、下記の内訳を明示するよう努めることとされています。分かる範囲でご記入ください（未記入でも送信できます）。",
+  materialCostLabel: "材料費（円）",
+  materialSuppliedNoteLabel: "元請支給の材料があれば、その内容",
+  laborCostLabel: "労務費（円）",
+  legalWelfareCostLabel: "法定福利費（事業主負担分・円）",
+  safetyHealthCostLabel: "安全衛生経費（円）",
+  retirementMutualAidCostLabel: "建設業退職金共済掛金（円）",
+  workDaysLabel: "必要となる作業日数（日）",
+  submit: "回答する",
+  submitting: "送信中…",
+  invalidNumber: "数字を入力してください（0以上）。",
+  needAllLines: "すべての工事について、数量と単価をご記入ください。",
+  failed: "送信に失敗しました。もう一度お試しください。",
+  thanks: "回答しました。ありがとうございました。",
+  alreadyResponded: "この依頼は既に回答済みです。ご協力ありがとうございました。",
+  notFound: "この依頼は見つかりません。リンクをご確認ください。",
+} as const;
+
+/**
+ * 比較表と採用の画面の文言（docs/design.md 7章「取り込みは『追加』ではなく
+ * 『採用』にする」）。1明細につき採用は1社まで（排他）。
+ */
+export const COMPARISON_TEXT = {
+  heading: "見積の比較",
+  empty: "まだ依頼がありません。",
+  noResponses: "まだ回答がありません。",
+  lineColumn: "工事項目",
+  quantityColumn: "数量",
+  /**
+   * 採用のボタン。**3社とも同じ文字にする。**
+   * 「採用する／採用中／採用をやめる」と出し分けていたが、
+   * 3つ並んだときに何が起きるか読み取れないと言われた（利用者の指摘）。
+   * 採用中だけ色を変えれば分かる。押せば入れ替わる（採用中を押すと外れる）。
+   * 色だけに頼らないよう、ボタンには aria-pressed を付ける。
+   */
+  adopt: "採用",
+  waiting: "回答待ち",
+  cheapestMark: "最安",
+  /** 自動で選ばない理由を画面にも書く。 */
+  cheapestNote:
+    "最安の印は目安です。自動では選びません。明細ごとに1社だけ選べます。",
+  adoptFailed: "採用できませんでした。もう一度お試しください。",
+  /**
+   * いま採用しているぶんの合計。**この画面から出す見積書と同じ金額**になる
+   * （どちらも lib/db/pricedEstimate.ts を通る）。
+   *
+   * 見積書を押す前に金額が見えること自体が体感になる。同時に、ここが 0円 でないことを
+   * 外から機械判定できる唯一の場所でもある（PDFのバイト列から金額は読めない）。
+   * scripts/prod-demo-check.sh がこのラベルを探す。
+   */
+  adoptedTotalLabel: "採用中の合計（税込）",
+  adoptedTotalNote: "この金額で見積書ができます。",
+  back: "もどる",
+} as const;
+
+/** 法定項目スロットの画面表示名（建設業法の項目名。docs/design.md 3章の原文表記）。 */
+export const LEGAL_ITEM_SLOT_LABELS = {
+  responsibility_scope: "責任施工範囲",
+  subcontract_schedule: "下請工事の工程",
+  overall_schedule: "全体工程",
+  quote_conditions: "見積条件",
+  trade_boundary: "他工種との関係部位",
+  special_parts: "特殊部分",
+  material_cost_burden: "材料費の負担",
+  safety_measures_burden: "労働災害防止対策の負担",
+  waste_disposal_burden: "建設副産物の運搬及び処理の負担",
+} as const;
+
+/** 施工条件・範囲リストの12区分の画面表示名（docs/design.md 5章の一次情報）。 */
+export const SITE_CONDITION_LABELS = {
+  materials: "材料",
+  assembly_processing: "組立・加工",
+  transport: "運搬",
+  scaffolding: "足場",
+  marking_out: "墨出し",
+  curing: "養生",
+  cleanup: "片付け",
+  equipment: "機器",
+  drawings_documents: "図面・書類",
+  samples: "見本",
+  inspection_confirmation: "検査・確認",
+  safety: "安全",
+} as const;
+
+/** 下請台帳の画面の文言（docs/design.md 7章「画面は5つ」）。 */
+/**
+ * 会社設定の文言（`docs/design.md` 7章「画面は5つ」）。
+ *
+ * この画面が持つのは2種類ある。**請負者情報**は①②の様式に印字される欄で、
+ * 保存した1件を全案件が参照する。**定型文**は法定項目の初期値で、
+ * 案件を新しく作るときにその案件へ複製する（あとから会社設定を直しても、
+ * 既に作った案件は変わらない。案件ごとに上書きできることと矛盾させないため）。
+ */
+export const COMPANY_PROFILE_TEXT = {
+  heading: "会社設定",
+  description:
+    "見積書に印字する自社の情報と、法定項目の定型文の初期値をここに置きます。",
+  contractorHeading: "請負者情報",
+  contractorNote: "見積書と見積依頼書に印字します。",
+  contractorNameLabel: "請負者名（会社名）",
+  representativeNameLabel: "代表者名",
+  addressLabel: "住所",
+  defaultsHeading: "法定項目の定型文",
+  defaultsNote:
+    "新しい案件を作ったとき、ここに書いた内容が法定項目の初期値として入ります。既にある案件は変わりません。空のままにした項目は初期値を入れません。",
+  save: "保存する",
+  saving: "保存中…",
+  saved: "保存しました。",
+  failed: "保存できませんでした。もう一度お試しください。",
+  tooLong: "入力が長すぎます。短くしてください。",
+  back: "もどる",
+} as const;
+
+export const SUBCONTRACTORS_TEXT = {
+  heading: "下請台帳",
+  description: "見積依頼の送り先は、ここに登録した会社から選びます。",
+  empty: "まだ1社も登録されていません。",
+  newHeading: "会社を登録する",
+  companyNameLabel: "会社名",
+  emailLabel: "メールアドレス",
+  submit: "登録する",
+  delete: "削除",
+  failed: "会社名とメールアドレスを入力してください。",
+  /** 上限に達したときの文言。lib/db/subcontractors.ts が投げる例外の文面でもある。 */
+  failedLimit: `登録できるのは${MAX_SUBCONTRACTORS_PER_OWNER}社までです。使わない会社を削除してから登録してください。`,
+  back: "もどる",
+} as const;
+
+/**
+ * 法定項目・施工条件の入力画面の文言（建設業法第20条第1項の④⑤⑥⑧と、
+ * ⑦にあたる施工条件・範囲リスト）。ここが埋まらないと依頼を送れない。
+ */
+export const LEGAL_ITEMS_TEXT = {
+  heading: "法定項目・施工条件",
+  description:
+    "見積依頼に添える項目です。すべての項目に「記入する」か「未定」を選ぶと、依頼を送れるようになります。",
+  slotsHeading: "法定項目",
+  slotsNote:
+    "内容が決まっていない項目は「未定」を選びます。「未定」と「未入力」は別のものとして扱い、「未定」は書類にそのまま印字されます。",
+  conditionsHeading: "施工条件・範囲リスト",
+  // 選べる印は3つある（○・×・未検討）。「未検討」が初期状態であることと、
+  // 残っていると送れないことを書く。「どちらか選ぶ」とだけ書くと、画面に並ぶ
+  // 3つのラジオボタンと食い違う。
+  conditionsNote:
+    "この依頼に含める区分に○、含めない区分に×を付けます。「未検討」が1つでも残っていると依頼を送れません。",
+  valueLabel: "内容",
+  /** スロットの3状態の表示名。DBの status と1対1で対応する。 */
+  statusLabels: {
+    filled: "記入する",
+    undetermined: "未定",
+    unset: "未入力",
+  } as const,
+  /** 施工条件の印の表示名。一次情報の○×の使い方に合わせる。 */
+  markLabels: {
+    include: "○ 含める",
+    exclude: "× 含めない",
+    unset: "未検討",
+  } as const,
+  save: "保存する",
+  saving: "保存中…",
+  saved: "保存しました。",
+  needValue: "「記入する」を選んだ項目には内容を入力してください。",
+  failed: "保存できませんでした。もう一度お試しください。",
+  back: "もどる",
+} as const;
+
+/**
+ * 法定項目・施工条件の入力画面へ誘導するリンクの文言。
+ * 案件詳細と送信画面の2箇所から同じ画面へ行くので、文言はここに1つだけ置く
+ * （`AGENTS.md`「結合を増やさない」1：同じ文言を2箇所以上に書かない）。
+ */
+export const LEGAL_ITEMS_LINK_LABEL = `${LEGAL_ITEMS_TEXT.heading}を入力する`;
+
+/** 依頼グループの送信画面の文言。 */
+export const SEND_REQUEST_TEXT = {
+  heading: "見積依頼を出す",
+  gateHeading: "送信前の確認",
+  gateOk: "法定項目はすべて記入済みです。",
+  gateNgHeading: "次の項目が未記入のため、まだ送れません。",
+  gateNgSlots: "法定項目",
+  gateNgConditions: "施工条件・範囲リスト",
+  subcontractorsHeading: "送り先",
+  subcontractorsEmpty: "下請が登録されていません。先に下請台帳に登録してください。",
+  subcontractorsLink: "下請台帳を開く",
+  priceBandHeading: "予定価格帯",
+  /** 3帯の表示名。見積期間（建設業法施行令第6条）の根拠になる。 */
+  priceBandLabels: {
+    under_500man: "500万円未満（見積期間1日以上）",
+    between_500man_and_5000man: "500万円以上5,000万円未満（10日以上）",
+    over_5000man: "5,000万円以上（15日以上）",
+  } as const,
+  priceBandRequired: "予定価格帯を選んでください。",
+  send: "この内容で送る",
+  sending: "送信中…",
+  sent: "依頼を出しました。",
+  failed: "送信できませんでした。もう一度お試しください。",
+  needSubcontractor: "送り先を1社以上選んでください。",
+} as const;
+
+/** 書類画面のUI文言（紙に印字される文字はテンプレート側が持つ）。 */
+export const SPIKE_TEXT = {
+  note: "書類の行を押すと、写真と数量を入れるシートが出ます。写真枠は直接押せます。",
+  openSheet: "写真・数量を入れる",
+  print: "印刷する",
+  takePhoto: "写真を撮る",
+  retakePhoto: "撮り直す",
+  quantityLabel: "数量",
+  closeSheet: "閉じる",
+} as const;

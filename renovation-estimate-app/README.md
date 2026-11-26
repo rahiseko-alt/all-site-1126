@@ -1,8 +1,50 @@
-# renovation-estimate-app
+# リフォーム見積
 
-リフォーム見積Webアプリ（PWA）。
+リフォーム工事の見積を作るWebアプリ（PWA）。現場でスマホから、事務所でPCから使う。
 
-- 種別：Webアプリ
-- 元リポ：https://github.com/rahiseko-alt/renovation-estimate-app
+現場の写真を撮る → 定型の明細から見積の下書きを作る → 一部を下請に「見積依頼」として送る →
+下請から単価の回答を受け取る → 掛率をかけて顧客向けの見積を確定し、PDFで出す。
 
-このフォルダは all-site-1126 の中でこのサイト専用の独立フォルダです。本体ファイルの移行状況は大元の README.md の移行表を見てください。
+下請にアカウントは要らない。リンクを開いて単価を入れるだけ。
+
+## 見積書の様式
+
+独自様式ではなく、**住宅リフォーム推進協議会「住宅リフォーム工事 御見積書」書式Ⅳ-1** に
+合わせている。様式の原本URLと、実物で確認した構造は `docs/design.md` 5章に置いてある
+（一次情報のURLはそちらを正本とし、ここには重ねて書かない）。
+
+協議会様式が1列にまとめている「（単価・数量・時間 等）」だけ、金額を計算できるよう
+**数量／単位／単価**の3列に分解している。集計欄の文言（「工事価格 （税抜き）」「取引に係る消費税等」
+「合計 （税込）」）は様式のまま使う。
+
+## 起動
+
+必要なソフト: Node.js 22 以上、pnpm 10（`packageManager` で固定）。
+
+```bash
+pnpm install
+cp apps/web/.env.example apps/web/.env.local   # 値を自分のものに書き換える
+pnpm dev
+```
+
+http://localhost:3000 を開く。
+
+環境変数は `apps/web/.env.example` に名前と用途を書いてある。`AUTH_SECRET` が未設定だと
+ログインが動かない（開発用の既定値をコードに埋めていないため）。
+
+## コマンド
+
+コマンドは `AGENTS.md` の「コマンド」節を正とする。
+
+## 開発の状態
+
+フェーズ0（土台・仮の認証・PWA・CI）まで。以降の予定は `docs/handoff.md` の③を見る。
+
+この製品が何であるか（誰が使うか・差別化点・出す書類・調査で確定した業界様式と法令要件）は
+`docs/design.md` にまとめてある。実装に入る前にこれを読む。
+
+利用者に渡す操作説明書は `docs/manual.md`。画面に出ている文言をそのまま引用しているので、
+`apps/web/lib/content.ts`・`apps/web/lib/quoteFlowText.ts`・`apps/web/lib/demoText.ts` の
+ラベルを変えたらここも直す。とくに `DEMO_ENTRY_TEXT.start`（デモの入口のボタン名）は、
+`scripts/smoke.sh` と `apps/web/e2e/demo-three-taps.spec.ts` の `TAPS` も同じ文字列を探すので、
+同時に直す。

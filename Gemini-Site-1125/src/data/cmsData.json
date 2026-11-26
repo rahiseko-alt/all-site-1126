@@ -1,0 +1,835 @@
+{
+  "common": {
+    "cCommon": {
+      "cFooterText": "<p>Have a project in mind or just want to connect? <br>I'm always up for a good conversation. ...</p>",
+      "cSocials": [
+        {
+          "cUrl": "mailto:romain.avalle@gmail.com",
+          "cLabel": "Email",
+          "id": "CxBkSNeTQYe6Ss4H6GlRdA"
+        },
+        {
+          "cUrl": "https://bsky.app/profile/romainavalle.bsky.social",
+          "cLabel": "Bluesky",
+          "id": "bWDv7BvNTBmYjto81JBsNg"
+        },
+        {
+          "cUrl": "https://www.linkedin.com/in/romainavalle/",
+          "cLabel": "LinkedIn",
+          "id": "JFv9OzapRE-JiPa3ZzZpZg"
+        },
+        {
+          "cUrl": "https://github.com/romainavalle",
+          "cLabel": "Github",
+          "id": "Hv6XeYfdRBKvF6CDy8Dafg"
+        },
+        {
+          "cUrl": "https://romain-avalle-2019.netlify.app/",
+          "cLabel": "Folio 2019",
+          "id": "UKj4Rid5QwOr60pn_RtOGQ"
+        }
+      ]
+    }
+  },
+  "index": {
+    "allCWorks": [
+      {
+        "id": "DD-EF80FTJS74K6sWszUdA",
+        "cTitle": "OFF Forum",
+        "cUrl": "https://www.offforum.com/",
+        "cPosition": "Tech lead",
+        "cWith": "",
+        "cDate": "2026-06-22",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "Cq4xL7avSq2JE2URuFXRxQ",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "W855-1NlT3mUieXZC914uw",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "DygBMqdFTl6xMvky3K6YOg",
+        "cTitle": "Ref Digital",
+        "cUrl": "https://ref.digital/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2026-03-16",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "XP2WaaEeQDC_AzFmht8G4A",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "a9TDF8YRRHq6oW-qqm96_Q",
+            "cLabel": "FWA FOTD"
+          },
+          {
+            "id": "EVqjn43JQwSYo39V5gG3PQ",
+            "cLabel": "CssDesignAwards"
+          },
+          {
+            "id": "JMjZacQoSZOem525yx1xlw",
+            "cLabel": "Gold IDEA FE development"
+          }
+        ]
+      },
+      {
+        "id": "UyDrK1WzS4emw6Telu-a0A",
+        "cTitle": "Dime MTL",
+        "cUrl": "http://dimemtl.com/",
+        "cPosition": "Tech lead",
+        "cWith": "",
+        "cDate": "2026-01-06",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "EFJgmtI_Smu082Aq7mZ9Xg",
+            "cLabel": "Awwwards SOTD"
+          },
+          {
+            "id": "L59NZibhQvWPGq09AsWKQQ",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "OTEoRAQZQviTkxe_jbHdWw",
+        "cTitle": "In the blink of an eye",
+        "cUrl": "https://thefwa.com/cases/in-the-blink-of-an-eye-p2",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2025-06-05",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "RDfY_PEvRA6AlHf3OeMTmQ",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "cJNmljaRQe6Em9kjBQ1gjA",
+        "cTitle": "HHHusher",
+        "cUrl": "https://www.cssdesignawards.com/sites/hhhusher/47525/",
+        "cPosition": "Tech lead",
+        "cWith": "",
+        "cDate": "2025-05-29",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "NKZeAR_6SGmBikuw5wlSKQ",
+            "cLabel": "CssDA"
+          },
+          {
+            "id": "WXaKm8MXRWimcAsOxMpftg",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          }
+        ]
+      },
+      {
+        "id": "EE4Fxo0DS_SwJPg9Yn1Q5Q",
+        "cTitle": "Canopy Planet",
+        "cUrl": "https://www.cssdesignawards.com/sites/canopy-planet/47253/",
+        "cPosition": "Tech lead",
+        "cWith": "",
+        "cDate": "2025-03-31",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "VMaag5kNSVW8VfPf9V7_sw",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "Er1KJxbKQqSjEoRxi0qiRw",
+        "cTitle": "Halo Dental",
+        "cUrl": "https://halodental.com/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2024-09-10",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "WY934dOiTWWTb3E8M2r2KA",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "QxaikxRiRXCrWBsnAXmxoA",
+            "cLabel": "FWA FOTD"
+          },
+          {
+            "id": "a5FfMGz7RtulC7AgSoKI_A",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "KZBnZ_cDRXalmQj1hCirxQ",
+        "cTitle": "Mission 2035",
+        "cUrl": "https://www.cssdesignawards.com/sites/mission-2035/46008/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2024-07-31",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "Ihbdtb2SS5qh1Kju4kI7KA",
+            "cLabel": "CssDA"
+          },
+          {
+            "id": "ci7NJA2ISsqrpdy_mv1P-A",
+            "cLabel": "IDEA coup de coeur du jury"
+          }
+        ]
+      },
+      {
+        "id": "C013rJMFTUaiQGX64linAw",
+        "cTitle": "Mellem",
+        "cUrl": "https://www.cssdesignawards.com/sites/mellem/44447/",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2023-12-03",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "YzqyD2QjQSa0qPj1fH0P8Q",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "XSN2jjOsQ8GKfQMpaXJ3JQ",
+        "cTitle": "Nortera",
+        "cUrl": "https://www.cssdesignawards.com/sites/nortera/43993/",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2023-09-10",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "Pgtgwj-TTDKenqDQghRUQg",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "FbHeN93uT3SOG07j2P3LNg",
+        "cTitle": "Next Gen Now",
+        "cUrl": "https://nextgennow.canopyplanet.org/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2023-08-13",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "aQ-UIFsEREeQAZt1or_mTg",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "ZmKQ_Z17TSmenbEZPqO4ag",
+            "cLabel": "FWA FOTD"
+          },
+          {
+            "id": "KI5gr5gjTz6UhsP5MIJxWw",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "fLJJpwB-QX28Mwsyik9rxA",
+        "cTitle": "Oovie",
+        "cUrl": "https://www.cssdesignawards.com/sites/oovie/43096/",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2023-04-03",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "XDH8P2dbRhaElIZc9kBFVw",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "Q1D1vLVxTLqmbswKFeZAVg",
+        "cTitle": "5 years of success",
+        "cUrl": "https://www.awwwards.com/sites/5-years-of-success",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2023-03-02",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "XBdy22LwTlWo13W2CLn4Ig",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "E72sQNKLSmiUzu3gbbknWA",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "HDCqZE_4TXOB2qGnfmDxVQ",
+        "cTitle": "Vie de compost",
+        "cUrl": "https://www.cssdesignawards.com/sites/vie-de-compost/42589/",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2022-12-24",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "RKNUMPjnQciXQu2vCyiW9Q",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "ObF6xwXgQDW1o6KO2lGoQA",
+        "cTitle": "Alicia Moore",
+        "cUrl": "https://www.aliciamoore.ca/",
+        "cPosition": "Developer",
+        "cWith": "Antinomy",
+        "cDate": "2022-04-04",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": []
+      },
+      {
+        "id": "ByTwW0AYRECOIut9Zjn86w",
+        "cTitle": "Make Reign",
+        "cUrl": "https://www.makereign.com/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2022-03-04",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": []
+      },
+      {
+        "id": "G_4ihBFkTl-XKx_jvELm-w",
+        "cTitle": "Santa Teresa",
+        "cUrl": "https://www.awwwards.com/sites/santa-teresa",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2022-01-13",
+        "cAgency": {
+          "cTitle": "REF"
+        },
+        "cRecognitions": [
+          {
+            "id": "DYBvJwRZTM6rFMGgdH_vXA",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "WNCvUQCPS4GTivAcSljDgA",
+            "cLabel": "FWA FOTD"
+          },
+          {
+            "id": "WMOSRUJLReq3mBy8eMWC_g",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "Yy-c5RPIQgKWilp9z1_M1w",
+        "cTitle": "Fan study by spotify",
+        "cUrl": "https://fanstudy.byspotify.com/",
+        "cPosition": "Developer",
+        "cWith": "Rally Interactive",
+        "cDate": "2021-06-17",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "Kj5p01PfRN2BsdYcpTgDjA",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "FoGC4JaJQROylJwnPUOSsQ",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "ICCFvSdhSw6aMimz8kALHg",
+        "cTitle": "Wax Poetics",
+        "cUrl": "https://waxpoetics.com/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2021-04-05",
+        "cAgency": {
+          "cTitle": "Wonderland"
+        },
+        "cRecognitions": [
+          {
+            "id": "KXsysUhNT-K-6fHL0ymgYw",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "ej8GjqBxRjGWQ8oPV88Jwg",
+            "cLabel": "Lovie Gold"
+          }
+        ]
+      },
+      {
+        "id": "Ov6urfsRR0Cb6ArzObYZUA",
+        "cTitle": "Studio BA",
+        "cUrl": "https://www.awwwards.com/sites/studio-ba-r",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2020-12-08",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "JTsNbg0VTiGdAiCrlJBeqA",
+            "cLabel": "Awwwards SOTD, Dev Award, MOTW"
+          },
+          {
+            "id": "RYCwvGhWS36ARUNA4WhFGA",
+            "cLabel": "FWA FOTD"
+          },
+          {
+            "id": "R7JAcoI6SS2Im7FltaEa0Q",
+            "cLabel": "FWAWWWARDS"
+          }
+        ]
+      },
+      {
+        "id": "FGxicOEpSXGkZF9DHr1Wig",
+        "cTitle": "Simon Daufresne",
+        "cUrl": "https://simondaufresne.com/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2020-10-26",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "BXN9RAteQxyfktebT85www",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "R8dcdw-hTjaDZ9qfz1WdIw",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "bxypIBB1QBi6JgezpaZf2Q",
+        "cTitle": "Wonderland",
+        "cUrl": "https://www.awwwards.com/sites/wonderlandams",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2020-09-28",
+        "cAgency": {
+          "cTitle": "Wonderland"
+        },
+        "cRecognitions": [
+          {
+            "id": "OnUHw5FMRhKR4EWKlXwf7g",
+            "cLabel": "Awwwards SOTD, Dev Award, MOTW"
+          }
+        ]
+      },
+      {
+        "id": "anYswtdbTq-Ut2HNWXQ_ag",
+        "cTitle": "Matter of mind",
+        "cUrl": "https://thefwa.com/cases/moem",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2020-08-20",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "UfPdcGNfRYmK2IwnkFkeIQ",
+            "cLabel": "Awwwards MOTW"
+          },
+          {
+            "id": "Jc0QucyMTsmoi0Vy8gwnPw",
+            "cLabel": "FWA FOTD"
+          },
+          {
+            "id": "Zn0Q1O-2RFW1n0tj2qg2Hw",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "XqAFhCRgSRu90GNk8ltxbw",
+        "cTitle": "DDNA",
+        "cUrl": "https://d-d-n-a.com/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2020-02-14",
+        "cAgency": {
+          "cTitle": "Wonderland"
+        },
+        "cRecognitions": [
+          {
+            "id": "biurKlXRQpSkCDNHLMxsCA",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          }
+        ]
+      },
+      {
+        "id": "eJusiWXITG6YvdwEEQYYDA",
+        "cTitle": "Zhenya Rynzhuk",
+        "cUrl": "https://zhenyary.com/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2019-09-01",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "SELs2wZ7Sq2v3unZ6tgSMA",
+            "cLabel": "Webby"
+          },
+          {
+            "id": "QMxuLuQ2Re-YdIvKNOPUpw",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "I5IjrjiVR_uEeiHNovJRXg",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "QsbSIjxBQBG3OLCSfC3XEg",
+        "cTitle": "Romain Avalle (2019)",
+        "cUrl": "https://romain-avalle-2019.netlify.app/",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2019-06-27",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "TKlvdtaWRge8T50M5Ye8yQ",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "U1N9FJ0GS9m-nEBXbfEPzw",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "YTaypUhGQPyqzbMjur3vCA",
+        "cTitle": "Veja Project",
+        "cUrl": "https://www.cssdesignawards.com/sites/veja-project/32599/",
+        "cPosition": "Developer",
+        "cWith": "Upian",
+        "cDate": "2019-04-18",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "GD8G3YiBQS-mRQ3B9tez7w",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "EQ2qHVc_TO6g2o_Vc7pnYg",
+        "cTitle": "Ranstad",
+        "cUrl": "https://www.cssdesignawards.com/sites/avec-ou-sans-randstad/34813/",
+        "cPosition": "Developer",
+        "cWith": "Angstrom",
+        "cDate": "2019-03-24",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "aQx7OTO8RJS_sCTwmsB8Vw",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "QaKKagegR9ahooNYKphA9w",
+        "cTitle": "Beauregard",
+        "cUrl": "https://www.awwwards.com/sites/beauregard",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2019-01-11",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "c4Ygt1B4STW2ZSNgvUHGIQ",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          }
+        ]
+      },
+      {
+        "id": "DrPdZ3tTSAOmKFKRHGeHwA",
+        "cTitle": "Beyond Beauty",
+        "cUrl": "https://beyond-beauty.netlify.app/",
+        "cPosition": "Tech lead & Developer",
+        "cWith": "",
+        "cDate": "2018-07-24",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "OraXtpHDTlaJYok6ENMuOA",
+            "cLabel": "Awwwards SOTM"
+          },
+          {
+            "id": "YbqSvsbNRBOk1v3F8ffgPQ",
+            "cLabel": "FWA"
+          },
+          {
+            "id": "EZ0-xdTSSsusj1uzkYHstw",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "SDVucFy1SjC6TVkccYcQjg",
+        "cTitle": "France 98",
+        "cUrl": "https://98.lequipe.fr/",
+        "cPosition": "Developer",
+        "cWith": "Upian",
+        "cDate": "2017-08-12",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": []
+      },
+      {
+        "id": "KQ1H7BglQmSW9fZV7NG7Hw",
+        "cTitle": "Predictive World",
+        "cUrl": "https://www.awwwards.com/sites/predictive-world",
+        "cPosition": "dev",
+        "cWith": "Stink Digital",
+        "cDate": "2016-12-10",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "HY0Ay66sT5GY31EXmkC_zw",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "X2uvm2WcT7qYISohxJS91A",
+            "cLabel": "FWA FOTD"
+          },
+          {
+            "id": "HORAb0aWQfmrSNEbc7ZGCg",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "FC9ze-L_TKG6j1SOTMPjcg",
+        "cTitle": "Remember Everything",
+        "cUrl": "https://www.awwwards.com/sites/the-jason-bourne-experience",
+        "cPosition": "dev",
+        "cWith": "Stink Digital",
+        "cDate": "2016-09-02",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "JFLLMNNnQ82Gh-Y9ZwnhyA",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          },
+          {
+            "id": "FcAh5XeTQuCm55_jLB6Ukw",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "RgIAACdAREKvWb7aXn6__Q",
+        "cTitle": "Les grandes serres de patin",
+        "cUrl": "https://www.cssdesignawards.com/sites/pantins-grandes-serres/33249/",
+        "cPosition": "dev",
+        "cWith": "BETC",
+        "cDate": "2016-07-14",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "azPGiScHRd2AtmQTa9rgKg",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "SpEAW43HT2K7xBum-SC4wQ",
+        "cTitle": "Autavia Cup",
+        "cUrl": "https://www.cssdesignawards.com/sites/autavia-cup/28203/",
+        "cPosition": "devTech",
+        "cWith": "909c",
+        "cDate": "2016-04-02",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "TST1Rx3OS2mfqJQ5E6FKPg",
+            "cLabel": "CssDA"
+          }
+        ]
+      },
+      {
+        "id": "JUxD7a0gRaWsfrscMSHKXw",
+        "cTitle": "Do not track",
+        "cUrl": "https://donottrack-doc.com/",
+        "cPosition": "Developer",
+        "cWith": "Upian",
+        "cDate": "2015-09-13",
+        "cAgency": {
+          "cTitle": "Freelance"
+        },
+        "cRecognitions": [
+          {
+            "id": "eoxlcf8rRMGJU7TGDbMlgw",
+            "cLabel": "FWA FOTD"
+          }
+        ]
+      },
+      {
+        "id": "MabJPdBmTF-4aRgAAQc_4g",
+        "cTitle": "Villebrequin",
+        "cUrl": "https://www.awwwards.com/sites/vilebrequin-magazine",
+        "cPosition": "dev",
+        "cWith": "",
+        "cDate": "2013-09-15",
+        "cAgency": {
+          "cTitle": "5emegauche"
+        },
+        "cRecognitions": [
+          {
+            "id": "D7t4UiiiT9aViKwuCkBZ8A",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          }
+        ]
+      },
+      {
+        "id": "TXgqIFX_QuaN7zwxJ7FjRw",
+        "cTitle": "5 emegauche (2012)",
+        "cUrl": "https://www.awwwards.com/sites/5emegauche-2",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2012-11-14",
+        "cAgency": {
+          "cTitle": "5emegauche"
+        },
+        "cRecognitions": [
+          {
+            "id": "T9nB8q2xTuKpTnjK5Ml2-g",
+            "cLabel": "Awwwards SOTD, Dev Award"
+          }
+        ]
+      },
+      {
+        "id": "VUN1WUOCS7eKJjUYt7t4hg",
+        "cTitle": "5 emegauche (2011)",
+        "cUrl": "https://www.awwwards.com/sites/5emegauche-1",
+        "cPosition": "Developer",
+        "cWith": "",
+        "cDate": "2011-07-05",
+        "cAgency": {
+          "cTitle": "5emegauche"
+        },
+        "cRecognitions": [
+          {
+            "id": "MU498TsORd-avJFSH1MySg",
+            "cLabel": "Awwwards SOTD"
+          }
+        ]
+      }
+    ],
+    "cIndex": {
+      "cDescription": "<p>I'm Romain Avalle, an interactive developer with 20 years of dedicated experience in front-end development and technical team leadership.&nbsp;</p>\n<p>My professional story kicked off in 2006, fresh out of Gobelins at lingoBee in London, shoreditch, where I spent three formative years as a Flash developer, yeah... Remember flash ???&nbsp;</p>\n<p>After a year off traveling, I came back to France, I transitioned into a leadership capacity as Lead Front-End Developer at 5emegauche, successfully leading development teams for five years. This period of strategic growth was followed by another five years of successful full freelance work, cultivating a versatile skill set, before I joined Wonderland in Amsterdam.</p>\n<p>Currently, as the Lead Interactive Developer at LG2 in Montreal, I am an expert in digital development and a technical team leader, managing and delivering complex digital projects. My role at LG2 allows me to support a big team of multidisciplinary talents, oversee the evolution of innovative solutions, and ensure the success of major mandates for a variety of clients.</p>\n<p>I'm Romain Avalle, an interactive developer who's been making the web move for 20 years.</p>\n<p>It started in 2006, fresh out of Gobelins: I moved to London barely speaking English, collected glasses in Shoreditch clubs, then landed my first dev job as a Flash developer at LingoBee, yeah... Remember Flash???</p>\n<p>Back in Paris, I spent five years at 5emegauche crafting sites for Dior, Bulgari and Van Cleef &amp; Arpels, then went freelance alongside studios like Stink, Upian, BETC and Rally Interactive.</p>\n<p>Amsterdam came next with Wonderland, then Montréal with LG2.</p>\n<p>Today I'm Team Lead &amp; Tech Lead at REF Digital, where I lead dev teams and ship complex digital projects, from first sketch to production. I care about technical rigor without the jargon, real collaboration with designers and clients, and quality that holds up in production. Behind the scenes, I help shape how we work: R&amp;D, hiring, training, and cutting friction out of the process. <br>Twenty years in, I still get the same kick when something on screen comes alive.</p>",
+      "cHero": {
+        "url": "https://www.datocms-assets.com/161518/1757799426-ra.jpg",
+        "width": 1400,
+        "height": 1213
+      },
+      "cHeroMobile": {
+        "url": "https://www.datocms-assets.com/161518/1757799426-ra.jpg",
+        "width": 1400,
+        "height": 1213
+      },
+      "cMail": {
+        "url": "https://www.datocms-assets.com/161518/1757799569-lets-talk.jpg",
+        "width": 1401,
+        "height": 399
+      },
+      "cMailMobile": {
+        "url": "https://www.datocms-assets.com/161518/1759807008-lets-talk-mobile.jpg",
+        "width": 456,
+        "height": 495
+      },
+      "cProjects": {
+        "url": "https://www.datocms-assets.com/161518/1757799559-select-projects.jpg",
+        "width": 1401,
+        "height": 249
+      },
+      "cProjectsMobile": {
+        "url": "https://www.datocms-assets.com/161518/1759807004-select-projects-sml.jpg",
+        "width": 546,
+        "height": 389
+      }
+    }
+  }
+}

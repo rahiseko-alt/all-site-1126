@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+@theme {
+  --spacing: 0.1rem;
+  --default-transition-duration: 0.15s;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  --color-white: #fff;
+  --color-black: #000;
+  --breakpoint-s: 650px;
+  --breakpoint-l: 1024px;
+  --text-12: 1.2rem;
+}
+
+@custom-variant has-hover (@media (hover: hover) and (pointer: fine));
+
+@font-face {
+  font-family: RemusVariableVF;
+  src:
+    url(./fonts/RemusVariableVF.Cr3_a1cP.woff2) format("woff2"),
+    url(./fonts/RemusVariableVF.Coq6sNE4.woff) format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  font-stretch: 45% 100%;
+}
+
+@font-face {
+  font-family: andale-mono;
+  src:
+    url(./fonts/AndaleMono.B_ce-kjs.woff2) format("woff2"),
+    url(./fonts/AndaleMono.DTdWX96f.woff) format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: comic-mono;
+  src:
+    url(./fonts/ComicMono-Bold.KJUb2rOM.woff2) format("woff2"),
+    url(./fonts/ComicMono-Bold.DS90UyJz.woff) format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --size: 375;
+  --lvh: 1lvh;
+  --dvh: 1dvh;
+  --svh: 1svh;
+}
+
+@media (width >= 800px) {
+  :root {
+    --size: 1400;
+  }
+}
+
+html {
+  font-size: calc(10 * (100vw / var(--size)));
+  -webkit-text-size-adjust: none;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: #0000;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: RemusVariableVF, Arial, Helvetica, sans-serif;
+  font-weight: 610;
+}
+
+body .konami {
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-weight: 600;
+}
+
+.text-regular,
+body {
+  font-variation-settings: "wght" 600;
+  letter-spacing: -0.03rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.text-12,
+.text-small {
+  font-size: 1.2rem;
+}
+
+.text-large {
+  letter-spacing: -0.06rem;
+  font-size: 3.2rem;
+  font-stretch: 45%;
+  line-height: 1.05;
+}
+
+.x-large {
+  font-size: 4.8rem;
+  line-height: 1.05;
+}
+
+.site-grid {
+  padding-inline: calc(var(--spacing) * 20);
+}
+
+.site-grid,
+.site-grid-inner {
+  -moz-column-gap: calc(var(--spacing) * 20);
+  column-gap: calc(var(--spacing) * 20);
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  display: grid;
+}
+
+@media (width >= 1024px) {
+  .site-grid {
+    padding-inline: calc(var(--spacing) * 20);
+  }
+  .inner .site-grid,
+  .site-grid {
+    -moz-column-gap: calc(var(--spacing) * 20);
+    column-gap: calc(var(--spacing) * 20);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin-inline: auto;
+    display: grid;
+  }
+  .inner .site-grid {
+    padding-inline: 0;
+  }
+  .site-grid-inner {
+    -moz-column-gap: calc(var(--spacing) * 20);
+    column-gap: calc(var(--spacing) * 20);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    display: grid;
+  }
+  .text-large {
+    letter-spacing: -0.06rem;
+    font-size: 4rem;
+    font-stretch: 45%;
+    line-height: 1.05;
+  }
+}
+
+p + p {
+  margin-top: 4rem;
+}
+
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.split-line {
+  will-change: transform, opacity;
+  display: block;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: none;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+main.black .bg,
+main.black .common-loader {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+main.black footer .inner,
+main.white .bg,
+main.white .common-loader {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+main.white footer .inner {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+::view-transition-old(root) {
+  mix-blend-mode: normal;
+  animation: none;
+}
+
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation: none;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+.lenis.lenis-autoToggle {
+  transition-behavior: allow-discrete;
+  transition-property: overflow;
+  transition-duration: 1ms;
+}
+
+.common-scene {
+  height: 100lvh;
+}

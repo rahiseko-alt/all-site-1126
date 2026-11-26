@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>クチコミ分析AI 機能別競合比較表</title>
+<style>
+  body { font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; margin: 20px; background: #f8f9fa; color: #1e293b; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  p.sub { color: #666; font-size: 13px; margin-top: 0; }
+
+  /* --- 比較表 --- */
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); font-size: 14px; }
+  th, td { border: 1px solid #d0d0d0; padding: 7px 10px; text-align: left; }
+  th { background: #2c3e50; color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 2; }
+  th.ours { background: #ea580c; }
+  tr.cat td { background: #34495e; color: #fff; font-weight: 700; font-size: 14px; }
+  tr:nth-child(even):not(.cat) { background: #f4f6f8; }
+  tr:hover:not(.cat) { background: #eaf0f6; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .partial { color: #d97706; font-weight: 700; }
+  .unique { background: #ecfdf5; }
+  .gap { background: #fef2f2; }
+  .num { text-align: center; width: 30px; color: #888; }
+  .comp { text-align: center; width: 70px; font-size: 15px; }
+  .dev { text-align: center; width: 50px; }
+  .dev input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
+  .prog { text-align: center; width: 80px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .prog-live { color: #16a34a; }
+  .prog-new { color: #2563eb; background: #dbeafe; }
+  .prog-fix { color: #7c3aed; background: #ede9fe; }
+  .prog-wip { color: #d97706; background: #FFF3E0; }
+  .prog-skip { color: #6b7280; background: #f3f4f6; }
+  .prog-no { color: #bbb; }
+  .note { font-size: 12px; color: #666; min-width: 140px; cursor: text; }
+  .note:empty::before { content: 'メモ...'; color: #ccc; font-style: italic; }
+  .note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+  .mono-note { font-size: 12px; color: #444; min-width: 100px; cursor: text; text-align: left; }
+  .mono-note:empty::before { content: '記入...'; color: #ccc; font-style: italic; }
+  .mono-note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+
+  /* --- 凡例 --- */
+  .legend { margin: 12px 0 16px; font-size: 13px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+  /* --- ツールバー --- */
+  .toolbar { margin: 16px 0; display: flex; gap: 12px; align-items: center; }
+  .toolbar button { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .toolbar button:hover { background: #1d4ed8; }
+  .toolbar .btn-cluster { background: #7c3aed; }
+  .toolbar .btn-cluster:hover { background: #6d28d9; }
+  .toolbar .status { font-size: 13px; color: #16a34a; font-weight: 600; display: none; }
+  .toolbar .export-link { font-size: 12px; color: #64748b; cursor: pointer; text-decoration: underline; margin-left: 8px; }
+  .toolbar .export-link:hover { color: #2563eb; }
+
+  /* --- クラスタリング結果 --- */
+  .cluster-result { background: #fff; border: 2px solid #7c3aed; border-radius: 8px; padding: 20px; margin: 16px 0; display: none; }
+  .cluster-result h3 { margin: 0 0 12px; color: #7c3aed; }
+  .cluster-group { margin: 8px 0; padding: 10px; background: #f8f7ff; border-radius: 6px; }
+  .cluster-group strong { font-size: 14px; }
+  .cluster-group .items { font-size: 12px; color: #555; margin-top: 4px; }
+  .cluster-group .var-tag { font-size: 11px; color: #7c3aed; margin-left: 8px; }
+  .cluster-actions { margin-top: 12px; display: flex; gap: 8px; }
+  .cluster-actions button { padding: 8px 20px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .cluster-actions .btn-apply { background: #7c3aed; color: #fff; }
+  .cluster-actions .btn-cancel { background: #e2e8f0; color: #475569; }
+
+  /* --- プロダクト定義 --- */
+  .product-def { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .product-def h2 { margin: 0 0 12px; font-size: 16px; }
+  .def-table { width: 100%; border-collapse: collapse; box-shadow: none; }
+  .def-table th { background: #f1f5f9; color: #334155; width: 30px; text-align: center; font-size: 16px; padding: 10px; }
+  .def-table td:nth-child(2) { width: 220px; font-weight: 600; font-size: 13px; padding: 10px; }
+  .def-table td:nth-child(3) { font-size: 13px; padding: 10px; cursor: text; }
+  .def-table td:nth-child(3):empty::before { content: 'クリックして入力...'; color: #ccc; font-style: italic; }
+  .def-table td:nth-child(3):focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+
+  /* --- スコア集計 --- */
+  .score-table { margin-top: 20px; width: auto; font-size: 14px; }
+  .score-table th { background: #2c3e50; color: #fff; padding: 6px 16px; }
+  .score-table td { padding: 6px 16px; text-align: center; }
+
+  /* --- ポジショニング勢力図 --- */
+  .pos-section { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; margin: 24px 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .pos-section h2 { margin: 0 0 8px; }
+  .pos-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; font-size: 13px; flex-wrap: wrap; }
+  .pos-controls select { padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+  .pos-controls .auto-tag { background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .pos-empty { color: #94a3b8; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
+  .pos-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 12px; }
+  .pos-legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .pos-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  /* --- サマリー --- */
+  .summary { margin-top: 24px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .summary-box { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; flex: 1; min-width: 220px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .summary-box h3 { margin: 0 0 8px; font-size: 15px; }
+  .summary-box ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; }
+
+  /* --- 月商試算 --- */
+  .cost-sim { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; margin: 24px 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .cost-sim h2 { margin: 0 0 12px; }
+  .cost-sim table { box-shadow: none; }
+  .cost-sim td, .cost-sim th { padding: 8px 12px; }
+  .cost-sim .highlight { background: #fef3c7; font-weight: 700; }
+
+  /* --- タブ --- */
+  .tab-nav { display: flex; gap: 0; margin: 20px 0 0; border-bottom: 2px solid #2c3e50; }
+  .tab-nav button { background: #e2e8f0; color: #475569; border: none; border-radius: 8px 8px 0 0; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; margin-right: 4px; }
+  .tab-nav button.active { background: #2c3e50; color: #fff; }
+  .tab-nav button:hover:not(.active) { background: #cbd5e1; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* --- S4セクション --- */
+  .s4-section { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .s4-section h3 { margin: 0 0 12px; font-size: 15px; color: #2c3e50; }
+  .s4-section table { width: 100%; border-collapse: collapse; font-size: 13px; box-shadow: none; }
+  .s4-section th { background: #f1f5f9; color: #334155; padding: 8px 10px; font-size: 12px; }
+  .s4-section td { padding: 7px 10px; font-size: 12px; }
+  .s4-section .ours-col { background: #fff7ed; }
+  .s4-note { font-size: 12px; color: #64748b; margin: 8px 0 0; line-height: 1.6; }
+  .kill-box { margin: 20px 0; padding: 20px; border-radius: 8px; font-size: 15px; }
+  .kill-pass { background: #ecfdf5; border: 2px solid #16a34a; color: #166534; }
+  .kill-fail { background: #fef2f2; border: 2px solid #dc2626; color: #dc2626; }
+  .risk-box { background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
+  .risk-box h4 { margin: 0 0 8px; color: #d97706; font-size: 14px; }
+  .risk-box ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; }
+  .adopted-tag { background: #dbeafe; color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .alt-tag { background: #f3f4f6; color: #6b7280; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>クチコミ分析AI 機能別 競合比較表</h1>
+<p class="sub">2026-03-18 作成 | 競合: 口コミコム / Location Connect(旧星トルン) / MEOチェキ+星カクトくん / Gyro-n Review+キキコミ</p>
+
+<!-- ===== タブ切り替え ===== -->
+<div class="tab-nav">
+  <button class="tab active" onclick="switchTab('s3')" id="btn-s3">S3: 機能比較</button>
+  <button class="tab" onclick="switchTab('s4')" id="btn-s4">S4: 実現性検証</button>
+</div>
+
+<!-- ===== S3: 機能比較 ===== -->
+<div class="tab-content active" id="tab-s3">
+
+<!-- ===== 開発の方向性（3指標） ===== -->
+<div class="product-def">
+  <h2>開発の方向性</h2>
+  <table class="def-table">
+    <tr>
+      <th>①</th>
+      <td>一言でどんなクチコミ管理ツールか？</td>
+      <td contenteditable="true" data-def="def1">AIがクチコミを全部やってくれる。無料から試せる。</td>
+    </tr>
+    <tr>
+      <th>②</th>
+      <td>狙うポジション</td>
+      <td contenteditable="true" data-def="def2">「安い×ラク×AI」で消極層を動かす。深い分析力は使い始めた後の継続・有料転換の根拠</td>
+    </tr>
+    <tr>
+      <th>③</th>
+      <td>①②の意図 vs 実装計画の過不足</td>
+      <td contenteditable="true" data-def="def3"></td>
+    </tr>
+  </table>
+</div>
+
+<!-- ===== ポジショニング勢力図 ===== -->
+<div class="pos-section">
+  <h2>ポジショニング勢力図</h2>
+  <p style="font-size:12px;color:#64748b;margin:0 0 8px;">
+    カテゴリ別スコアの分散が大きい＝各社が戦略的に差をつけている軸。自動で上位2軸を選出。
+  </p>
+  <div class="pos-controls">
+    <label>X軸: <select id="axisX"></select></label>
+    <label>Y軸: <select id="axisY"></select></label>
+    <span class="auto-tag" id="autoTag">自動選出</span>
+  </div>
+  <div id="posChartArea">
+    <p class="pos-empty">機能表にデータを入力すると自動生成されます</p>
+  </div>
+  <div class="pos-legend" id="posLegend"></div>
+</div>
+
+<!-- ===== ツールバー ===== -->
+<div class="toolbar">
+  <button onclick="save()">保存</button>
+  <button class="btn-cluster" onclick="runClustering()">カテゴリ自動分類</button>
+  <span class="status" id="saveStatus">保存しました</span>
+  <span class="export-link" onclick="exportMd()">Markdown書出</span>
+</div>
+<div class="cluster-result" id="clusterResult"></div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#16a34a"></span> ○ 対応</span>
+  <span><span class="dot" style="background:#d97706"></span> △ 部分対応</span>
+  <span><span class="dot" style="background:#dc2626"></span> × 未対応</span>
+  <span><span class="dot" style="background:#ecfdf5;border:1px solid #a7f3d0"></span> 自社独自</span>
+  <span><span class="dot" style="background:#fef2f2;border:1px solid #fca5a5"></span> 致命的ギャップ</span>
+</div>
+
+<!-- ===== 機能比較表 ===== -->
+<table id="compTable">
+<thead>
+  <tr>
+    <th style="width:30px">#</th>
+    <th>機能</th>
+    <th class="comp ours">クチコミ分析AI</th>
+    <th class="comp">口コミコム</th>
+    <th class="comp">Location Connect</th>
+    <th class="comp">MEOチェキ</th>
+    <th class="comp">Gyro-n</th>
+    <th class="dev">開発</th>
+    <th>進捗</th>
+    <th>備考</th>
+  </tr>
+</thead>
+<tbody>
+
+<!-- ===== クチコミ分析 ===== -->
+<tr class="cat"><td colspan="10">クチコミ分析</td></tr>
+<tr>
+  <td class="num">1</td>
+  <td>感情分析（ポジネガ判定）</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="1" checked></td>
+  <td class="prog prog-live">稼働中</td>
+  <td class="note" contenteditable="true">Gemini 2.5 Flash。-1〜1スコア</td>
+</tr>
+<tr class="unique">
+  <td class="num">2</td>
+  <td>テーマ・キーワード抽出</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="2" checked></td>
+  <td class="prog prog-live">稼働中</td>
+  <td class="note" contenteditable="true">口コミコムと当社のみ。差別化ポイント</td>
+</tr>
+<tr>
+  <td class="num">3</td>
+  <td>QSCA分析（飲食5軸）</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="3"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">口コミコムも明示的搭載は未確認。実質空白地帯</td>
+</tr>
+<tr class="gap">
+  <td class="num">4</td>
+  <td>トレンド分析（評価推移）</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="4"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">致命的ギャップ。全競合が対応</td>
+</tr>
+<tr>
+  <td class="num">5</td>
+  <td>改善提案AI生成</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="5"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">口コミコムの「健康診断」が近い。差別化機会</td>
+</tr>
+<tr>
+  <td class="num">6</td>
+  <td>競合店クチコミ分析</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="6"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">口コミコムのみ。エンタープライズ機能</td>
+</tr>
+
+<!-- ===== AI返信 ===== -->
+<tr class="cat"><td colspan="10">AI返信</td></tr>
+<tr>
+  <td class="num">7</td>
+  <td>AI返信文生成</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="7" checked></td>
+  <td class="prog prog-live">稼働中</td>
+  <td class="note" contenteditable="true">コモディティ化。差別化不可</td>
+</tr>
+<tr>
+  <td class="num">8</td>
+  <td>トーン調整</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="8" checked></td>
+  <td class="prog prog-live">稼働中</td>
+  <td class="note" contenteditable="true">当社3種（丁寧/親しみ/謝罪）。Gyro-nは状況応じ自動</td>
+</tr>
+<tr>
+  <td class="num">9</td>
+  <td>ブランドボイス学習</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="9"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">Gyro-nが最先端（ワンクリック学習+カスタムプロンプト）</td>
+</tr>
+<tr>
+  <td class="num">10</td>
+  <td>自動返信（承認不要）</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="10"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">H13（AI間違えない前提）と直結。ワンタップ承認が落とし所か</td>
+</tr>
+<tr>
+  <td class="num">11</td>
+  <td>多言語AI返信</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="11"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">Gyro-nのみ8言語。インバウンド需要</td>
+</tr>
+<tr>
+  <td class="num">12</td>
+  <td>医療広告ガイドライン対応</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="12"></td>
+  <td class="prog prog-skip">除外</td>
+  <td class="note" contenteditable="true">飲食特化のため対象外</td>
+</tr>
+
+<!-- ===== クチコミ促進 ===== -->
+<tr class="cat"><td colspan="10">クチコミ促進・収集</td></tr>
+<tr class="gap">
+  <td class="num">13</td>
+  <td>QRコード生成</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="13"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">店頭での口コミ依頼に必須</td>
+</tr>
+<tr>
+  <td class="num">14</td>
+  <td>SMS/メール送信</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="14"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">従量課金モデル。MEOチェキ50件¥1,100/Gyro-n¥20通</td>
+</tr>
+<tr>
+  <td class="num">15</td>
+  <td>アンケート連携</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="15"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">Gyro-nキキコミは特許取得（中立的設問構成）</td>
+</tr>
+<tr>
+  <td class="num">16</td>
+  <td>クチコミ文生成アシスト</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="16"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">来店客のクチコミ投稿をAIアシスト</td>
+</tr>
+<tr>
+  <td class="num">17</td>
+  <td>クーポン/インセンティブ</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="17"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+
+<!-- ===== 通知・アラート ===== -->
+<tr class="cat"><td colspan="10">通知・アラート</td></tr>
+<tr class="gap">
+  <td class="num">18</td>
+  <td>新着クチコミ通知（メール）</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="18"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">致命的ギャップ。クチコミ管理の生命線</td>
+</tr>
+<tr>
+  <td class="num">19</td>
+  <td>低評価アラート</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="19"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">MEOチェキは急降下アラート（プロプラン以上）</td>
+</tr>
+
+<!-- ===== レポート・可視化 ===== -->
+<tr class="cat"><td colspan="10">レポート・可視化</td></tr>
+<tr class="gap">
+  <td class="num">20</td>
+  <td>ダッシュボード</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="20"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">致命的ギャップ。可視化なしでは改善効果を実感できない</td>
+</tr>
+<tr class="gap">
+  <td class="num">21</td>
+  <td>CSV/PDFエクスポート</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="21"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">経営者がチームに共有する手段</td>
+</tr>
+<tr>
+  <td class="num">22</td>
+  <td>店舗間比較</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="22"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">複数店舗向け。MVP対象外の可能性</td>
+</tr>
+
+<!-- ===== プラットフォーム連携 ===== -->
+<tr class="cat"><td colspan="10">プラットフォーム連携</td></tr>
+<tr>
+  <td class="num">23</td>
+  <td>Google対応</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="23" checked></td>
+  <td class="prog prog-live">稼働中</td>
+  <td class="note" contenteditable="true">Google Places API</td>
+</tr>
+<tr>
+  <td class="num">24</td>
+  <td>食べログ対応</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="24"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">口コミコムのみ。公式連携は参入障壁</td>
+</tr>
+<tr>
+  <td class="num">25</td>
+  <td>Yahoo!プレイス対応</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="25"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">26</td>
+  <td>Instagram連携</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="26"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">27</td>
+  <td>複数サイト一括管理</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="27"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">口コミコム32サイト。圧倒的</td>
+</tr>
+
+<!-- ===== 管理・セキュリティ ===== -->
+<tr class="cat"><td colspan="10">管理・セキュリティ</td></tr>
+<tr class="gap">
+  <td class="num">28</td>
+  <td>認証/ログイン</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="28"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">致命的ギャップ。H12（ワンタップ級の簡便さ必須）</td>
+</tr>
+<tr>
+  <td class="num">29</td>
+  <td>マルチ店舗管理</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="29"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">ターゲットは1-5店舗。最低限必要</td>
+</tr>
+<tr>
+  <td class="num">30</td>
+  <td>ユーザー権限管理</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="dev"><input type="checkbox" data-id="30"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">MVP対象外の可能性</td>
+</tr>
+
+<!-- ===== 料金詳細（実数値） ===== -->
+<tr class="cat"><td colspan="10">料金詳細（実数値）</td></tr>
+<tr>
+  <td class="num">31</td>
+  <td>初期費用</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥0</td>
+  <td class="comp">非公開</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥0</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">Gyro-nキキコミのみ初期費用あり（非公開）</td>
+</tr>
+<tr>
+  <td class="num">32</td>
+  <td>最低月額（税込）</td>
+  <td class="comp">¥0/¥980</td>
+  <td class="comp">非公開</td>
+  <td class="comp">非公開</td>
+  <td class="comp">¥0/¥3,278</td>
+  <td class="comp">¥1,650</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">当社=無料+有料¥980。MEOチェキ=フリープラン+エントリー¥3,278。Gyro-n=基本¥1,500(税別)</td>
+</tr>
+<tr>
+  <td class="num">33</td>
+  <td>口コミ管理込み月額</td>
+  <td class="comp">¥0/¥980</td>
+  <td class="comp">非公開</td>
+  <td class="comp">非公開</td>
+  <td class="comp">¥11,000〜</td>
+  <td class="comp">¥2,750</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">MEOチェキ=for レビュー¥11,000〜。Gyro-n=クチコミ対策パック¥2,500(税別)</td>
+</tr>
+<tr>
+  <td class="num">34</td>
+  <td>SMS従量課金</td>
+  <td class="comp">—</td>
+  <td class="comp">—</td>
+  <td class="comp">—</td>
+  <td class="comp">50件¥1,100</td>
+  <td class="comp">¥20/通</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">Gyro-nデバイス送信なら¥0</td>
+</tr>
+<tr>
+  <td class="num">35</td>
+  <td>最低契約期間</td>
+  <td class="comp">なし</td>
+  <td class="comp">不明</td>
+  <td class="comp">不明</td>
+  <td class="comp">不明</td>
+  <td class="comp">なし</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">Gyro-nキキコミのみ6ヶ月</td>
+</tr>
+
+<!-- ===== マネタイズ動線（競合の実態） ===== -->
+<tr class="cat"><td colspan="10">マネタイズ動線（競合の実態）</td></tr>
+<tr>
+  <td class="num">36</td>
+  <td>無料プランの範囲（何が無料か）</td>
+  <td class="mono-note" contenteditable="true">設計中（S5で決定）</td>
+  <td class="mono-note" contenteditable="true">なし。初月無料トライアルのみ</td>
+  <td class="mono-note" contenteditable="true">なし。資料請求→商談型</td>
+  <td class="mono-note" contenteditable="true">フリープラン: 一部機能。自動更新なし</td>
+  <td class="mono-note" contenteditable="true">なし。2週間無料トライアル</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">37</td>
+  <td>有料化トリガー（何で制限/飢えさせるか）</td>
+  <td class="mono-note" contenteditable="true">設計中（S5で決定）</td>
+  <td class="mono-note" contenteditable="true">機能制限（AI返信等はプランによる）</td>
+  <td class="mono-note" contenteditable="true">接客研修・採用支援等の上位サービス</td>
+  <td class="mono-note" contenteditable="true">フリー→有料: 自動更新+全機能解放。順位計測→口コミ管理→多店舗で段階拡張</td>
+  <td class="mono-note" contenteditable="true">基本→クチコミ対策パック: Review機能追加。Review→キキコミ: 口コミ獲得力追加</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">38</td>
+  <td>低額→上位プランの誘導要素</td>
+  <td class="mono-note" contenteditable="true">設計中（S5で決定）</td>
+  <td class="mono-note" contenteditable="true">店舗数増→ボリュームディスカウント。専任担当者（11店舗〜）</td>
+  <td class="mono-note" contenteditable="true">ロイヤルカスタマー専用（研修・採用支援）</td>
+  <td class="mono-note" contenteditable="true">プロダクトライン拡大（MEOチェキ→for レビュー→for 複数店舗）</td>
+  <td class="mono-note" contenteditable="true">サイテーション連携(+¥4,500)、追加キーワード、競合モニタリング</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">39</td>
+  <td>課金ゲート種別（機能/容量/店舗数/期間）</td>
+  <td class="mono-note" contenteditable="true">設計中（S5で決定）</td>
+  <td class="mono-note" contenteditable="true">機能+店舗数（カスタム見積もり）</td>
+  <td class="mono-note" contenteditable="true">機能+サービスレベル</td>
+  <td class="mono-note" contenteditable="true">機能（プロダクト別）+店舗数（多店舗向け）+従量（SMS）</td>
+  <td class="mono-note" contenteditable="true">機能（パック別）+店舗数+従量（SMS）+オプション</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+
+</tbody>
+</table>
+
+<!-- ===== 月商500万試算 ===== -->
+<div class="cost-sim">
+  <h2>月商500万円の飲食個人店（1店舗）年間コスト試算</h2>
+  <p style="font-size:12px;color:#666;margin:0 0 12px;">前提: 1店舗・口コミ管理機能利用・SMS月50通利用想定</p>
+  <table>
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th class="comp ours">クチコミ分析AI</th>
+        <th class="comp">口コミコム</th>
+        <th class="comp">Location Connect</th>
+        <th class="comp">MEOチェキ</th>
+        <th class="comp">Gyro-n</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>初期費用</td>
+        <td class="comp">¥0</td>
+        <td class="comp">¥0</td>
+        <td class="comp">非公開</td>
+        <td class="comp">¥0</td>
+        <td class="comp">¥0</td>
+      </tr>
+      <tr>
+        <td>月額基本料 × 12</td>
+        <td class="comp">¥11,760</td>
+        <td class="comp">非公開</td>
+        <td class="comp">非公開</td>
+        <td class="comp">¥132,000</td>
+        <td class="comp">¥33,000</td>
+      </tr>
+      <tr>
+        <td>SMS費用（50通×12月）</td>
+        <td class="comp">—</td>
+        <td class="comp">—</td>
+        <td class="comp">—</td>
+        <td class="comp">¥13,200</td>
+        <td class="comp">¥12,000</td>
+      </tr>
+      <tr class="highlight" style="background:#fef3c7;">
+        <td><strong>年間合計</strong></td>
+        <td class="comp" style="font-weight:700;color:#ea580c;">¥11,760</td>
+        <td class="comp" style="font-weight:700;">非公開（推定¥120,000〜）</td>
+        <td class="comp" style="font-weight:700;">非公開</td>
+        <td class="comp" style="font-weight:700;">¥145,200</td>
+        <td class="comp" style="font-weight:700;">¥45,000</td>
+      </tr>
+      <tr>
+        <td>対当社比</td>
+        <td class="comp">—</td>
+        <td class="comp">推定10倍以上</td>
+        <td class="comp">—</td>
+        <td class="comp">約12.3倍</td>
+        <td class="comp">約3.8倍</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:11px;color:#999;margin-top:8px;">※口コミコムの推定は比較サイト情報から。正確な金額は要問い合わせ。MEOチェキはfor レビュー(¥11,000/月)で算出。Gyro-nはクチコミ対策パック(¥2,750/月)で算出</p>
+</div>
+
+<!-- スコア集計（JS自動計算） -->
+<table class="score-table" id="scoreTable">
+<thead>
+  <tr><th></th><th>○ 対応</th><th>△ 部分</th><th>× 未対応</th><th>対応率</th></tr>
+</thead>
+<tbody id="scoreBody">
+</tbody>
+</table>
+
+<!-- サマリー3種 -->
+<div class="summary">
+  <div class="summary-box" style="border-left: 4px solid #dc2626;">
+    <h3>致命的ギャップ（競合にあり/自社にない）</h3>
+    <ul id="gapList">
+      <li><strong>#4 トレンド分析</strong> — 改善効果の可視化不可。全競合が対応</li>
+      <li><strong>#18 新着クチコミ通知</strong> — 管理ツールの生命線。H11に直結</li>
+      <li><strong>#20 ダッシュボード</strong> — 全競合が対応</li>
+      <li><strong>#21 CSV/PDFエクスポート</strong> — チーム共有手段なし</li>
+      <li><strong>#28 認証/ログイン</strong> — URL知っていれば誰でもアクセス可能</li>
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #16a34a;">
+    <h3>自社独自の武器（競合にない or 限定的）</h3>
+    <ul id="uniqueList">
+      <li><strong>#2 テーマ抽出</strong> — 口コミコムと当社のみ。¥980で提供は当社だけ</li>
+      <li><strong>#8 トーン調整(3種)</strong> — 国内で明示的に3トーン選択可能なのは少数</li>
+      <li><strong>価格</strong> — 口コミ管理込み¥980/月は最安。次点Gyro-n¥2,750の約1/3</li>
+      <li><strong>セルフサービス</strong> — 営業不要。登録→即利用。個人店の心理的ハードル最低</li>
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #2563eb;">
+    <h3>差別化機会</h3>
+    <ul id="oppList">
+      <li><strong>#3 QSCA分析</strong> — 実質空白地帯。飲食5軸で先行すれば独自ポジション確立</li>
+      <li><strong>#5 改善提案AI生成</strong> — 口コミコムの「健康診断」が近いがエンタープライズ。¥980で提供できれば破壊的</li>
+      <li><strong>#13 QRコード生成</strong> — 店頭での口コミ促進。実装コスト低、効果大</li>
+      <li><strong>「AI×無料」フック</strong> — 消極層を動かす集客導線。競合は機能訴求が主で心理的ハードル設計が甘い</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /tab-s3 -->
+
+<!-- ===== S4: 実現性検証 ===== -->
+<div class="tab-content" id="tab-s4">
+
+<h2>S4: 実現性検証 — 外部連携選定</h2>
+<p class="sub">P0#7〜#12 | 調査日: 2026-03-19 | 出典: 各社求人票(Findy/Green/HERP) + Google Cloud公式事例 + 公式サイト</p>
+
+<!-- #7 外部連携洗い出し -->
+<div class="s4-section">
+  <h3>#7 この商品に必要な外部連携を洗い出す</h3>
+  <table>
+    <thead>
+      <tr><th>#</th><th>カテゴリ</th><th>用途</th><th>現採用</th><th>必須度</th><th>MVP必須</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>AI/NLP</td><td>感情分析・テーマ抽出・AI返信文生成</td><td>Gemini 2.5 Flash</td><td>必須</td><td class="yes">○</td></tr>
+      <tr><td>2</td><td>DB</td><td>クチコミ・ユーザー・店舗・分析結果の永続化</td><td>Prisma v6 + SQLite (→Postgres)</td><td>必須</td><td class="yes">○</td></tr>
+      <tr><td>3</td><td>ホスティング</td><td>Next.jsアプリのデプロイ・API Routes実行</td><td>Vercel (予定)</td><td>必須</td><td class="yes">○</td></tr>
+      <tr><td>4</td><td>決済</td><td>月額サブスク課金 (¥980/月)</td><td>Stripe (予定・未実装)</td><td>推奨</td><td class="partial">△</td></tr>
+      <tr><td>5</td><td>クチコミAPI</td><td>Googleクチコミの自動収集・新着検知</td><td>Google Places API (New)</td><td>必須</td><td class="yes">○</td></tr>
+      <tr><td>6</td><td>認証/Auth</td><td>ログイン・セッション管理・マルチ店舗アクセス制御</td><td>なし</td><td>必須</td><td class="yes">○</td></tr>
+      <tr><td>7</td><td>メール送信</td><td>新着クチコミ通知・アカウント関連メール</td><td>なし</td><td>必須</td><td class="yes">○</td></tr>
+      <tr><td>8</td><td>モニタリング</td><td>エラー検知・パフォーマンス監視</td><td>なし</td><td>推奨</td><td class="partial">△</td></tr>
+      <tr><td>9</td><td>DNS/CDN</td><td>独自ドメイン・CDN配信・DDoS防御</td><td>なし</td><td>推奨</td><td class="partial">△</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- #8 競合技術スタック比較 -->
+<div class="s4-section">
+  <h3>#8 競合が何を使ってるか調べる</h3>
+  <table>
+    <thead>
+      <tr><th>カテゴリ</th><th style="background:#ea580c;color:#fff;">クチコミ分析AI</th><th>口コミコム</th><th>Location Connect</th><th>MEOチェキ</th><th>Gyro-n</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>フロントエンド</strong></td><td class="ours-col">Next.js 16 + React 19</td><td>Vue.js, React</td><td>React, TypeScript</td><td>PHP, jQuery, Vue.js</td><td>JavaScript, TypeScript</td></tr>
+      <tr><td><strong>バックエンド</strong></td><td class="ours-col">Next.js API Routes</td><td>Ruby on Rails</td><td>Rails (推定)</td><td>PHP, Laravel</td><td>Java, Scala, Spring</td></tr>
+      <tr><td><strong>DB</strong></td><td class="ours-col">SQLite→Postgres予定</td><td>PostgreSQL, ES, Redis, BigQuery</td><td>非公開</td><td>MySQL, Redis</td><td>MySQL, PostgreSQL</td></tr>
+      <tr><td><strong>インフラ</strong></td><td class="ours-col">Vercel (予定)</td><td>AWS + GCP</td><td>AWS</td><td>AWS</td><td>AWS</td></tr>
+      <tr><td><strong>AI/NLP</strong></td><td class="ours-col">Gemini 2.5 Flash</td><td>Vertex AI, BigQuery ML, Cloud NL API</td><td>非公開</td><td>非公開 (生成AI返信あり)</td><td>非公開 (8言語AI返信)</td></tr>
+      <tr><td><strong>API連携</strong></td><td class="ours-col">Google Places API</td><td>GBP API + 32サイト</td><td>GBP API, Instagram</td><td>GBP API</td><td>GBP API, Yahoo!, Instagram</td></tr>
+      <tr><td><strong>決済</strong></td><td class="ours-col">Stripe (予定)</td><td>非公開</td><td>非公開</td><td>非公開</td><td>非公開</td></tr>
+      <tr><td><strong>通知</strong></td><td class="ours-col">Resend (予定)</td><td>非公開</td><td>QR, LINE, SMS</td><td>SMS, Email, QR</td><td>メール</td></tr>
+      <tr><td><strong>監視</strong></td><td class="ours-col">Sentry (予定)</td><td>Datadog, Sentry</td><td>DataDog</td><td>Crowdwatch, Sentry, Mackerel</td><td>非公開</td></tr>
+    </tbody>
+  </table>
+  <p class="s4-note"><strong>出典:</strong> mov Findy/Green求人 | Google Cloud公式事例(Vertex AI導入) | エフェクチュアル HERP求人 | GMOトライハッチ Green求人 | ユニヴァ・ジャイロン Green求人</p>
+  <p class="s4-note"><strong>特筆:</strong> 全競合がAWSを採用。口コミコムのみGCPを併用（AI基盤にVertex AI）。当社のVercel選択は業界内で唯一のサーバーレスアプローチ</p>
+</div>
+
+<!-- #9 カテゴリ別候補比較 -->
+<div class="s4-section">
+  <h3>#9 各カテゴリで候補を2つ以上出す</h3>
+  <table>
+    <thead>
+      <tr><th>カテゴリ</th><th>候補</th><th></th><th>無料枠</th><th>有料料金</th><th>特徴</th></tr>
+    </thead>
+    <tbody>
+      <tr class="cat"><td colspan="6">AI/NLP</td></tr>
+      <tr><td></td><td>Gemini 2.5 Flash</td><td><span class="adopted-tag">採用</span></td><td>250 RPD / 15 RPM</td><td>入力$0.30/出力$2.50 per 1Mトークン</td><td>無料枠あり。日本語良好。Vercel AI SDK対応</td></tr>
+      <tr><td></td><td>OpenAI GPT-4o-mini</td><td><span class="alt-tag">候補</span></td><td>なし</td><td>入力$0.15/出力$0.60 per 1Mトークン</td><td>単価最安クラス。無料枠なし</td></tr>
+      <tr><td></td><td>OpenAI GPT-4.1-nano</td><td><span class="alt-tag">候補</span></td><td>なし</td><td>入力$0.10/出力$0.40 per 1Mトークン</td><td>最安。Batch APIで50%割引可</td></tr>
+
+      <tr class="cat"><td colspan="6">DB</td></tr>
+      <tr><td></td><td>Neon Serverless Postgres</td><td><span class="adopted-tag">採用</span></td><td>500MB, 100 CU-hours/月</td><td>Launch $19/月〜(10GB)</td><td>Vercel公式統合(旧Vercel Postgres後継)。東京リージョン。scale-to-zero</td></tr>
+      <tr><td></td><td>Supabase Postgres</td><td><span class="alt-tag">候補</span></td><td>500MB, 50K MAU</td><td>Pro $25/月(8GB)</td><td>東京リージョン。Auth統合可。1週間非活動でpause</td></tr>
+      <tr><td></td><td>Railway Postgres</td><td><span class="alt-tag">候補</span></td><td>なし</td><td>$5/月+従量</td><td>リージョン選択可。Prisma対応。無料枠なし</td></tr>
+
+      <tr class="cat"><td colspan="6">ホスティング</td></tr>
+      <tr><td></td><td>Vercel Pro</td><td><span class="adopted-tag">採用</span></td><td>Hobby=非商用のみ</td><td>Pro $20/ユーザー/月</td><td>Next.js最適化。ISR/Edge/Fluid Compute。商用はPro必須</td></tr>
+      <tr><td></td><td>Railway</td><td><span class="alt-tag">候補</span></td><td>なし</td><td>$5/月+従量(中規模$8-15/月)</td><td>コンテナベース。Next.js最適化なし</td></tr>
+      <tr><td></td><td>Cloudflare Pages</td><td><span class="alt-tag">候補</span></td><td>無制限リクエスト</td><td>Workers $5/月</td><td>Next.js一部機能に制限あり</td></tr>
+
+      <tr class="cat"><td colspan="6">決済</td></tr>
+      <tr><td></td><td>Stripe</td><td><span class="adopted-tag">採用</span></td><td>初期費用なし(従量のみ)</td><td>3.6%+¥30/件</td><td>日本法人。PayPay対応。Next.js連携豊富</td></tr>
+      <tr><td></td><td>LemonSqueezy</td><td><span class="alt-tag">候補</span></td><td>初期費用なし(従量のみ)</td><td>5%+$0.50/件</td><td>MoR(税務代行)が強み。手数料高い</td></tr>
+
+      <tr class="cat"><td colspan="6">クチコミAPI</td></tr>
+      <tr><td></td><td>Google Places API (New)</td><td><span class="adopted-tag">採用</span></td><td>10,000 req/月(Essentials)</td><td>$2〜7/1,000 req</td><td>現採用。⚠️ 1リクエスト最大5レビュー制限</td></tr>
+      <tr><td></td><td>Google Business Profile API</td><td><span class="alt-tag">候補</span></td><td>無料(OAuth必須)</td><td>無料</td><td>全レビュー取得可。オーナー本人のOAuth認証必須</td></tr>
+
+      <tr class="cat"><td colspan="6">認証/Auth</td></tr>
+      <tr><td></td><td>Auth.js v5 (NextAuth)</td><td><span class="adopted-tag">採用</span></td><td>OSS完全無料</td><td>—</td><td>Next.js公式推奨。Google OAuth対応。UI自前</td></tr>
+      <tr><td></td><td>Clerk</td><td><span class="alt-tag">候補</span></td><td>50,000 MRU/月</td><td>Pro $25/月</td><td>UIコンポーネント込み。DX最高。有料化コスト発生</td></tr>
+      <tr><td></td><td>Supabase Auth</td><td><span class="alt-tag">候補</span></td><td>50,000 MAU/月</td><td>Pro $25/月(含む)</td><td>DB統一時に有利。SSR対応</td></tr>
+
+      <tr class="cat"><td colspan="6">メール送信</td></tr>
+      <tr><td></td><td>Resend</td><td><span class="adopted-tag">採用</span></td><td>3,000通/月(100通/日)</td><td>Pro $20/月(50K通)</td><td>React Email対応。Vercelエコシステム人気</td></tr>
+      <tr><td></td><td>Amazon SES</td><td><span class="alt-tag">候補</span></td><td>3,000通/月(初年12ヶ月)</td><td>$0.10/1,000通</td><td>業界最安。サンドボックス解除が重い</td></tr>
+      <tr><td></td><td>SendGrid</td><td><span class="alt-tag">候補</span></td><td>100通/日</td><td>$19.95/月(50K通)</td><td>実績豊富。無料枠が少ない</td></tr>
+
+      <tr class="cat"><td colspan="6">モニタリング</td></tr>
+      <tr><td></td><td>Vercel Analytics + Sentry</td><td><span class="adopted-tag">採用</span></td><td>Analytics=Pro含む / Sentry=5K errors/月</td><td>—</td><td>Vercel統合。追加コスト0</td></tr>
+      <tr><td></td><td>Axiom</td><td><span class="alt-tag">候補</span></td><td>500GB取込/月</td><td>Team $25/月</td><td>Vercel Log Drain対応。ログ解析に強い</td></tr>
+
+      <tr class="cat"><td colspan="6">DNS/CDN</td></tr>
+      <tr><td></td><td>Cloudflare (無料)</td><td><span class="adopted-tag">採用</span></td><td>完全無料(DNS+CDN+DDoS+SSL)</td><td>Pro $20/ドメイン/月</td><td>東京PoP。WAF。キャッシュ</td></tr>
+      <tr><td></td><td>Vercel DNS</td><td><span class="alt-tag">候補</span></td><td>Pro含む</td><td>—</td><td>ネイティブ統合。追加設定不要</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- #10 フィルタ6項目評価 -->
+<div class="s4-section">
+  <h3>#10 フィルタ6項目で全候補を評価</h3>
+  <p class="s4-note" style="margin:0 0 12px;">①客の想定端末で動くか ②日本語/日本リージョンで制限ないか ③無料枠は客数に足りるか ④落ちたらどうなるか ⑤代わりの手段はあるか ⑥利用規約でうちの使い方が禁止されてないか</p>
+  <table>
+    <thead>
+      <tr><th>採用サービス</th><th>カテゴリ</th><th>①端末互換</th><th>②日本語/JP</th><th>③無料枠充足</th><th>④障害時影響</th><th>⑤代替手段</th><th>⑥利用規約</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Gemini 2.5 Flash</strong></td><td>AI</td><td class="yes">○ サーバー側</td><td class="yes">○ 日本語対応</td><td class="yes">○ 250 RPD</td><td class="partial">△ AI機能停止</td><td class="yes">○ GPT-4o-mini</td><td class="yes">○</td></tr>
+      <tr><td><strong>Neon Postgres</strong></td><td>DB</td><td class="yes">○ サーバー側</td><td class="yes">○ 東京リージョン</td><td class="yes">○ 500MB</td><td class="no">× 全機能停止</td><td class="yes">○ Supabase</td><td class="yes">○</td></tr>
+      <tr><td><strong>Vercel Pro</strong></td><td>ホスティング</td><td class="yes">○ エッジ東京</td><td class="yes">○</td><td class="yes">○ $20/月</td><td class="no">× サイト全停止</td><td class="yes">○ Railway</td><td class="yes">○</td></tr>
+      <tr><td><strong>Stripe</strong></td><td>決済</td><td class="yes">○ ブラウザ</td><td class="yes">○ 日本法人</td><td class="yes">○ 従量のみ</td><td class="partial">△ 課金停止</td><td class="partial">△ LemonSqueezy</td><td class="yes">○</td></tr>
+      <tr><td><strong>Google Places API</strong></td><td>クチコミAPI</td><td class="yes">○ サーバー側</td><td class="yes">○</td><td class="yes">○ 10K req/月</td><td class="no">× 取得停止</td><td class="partial">△ 代替困難</td><td class="partial">△ 5件制限</td></tr>
+      <tr><td><strong>Auth.js v5</strong></td><td>認証</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○ OSS無料</td><td class="no">× ログイン不可</td><td class="yes">○ Clerk</td><td class="yes">○</td></tr>
+      <tr><td><strong>Resend</strong></td><td>メール</td><td class="yes">○ サーバー側</td><td class="yes">○</td><td class="yes">○ 3K通/月</td><td class="partial">△ 通知停止</td><td class="yes">○ SES</td><td class="yes">○</td></tr>
+      <tr><td><strong>Sentry</strong></td><td>監視</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○ 5K errors</td><td class="yes">○ 監視停止のみ</td><td class="yes">○ Axiom</td><td class="yes">○</td></tr>
+      <tr><td><strong>Cloudflare</strong></td><td>DNS/CDN</td><td class="yes">○ 東京PoP</td><td class="yes">○</td><td class="yes">○ 完全無料</td><td class="partial">△ DNS停止</td><td class="yes">○ Vercel DNS</td><td class="yes">○</td></tr>
+    </tbody>
+  </table>
+  <p class="s4-note"><strong>結果:</strong> 全サービスが6項目をクリア（致命的不合格なし）。Google Places APIの⑥「5件制限」は機能制約であり利用規約違反ではない。MVPでは新着蓄積方式で回避可能</p>
+</div>
+
+<!-- #11 競合との選択差異 -->
+<div class="s4-section">
+  <h3>#11 競合と比較する — 選択の差異分析</h3>
+  <table>
+    <thead>
+      <tr><th>差異</th><th>当社の選択</th><th>競合の選択</th><th>なぜ違う？</th><th>差別化に使えるか？</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>インフラ</strong></td>
+        <td>Vercel (サーバーレス)</td>
+        <td>全4社がAWS</td>
+        <td>競合はエンタープライズ向け。多店舗・チーム・API連携でAWS+独自インフラが必要。当社は個人店1-5店舗でサーバーレスが十分</td>
+        <td class="yes">○ コスト構造の差(¥980可能)に直結</td>
+      </tr>
+      <tr>
+        <td><strong>AI基盤</strong></td>
+        <td>Gemini API直呼び</td>
+        <td>口コミコム=Vertex AI+GCPフルスタック。他3社=非公開</td>
+        <td>口コミコムは32サイト×大量データの処理にGCP基盤が必要。当社はGoogle1サイト×少量でAPI直呼びが合理的</td>
+        <td class="partial">△ 技術差は顧客に見えない。コスト差に転嫁</td>
+      </tr>
+      <tr>
+        <td><strong>DB</strong></td>
+        <td>Neon (サーバーレスPostgres)</td>
+        <td>MySQL/PostgreSQL (EC2/RDS)</td>
+        <td>競合は常時稼働の従来型DB。当社はscale-to-zeroで非稼働時コスト0</td>
+        <td class="yes">○ MVP期のコスト最小化に寄与</td>
+      </tr>
+      <tr>
+        <td><strong>通知手段</strong></td>
+        <td>メールのみ (Resend)</td>
+        <td>SMS+LINE+QR+メール (多チャネル)</td>
+        <td>競合はSMS/LINE従量課金が追加収益源。当社はMVPでメールに絞り複雑さを排除</td>
+        <td class="no">× MVPの制約。将来LINE追加検討</td>
+      </tr>
+      <tr>
+        <td><strong>認証</strong></td>
+        <td>Auth.js (OSS)</td>
+        <td>独自実装 (推定)</td>
+        <td>大手は独自認証基盤。当社はOSSで十分かつコスト0</td>
+        <td class="partial">△ Google OAuthでワンタップログイン(H12対応)</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="s4-note"><strong>総括:</strong> 全競合がAWS(自社運用型)、当社がVercel(サーバーレス型)。競合が「やらない」のではなく「この価格帯ではAWSの固定費が採算に合わない」ことの裏返し。サーバーレス選択が¥980/月の価格設定を可能にしている</p>
+</div>
+
+<!-- #12 採用決定+Kill判定 -->
+<div class="s4-section">
+  <h3>#12 採用決定＋理由を記録</h3>
+  <table>
+    <thead>
+      <tr><th>カテゴリ</th><th>採用サービス</th><th>選定理由</th><th>月額(MVP期)</th><th>移行トリガー</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>AI/NLP</td><td><strong>Gemini 2.5 Flash</strong></td><td>無料枠あり。コスパ最良。日本語良好</td><td>$0</td><td>精度不足時→GPT-4o-mini</td></tr>
+      <tr><td>DB</td><td><strong>Neon Serverless Postgres</strong></td><td>Vercel公式統合。Prisma対応。scale-to-zero</td><td>$0</td><td>500MB超過→Neon有料($19/月)</td></tr>
+      <tr><td>ホスティング</td><td><strong>Vercel Pro</strong></td><td>Next.js最適化。商用利用はPro必須</td><td><strong>$20/月</strong></td><td>— (固定)</td></tr>
+      <tr><td>決済</td><td><strong>Stripe</strong></td><td>日本法人。手数料3.6%。PayPay対応</td><td>$0</td><td>— (従量発生時のみ)</td></tr>
+      <tr><td>クチコミAPI</td><td><strong>Google Places API (New)</strong></td><td>現採用。無料枠10K req。デファクト</td><td>$0</td><td>全レビュー必要→GBP API (OAuth)</td></tr>
+      <tr><td>認証</td><td><strong>Auth.js v5</strong></td><td>OSS無料。Next.js公式推奨</td><td>$0</td><td>DX向上→Clerk</td></tr>
+      <tr><td>メール</td><td><strong>Resend</strong></td><td>3,000通/月無料。React Email対応</td><td>$0</td><td>通数超過→有料($20/月)</td></tr>
+      <tr><td>モニタリング</td><td><strong>Vercel Analytics + Sentry</strong></td><td>ネイティブ統合。追加コスト0</td><td>$0</td><td>—</td></tr>
+      <tr><td>DNS/CDN</td><td><strong>Cloudflare (無料)</strong></td><td>DDoS防御+CDN+SSL。完全無料</td><td>$0</td><td>—</td></tr>
+    </tbody>
+    <tfoot>
+      <tr style="background:#f8fafc;font-weight:700;"><td colspan="3" style="text-align:right;">MVP期 月額合計</td><td colspan="2"><strong>$20/月 (≒¥3,000。Vercel Pro代のみ)</strong></td></tr>
+    </tfoot>
+  </table>
+
+  <h4 style="margin:20px 0 8px;font-size:14px;">Kill条件チェック</h4>
+  <table>
+    <tbody>
+      <tr><td>&#10102; 全候補フィルタ落ち（作れない）</td><td class="yes" style="font-weight:700;">PASS — 全9カテゴリで採用候補あり</td></tr>
+      <tr><td>&#10103; 客の環境で動かせない</td><td class="yes" style="font-weight:700;">PASS — Webブラウザベース。スマホ/PC対応</td></tr>
+      <tr><td>&#10104; 開発コスト¥0制約</td><td class="yes" style="font-weight:700;">PASS — 全サービス無料枠内。唯一のコスト: Vercel Pro $20/月</td></tr>
+    </tbody>
+  </table>
+
+  <div class="kill-box kill-pass">
+    <strong>S4 Kill判定: PASS（続行）</strong><br>
+    全カテゴリで採用サービス確定。開発コスト月額$20のみ。実現可能
+  </div>
+
+  <div class="risk-box">
+    <h4>マスター確認事項（3件）</h4>
+    <ul>
+      <li><strong>Google Places API 5レビュー制限:</strong> 1リクエストで最大5件しかレビューを取得できない。「全クチコミ分析」は不可。MVPでは新着を定期取得→DB蓄積する方式で段階的にデータを貯める。将来的にGBP API(オーナーOAuth)で全レビュー取得へ移行</li>
+      <li><strong>Gemini無料枠のデータ利用:</strong> 無料枠ではクチコミデータがGoogleのモデル改善に利用される。個人店データのため、有料API移行の時期をS5コスト発生マップに含める</li>
+      <li><strong>Vercel Pro $20/月:</strong> 開発コスト¥0制約の唯一の例外。ホスティングは代替困難（Next.js最適化がVercel固有）。許容範囲内か？</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /tab-s4 -->
+
+<script>
+const PRODUCT_KEY = 'review-analysis';
+const SK = PRODUCT_KEY + '-state';
+const COMP_COLORS = ['#ea580c','#3b82f6','#16a34a','#8b5cf6','#ec4899','#64748b','#f59e0b','#06b6d4'];
+
+// ========== タブ切り替え ==========
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-nav button').forEach(el => el.classList.remove('active'));
+  const tab = document.getElementById('tab-' + tabId);
+  const btn = document.getElementById('btn-' + tabId);
+  if (tab) tab.classList.add('active');
+  if (btn) btn.classList.add('active');
+  history.replaceState(null, '', '#' + tabId);
+}
+// URLハッシュでタブ直リンク
+if (location.hash === '#s4') switchTab('s4');
+
+// ========== 保存・復元 ==========
+function gatherState() {
+  const checks = {}, notes = {}, defs = {};
+  document.querySelectorAll('input[data-id]').forEach(cb => { checks[cb.dataset.id] = cb.checked; });
+  document.querySelectorAll('.note[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) notes[i] = el.textContent.trim(); });
+  document.querySelectorAll('.mono-note[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) notes['m'+i] = el.textContent.trim(); });
+  document.querySelectorAll('[data-def]').forEach(el => { defs[el.dataset.def] = el.textContent.trim(); });
+  return { checks, notes, defs, axisX: document.getElementById('axisX').value, axisY: document.getElementById('axisY').value };
+}
+function applyState(state) {
+  if (!state) return;
+  if (state.checks) Object.entries(state.checks).forEach(([id, v]) => { const cb = document.querySelector(`input[data-id="${id}"]`); if (cb) cb.checked = v; });
+  if (state.notes) { const els = document.querySelectorAll('.note[contenteditable]'); const mels = document.querySelectorAll('.mono-note[contenteditable]'); Object.entries(state.notes).forEach(([i, text]) => { if (i.startsWith('m')) { if (mels[+i.slice(1)]) mels[+i.slice(1)].textContent = text; } else { if (els[+i]) els[+i].textContent = text; } }); }
+  if (state.defs) Object.entries(state.defs).forEach(([key, text]) => { const el = document.querySelector(`[data-def="${key}"]`); if (el) el.textContent = text; });
+}
+function save() { localStorage.setItem(SK, JSON.stringify(gatherState())); const el = document.getElementById('saveStatus'); el.style.display = 'inline'; setTimeout(() => el.style.display = 'none', 2500); }
+function loadState() { try { applyState(JSON.parse(localStorage.getItem(SK))); } catch(e) {} }
+function autoSave() { localStorage.setItem(SK, JSON.stringify(gatherState())); }
+document.querySelectorAll('input[data-id]').forEach(cb => cb.addEventListener('change', autoSave));
+document.querySelectorAll('.note[contenteditable], .mono-note[contenteditable], [data-def]').forEach(el => el.addEventListener('blur', autoSave));
+
+// ========== スコア集計 ==========
+function getCompHeaders() { return Array.from(document.querySelectorAll('#compTable thead th.comp')); }
+function isFuncRow(cells) { let ok = false; cells.forEach(c => { if ('○△×'.includes(c.textContent.trim())) ok = true; }); return ok; }
+
+function calcScores() {
+  const headers = getCompHeaders();
+  const scores = {};
+  headers.forEach(th => { scores[th.textContent.trim()] = { yes:0, partial:0, no:0 }; });
+  document.querySelectorAll('#compTable tbody tr:not(.cat)').forEach(row => {
+    const cells = row.querySelectorAll('.comp');
+    if (!cells.length || !isFuncRow(cells)) return;
+    cells.forEach((cell, i) => {
+      const name = headers[i]?.textContent?.trim();
+      if (!name || !scores[name]) return;
+      const t = cell.textContent.trim();
+      if (t === '○') scores[name].yes++; else if (t === '△') scores[name].partial++; else if (t === '×') scores[name].no++;
+    });
+  });
+  const tbody = document.getElementById('scoreBody');
+  tbody.innerHTML = '';
+  Object.entries(scores).forEach(([name, s]) => {
+    const total = s.yes + s.partial + s.no;
+    const rate = total ? Math.round((s.yes + s.partial * 0.5) / total * 100) + '%' : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><strong>${name}</strong></td><td class="yes">${s.yes}</td><td class="partial">${s.partial}</td><td class="no">${s.no}</td><td style="font-weight:700">${rate}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ========== ポジショニング勢力図 ==========
+function getCategoryScores() {
+  const headers = getCompHeaders();
+  const compNames = headers.map(th => th.textContent.trim());
+  const compCount = compNames.length;
+  const rawCats = [];
+  let currentCat = null, catRows = [];
+
+  document.querySelectorAll('#compTable tbody tr').forEach(row => {
+    if (row.classList.contains('cat')) {
+      if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+      currentCat = row.textContent.trim();
+      catRows = [];
+    } else {
+      const cells = row.querySelectorAll('.comp');
+      if (cells.length && isFuncRow(cells)) catRows.push(cells);
+    }
+  });
+  if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+
+  const categories = rawCats.map(cat => {
+    const n = cat.rows.length;
+    const scores = [];
+    for (let ci = 0; ci < compCount; ci++) {
+      let sum = 0;
+      cat.rows.forEach(cells => { const t = cells[ci]?.textContent?.trim(); if (t === '○') sum += 1; else if (t === '△') sum += 0.5; });
+      scores.push(sum);
+    }
+    const normed = scores.map(s => n ? s / n : 0);
+    const mean = normed.reduce((a, b) => a + b, 0) / normed.length;
+    const variance = normed.reduce((a, b) => a + (b - mean) ** 2, 0) / normed.length;
+    return { name: cat.name, scores, maxScore: n, variance };
+  });
+
+  const overallScores = [];
+  for (let ci = 0; ci < compCount; ci++) {
+    let sum = 0;
+    rawCats.forEach(cat => { cat.rows.forEach(cells => { const t = cells[ci]?.textContent?.trim(); if (t === '○') sum += 1; else if (t === '△') sum += 0.5; }); });
+    overallScores.push(sum);
+  }
+  const totalFeatures = rawCats.reduce((a, c) => a + c.rows.length, 0);
+  return { compNames, categories, overallScores, totalFeatures };
+}
+
+function populateAxisSelectors(catData) {
+  const selX = document.getElementById('axisX'), selY = document.getElementById('axisY');
+  selX.innerHTML = ''; selY.innerHTML = '';
+  const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+  sorted.forEach(cat => {
+    const label = `${cat.name} (${cat.maxScore}項目)`;
+    selX.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+    selY.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+  });
+  if (sorted.length >= 2) { selX.value = sorted[0].name; selY.value = sorted[1].name; }
+  try { const state = JSON.parse(localStorage.getItem(SK)); if (state?.axisX && sorted.find(c => c.name === state.axisX)) selX.value = state.axisX; if (state?.axisY && sorted.find(c => c.name === state.axisY)) selY.value = state.axisY; } catch(e) {}
+}
+
+function renderChart(catData) {
+  const area = document.getElementById('posChartArea');
+  const legendEl = document.getElementById('posLegend');
+  const autoTag = document.getElementById('autoTag');
+  if (!catData.categories.length) { area.innerHTML = '<p class="pos-empty">データなし</p>'; return; }
+
+  const axisXName = document.getElementById('axisX').value;
+  const axisYName = document.getElementById('axisY').value;
+  const catX = catData.categories.find(c => c.name === axisXName);
+  const catY = catData.categories.find(c => c.name === axisYName);
+  if (!catX || !catY) return;
+
+  const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+  autoTag.style.display = (sorted.length >= 2 && axisXName === sorted[0].name && axisYName === sorted[1].name) ? 'inline' : 'none';
+
+  const W = 600, H = 440, PAD = 70;
+  const cW = W - PAD * 2, cH = H - PAD * 2;
+  const maxX = catX.maxScore || 1, maxY = catY.maxScore || 1;
+  let svg = `<svg width="${W}" height="${H}" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;">`;
+
+  for (let v = 0; v <= maxX; v++) { const x = PAD + (v / maxX) * cW; svg += `<line x1="${x}" y1="${PAD}" x2="${x}" y2="${PAD+cH}" stroke="${v===0?'#cbd5e1':'#f1f5f9'}"/><text x="${x}" y="${PAD+cH+16}" text-anchor="middle" font-size="10" fill="#94a3b8">${v}</text>`; }
+  for (let v = 0; v <= maxY; v++) { const y = PAD + ((maxY - v) / maxY) * cH; svg += `<line x1="${PAD}" y1="${y}" x2="${PAD+cW}" y2="${y}" stroke="${v===0?'#cbd5e1':'#f1f5f9'}"/><text x="${PAD-8}" y="${y+4}" text-anchor="end" font-size="10" fill="#94a3b8">${v}</text>`; }
+  svg += `<rect x="${PAD}" y="${PAD}" width="${cW}" height="${cH}" fill="none" stroke="#cbd5e1"/>`;
+  svg += `<text x="${PAD+cW/2}" y="${H-8}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">${axisXName}（${maxX}項目中の実装スコア）</text>`;
+  svg += `<text x="16" y="${PAD+cH/2}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569" transform="rotate(-90,16,${PAD+cH/2})">${axisYName}（${maxY}項目中）</text>`;
+
+  const oS = catData.overallScores;
+  const total = catData.totalFeatures || 1;
+  const minO = Math.min(...oS), maxO = Math.max(...oS), oRange = maxO - minO || 1;
+  const bubbleR = oS.map(s => 14 + ((s - minO) / oRange) * 28);
+  const order = catData.compNames.map((_, i) => i).sort((a, b) => bubbleR[b] - bubbleR[a]);
+
+  order.forEach(i => {
+    const vx = catX.scores[i], vy = catY.scores[i];
+    const cx = PAD + (vx / maxX) * cW, cy = PAD + ((maxY - vy) / maxY) * cH;
+    const color = COMP_COLORS[i % COMP_COLORS.length], r = bubbleR[i], isOurs = i === 0;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="${isOurs ? 3 : 1.5}"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}"/>`;
+    const lx = cx + r + 5, ly = cy - 4;
+    svg += `<text x="${lx}" y="${ly}" font-size="11" font-weight="${isOurs ? '700' : '500'}" fill="${color}">${catData.compNames[i]}</text>`;
+    svg += `<text x="${lx}" y="${ly + 13}" font-size="9" fill="#94a3b8">${oS[i]}/${total}項目</text>`;
+  });
+  svg += '</svg>';
+  area.innerHTML = svg;
+
+  let legHtml = catData.compNames.map((n, i) => `<span><span class="pos-dot" style="background:${COMP_COLORS[i%COMP_COLORS.length]}"></span>${n} (${oS[i]}/${total})</span>`).join('');
+  legHtml += '<span style="color:#94a3b8;margin-left:12px;">○=1点 △=0.5点 | バブル大＝総合実装数が多い</span>';
+  legendEl.innerHTML = legHtml;
+}
+
+function updateMap() { const d = getCategoryScores(); if (d.categories.length >= 2) { populateAxisSelectors(d); renderChart(d); } }
+document.getElementById('axisX').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+document.getElementById('axisY').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+
+// ========== カテゴリ自動分類 ==========
+function runClustering() {
+  const headers = getCompHeaders();
+  const compCount = headers.length;
+  if (compCount < 2) { alert('競合が2社以上必要です'); return; }
+  const items = [];
+  document.querySelectorAll('#compTable tbody tr:not(.cat)').forEach(row => {
+    const cells = row.querySelectorAll('.comp');
+    if (!cells.length || !isFuncRow(cells)) return;
+    const numCell = row.querySelector('.num, td:first-child');
+    const nameCell = row.children[1];
+    const id = numCell?.textContent?.trim() || String(items.length + 1);
+    const name = nameCell?.textContent?.trim() || '?';
+    const vals = [];
+    for (let ci = 0; ci < compCount; ci++) {
+      const t = cells[ci]?.textContent?.trim();
+      vals.push(t === '○' ? 1 : t === '△' ? 0.5 : 0);
+    }
+    items.push({ id, name, vals, row });
+  });
+  if (items.length < 4) { alert('4項目以上必要です'); return; }
+  function pearson(a, b) {
+    const n = a.length, ma = a.reduce((s,v) => s+v, 0)/n, mb = b.reduce((s,v) => s+v, 0)/n;
+    let num = 0, da = 0, db = 0;
+    for (let i = 0; i < n; i++) { num += (a[i]-ma)*(b[i]-mb); da += (a[i]-ma)**2; db += (b[i]-mb)**2; }
+    da = Math.sqrt(da); db = Math.sqrt(db);
+    return (da && db) ? num / (da * db) : 0;
+  }
+  const corr = {};
+  items.forEach((a, i) => items.forEach((b, j) => { corr[i+','+j] = pearson(a.vals, b.vals); }));
+  let clusters = {};
+  items.forEach((_, i) => { clusters[i] = [i]; });
+  function cdist(c1, c2) {
+    let t = 0, n = 0;
+    c1.forEach(i => c2.forEach(j => { t += corr[i+','+j]; n++; }));
+    return n ? t / n : 0;
+  }
+  const target = Math.max(5, Math.min(10, Math.round(items.length / 5)));
+  while (Object.keys(clusters).length > target) {
+    let best = null, bsim = -999;
+    const keys = Object.keys(clusters);
+    for (let a = 0; a < keys.length; a++) {
+      for (let b = a + 1; b < keys.length; b++) {
+        const s = cdist(clusters[keys[a]], clusters[keys[b]]);
+        if (s > bsim) { bsim = s; best = [keys[a], keys[b]]; }
+      }
+    }
+    clusters[best[0]] = clusters[best[0]].concat(clusters[best[1]]);
+    delete clusters[best[1]];
+  }
+  const container = document.getElementById('clusterResult');
+  let html = '<h3>カテゴリ自動分類の結果</h3><p style="font-size:12px;color:#666;">ピアソン相関+凝集型クラスタリング。確認後「適用」で表に反映。</p>';
+  const groups = Object.values(clusters).map(members => {
+    members.sort((a, b) => a - b);
+    const avg = new Array(compCount).fill(0);
+    members.forEach(idx => { items[idx].vals.forEach((v, ci) => { avg[ci] += v; }); });
+    avg.forEach((_, ci) => { avg[ci] /= members.length; });
+    const mean = avg.reduce((s,v) => s+v, 0) / avg.length;
+    const variance = avg.reduce((s,v) => s + (v - mean) ** 2, 0) / avg.length;
+    return { members, variance };
+  });
+  groups.sort((a, b) => a.members[0] - b.members[0]);
+  groups.forEach((g, gi) => {
+    const itemList = g.members.map(idx => `#${items[idx].id} ${items[idx].name}`).join('、');
+    html += `<div class="cluster-group"><strong>グループ${gi+1}</strong> <span class="var-tag">分散: ${g.variance.toFixed(3)}</span><div class="items">${itemList}</div></div>`;
+  });
+  html += '<div class="cluster-actions"><button class="btn-apply" onclick="applyClustering()">適用</button><button class="btn-cancel" onclick="document.getElementById(\'clusterResult\').style.display=\'none\'">キャンセル</button></div>';
+  container.innerHTML = html;
+  container.style.display = 'block';
+  container._groups = groups;
+  container._items = items;
+}
+
+function applyClustering() {
+  const container = document.getElementById('clusterResult');
+  const groups = container._groups;
+  const items = container._items;
+  if (!groups || !items) return;
+  const tbody = document.querySelector('#compTable tbody');
+  tbody.querySelectorAll('.cat').forEach(el => el.remove());
+  groups.forEach((g, gi) => {
+    const catRow = document.createElement('tr');
+    catRow.className = 'cat';
+    const colSpan = document.querySelector('#compTable thead tr').children.length;
+    catRow.innerHTML = `<td colspan="${colSpan}">グループ${gi+1}（${g.members.length}項目）</td>`;
+    tbody.appendChild(catRow);
+    g.members.forEach(idx => { tbody.appendChild(items[idx].row); });
+  });
+  container.style.display = 'none';
+  calcScores();
+  updateMap();
+  autoSave();
+}
+
+// ========== Markdown書出 ==========
+function exportMd() {
+  let md = `# ${PRODUCT_KEY} 開発指示チェックリスト\n\n> ${new Date().toISOString().slice(0,19).replace('T',' ')}\n\n`;
+  const d1 = document.querySelector('[data-def="def1"]')?.textContent?.trim();
+  const d2 = document.querySelector('[data-def="def2"]')?.textContent?.trim();
+  const d3 = document.querySelector('[data-def="def3"]')?.textContent?.trim();
+  if (d1||d2||d3) { md += '## 開発の方向性\n\n'; if(d1) md += `1. **一言定義:** ${d1}\n`; if(d2) md += `2. **狙うポジション:** ${d2}\n`; if(d3) md += `3. **意図 vs 実装:** ${d3}\n`; md += '\n'; }
+  md += '## チェック済み（開発対象）\n\n'; let unc = '\n## 未チェック\n\n';
+  document.querySelectorAll('input[data-id]').forEach(cb => {
+    const row = cb.closest('tr'), cells = row.children, id = cb.dataset.id;
+    const name = cells[1]?.textContent, self = cells[2]?.textContent?.trim();
+    const note = cells[cells.length-1]?.textContent?.trim()||'';
+    const icon = self==='○'?'(済)':self==='△'?'(部分)':'(未)';
+    const line = `- [${cb.checked?'x':' '}] #${id} ${name} ${icon}${note?' — '+note:''}\n`;
+    if (cb.checked) md += line; else if (self==='×'||self==='△') unc += line;
+  });
+  const blob = new Blob([md+unc], {type:'text/markdown'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = PRODUCT_KEY + '-dev-checklist.md'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ========== 初期化 ==========
+loadState();
+calcScores();
+updateMap();
+</script>
+
+</body>
+</html>

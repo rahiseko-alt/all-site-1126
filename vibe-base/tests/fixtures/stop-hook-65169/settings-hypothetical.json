@@ -1,0 +1,41 @@
+{
+  "_comment": "本番非適用の仮想 settings。Stop/SubagentStop hook 登録例。本番 settings.json を絶対に上書きしない。",
+  "_source": "tests/fixtures/stop-hook-65169/settings-hypothetical.json",
+  "_related_issue": "https://github.com/anthropics/claude-code/issues/65169",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tests/fixtures/stop-hook-65169/stub-stop-hook.sh",
+            "_comment": "Stop hook: セッション終了時に発火（#65169 解消後に有効化想定）"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tests/fixtures/stop-hook-65169/stub-subagent-stop-hook.sh",
+            "_comment": "SubagentStop hook: Agent ツール完了時に発火（#65169 による Agent PostToolUse 非発火とは別イベント）"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Agent PostToolUse fired' >> /tmp/agent-posttooluse-65169.txt",
+            "_comment": "#65169: このイベントは Agent 完了時に現状発火しない（バグ）。解消後にここで verify-agent 自動連鎖を実装予定。"
+          }
+        ]
+      }
+    ]
+  }
+}

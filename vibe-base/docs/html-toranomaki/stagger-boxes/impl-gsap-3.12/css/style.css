@@ -1,0 +1,55 @@
+:root {
+  --light: #eeeeee;
+  --dark: #161616;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+/* pin される本体。スクロール中は画面に固定される */
+.trigger {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--light);
+  position: relative;
+}
+
+/* 背後に潜むラベル。リボンと同色で隠れ、棒がずれた瞬間に覗く */
+.label {
+  position: absolute;
+  top: calc(50vh - 56px);
+  width: 50%;
+  z-index: 2;
+  margin: 0;
+  text-align: center;
+  font-size: 50px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--light);
+  pointer-events: none;
+}
+.label.down { left: 0; }
+.label.up   { right: 0; }
+
+/* リボン = 横棒の積層 */
+.ribbon {
+  position: relative;
+  z-index: 1;
+}
+
+.box {
+  height: 1.2vh;
+  width: 50%;
+  margin-bottom: -0.2vh;
+  background: var(--dark);
+  display: block;
+  will-change: transform;
+}

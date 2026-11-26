@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>クチコミ分析AI S4 実現性検証</title>
+<style>
+  body { font-family: 'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; margin: 20px; background: #f5f5f0; color: #1e293b; line-height: 1.7; }
+  h1 { font-size: 20px; margin-bottom: 2px; }
+  h2 { font-size: 17px; margin: 32px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #6366f1; }
+  h3 { font-size: 14px; margin: 20px 0 8px; color: #4338ca; }
+  p.sub { color: #666; font-size: 12px; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.08); font-size: 12px; margin-bottom: 16px; }
+  th, td { border: 1px solid #d0d0d0; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #2c3e50; color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 2; font-size: 11px; }
+  tr:nth-child(even) { background: #f8fafc; }
+  tr:hover { background: #eef2ff; }
+  .cat td { background: #334155; color: #fff; font-weight: 700; font-size: 13px; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .warn { color: #d97706; font-weight: 700; }
+  .adopted { background: #ecfdf5; }
+  .rejected { background: #fef2f2; }
+  .tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+  .tag-free { background: #dcfce7; color: #15803d; }
+  .tag-paid { background: #fee2e2; color: #991b1b; }
+  .tag-adopt { background: #6366f1; color: #fff; }
+  .tag-alt { background: #e2e8f0; color: #475569; }
+  .kill-box {
+    background: #fff; border: 3px solid #16a34a; border-radius: 12px; padding: 20px; margin: 20px 0;
+    text-align: center;
+  }
+  .kill-box h2 { border: none; color: #16a34a; margin: 0 0 8px; }
+  .kill-box .verdict { font-size: 28px; font-weight: 900; color: #16a34a; }
+  .kill-box .reason { font-size: 13px; color: #666; margin-top: 6px; }
+  .task-badge {
+    display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 10px;
+    border-radius: 20px; background: #6366f1; color: #fff; margin-right: 6px;
+  }
+  .comp-row td:first-child { font-weight: 700; white-space: nowrap; }
+  .section-box {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .note { font-size: 11px; color: #64748b; margin-top: 4px; }
+  .decision-box {
+    background: linear-gradient(135deg, #eef2ff, #faf5ff); border: 2px solid #6366f1;
+    border-radius: 12px; padding: 20px; margin: 20px 0;
+  }
+  .decision-box h3 { color: #4338ca; margin-top: 0; }
+  .decision-table { font-size: 13px; }
+  .decision-table th { background: #4338ca; }
+  .decision-table td { padding: 8px 12px; }
+  .hypo-update { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+  .hypo-update h3 { color: #b45309; margin: 0 0 8px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>クチコミ分析AI — S4 実現性検証</h1>
+<p class="sub">P0 Stage 4 | Kill条件: 開発コスト¥0が不可 → 中止</p>
+
+<!-- ============================================ -->
+<h2><span class="task-badge">#7</span>外部連携洗い出し</h2>
+<p class="sub">MVP実現に必要な外部連携をカテゴリ別に列挙</p>
+
+<table>
+  <tr><th>カテゴリ</th><th>用途</th><th>現在の採用</th><th>必須度</th></tr>
+  <tr class="cat"><td colspan="4">コア機能</td></tr>
+  <tr><td>AI/LLM</td><td>クチコミ感情分析 + AI返信案生成</td><td>Gemini 2.5 Flash</td><td>必須</td></tr>
+  <tr><td>レビュー取得API</td><td>Googleクチコミの自動取得</td><td>Google Places API (New)</td><td>必須</td></tr>
+  <tr><td>データベース</td><td>店舗/レビュー/分析/返信の永続化</td><td>Neon PostgreSQL + Prisma v6</td><td>必須</td></tr>
+  <tr class="cat"><td colspan="4">インフラ</td></tr>
+  <tr><td>ホスティング</td><td>アプリ+LP配信</td><td>Vercel</td><td>必須</td></tr>
+  <tr><td>認証</td><td>ユーザーログイン</td><td>未実装（Google OAuthスキャフォールド済み）</td><td>MVP必須</td></tr>
+  <tr class="cat"><td colspan="4">収益化（Stage 3）</td></tr>
+  <tr><td>決済</td><td>サブスクリプション課金</td><td>未実装（Stripe予定）</td><td>Stage 3</td></tr>
+  <tr class="cat"><td colspan="4">補助</td></tr>
+  <tr><td>アナリティクス</td><td>ユーザー行動計測</td><td>GA4 (G-D1EVEDQWES)</td><td>必須</td></tr>
+  <tr><td>メール</td><td>通知・ウェルカムメール</td><td>未実装</td><td>Stage 2</td></tr>
+  <tr><td>ウェイトリストDB</td><td>LP申し込み受付</td><td>Supabase</td><td>Stage 1</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2><span class="task-badge">#8</span>競合の外部連携調査</h2>
+<p class="sub">S3の競合4社が使う外部サービスを調査</p>
+
+<table class="comp-row">
+  <tr>
+    <th>カテゴリ</th>
+    <th>口コミコム<br>(mov)</th>
+    <th>Location Connect<br>(エフェクチュアル)</th>
+    <th>MEOチェキ<br>(GMOトライハッチ)</th>
+    <th>Gyro-n Review<br>(ユニヴァ・ジャイロン)</th>
+    <th style="background:#ea580c">クチコミ分析AI<br>(自社)</th>
+  </tr>
+  <tr><td>バックエンド</td><td>Ruby on Rails</td><td>Ruby on Rails + Python</td><td>非公開</td><td>Java + Scala</td><td>Next.js 16 (Node.js)</td></tr>
+  <tr><td>フロントエンド</td><td>Vue.js</td><td>React + TS (移行中)</td><td>非公開 (React系?)</td><td>JS/TS</td><td>React 19 + TS</td></tr>
+  <tr><td>DB</td><td>PostgreSQL + ES + Redis</td><td>MySQL</td><td>非公開</td><td>非公開</td><td>Neon PostgreSQL</td></tr>
+  <tr><td>クラウド</td><td>AWS (Fargate) + GCP</td><td>AWS + GCP</td><td>非公開</td><td>AWS</td><td>Vercel</td></tr>
+  <tr><td>AI/LLM</td><td>Vertex AI + OpenAI</td><td>非公開モデル</td><td>「生成AI」(非公開)</td><td>非公開 (学習型)</td><td>Gemini 2.5 Flash</td></tr>
+  <tr><td>Google API</td><td>GBP API (フルスイート)</td><td>GBP API (フルスイート)</td><td>GBP API (My Business)</td><td>GBP API + Yext</td><td>Places API (New)</td></tr>
+  <tr><td>連携サイト数</td><td>31サイト (食べログ等)</td><td>GBP + Yahoo</td><td>GBP中心</td><td>Yext経由~30サイト</td><td>Google Maps 1サイト</td></tr>
+  <tr><td>決済</td><td>営業課金</td><td>営業課金</td><td>クレカ / 請求書</td><td>クレカ / 銀行振込</td><td>Stripe (予定)</td></tr>
+  <tr><td>規模</td><td>1億+クチコミ処理</td><td>5万+店舗</td><td>6万+店舗</td><td>1,000+社</td><td>0 (MVP前)</td></tr>
+</table>
+
+<div class="section-box">
+  <h3>競合との技術選択の差異</h3>
+  <ul style="font-size:12px; line-height:2;">
+    <li><strong>AWS vs Vercel:</strong> 競合3社はAWSを使用。自社はVercel。理由: 開発コスト¥0制約。VercelのHobbyプランは無料、AWSは従量課金で¥0保証が困難</li>
+    <li><strong>GBP API vs Places API:</strong> 競合は全社GBP API (旧My Business API)を使用。自社はPlaces API (New)。GBP APIはビジネスオーナー認証が必要で、ユーザーにOAuth認証を求める。Places APIは公開クチコミを取得するだけなのでUXが簡素</li>
+    <li><strong>マルチサイト vs Google特化:</strong> 口コミコム(31サイト)とGyro-n(Yext30サイト)は多サイト対応。自社はGoogle Maps 1サイト特化。理由: MVPスコープを最小化。Google Mapsが飲食店クチコミの最大プラットフォーム</li>
+    <li><strong>Gemini vs OpenAI/Vertex:</strong> 口コミコムはVertex AI+OpenAI。自社はGemini 2.5 Flash単体。理由: 無料枠が最も大きい（15RPM/1500RPD）。日本語性能も十分</li>
+  </ul>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="task-badge">#9</span>各カテゴリ候補比較</h2>
+<p class="sub">全カテゴリで2つ以上の候補を列挙</p>
+
+<h3>AI/LLM</h3>
+<table>
+  <tr><th>候補</th><th>無料枠</th><th>日本語性能</th><th>レスポンス速度</th><th>コスト(超過時)</th></tr>
+  <tr class="adopted"><td><span class="tag tag-adopt">採用</span> Gemini 2.5 Flash</td><td><span class="yes">15RPM / 1,500RPD</span></td><td>高い</td><td>~1秒</td><td>$0.15/1Mトークン(入力)</td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> OpenAI GPT-4o-mini</td><td><span class="warn">Tier 1: $5/月クレジット</span></td><td>高い</td><td>~1.5秒</td><td>$0.15/1Mトークン(入力)</td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Claude 3.5 Haiku</td><td><span class="no">無料枠なし(API)</span></td><td>非常に高い</td><td>~1秒</td><td>$0.80/1Mトークン(入力)</td></tr>
+</table>
+
+<h3>レビュー取得API</h3>
+<table>
+  <tr><th>候補</th><th>無料枠</th><th>取得できるデータ</th><th>認証方式</th><th>制約</th></tr>
+  <tr class="adopted"><td><span class="tag tag-adopt">採用</span> Google Places API (New)</td><td><span class="yes">$200/月クレジット</span></td><td>公開レビュー5件+評価</td><td>APIキーのみ</td><td>レビュー5件上限。返信投稿不可</td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Google Business Profile API</td><td><span class="yes">無料</span></td><td>全レビュー+返信投稿</td><td>OAuth 2.0（店舗オーナー認証必須）</td><td>オーナー認証のUX摩擦大。H12リスク</td></tr>
+</table>
+<p class="note">※ Places APIの5件制限はMVPでは許容。全件取得はStage 2でGBP API移行を検討。</p>
+
+<h3>データベース</h3>
+<table>
+  <tr><th>候補</th><th>無料枠</th><th>リージョン</th><th>Prisma対応</th><th>特徴</th></tr>
+  <tr class="adopted"><td><span class="tag tag-adopt">採用</span> Neon PostgreSQL</td><td><span class="yes">0.5GB / 190h compute</span></td><td>ap-southeast-1</td><td><span class="yes">対応</span></td><td>サーバーレス。Vercelと統合良好</td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Supabase PostgreSQL</td><td><span class="yes">500MB / 2プロジェクト</span></td><td>ap-northeast-1</td><td><span class="yes">対応</span></td><td>Auth/Storage同梱。LP側で既使用</td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Turso (LibSQL)</td><td><span class="yes">9GB / 500M行読取</span></td><td>ap-northeast-1</td><td><span class="warn">Prisma非対応</span></td><td>Edge対応。Prisma未対応が障壁</td></tr>
+</table>
+
+<h3>ホスティング</h3>
+<table>
+  <tr><th>候補</th><th>無料枠</th><th>Next.js対応</th><th>Edge Functions</th><th>日本リージョン</th></tr>
+  <tr class="adopted"><td><span class="tag tag-adopt">採用</span> Vercel</td><td><span class="yes">Hobby (無制限デプロイ)</span></td><td><span class="yes">ネイティブ (Turbopack)</span></td><td><span class="yes">対応</span></td><td><span class="yes">hnd1</span></td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Cloudflare Pages</td><td><span class="yes">無制限リクエスト</span></td><td><span class="warn">部分対応 (@opennextjs)</span></td><td><span class="yes">Workers</span></td><td><span class="yes">対応</span></td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Netlify</td><td><span class="yes">100GB帯域</span></td><td><span class="warn">アダプタ必要</span></td><td><span class="yes">対応</span></td><td><span class="no">最寄りUS</span></td></tr>
+</table>
+
+<h3>認証</h3>
+<table>
+  <tr><th>候補</th><th>無料枠</th><th>Google OAuth</th><th>Next.js統合</th><th>特徴</th></tr>
+  <tr class="adopted"><td><span class="tag tag-adopt">採用候補</span> NextAuth.js (Auth.js v5)</td><td><span class="yes">完全無料(OSS)</span></td><td><span class="yes">対応</span></td><td><span class="yes">ネイティブ</span></td><td>自前DB管理。追加コスト¥0</td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Supabase Auth</td><td><span class="yes">50,000 MAU</span></td><td><span class="yes">対応</span></td><td><span class="warn">SDK経由</span></td><td>LP側Supabaseと統合可</td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> Clerk</td><td><span class="warn">10,000 MAU</span></td><td><span class="yes">対応</span></td><td><span class="yes">優秀</span></td><td>UI同梱。有料化が早い</td></tr>
+</table>
+
+<h3>決済（Stage 3）</h3>
+<table>
+  <tr><th>候補</th><th>初期費用</th><th>手数料</th><th>日本円対応</th><th>サブスク対応</th></tr>
+  <tr class="adopted"><td><span class="tag tag-adopt">採用候補</span> Stripe</td><td><span class="yes">¥0</span></td><td>3.6%</td><td><span class="yes">対応</span></td><td><span class="yes">Billing</span></td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> LemonSqueezy</td><td><span class="yes">¥0</span></td><td>5% + $0.50</td><td><span class="yes">対応</span></td><td><span class="yes">対応</span></td></tr>
+</table>
+
+<h3>メール（Stage 2）</h3>
+<table>
+  <tr><th>候補</th><th>無料枠</th><th>Next.js統合</th><th>日本語</th></tr>
+  <tr class="adopted"><td><span class="tag tag-adopt">採用候補</span> Resend</td><td><span class="yes">3,000通/月</span></td><td><span class="yes">React Email対応</span></td><td><span class="yes">問題なし</span></td></tr>
+  <tr><td><span class="tag tag-alt">候補</span> SendGrid</td><td><span class="yes">100通/日</span></td><td><span class="yes">SDK有</span></td><td><span class="yes">問題なし</span></td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2><span class="task-badge">#10</span>フィルタ6項目評価</h2>
+<p class="sub">全採用候補×6項目で評価</p>
+
+<table>
+  <tr>
+    <th>サービス</th>
+    <th>①端末<br>互換性</th>
+    <th>②日本語<br>日本リージョン</th>
+    <th>③無料枠<br>充足度</th>
+    <th>④障害時<br>影響</th>
+    <th>⑤代替<br>手段</th>
+    <th>⑥利用規約<br>適合</th>
+  </tr>
+  <tr>
+    <td><strong>Gemini 2.5 Flash</strong></td>
+    <td class="yes">○ サーバーサイド呼出</td>
+    <td class="yes">○ 日本語対応良好</td>
+    <td class="yes">○ 1,500RPD=初期50店舗×30件/日で充分</td>
+    <td class="warn">△ 分析・返信生成が停止</td>
+    <td class="yes">○ OpenAI GPT-4o-miniにフォールバック可</td>
+    <td class="yes">○ 商用利用OK</td>
+  </tr>
+  <tr>
+    <td><strong>Google Places API</strong></td>
+    <td class="yes">○ サーバーサイド呼出</td>
+    <td class="yes">○ 日本語レビュー取得可</td>
+    <td class="yes">○ $200/月クレジット=~10,000リクエスト</td>
+    <td class="warn">△ レビュー取得停止。既存データは残る</td>
+    <td class="warn">△ GBP APIに移行可。スクレイピングは規約違反</td>
+    <td class="yes">○ 商用利用OK。キャッシュ30日制限あり</td>
+  </tr>
+  <tr>
+    <td><strong>Neon PostgreSQL</strong></td>
+    <td class="yes">○ サーバーサイド</td>
+    <td class="yes">○ ap-southeast-1 (シンガポール)</td>
+    <td class="yes">○ 0.5GB=初期100店舗×1000件で充分</td>
+    <td class="no">× 全機能停止（単一障害点）</td>
+    <td class="yes">○ Supabase/PlanetScaleに移行可</td>
+    <td class="yes">○ 商用利用OK</td>
+  </tr>
+  <tr>
+    <td><strong>Vercel</strong></td>
+    <td class="yes">○ CDN配信</td>
+    <td class="yes">○ hnd1 (東京)</td>
+    <td class="yes">○ Hobby=個人商用OK。帯域100GB</td>
+    <td class="no">× 全サイト停止</td>
+    <td class="yes">○ Cloudflare Pagesに移行可</td>
+    <td class="yes">○ 商用利用OK (Hobby)</td>
+  </tr>
+  <tr>
+    <td><strong>NextAuth.js</strong></td>
+    <td class="yes">○ ブラウザ側はセッションCookie</td>
+    <td class="yes">○ 制限なし</td>
+    <td class="yes">○ 完全無料(OSS)</td>
+    <td class="yes">○ 自前DB管理。外部依存なし</td>
+    <td class="yes">○ Supabase Auth等に移行可</td>
+    <td class="yes">○ MITライセンス</td>
+  </tr>
+  <tr>
+    <td><strong>Stripe</strong></td>
+    <td class="yes">○ Checkout=全端末対応</td>
+    <td class="yes">○ 日本法人あり。JPY対応</td>
+    <td class="yes">○ 初期費用¥0。従量3.6%のみ</td>
+    <td class="warn">△ 決済停止。既存サブスクは継続</td>
+    <td class="warn">△ LemonSqueezy。移行コスト高</td>
+    <td class="yes">○ SaaS課金OK</td>
+  </tr>
+  <tr>
+    <td><strong>GA4</strong></td>
+    <td class="yes">○ ブラウザタグ</td>
+    <td class="yes">○ 日本対応</td>
+    <td class="yes">○ 完全無料</td>
+    <td class="yes">○ 計測停止のみ。サービスに影響なし</td>
+    <td class="yes">○ Plausible/Umami</td>
+    <td class="yes">○ 商用利用OK</td>
+  </tr>
+  <tr>
+    <td><strong>Resend</strong></td>
+    <td class="yes">○ サーバーサイド</td>
+    <td class="yes">○ 制限なし</td>
+    <td class="yes">○ 3,000通/月</td>
+    <td class="yes">○ メール遅延のみ。サービス継続</td>
+    <td class="yes">○ SendGrid</td>
+    <td class="yes">○ 商用利用OK</td>
+  </tr>
+</table>
+
+<div class="section-box">
+  <h3>フィルタ結果サマリー</h3>
+  <ul style="font-size:12px; line-height:2;">
+    <li><span class="yes">全候補が6項目中5項目以上で○。フィルタ落ち=なし</span></li>
+    <li><strong>④障害時の単一障害点:</strong> Neon（DB停止=全機能停止）とVercel（配信停止=全サイト停止）が単一障害点。ただし競合も同様（AWS障害で口コミコム/Location Connect/Gyro-nが全停止する構造）。個人店ターゲットで99.9%SLAは十分</li>
+    <li><strong>③無料枠充足度:</strong> 全サービスの無料枠がStage 1（~100店舗）をカバー。<strong>開発コスト¥0は達成可能</strong></li>
+  </ul>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="task-badge">#11</span>競合との選択差異分析</h2>
+<p class="sub">自社の選択が競合と大きく異なる点の理由</p>
+
+<table>
+  <tr><th>差異</th><th>競合の選択</th><th>自社の選択</th><th>なぜ違うか</th><th>リスク</th></tr>
+  <tr>
+    <td><strong>クラウド</strong></td>
+    <td>AWS (3社) + GCP (2社)</td>
+    <td>Vercel</td>
+    <td>開発コスト¥0制約。AWS/GCPは従量課金で¥0保証不可。VercelのHobbyプランは無料</td>
+    <td>低: Next.jsとの統合が最も深い。Hobbyの帯域100GBはStage 1で十分</td>
+  </tr>
+  <tr>
+    <td><strong>レビュー取得</strong></td>
+    <td>GBP API (全社)</td>
+    <td>Places API (New)</td>
+    <td>GBP APIはOAuth認証が必須→UX摩擦(H12リスク)。Places APIはAPIキーのみで即取得可能</td>
+    <td>中: 5件制限あり。Stage 2でGBP API移行が必要になる可能性</td>
+  </tr>
+  <tr>
+    <td><strong>連携サイト数</strong></td>
+    <td>31サイト(口コミコム)〜2サイト</td>
+    <td>Google Maps 1サイト</td>
+    <td>MVPスコープ最小化。飲食個人店の最大クチコミソース=Google Maps。食べログ等は2周目</td>
+    <td>低: 個人店オーナーが最も気にするのはGoogle評価。多サイト対応は差別化ではなくエンタープライズ要件</td>
+  </tr>
+  <tr>
+    <td><strong>AI</strong></td>
+    <td>Vertex AI+OpenAI(口コミコム)、非公開(他3社)</td>
+    <td>Gemini 2.5 Flash単体</td>
+    <td>無料枠が最大(1,500RPD)。単体で分析+返信の両方を処理可能</td>
+    <td>低: OpenAIへのフォールバックパスあり。Geminiの日本語性能は検証済み(H8)</td>
+  </tr>
+  <tr>
+    <td><strong>決済</strong></td>
+    <td>営業課金(大手2社)、クレカ(中小2社)</td>
+    <td>Stripe (セルフサーブ)</td>
+    <td>個人店向け×セルフサービスモデル。営業不要・即時決済がターゲットに合致</td>
+    <td>低: Stripeは日本SaaS市場の標準。¥980/月の少額課金に最適</td>
+  </tr>
+</table>
+
+<div class="section-box">
+  <h3>差別化として狙える競合未使用の選択肢</h3>
+  <ol style="font-size:12px; line-height:2;">
+    <li><strong>Gemini無料枠の活用:</strong> 競合はAIコストを価格に転嫁（¥7,000〜¥55,000/月）。自社はGemini無料枠で¥0/月を実現 → 価格破壊の源泉</li>
+    <li><strong>Vercel Edge Functions:</strong> 競合はAWS EC2/Fargate（常時起動）。自社はEdge Functions（コールドスタート不要、東京リージョン） → レスポンス速度で差別化</li>
+    <li><strong>Places API（認証不要）:</strong> 競合はGBP APIのOAuth認証を前提。自社はPlaces APIで「店名入力だけで即分析開始」→ UX簡素化(H12対応)</li>
+  </ol>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="task-badge">#12</span>採用決定 + 理由記録</h2>
+
+<div class="decision-box">
+  <h3>採用サービス一覧</h3>
+  <table class="decision-table">
+    <tr><th>カテゴリ</th><th>採用</th><th>選定理由</th><th>移行トリガー</th></tr>
+    <tr><td>AI/LLM</td><td><strong>Gemini 2.5 Flash</strong></td><td>無料枠最大(1,500RPD)。日本語性能十分。サーバーサイドで安全</td><td>無料枠超過 or 精度不足 → OpenAI GPT-4o-mini</td></tr>
+    <tr><td>レビュー取得</td><td><strong>Google Places API (New)</strong></td><td>APIキーのみで認証不要。UX摩擦ゼロ。$200/月クレジットでStage 1カバー</td><td>5件制限が障壁 → GBP API (OAuth)</td></tr>
+    <tr><td>DB</td><td><strong>Neon PostgreSQL + Prisma v6</strong></td><td>0.5GB無料枠。Vercel統合良好。サーバーレスでコールドスタート短い</td><td>ストレージ超過 → Supabase or Neon Pro ($19/月)</td></tr>
+    <tr><td>ホスティング</td><td><strong>Vercel (Hobby)</strong></td><td>Next.jsネイティブ。東京リージョン。無料。デプロイ無制限</td><td>帯域100GB超過 → Vercel Pro ($20/月)</td></tr>
+    <tr><td>認証</td><td><strong>NextAuth.js (Auth.js v5)</strong></td><td>完全無料(OSS)。Next.jsネイティブ。外部依存ゼロ。DB管理自前</td><td>なし（OSSのため移行不要）</td></tr>
+    <tr><td>決済</td><td><strong>Stripe</strong></td><td>初期¥0。日本法人。JPYサブスク対応。SaaS標準</td><td>なし（Stage 3で実装）</td></tr>
+    <tr><td>アナリティクス</td><td><strong>GA4</strong></td><td>完全無料。既に設定済み</td><td>なし</td></tr>
+    <tr><td>メール</td><td><strong>Resend</strong></td><td>3,000通/月無料。React Emailでテンプレート管理</td><td>なし（Stage 2で実装）</td></tr>
+  </table>
+</div>
+
+<!-- Kill判定 -->
+<div class="kill-box">
+  <h2>S4 Kill条件チェック</h2>
+  <div class="verdict">PASS — 開発コスト¥0は達成可能</div>
+  <div class="reason">
+    全カテゴリで無料枠がStage 1（~100店舗）をカバー。<br>
+    フィルタ落ち候補=0件。全候補で代替手段あり。<br>
+    競合との選択差異は合理的（コスト¥0制約+UX簡素化の方針に起因）。
+  </div>
+</div>
+
+<!-- 仮説テーブル更新 -->
+<div class="hypo-update">
+  <h3>仮説テーブル更新提案</h3>
+  <table style="font-size:12px;">
+    <tr><th>ID</th><th>変更</th><th>内容</th></tr>
+    <tr><td>H7</td><td>結果: ⏳→⏳（据置）</td><td>Places APIの5件制限を確認。Stage 1ではMVP許容。全件取得はGBP API移行要。実運用検証はP1で</td></tr>
+    <tr><td>H9</td><td>結果: ⏳→⏳（補足追加）</td><td>Gemini 1,500RPD / Neon 0.5GB / Vercel 100GB / Places $200クレジット。Stage 1（~100店舗）で全て無料枠内。S5でコスト発生マップに詳細記載</td></tr>
+    <tr><td>H14</td><td><strong>新設</strong></td><td>「Places APIの5件制限でもユーザーは十分価値を感じる」— MVPで最新5件の分析+返信で十分か。不足ならGBP API移行必須（OAuth認証のUX摩擦とトレードオフ）</td></tr>
+  </table>
+</div>
+
+</body>
+</html>

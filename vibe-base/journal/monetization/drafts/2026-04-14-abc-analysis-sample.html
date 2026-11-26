@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ABC分析 実行サンプル — カテゴリ230</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #666;
+    --border: #ddd;
+    --bg: #fafafa;
+    --bg-alt: #f4f4f4;
+    --accent: #2a5d84;
+    --a: #047857;
+    --b: #b45309;
+    --c: #64748b;
+    --lo: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 14px;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+  }
+  header { border-bottom: 2px solid var(--fg); padding-bottom: 10px; margin-bottom: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 12px; }
+  h2 {
+    font-size: 16px;
+    margin: 28px 0 10px;
+    padding: 6px 12px;
+    border-left: 5px solid var(--accent);
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 14px; margin: 14px 0 6px; color: var(--accent); }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+    margin: 8px 0 16px;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  th { background: var(--bg-alt); font-weight: 600; font-size: 11px; color: var(--muted); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.center { text-align: center; }
+
+  .group-a { background: #ecfdf5; }
+  .group-b { background: #fffbeb; }
+  .group-c { background: #f8fafc; }
+
+  .tag-a { display: inline-block; padding: 1px 8px; border-radius: 2px; font-size: 11px; font-weight: 700; background: var(--a); color: #fff; }
+  .tag-b { display: inline-block; padding: 1px 8px; border-radius: 2px; font-size: 11px; font-weight: 700; background: var(--b); color: #fff; }
+  .tag-c { display: inline-block; padding: 1px 8px; border-radius: 2px; font-size: 11px; font-weight: 700; background: var(--c); color: #fff; }
+
+  .note { background: #fff; border-left: 3px solid var(--accent); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .warn { background: #fef9c3; border-left: 3px solid var(--b); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .critical { background: #fee2e2; border-left: 3px solid var(--lo); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+
+  .self-eval { background: #fff; border: 2px solid var(--lo); padding: 14px 18px; margin: 20px 0; font-size: 13px; }
+  .self-eval h3 { color: var(--lo); margin-top: 0; }
+
+  .summary-box { background: #fff; border: 1px solid var(--border); padding: 14px 18px; margin: 12px 0; }
+  .summary-box dl { display: grid; grid-template-columns: 180px 1fr; gap: 6px 12px; margin: 6px 0; font-size: 13px; }
+  .summary-box dt { color: var(--muted); }
+  .summary-box dd { margin: 0; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ABC分析 実行サンプル — カテゴリ230（業務自動化・効率化支援）</h1>
+  <div class="subtitle">元データ: <code>journal/monetization/drafts/2026-04-14-competitor-research.html</code>（Session 168 取得）</div>
+  <div class="subtitle">分析者: vibe-base 司令塔 / 分析日: 2026-04-14</div>
+</header>
+
+<!-- ========================================= -->
+<h2>§0. この分析の目的</h2>
+<p>マスターから「自分（AI）がやった ABC分析が良いか悪いか判断しないと戦略論は答えられない」と指摘されたため、既存データから ABC分析を実行し、<strong>品質評価材料として提示する</strong>。</p>
+<p><strong>マスターにお願いしたいこと:</strong> この分析の品質（精度・カバー範囲・意思決定材料として十分か）を判定してください。判定結果次第で、①このまま戦略議論に進む ②再調査して作り直す ③分析手法自体を変更する、のいずれかを選びます。</p>
+
+<!-- ========================================= -->
+<h2>§1. 分析対象データ</h2>
+
+<div class="summary-box">
+<dl>
+  <dt>カテゴリ</dt><dd>230 業務自動化・効率化支援</dd>
+  <dt>取得日</dt><dd>2026-04-14（Session 168 調査時）</dd>
+  <dt>取得手段</dt><dd>WebFetch + Playwright（販売数順・キーワード検索複合）</dd>
+  <dt>サンプル件数（有効）</dt><dd><strong>18 件</strong>（販売数の数値が確定している出品のみ）</dd>
+  <dt>除外</dt><dd>販売数不明・推定値のみの出品は除外</dd>
+  <dt>合計販売数</dt><dd>7,511 件</dd>
+</dl>
+</div>
+
+<div class="critical">
+<strong>サンプル不足の自白:</strong> ハンドブック §1 で「N=80件」と規定したが、実際の既存データでは販売数が明示されている出品が <strong>18件しかない</strong>。残り62件は販売数が取得できなかった or アグリゲートされていたため個別分析不可。<strong>このサンプル数では意思決定ベースとして不足。</strong>
+</div>
+
+<!-- ========================================= -->
+<h2>§2. 販売数降順 + 累計％ + ABC分類</h2>
+
+<p>ルール: 累計販売数 0-80% = A群 / 80-95% = B群 / 95-100% = C群。販売数ゼロ除外（該当なし）。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th class="center">順位</th>
+      <th>出品者（サービス概要）</th>
+      <th class="num">価格</th>
+      <th class="num">販売数</th>
+      <th class="num">累計</th>
+      <th class="num">累計%</th>
+      <th class="center">分類</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="group-a"><td class="center">1</td><td>yamazero（Excel代行全般）</td><td class="num">¥9,000</td><td class="num">1,607</td><td class="num">1,607</td><td class="num">21.4%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">2</td><td>n00518（GAS自動化）</td><td class="num">¥3,000</td><td class="num">892</td><td class="num">2,499</td><td class="num">33.3%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">3</td><td>ネバーピース（繰り返し作業自動化）</td><td class="num">¥3,000</td><td class="num">815</td><td class="num">3,314</td><td class="num">44.1%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">4</td><td>tanaka_s_001（高単価 自動化）</td><td class="num">¥45,000+</td><td class="num">651</td><td class="num">3,965</td><td class="num">52.8%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">5</td><td>エイトさん（Pythonスクレイピング）</td><td class="num">¥10,000</td><td class="num">585</td><td class="num">4,550</td><td class="num">60.6%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">6</td><td>いき育児中（Excel VBA 何でも承）</td><td class="num">¥29,000</td><td class="num">439</td><td class="num">4,989</td><td class="num">66.4%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">7</td><td>ゆふづつ（Excel VBA 自動化）</td><td class="num">¥9,000</td><td class="num">407</td><td class="num">5,396</td><td class="num">71.8%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">8</td><td>ExcelVBA匠</td><td class="num">¥10,000</td><td class="num">383</td><td class="num">5,779</td><td class="num">76.9%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-a"><td class="center">9</td><td>らくはた（VBAプロ）</td><td class="num">¥3,000</td><td class="num">368</td><td class="num">6,147</td><td class="num">81.8%</td><td class="center"><span class="tag-a">A</span></td></tr>
+    <tr class="group-b"><td class="center">10</td><td>カスミ（Excel VBA 講師）</td><td class="num">¥3,000</td><td class="num">314</td><td class="num">6,461</td><td class="num">86.0%</td><td class="center"><span class="tag-b">B</span></td></tr>
+    <tr class="group-b"><td class="center">11</td><td>キタノネコ（RPA系）</td><td class="num">¥17,500</td><td class="num">225</td><td class="num">6,686</td><td class="num">89.0%</td><td class="center"><span class="tag-b">B</span></td></tr>
+    <tr class="group-b"><td class="center">12</td><td>SCRAPRO（スクレイピング）</td><td class="num">¥3,000</td><td class="num">217</td><td class="num">6,903</td><td class="num">91.9%</td><td class="center"><span class="tag-b">B</span></td></tr>
+    <tr class="group-b"><td class="center">13</td><td>HasegawaTech（RPA）</td><td class="num">¥15,000</td><td class="num">156</td><td class="num">7,059</td><td class="num">94.0%</td><td class="center"><span class="tag-b">B</span></td></tr>
+    <tr class="group-c"><td class="center">14</td><td>CHAPPY_Engineer（高品質スクレイパー）</td><td class="num">¥8,000</td><td class="num">153</td><td class="num">7,212</td><td class="num">96.0%</td><td class="center"><span class="tag-c">C</span></td></tr>
+    <tr class="group-c"><td class="center">15</td><td>yousystem（RPA 相談）</td><td class="num">¥75,000</td><td class="num">98</td><td class="num">7,310</td><td class="num">97.3%</td><td class="center"><span class="tag-c">C</span></td></tr>
+    <tr class="group-c"><td class="center">16</td><td>bakuta（スクレイピング）</td><td class="num">¥5,500</td><td class="num">92</td><td class="num">7,402</td><td class="num">98.5%</td><td class="center"><span class="tag-c">C</span></td></tr>
+    <tr class="group-c"><td class="center">17</td><td>ろぽまる（スクレイピング）</td><td class="num">¥5,500</td><td class="num">68</td><td class="num">7,470</td><td class="num">99.5%</td><td class="center"><span class="tag-c">C</span></td></tr>
+    <tr class="group-c"><td class="center">18</td><td>RPA_miyazaki</td><td class="num">¥27,500</td><td class="num">41</td><td class="num">7,511</td><td class="num">100.0%</td><td class="center"><span class="tag-c">C</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ========================================= -->
+<h2>§3. A群の統計（9件）</h2>
+
+<div class="summary-box">
+<dl>
+  <dt>件数</dt><dd>9件（サンプル全体の 50%）</dd>
+  <dt>累計販売数</dt><dd>6,147 / 7,511（<strong>81.8%</strong>）</dd>
+  <dt>価格 中央値（5位）</dt><dd>¥10,000（エイトさん）</dd>
+  <dt>価格 最頻値</dt><dd><strong>¥3,000（3件）</strong>（n00518, ネバーピース, らくはた）</dd>
+  <dt>価格 レンジ</dt><dd>¥3,000 〜 ¥45,000+（幅広い）</dd>
+  <dt>販売数 レンジ</dt><dd>368 〜 1,607 件</dd>
+</dl>
+</div>
+
+<h3>A群の価格分布</h3>
+<table>
+  <thead><tr><th>価格</th><th class="center">件数</th><th>出品者</th></tr></thead>
+  <tbody>
+    <tr><td class="num">¥3,000</td><td class="center">3</td><td>n00518 / ネバーピース / らくはた</td></tr>
+    <tr><td class="num">¥9,000</td><td class="center">2</td><td>yamazero / ゆふづつ</td></tr>
+    <tr><td class="num">¥10,000</td><td class="center">2</td><td>エイトさん / ExcelVBA匠</td></tr>
+    <tr><td class="num">¥29,000</td><td class="center">1</td><td>いき育児中</td></tr>
+    <tr><td class="num">¥45,000+</td><td class="center">1</td><td>tanaka_s_001</td></tr>
+  </tbody>
+</table>
+
+<h3>A群の共通パターン（判明範囲）</h3>
+<ul>
+  <li><strong>価格は二極化</strong>: ¥3,000 帯（3件）と ¥9-10,000 帯（4件）に集中 → A群の 78% がこの2価格帯</li>
+  <li><strong>高単価 (¥29k-¥45k+) も2件</strong>: いき育児中 / tanaka_s_001。特殊ポジション（実績者のみ）</li>
+  <li><strong>販売数上位3件（yamazero, n00518, ネバーピース）で全体の 44.1%</strong> を占める。<strong>寡占度が強い</strong></li>
+</ul>
+
+<div class="note">
+<strong>A群9件の構成から読み取れる戦略仮説:</strong>
+<ul>
+  <li>¥3,000帯 = 低単価で大量受注＝回転率勝負。新規参入もここに集中する傾向</li>
+  <li>¥9-10,000帯 = 中単価で「品質・実績」を示して単価上げるゾーン（エイトさんらくはた型）</li>
+  <li>¥29k-¥45k+ = 実績者専用帯。新規が直接参入するのは非現実的</li>
+</ul>
+</div>
+
+<!-- ========================================= -->
+<h2>§4. B群 / C群 の統計（参考）</h2>
+
+<h3>B群（4件、累計 12.2%）</h3>
+<ul>
+  <li>価格中央値: ¥9,000（カスミ ¥3,000 / SCRAPRO ¥3,000 / HasegawaTech ¥15,000 / キタノネコ ¥17,500 の真ん中）</li>
+  <li>A群に近い存在。ただし販売数は A群の半分以下</li>
+</ul>
+
+<h3>C群（5件、累計 6.0%）</h3>
+<ul>
+  <li>価格レンジ: ¥5,500 〜 ¥75,000</li>
+  <li>yousystem ¥75,000 は高単価ニッチで生き残っているが販売数は A群最下位以下</li>
+</ul>
+
+<!-- ========================================= -->
+<h2>§5. 自己評価：この分析は良いか悪いか</h2>
+
+<div class="self-eval">
+<h3>⚠️ 自己評価: 40/100 点</h3>
+<p><strong>合格ラインは 70点と想定。現状は意思決定ベースとして不足。</strong></p>
+
+<h3>良い点</h3>
+<ul>
+  <li>✅ ABC分類の計算方法は正しい（累計80%で切り、B/C も 15%/5% で切っている）</li>
+  <li>✅ A群の寡占度（上位3件で44%）という定量的な結論が出ている</li>
+  <li>✅ A群の価格帯パターン（¥3,000帯 と ¥9-10,000帯 の二極化）が見えた</li>
+  <li>✅ 販売数ゼロはサンプルに入っていない（除外要件は自動的に満たされている）</li>
+</ul>
+
+<h3>悪い点</h3>
+<ul>
+  <li>❌ <strong>サンプル数 18件</strong>。ハンドブック §1 規定の 80件に対して 22.5% しかない。統計的有意性が弱い</li>
+  <li>❌ カテゴリ230 の総出品数は 6,824件。18件では 0.26% しか見ていない</li>
+  <li>❌ 「レビュー数」と「実販売数」が混在している可能性（エイトさん 446件 vs 585件など食い違いあり）。信頼できるのは<strong>相対順位</strong>のみ</li>
+  <li>❌ 価格が「¥3,000」「¥10,000」のようにキリの良い数字ばかりで、実際の分布と乖離している可能性</li>
+  <li>❌ A群の共通文章パターン・訴求軸の分析がまだ取れていない（Session 168 では部分的にしかやっていない）</li>
+  <li>❌ B群・C群の存在意義（空白地帯のヒント源）が埋没している</li>
+</ul>
+
+<h3>この分析で戦略判断するリスク</h3>
+<ul>
+  <li>「A群は ¥3,000帯 と ¥9-10,000帯 に二極化」という仮説は、18件サンプルからの推測。80件全数調査で崩れる可能性</li>
+  <li>「寡占度が強い」という結論は合っているが、寡占の要因（レビュー蓄積・評価・出品歴）までは分析できていない</li>
+  <li>新規参入の判断材料としては「面白そうなヒント」レベル。<strong>実際の意思決定には不足</strong></li>
+</ul>
+</div>
+
+<!-- ========================================= -->
+<h2>§6. マスターへの判断依頼</h2>
+
+<p>この分析の品質を見て、以下から選んでください:</p>
+
+<ol>
+  <li><strong>この精度で戦略議論に進む</strong> — サンプル18件は少ないが、A群のパターンはある程度見えた。この結果を前提に「A研究 → 隙を突く」戦略の方針を決める</li>
+  <li><strong>再調査してやり直す</strong> — 80件全数を取得し直す（1時間程度の調査エージェント委譲）+ A群の文章パターンも並行抽出 → 再度 ABC分析を提示 → その後戦略議論</li>
+  <li><strong>分析手法を変更する</strong> — ABC分析ではなく別手法（例: 価格帯別販売数ランキング / 出品歴別分析 / レビュー数別分析）で見直す</li>
+  <li><strong>分析より戦略論を優先</strong> — この分析は参考程度にして、「A真似 vs A研究→隙を突く」の方針を先に決め、後日正式調査</li>
+</ol>
+
+<p>番号で回答お願いします。</p>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<meta charset="utf-8">
+<title>x-auto-post 自動化 全体像と復旧マップ</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --line:#30363d;
+    --tx:#e6edf3; --mut:#9198a1; --ok:#2ea043; --okbg:#12261a;
+    --bad:#f85149; --badbg:#2d1315; --warn:#d29922; --warnbg:#2b2413;
+    --accent:#58a6ff; --accentbg:#0f2233;
+  }
+  @media (prefers-color-scheme: light){
+    :root{--bg:#f6f8fa;--panel:#fff;--panel2:#f0f3f6;--line:#d0d7de;
+      --tx:#1f2328;--mut:#59636e;--okbg:#dafbe1;--badbg:#ffebe9;--warnbg:#fff8c5;--accentbg:#ddf4ff;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+    font-family:-apple-system,"Segoe UI",system-ui,"Hiragino Kaku Gothic ProN","Yu Gothic UI",sans-serif;
+    line-height:1.6;padding:32px 20px 80px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:.5px}
+  .sub{color:var(--mut);font-size:14px;margin-bottom:28px}
+  h2{font-size:18px;margin:36px 0 14px;padding-left:10px;border-left:4px solid var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+  .grid{display:grid;gap:14px}
+  .cols-2{grid-template-columns:1fr 1fr}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:800px){.cols-2,.cols-3{grid-template-columns:1fr}}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;vertical-align:middle}
+  .p-ok{background:var(--okbg);color:var(--ok);border:1px solid var(--ok)}
+  .p-bad{background:var(--badbg);color:var(--bad);border:1px solid var(--bad)}
+  .p-warn{background:var(--warnbg);color:var(--warn);border:1px solid var(--warn)}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px}
+  .node{flex:1 1 150px;min-width:140px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:9px;padding:12px 13px}
+  .node .t{font-weight:700;font-size:14px;margin-bottom:3px}
+  .node .d{font-size:12px;color:var(--mut)}
+  .node.bad{border-color:var(--bad);background:var(--badbg)}
+  .node.ok{border-color:var(--ok)}
+  .arrow{align-self:center;color:var(--mut);font-size:20px;flex:0 0 auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);font-weight:700}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px}
+  .time{display:grid;grid-template-columns:70px 1fr;gap:0}
+  .time .h{font-weight:700;color:var(--accent);padding:6px 8px;border-bottom:1px solid var(--line)}
+  .time .e{padding:6px 8px;border-bottom:1px solid var(--line);font-size:13px}
+  .big{font-size:15px}
+  ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:8px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+</style>
+
+<div class="wrap">
+  <h1>x-auto-post ── 自動化の全体像と復旧マップ</h1>
+  <div class="sub">2026-07-08 診断 / 本番リポ: <code>rahiseko-alt/x-auto-post</code>（GitHub Actions 8ワークフロー稼働）</div>
+
+  <div class="card" style="border-color:var(--bad)">
+    <div class="big"><span class="pill p-bad">現状</span> &nbsp;<b>自動投稿は完全停止中</b>（在庫 unposted=0・最後の実投稿 2026-07-07 21:31 JST）</div>
+    <div style="margin-top:8px;color:var(--mut)">根因は「投稿」ではなく<b>「補充(refill)」の死</b>。補充が5日間サイレントに0件生成を続け、在庫が尽きて投稿が止まった。</div>
+  </div>
+
+  <h2>① 自動化の全体像（生成→投稿→計測→学習の閉ループ）</h2>
+  <div class="card">
+    <div class="flow">
+      <div class="node bad"><div class="t">refill 🔴</div><div class="d">feed_fetch → generate<br>在庫を作る係</div></div>
+      <div class="arrow">→</div>
+      <div class="node bad"><div class="t">queue.json 🔴</div><div class="d">投稿在庫<br>今 <b>残0</b></div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="t">post ✅</div><div class="d">1日3回 X投稿<br>在庫を消費</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="t">post-log.json</div><div class="d">投稿実績</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="t">analyze</div><div class="d">効果測定→<br>重み更新(学習)</div></div>
+    </div>
+    <div style="text-align:center;color:var(--mut);margin:10px 0 2px;font-size:12px">↑ analyze が更新した重みが翌日の generate に効く＝閉ループ</div>
+    <div class="flow" style="margin-top:14px">
+      <div class="node ok"><div class="t">monitor ✅</div><div class="d">在庫&lt;3・投稿停止を検知しIssue起票（正しく動作）</div></div>
+      <div class="node"><div class="t">reply</div><div class="d">投稿30分後に自動返信</div></div>
+      <div class="node"><div class="t">grok(週次)</div><div class="d">競合ベンチ分析</div></div>
+      <div class="node"><div class="t">broadcast</div><div class="d">feed分析結果を別経路で queue 追加</div></div>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--bad)"></span>停止/故障</span>
+      <span><span class="dot" style="background:var(--ok)"></span>正常</span>
+      <span><span class="dot" style="background:var(--panel2);border:1px solid var(--line)"></span>稼働（影響波及先）</span>
+    </div>
+  </div>
+
+  <h2>② 1日のタイムライン（JST）</h2>
+  <div class="card time">
+    <div class="h">07:00</div><div class="e"><b>refill</b> — 在庫補充 <span class="pill p-bad">0件しか作れず死んでいた</span></div>
+    <div class="h">08:00</div><div class="e"><b>post①</b> / 08:30 reply① / 09:00 monitor①</div>
+    <div class="h">12:15</div><div class="e"><b>post②</b> / 12:45 reply② / 13:15 monitor②</div>
+    <div class="h">19:00</div><div class="e"><b>post③</b> / 19:30 reply③ / 20:00 monitor③</div>
+    <div class="h">21:00</div><div class="e"><b>analyze</b> — 効果測定→重み更新</div>
+    <div class="h">週次</div><div class="e">月 grok / 水 npm audit</div>
+  </div>
+
+  <h2>③ 何が・なぜ止まったか（3つの故障が連鎖）</h2>
+  <div class="grid cols-3">
+    <div class="card" style="border-color:var(--bad)">
+      <span class="pill p-bad">故障1・根因</span>
+      <div style="margin-top:8px"><b>補充のLLMキー欠落</b></div>
+      <div style="color:var(--mut);font-size:13px;margin-top:6px">GitHub secret の <code>XAUTOBOT260616_GEMINI/_GROQ/_GHMODELS</code> が3件とも不在。generate.py が本文を作れず0件。</div>
+    </div>
+    <div class="card" style="border-color:var(--bad)">
+      <span class="pill p-bad">故障2・隠蔽</span>
+      <div style="margin-top:8px"><b>サイレント成功</b></div>
+      <div style="color:var(--mut);font-size:13px;margin-top:6px">0件でも <code>EXIT 0</code>=「成功」表示。5日間、緑のまま裏で崩壊。誰も気付けなかった。</div>
+    </div>
+    <div class="card" style="border-color:var(--bad)">
+      <span class="pill p-bad">故障3・枯渇</span>
+      <div style="margin-top:8px"><b>在庫ゼロ→投稿停止</b></div>
+      <div style="color:var(--mut);font-size:13px;margin-top:6px">補充されないまま在庫を消費し尽くし、投稿する弾が無くなった（現在 残0）。</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px;border-color:var(--warn)">
+    <span class="pill p-warn">重要</span> monitor（検知）は<b>正しく動作</b>し Issue #43〜#46 を起票済み。だが GitHub Issue がマスターに届かず放置された ＝ <b>「検知はできても通知が届かない」設計欠陥</b>。これが再発防止の本丸。
+  </div>
+
+  <h2>④ 復旧に必要なこと</h2>
+  <table>
+    <tr><th style="width:150px">項目</th><th>内容</th><th style="width:120px">状態</th></tr>
+    <tr>
+      <td><b>secret 再登録</b></td>
+      <td>欠落3キー(GEMINI/GROQ/GHModels)を GitHub secret に設定。<b>値はマスターのみ保有・貼付厳禁</b>。最低GEMINI 1つで復活。</td>
+      <td><span class="pill p-warn">マスター作業待ち</span></td>
+    </tr>
+    <tr>
+      <td><b>silent-success 根治</b></td>
+      <td>キー全空なら <code>EXIT 1</code> で失敗通知するよう generate.py 修正。実挙動でEXIT 1確認済。</td>
+      <td><span class="pill p-ok">修正済(検証後push)</span></td>
+    </tr>
+    <tr>
+      <td><b>通知の確実化</b></td>
+      <td>GitHub Issue依存を脱却。セッション開始時に未解決アラートを表示し必ず気付く経路にする。</td>
+      <td><span class="pill p-warn">実装中</span></td>
+    </tr>
+    <tr>
+      <td><b>即時の在庫回復</b></td>
+      <td>secret復活後に refill を手動起動→在庫を積み次サイクルで投稿再開。</td>
+      <td><span class="pill p-warn">secret後</span></td>
+    </tr>
+    <tr>
+      <td><b>システム台帳</b></td>
+      <td>「誰も全体を把握してない」根治。構成・データフロー・secret依存を単一正本化＋実態と機械照合。</td>
+      <td><span class="pill p-warn">実装中</span></td>
+    </tr>
+    <tr>
+      <td><b>ディレクトリ整理</b></td>
+      <td>紛らわしいローカル <code>x-auto-post-repo</code> を削除（本番無傷を確認済）。x関係を1本化。</td>
+      <td><span class="pill p-ok">完了</span></td>
+    </tr>
+  </table>
+
+  <div class="sub" style="margin-top:26px">検証方針: 全修正は 3ラウンド×3検証者=9回の反証検証をパスするまで本番反映しない。</div>
+</div>

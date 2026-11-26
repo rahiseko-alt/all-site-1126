@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEBページ分類体系</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', 'Hiragino Sans', sans-serif; background: #fff; color: #333; padding: 40px; max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 22px; margin-bottom: 4px; border-bottom: 2px solid #333; padding-bottom: 8px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+  h2 { font-size: 17px; margin-top: 48px; margin-bottom: 16px; border-left: 4px solid #333; padding-left: 10px; }
+  h3 { font-size: 14px; margin-top: 24px; margin-bottom: 8px; color: #555; }
+
+  /* tree diagram */
+  .tree { font-size: 13px; line-height: 2; font-family: 'Consolas', 'MS Gothic', monospace; white-space: pre; background: #fafafa; padding: 20px 24px; border-radius: 8px; border: 1px solid #e0e0e0; overflow-x: auto; }
+  .tree strong { font-weight: 700; }
+
+  /* tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; margin-bottom: 16px; }
+  th { background: #fafafa; text-align: left; padding: 8px 12px; border: 1px solid #ddd; font-weight: 600; white-space: nowrap; }
+  td { padding: 8px 12px; border: 1px solid #ddd; vertical-align: top; }
+  tr:hover td { background: #f8f9ff; }
+  .sep td { background: #f0f0f0; font-weight: 600; text-align: center; font-size: 12px; color: #888; }
+  .ex { color: #666; font-size: 12px; }
+
+  /* notes */
+  .note { font-size: 12px; color: #666; line-height: 1.8; margin-top: 8px; margin-bottom: 16px; padding-left: 8px; }
+  .note li { list-style: none; padding: 2px 0; }
+  .note li::before { content: "※ "; color: #999; }
+
+  /* section colors */
+  .s1 { border-left-color: #4285f4; }
+  .s2 { border-left-color: #34a853; }
+  .s3 { border-left-color: #f9ab00; }
+  .s4 { border-left-color: #ea4335; }
+  .s5 { border-left-color: #a142f4; }
+  .s6 { border-left-color: #00897b; }
+  .s7 { border-left-color: #e91e63; }
+
+  .divider { border: none; border-top: 2px solid #eee; margin: 48px 0; }
+  .pending { font-size: 12px; color: #aaa; margin-top: 4px; }
+  .footer { margin-top: 48px; font-size: 11px; color: #bbb; border-top: 1px solid #eee; padding-top: 12px; }
+</style>
+</head>
+<body>
+
+<h1>WEBページ分類体系</h1>
+<p class="subtitle">A267-A268 起点 | なぜ→何を→どう→金 の順で構成</p>
+
+<!-- ================================================================== -->
+<h2 class="s1">1. インターネットの階層</h2>
+<!-- ================================================================== -->
+
+<div class="tree"><strong>インターネット</strong> = 地球
+
+├── <strong>プロトコル</strong> = 物理法則（地球全体に適用）
+│   ├── <strong>HTTP/HTTPS</strong> → ウェブを実現
+│   ├── <strong>SMTP</strong> → メールを実現
+│   ├── <strong>FTP</strong> → ファイル転送を実現
+│   └── <strong>WebSocket</strong> → リアルタイム通信を実現
+│
+└── <strong>サービス</strong> = 法則に基づいて成立した社会基盤
+    ├── <strong>ウェブ</strong> = 居住するために整えられたエリア（HTTP上に構築）
+    │   ├── <strong>ウェブサイト</strong> = マンション
+    │   │   └── <strong>ウェブページ</strong> = マンションの中の1部屋
+    │   └── <strong>URL</strong> = 住所
+    ├── <strong>メール</strong> = 郵便制度（SMTP上に構築）
+    └── <strong>ファイル転送</strong> = 物流網（FTP上に構築）
+
+──────────────────────────────────────────
+
+<strong>ブラウザ</strong> = インターネット（主にウェブ）を見るためのメガネ
+  Chrome、Safari、Edge、Firefox など
+  ※ 本来はウェブを見るメガネ。現在はほぼ全サービスを吸収</div>
+
+<p class="pending">未着手: DNS / SSH / P2P / VoIP / ストリーミング / TCP-IP物理層 / VPN / IoT</p>
+
+<hr class="divider">
+
+<!-- ================================================================== -->
+<h2 class="s2">2. 客の動機 → 提供すべきWEBサービス</h2>
+<!-- ================================================================== -->
+
+<p style="font-size:13px; color:#555; margin-bottom:12px;">客がインターネットに来る理由は3つしかない。それぞれに対して用意すべきサービスが決まる。</p>
+
+<table>
+  <tr><th style="width:30px">#</th><th style="width:140px">客の動機</th><th style="width:180px">サービス種別</th><th>具体例</th></tr>
+  <tr><td rowspan="5">1</td><td rowspan="5"><strong>知りたい</strong></td><td>組織サイト（コーポレート）</td><td class="ex">Toyota、Sony、中小企業HP、学校HP</td></tr>
+  <tr><td>ポートフォリオ / プロフィール</td><td class="ex">Dribbble作家ページ、GitHub Profile、名刺サイト</td></tr>
+  <tr><td>メディア / ニュース</td><td class="ex">日経、TechCrunch、SmartNews、foodee</td></tr>
+  <tr><td>ブログ / 個人発信</td><td class="ex">note、Zenn、はてなブログ、WordPress</td></tr>
+  <tr><td>マニュアル / ドキュメント</td><td class="ex">MDN、Stripe Docs、Notion Help、行政FAQ</td></tr>
+  <tr><td rowspan="3">2</td><td rowspan="3"><strong>「場」に行きたい</strong></td><td>コミュニティ / SNS</td><td class="ex">X、Reddit、Discord、食べログ口コミ</td></tr>
+  <tr><td>マーケットプレイス</td><td class="ex">メルカリ、Airbnb、ランサーズ、ココナラ</td></tr>
+  <tr><td>エンタメ / ゲーム</td><td class="ex">YouTube、Spotify、Netflix、ブラウザゲーム</td></tr>
+  <tr><td rowspan="3">3</td><td rowspan="3"><strong>買いたい</strong></td><td>EC（物販）</td><td class="ex">Amazon、楽天、Shopify店舗、BASE</td></tr>
+  <tr><td>デジタル販売</td><td class="ex">Steam、App Store、Gumroad、Kindle</td></tr>
+  <tr><td>予約 / サービス購入</td><td class="ex">ホットペッパー、一休、Booking.com</td></tr>
+  <tr class="sep"><td></td><td colspan="3">--- 以下、動機ではなく部品 ---</td></tr>
+  <tr><td>—</td><td><strong>機能（部品）</strong></td><td colspan="2">チェックアウト、ダッシュボード、フォーム、アンケート、FAQ、ヘルプ、プライバシーポリシー、特商法 — サイト内に組み込まれる構成要素であり、単独の動機ではない</td></tr>
+</table>
+
+<ul class="note">
+  <li>1〜3は単体でも合体形態でも成立する（例: Amazon = 1+2+3、食べログ = 1+2+3）</li>
+  <li>LP（ランディングページ）は動機でもサービスでもなく「着地点」。1〜3のどれにでもなり得る形式</li>
+</ul>
+
+<hr class="divider">
+
+<!-- ================================================================== -->
+<h2 class="s3">3. サイトを構成するページ種別</h2>
+<!-- ================================================================== -->
+
+<p style="font-size:13px; color:#555; margin-bottom:12px;">どのサービスを作るにしても、サイトは以下のページ種別の組み合わせで構成される。</p>
+
+<h3>入口ページ — 客が最初に見る</h3>
+<table>
+  <tr><th style="width:160px">種別</th><th>役割</th><th style="width:140px">典型レイアウト</th><th style="width:200px">例</th></tr>
+  <tr><td>トップページ</td><td>サイト全体の入口。ナビゲーションハブ。ブランド印象を決定</td><td>ヒーロー+セクション</td><td class="ex">apple.com、各社コーポレートトップ</td></tr>
+  <tr><td>LP（ランディング）</td><td>1つのCTAに集中。スクロール完結。広告からの着地点</td><td>シングルカラム</td><td class="ex">SaaS登録LP、キャンペーンLP</td></tr>
+</table>
+
+<h3>コンテンツページ — 情報を届ける</h3>
+<table>
+  <tr><th style="width:160px">種別</th><th>役割</th><th style="width:140px">典型レイアウト</th><th style="width:200px">例</th></tr>
+  <tr><td>一覧（リスト/グリッド）</td><td>同種アイテムの列挙。フィルター・ソート・ページング</td><td>グリッド/カード</td><td class="ex">商品一覧、記事一覧、検索結果</td></tr>
+  <tr><td>詳細（シングル）</td><td>1アイテムの全情報。一覧からの遷移先</td><td>シングルカラム or 2カラム</td><td class="ex">商品詳細、記事本文、店舗ページ</td></tr>
+  <tr><td>比較 / 料金</td><td>プラン・機能の比較表。意思決定を促す</td><td>テーブル</td><td class="ex">Pricing Page、機能比較表</td></tr>
+</table>
+
+<h3>アクションページ — 客に行動させる</h3>
+<table>
+  <tr><th style="width:160px">種別</th><th>役割</th><th style="width:140px">典型レイアウト</th><th style="width:200px">例</th></tr>
+  <tr><td>フォーム / 入力</td><td>データを受け取る。問い合わせ、登録、アンケート</td><td>シングルカラム</td><td class="ex">お問い合わせ、会員登録</td></tr>
+  <tr><td>認証（ログイン/登録）</td><td>アクセス制御の入口</td><td>中央寄せカード</td><td class="ex">ログイン画面、OAuth同意画面</td></tr>
+  <tr><td>チェックアウト / 決済</td><td>購入フローの最終段階</td><td>ウィザード/ステップ</td><td class="ex">カート確認、支払い入力</td></tr>
+</table>
+
+<h3>管理ページ — ログイン後の内部</h3>
+<table>
+  <tr><th style="width:160px">種別</th><th>役割</th><th style="width:140px">典型レイアウト</th><th style="width:200px">例</th></tr>
+  <tr><td>ダッシュボード</td><td>データの可視化・KPI監視</td><td>グリッド（ウィジェット）</td><td class="ex">GA4、Vercel Dashboard</td></tr>
+  <tr><td>設定 / プロフィール</td><td>ユーザー自身の情報・環境を編集</td><td>シングルカラム or タブ</td><td class="ex">アカウント設定、通知設定</td></tr>
+</table>
+
+<h3>補助ページ — サイトの信頼性・安全性</h3>
+<table>
+  <tr><th style="width:160px">種別</th><th>役割</th><th style="width:140px">典型レイアウト</th><th style="width:200px">例</th></tr>
+  <tr><td>ヘルプ / FAQ</td><td>疑問解消。検索+アコーディオン構成が多い</td><td>2カラム（サイドナビ）</td><td class="ex">Stripe Docs、よくある質問</td></tr>
+  <tr><td>法的ページ</td><td>プライバシーポリシー、特商法、利用規約</td><td>シングルカラム（長文）</td><td class="ex">各サービスの法的ページ</td></tr>
+  <tr><td>エラー / ステータス</td><td>404、500、メンテナンス中、完了画面</td><td>中央寄せメッセージ</td><td class="ex">GitHub 404、購入完了</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- ================================================================== -->
+<h2 class="s4">4. 集客ファネル</h2>
+<!-- ================================================================== -->
+
+<p style="font-size:13px; color:#555; margin-bottom:12px;">サービスを作っても客が来なければ意味がない。客を連れてきて買わせるまでの流れ。</p>
+
+<table>
+  <tr><th style="width:30px">#</th><th style="width:200px">ステップ</th><th>内容</th><th style="width:180px">使うもの</th></tr>
+  <tr><td>1</td><td>誰に売るか</td><td>ターゲット定義。ペルソナ・課題・予算感</td><td class="ex">ペルソナシート、インタビュー</td></tr>
+  <tr><td>2</td><td>どこにいるか</td><td>ターゲットが集まっているチャネルを特定</td><td class="ex">SNS、検索、業界メディア、口コミ</td></tr>
+  <tr><td>3</td><td>どうやって知ってもらうか</td><td>認知を取る手段。無料（SEO/SNS/口コミ）or 有料（広告）</td><td class="ex">ブログ、X投稿、Google広告、紹介</td></tr>
+  <tr><td>4</td><td>どんなLPにするか</td><td>着地先の種類・形式を決定</td><td class="ex">LP、サービスサイト、EC直結</td></tr>
+  <tr><td>5</td><td>LPの中身をどうするか</td><td>コピー、デザイン、動画、社会的証明、CTA配置</td><td class="ex">ヒーローコピー、デモ動画、口コミ</td></tr>
+  <tr><td>6</td><td>どう課金するか</td><td>決済導線。カート→支払い→確認→完了</td><td class="ex">Stripe、PayPal、銀行振込</td></tr>
+  <tr><td>7</td><td>何を届けるか</td><td>提供・オンボーディング。初回体験が継続を決める</td><td class="ex">ウェルカムメール、セットアップ画面</td></tr>
+</table>
+
+<ul class="note">
+  <li>3→4は状況で組み合わせが変わる（SNS→LP、ブログ→EC直結 等）</li>
+  <li>5→6は固定ペア。LPは常に課金直前の「最後の説得」</li>
+  <li><strong>LP = Last Punch（トドメの一撃）</strong> — 一撃で決まるなら直接LP、決まらないならジャブ（ブログ、事例、SNS投稿）で温めてからLPで仕留める</li>
+</ul>
+
+<hr class="divider">
+
+<!-- ================================================================== -->
+<h2 class="s5">5. レイアウトパターン</h2>
+<!-- ================================================================== -->
+
+<p style="font-size:13px; color:#555; margin-bottom:12px;">ページ種別ごとに最適なレイアウトが決まる。模写で覚えるべき「型」の一覧。</p>
+
+<table>
+  <tr><th style="width:180px">パターン</th><th>構造</th><th style="width:280px">使うページ種別</th></tr>
+  <tr><td>シングルカラム</td><td>1列で上から下へ流れる。集中させたいときの基本形</td><td class="ex">LP、記事詳細、フォーム、法的ページ</td></tr>
+  <tr><td>2カラム（サイド+メイン）</td><td>サイドバーにナビや目次。メインにコンテンツ</td><td class="ex">ドキュメント、ヘルプ、ブログ（PC）、管理画面</td></tr>
+  <tr><td>グリッド / カード</td><td>同種アイテムの繰り返し。画像主体で一覧性が高い</td><td class="ex">商品一覧、記事一覧、ポートフォリオ、ダッシュボード</td></tr>
+  <tr><td>テーブル（表）</td><td>行×列の構造化データ。比較・管理向き</td><td class="ex">料金比較、管理画面リスト、スプレッドシート</td></tr>
+  <tr><td>タイムライン / フィード</td><td>時系列でアイテムが流れる。新しいものが上</td><td class="ex">SNSフィード、チャット、更新履歴、通知</td></tr>
+  <tr><td>ヒーロー + セクション</td><td>大きなビジュアル冒頭 → セクション繰り返し</td><td class="ex">トップページ、LP、プロダクトサイト</td></tr>
+  <tr><td>マスター / ディテール</td><td>左に一覧、右に選択したアイテムの詳細を表示</td><td class="ex">メールクライアント、チャットUI、ファイル管理</td></tr>
+  <tr><td>ウィザード / ステップ</td><td>段階的に入力を進める。進捗バー付き</td><td class="ex">会員登録、チェックアウト、セットアップ</td></tr>
+  <tr><td>中央寄せカード</td><td>画面中央に1つのカード。周囲は余白</td><td class="ex">ログイン画面、エラーページ、完了画面</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- ================================================================== -->
+<h2 class="s6">6. 技術選定</h2>
+<!-- ================================================================== -->
+
+<h3>6-1. 画面の作り方（レンダリング方式）</h3>
+<table>
+  <tr><th style="width:180px">方式</th><th>仕組み</th><th style="width:180px">向いている場面</th><th style="width:140px">代表技術</th></tr>
+  <tr><td>静的サイト（SSG）</td><td>ビルド時にHTML生成。CDN配信で高速</td><td class="ex">ブログ、ドキュメント、LP、ポートフォリオ</td><td class="ex">Astro、Hugo、Next.js static</td></tr>
+  <tr><td>SSR（サーバー描画）</td><td>リクエストごとにサーバーでHTML生成</td><td class="ex">EC商品ページ、SEO重要なページ</td><td class="ex">Next.js SSR、Nuxt、Rails</td></tr>
+  <tr><td>SPA（クライアント描画）</td><td>初回ロード後はJSがDOM操作。APIで通信</td><td class="ex">ダッシュボード、管理画面、ログイン後</td><td class="ex">React SPA、Vue SPA</td></tr>
+  <tr><td>MPA（従来型）</td><td>ページ遷移ごとにサーバーからHTML取得</td><td class="ex">行政サイト、WordPress、シンプルなサイト</td><td class="ex">WordPress、PHP、静的HTML</td></tr>
+  <tr><td>ハイブリッド</td><td>ページ単位でSSG/SSR/SPAを選択</td><td class="ex">大規模サイト（トップはSSG、管理画面はSPA）</td><td class="ex">Next.js App Router、Remix</td></tr>
+  <tr><td>エッジレンダリング</td><td>CDNエッジで動的処理。低レイテンシ</td><td class="ex">パーソナライズ、A/Bテスト、地域別表示</td><td class="ex">Cloudflare Workers、Vercel Edge</td></tr>
+</table>
+
+<h3>6-2. アプリケーションの分類</h3>
+<div class="tree"><strong>アプリケーション</strong>
+├── <strong>Webアプリ</strong>（ブラウザ上で動作。インストール不要）
+│   └── Notion、Gmail、GA4、foodee
+├── <strong>ネイティブアプリ</strong>（端末にインストール）
+│   ├── <strong>モバイルアプリ</strong>（iOS / Android）
+│   └── <strong>デスクトップアプリ</strong>（Windows / Mac）
+├── <strong>PWA</strong>（Webアプリだがインストールも可能）
+│   └── X、Starbucks
+└── <strong>ハイブリッドアプリ</strong>（Web技術でネイティブの殻をかぶせたもの）
+    └── Slack(デスクトップ版)、VS Code</div>
+
+<ul class="note">
+  <li><strong>動作場所</strong> — ローカル / ブラウザ（どこで動くか）</li>
+  <li><strong>売り方</strong> — SaaS（月額課金）/ パッケージ（買い切り）</li>
+</ul>
+
+<hr class="divider">
+
+<!-- ================================================================== -->
+<h2 class="s7">7. 収益モデル</h2>
+<!-- ================================================================== -->
+
+<p style="font-size:13px; color:#555; margin-bottom:12px;">サービスの種類によって取れる収益モデルが決まる。逆に、収益モデルからサービス設計を逆算することもできる。</p>
+
+<table>
+  <tr><th style="width:160px">モデル</th><th>仕組み</th><th style="width:120px">主要KPI</th><th style="width:200px">典型サービス</th></tr>
+  <tr><td>広告収入</td><td>トラフィック × 広告単価。大量PVが必要</td><td class="ex">PV、CTR、CPM</td><td class="ex">ニュースメディア、ブログ、YouTube</td></tr>
+  <tr><td>サブスクリプション</td><td>月額/年額の定額課金。継続率が命</td><td class="ex">MRR、Churn率</td><td class="ex">Netflix、Notion、日経電子版</td></tr>
+  <tr><td>フリーミアム</td><td>基本無料+上位機能で課金。無料→有料の転換率が勝負</td><td class="ex">CVR、ARPU</td><td class="ex">Spotify、Canva、Slack</td></tr>
+  <tr><td>EC（物販）</td><td>商品販売。仕入れ→販売の差額が利益</td><td class="ex">AOV、LTV、在庫回転</td><td class="ex">Amazon、楽天、Shopify店舗</td></tr>
+  <tr><td>リード獲得</td><td>見込み客情報を取得→営業チームに渡す</td><td class="ex">CPA、リード数、商談化率</td><td class="ex">BtoB LP、資料請求、無料相談</td></tr>
+  <tr><td>SaaS利用料</td><td>機能利用に対する従量 or 定額課金</td><td class="ex">MRR、NRR、CAC</td><td class="ex">AWS、Stripe、freee</td></tr>
+  <tr><td>マッチング手数料</td><td>成約ごとに片方 or 両方から徴収</td><td class="ex">GMV、テイクレート</td><td class="ex">Airbnb、メルカリ、ランサーズ</td></tr>
+  <tr><td>寄付 / 公共予算</td><td>非営利・行政。収益は目的でない</td><td class="ex">—</td><td class="ex">Wikipedia、省庁サイト、NPO</td></tr>
+</table>
+
+<p class="footer">v1.0 | 出典: A267-A268 (Session 65起点) | Session 68で客の動機視点に再構成 | Session 69で深掘り統合</p>
+
+</body>
+</html>

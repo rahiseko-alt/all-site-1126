@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>2026-05-31 Check-out (Session 2) — pre-edit ask 化 + saltydog 取込</title>
+<style>
+body{font-family:'Segoe UI',sans-serif;max-width:920px;margin:0 auto;padding:24px;line-height:1.7;color:#222;background:#faf9f7}
+h1{font-size:1.5rem;border-bottom:3px solid #4a90e2;padding-bottom:8px}
+h2{font-size:1.15rem;margin-top:28px;background:#eef3fb;padding:6px 10px;border-left:4px solid #4a90e2}
+.alert-red{background:#fdecea;border:1.5px solid #e74c3c;border-radius:6px;padding:12px 16px;margin:16px 0}
+.alert-red b{color:#c0392b}
+code{background:#f0f0f0;padding:1px 5px;border-radius:3px;font-size:0.9em}
+table{border-collapse:collapse;width:100%;margin:8px 0}
+th,td{border:1px solid #ccc;padding:6px 10px;text-align:left;font-size:0.92rem}
+th{background:#f3f3f3}
+.h{color:#c0392b;font-weight:700}.m{color:#e67e22}.l{color:#888}
+</style>
+</head>
+<body>
+<h1>2026-05-31 Check-out (Session 2)</h1>
+<p>branch: <code>master</code> ／ <b>次セッションは本ファイルを最初に Read してから着手すること。</b>（同日 Session 1 = フリノバ/feed-check は <code>2026-05-31-checkout.html</code> 参照）</p>
+
+<div class="alert-red">
+<b>最重要:</b> 本番ファイル編集ガード <code>pre-edit.sh</code> を「ターミナルマーカー(.allow-prod-edit) 方式」から「<b>チャット内承認(ask)</b>」へ変更（commit <code>4c4999f</code>・全19プロダクト propagate 済）。<br>
+・<b>AI は自分のセキュリティ guardrail hook を編集できない</b>（auto-mode 分類器が plan 承認でも hard-block）。変更はマスター手動 + <b>byte 正確な tmp→cp コピー</b>で実施した（チャット貼付は長い行を物理改行で破壊する）。<br>
+・ask は<b>permission mode 依存</b>: 通常編集モードでは ask 描画、acceptEdits 等の自動承認モードでは静かに通過（公式仕様・マスター了承の Option A）。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li>saltydog 公式HP redesign（Codex <code>fe12561</code>）を <code>products/trimmer-system/site/</code> に取込（commit <code>51a0853</code>）。命名規則違反＋未参照重複の日本語スクショは除外。</li>
+<li>マスターの恒常的不満「本番編集の度にターミナルでマーカー更新が必要」を根本解決。原因 = ルート <code>.vercel</code> が全 product を本番扱い + マーカー方式の独自設計。</li>
+<li>3 Explore 並列調査で実装ルート確定 → plan <code>flickering-hugging-flame</code> 承認 → 実装。</li>
+<li>hook を ①<code>/products/</code> 境界停止（ルート .vercel 無視）②exit2+marker → 公式 <code>permissionDecision:"ask"</code> stdout に変更。全プロダクト propagate。</li>
+<li>permission-defense.md / trimmer-system memory.md の陳腐化記述を更新。</li>
+<li>機械検証 10/11 PASS（残1=ライブ ask 描画はモード依存で確認）。ターミナル操作は全廃。</li>
+</ol>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+<tr><th>hash</th><th>種別</th><th>内容</th></tr>
+<tr><td><code>4c4999f</code></td><td>fix(hooks)</td><td>本番編集ガードをターミナルマーカー→チャット内承認(ask)へ・全19product propagate</td></tr>
+<tr><td><code>51a0853</code></td><td>feat(trimmer-system)</td><td>saltydog 公式HP redesign を site/ に取込</td></tr>
+</table>
+
+<h2>C. 影響波及（必読）</h2>
+<ul>
+<li><b>全プロダクト</b>の <code>pre-edit.sh</code> が ask 方式に統一。デプロイ済（<code>.vercel</code> 保有）製品の本番ファイル編集は通常モードで chat-ask、非デプロイは無プロンプト。</li>
+<li><b>trimmer-system は Cloudflare Pages デプロイ済だが <code>.vercel</code> 不在</b>のため hook 保護対象外（src/ 編集は無プロンプト）。マスター明示の「trimmer 無摩擦」方針。</li>
+<li>旧 <code>.allow-prod-edit</code> ターミナルマーカーは廃止（<code>.allow-destructive</code> は別機構で存続）。</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table>
+<tr><th>優先</th><th>項目</th></tr>
+<tr><td class="l">L</td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否のマスター判断（前セッションからの継続・実害なし）</td></tr>
+<tr><td class="l">L</td><td>skills repo の他者未コミット変更の去就判断（継続）</td></tr>
+<tr><td class="l">L</td><td>saltydog site の本番化 TODO（Unsplash→実写真 / LINE・予約 URL 実値 / 正規ドメイン決定）= trimmer-system エージェント領域</td></tr>
+</table>
+
+<h2>E. 配備済 subagent / skill / hook</h2>
+<ul><li>新規配備なし。既存 <code>pre-edit.sh</code> のロジック改修のみ（全 product 配布）。</li></ul>
+
+<h2>F. 本セッション生成レポート</h2>
+<ul><li>plan: <code>~/.claude/plans/flickering-hugging-flame.md</code>（hook ask 化の設計・受入基準）</li></ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本ファイル + <code>memory.md</code> P1/P4 を Read。</li>
+<li>Check-in 機械検証 <code>bash scripts/check-in-verify.sh</code>（A-20 hook syntax 含む）。</li>
+<li>機械検証サマリ: 本セッション secret-scan 0 / check-in-verify EXIT 0(WARN1) / code-review 実バグ 0。</li>
+</ol>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ルール構造改革 — 発火検証マトリクス</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--text:#1a1a2e;--sub:#64748b;--border:#e2e8f0;--green:#166534;--green-bg:#dcfce7;--blue:#1e40af;--blue-bg:#dbeafe;--orange:#9a3412;--orange-bg:#fff7ed;--red:#991b1b;--red-bg:#fee2e2;--purple:#7c3aed;--purple-bg:#f3e8ff;--teal:#0f766e;--teal-bg:#ccfbf1}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);padding:32px 24px;line-height:1.6}
+.container{max-width:1400px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;margin-bottom:4px}
+.meta{font-size:.85rem;color:var(--sub);margin-bottom:20px}
+.summary{background:var(--card);border-radius:10px;padding:20px 24px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.summary h2{font-size:1.1rem;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.stat{text-align:center;padding:16px;border-radius:8px;background:#f8fafc}
+.stat-val{font-size:1.8rem;font-weight:700}
+.stat-label{font-size:.78rem;color:var(--sub)}
+.stat-green .stat-val{color:var(--green)}
+.stat-blue .stat-val{color:var(--blue)}
+.stat-orange .stat-val{color:var(--orange)}
+.stat-red .stat-val{color:var(--red)}
+.before-after{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.ba-card{padding:16px;border-radius:8px}
+.ba-before{background:var(--red-bg);border-left:4px solid var(--red)}
+.ba-after{background:var(--green-bg);border-left:4px solid var(--green)}
+.ba-card h3{font-size:.95rem;margin-bottom:8px}
+.ba-card p{font-size:.85rem;color:#475569}
+.section{background:var(--card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:24px;overflow:hidden}
+.section-header{padding:14px 24px;font-weight:700;font-size:1.05rem;border-bottom:1px solid var(--border);border-left:4px solid}
+.sh-base{background:#f8fafc;color:#334155;border-left-color:#64748b}
+.sh-rules{background:var(--blue-bg);color:var(--blue);border-left-color:#3b82f6}
+.sh-coverage{background:var(--teal-bg);color:var(--teal);border-left-color:#14b8a6}
+.sh-matrix{background:var(--purple-bg);color:var(--purple);border-left-color:#8b5cf6}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead th{background:#f8fafc;padding:10px 12px;text-align:left;font-weight:600;color:#475569;border-bottom:2px solid var(--border);white-space:nowrap}
+tbody td{padding:8px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+tbody tr:hover{background:#f8fafc}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.73rem;font-weight:700;line-height:1.6;white-space:nowrap;margin:1px 2px}
+.b-always{background:#e0e7ff;color:#3730a3}
+.b-product{background:var(--blue-bg);color:var(--blue)}
+.b-risk{background:var(--red-bg);color:var(--red)}
+.b-legal{background:var(--orange-bg);color:var(--orange)}
+.b-deploy{background:#fce7f3;color:#9d174d}
+.b-lp{background:var(--teal-bg);color:var(--teal)}
+.b-video{background:var(--purple-bg);color:var(--purple)}
+.b-quality{background:#fef3c7;color:#92400e}
+.b-delivery{background:#d1fae5;color:#065f46}
+.b-clone{background:#e0f2fe;color:#0369a1}
+.b-research{background:#fae8ff;color:#86198f}
+.b-struct{background:#f1f5f9;color:#475569}
+.b-ag{background:#fff7ed;color:#c2410c}
+.b-none{background:#f1f5f9;color:#94a3b8}
+.phase-tag{display:inline-block;padding:2px 10px;border-radius:4px;font-size:.75rem;font-weight:700;margin-right:4px}
+.pt-p0{background:#eff6ff;color:#1e40af}
+.pt-p1{background:#f0fdf4;color:#166534}
+.pt-p2{background:#fff7ed;color:#9a3412}
+.pt-p3{background:#eef2ff;color:#4338ca}
+.pt-p4{background:#fff1f2;color:#be123c}
+.note{padding:12px 24px;font-size:.82rem;color:var(--sub);background:#f8fafc;border-bottom:1px solid var(--border)}
+td.center{text-align:center}
+.star{color:#eab308}
+.excluded{color:#94a3b8;font-style:italic}
+@media(max-width:768px){body{padding:16px 8px}.before-after{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}table{font-size:.75rem}thead th,tbody td{padding:6px 8px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>ルール構造改革 — 発火検証マトリクス</h1>
+<p class="meta">作成: 2026-04-02 | 検証対象: .claude/rules/ 13ファイル vs PC表 73タスク</p>
+
+<!-- ===== 目的と改善 ===== -->
+<div class="summary">
+<h2>改革の目的</h2>
+<div class="before-after">
+<div class="ba-card ba-before">
+<h3>Before（Pull型）</h3>
+<p>CLAUDE.md §3 に32本のSOPを列挙。エージェントが「自分で判断して開く」方式。<br>問題: 判断を間違える / 面倒で飛ばす → ルール違反 → 手戻り</p>
+</div>
+<div class="ba-card ba-after">
+<h3>After（Push型）</h3>
+<p>.claude/rules/ の paths 指定で、作業対象ファイルに応じてルール要点が自動注入。<br>エージェントの判断ステップを排除。読み忘れが構造的に発生しない。</p>
+</div>
+</div>
+
+<div class="stats">
+<div class="stat stat-green"><div class="stat-val">87.5%</div><div class="stat-label">SOP自動注入率（28/32本）</div></div>
+<div class="stat stat-blue"><div class="stat-val">13</div><div class="stat-label">rulesファイル数</div></div>
+<div class="stat stat-orange"><div class="stat-val">73</div><div class="stat-label">PC表タスク総数</div></div>
+<div class="stat stat-red"><div class="stat-val">4</div><div class="stat-label">意図的除外SOP</div></div>
+</div>
+</div>
+
+<!-- ===== 常時発火するルール ===== -->
+<div class="section">
+<div class="section-header sh-base">常時発火（全タスク共通）</div>
+<div class="note">以下の2ファイルはPC表の全73タスクで発火する。個別検証不要。</div>
+<table>
+<thead><tr><th>rulesファイル</th><th>発火条件</th><th>カバーするSOP</th><th>検証方法</th></tr></thead>
+<tbody>
+<tr><td><span class="badge b-always">session-lifecycle</span></td><td>pathsなし = 常時注入</td><td>git-workflow / mission-log-ops / handoff-protocol</td><td>Check-in/out手順を実行しているか</td></tr>
+<tr><td><span class="badge b-product">product-development</span></td><td>products/**</td><td>product-cycle / agent-rules</td><td>PC表ルール（rationale記載・○基準）を遵守しているか</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 専門ルール × PCタスク マトリクス ===== -->
+<div class="section">
+<div class="section-header sh-matrix">発火検証マトリクス（専門ルール × PCタスク）</div>
+<div class="note">常時発火の2ファイルを除いた11ファイルについて、PC表のどのタスクで発火すべきかを列挙。<br><strong>検証方法:</strong> 該当タスクを実行したとき、「期待する行動」が実行されていれば発火の証拠。されていなければ未発火（またはルール無視）。</div>
+<table>
+<thead><tr><th style="width:140px">rulesファイル</th><th style="width:180px">発火条件（paths）</th><th>発火するPCタスク</th><th>期待する行動（=発火の証拠）</th></tr></thead>
+<tbody>
+
+<tr>
+<td><span class="badge b-risk">risk-assessment</span></td>
+<td>**/risk-diagnosis.md<br>**/risk-registry.md<br>**/dead-end-registry.md<br>**/pc-progress.html</td>
+<td>
+<span class="phase-tag pt-p0">P0</span>#13 リスク予備フィルター<br>
+<span class="phase-tag pt-p0">P0</span>#18 ゲート（リスクタグ再評価）<br>
+<span class="phase-tag pt-p1">P1</span>#14 ゲート<br>
+<span class="phase-tag pt-p2">P2</span>#14 リスク診断 CL-11<br>
+<span class="phase-tag pt-p2">P2</span>#27 ゲート
+</td>
+<td>
+- リスクタグ4種（Aout/Gray/Judge-Able/Clear）で分類<br>
+- 出力先（A/B/C）で被害対象を分類<br>
+- ドン詰まり台帳を事前照合<br>
+- ゲート前にタグ再評価を実施
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-quality">quality-templates</span></td>
+<td>products/*/docs/cl3-*<br>products/*/docs/test-plan*<br>products/*/docs/external-service*<br>products/*/docs/*-comparison*<br>products/*/tmp/feature-list*</td>
+<td>
+<span class="phase-tag pt-p0">P0</span>#5 競合調査（比較表作成）<br>
+<span class="phase-tag pt-p0">P0</span>#7-12 外部連携（比較表+フィルタ）<br>
+<span class="phase-tag pt-p1">P1</span>#7 外部サービス確認<br>
+<span class="phase-tag pt-p1">P1</span>#10-11 テスト計画<br>
+<span class="phase-tag pt-p1">P1</span>#12 障害検証 CL-3
+</td>
+<td>
+- 比較表: 単一HTML+3〜5社+推測禁止<br>
+- 障害シナリオ: 7カテゴリ必須<br>
+- 外部サービス: タイムスタンプ+ソース付き<br>
+- テスト計画: TC-1〜TC-7グループ使用
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-legal">legal</span></td>
+<td>**/terms.html<br>**/privacy.html<br>**/legal.html<br>**/terms-of-service*<br>**/privacy-policy*</td>
+<td>
+<span class="phase-tag pt-p2">P2</span>#13 法令表記 CL-9
+</td>
+<td>
+- 事業者情報（小齊平恒平/Aiueo/rahiseko@gmail.com）を正本から転記<br>
+- RSS/API使用時は法的調査テンプレート使用<br>
+- © 2026 Aiueo. All rights reserved.
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-deploy">deployment</span></td>
+<td>**/vercel.json<br>**/vercel<br>**/.vercel/**</td>
+<td>
+<span class="phase-tag pt-p2">P2</span>#16 vercel --prod<br>
+<span class="phase-tag pt-p2">P2</span>#17 独自ドメイン設定
+</td>
+<td>
+- デプロイ前: npm run build成功+環境変数+OAuth URI確認<br>
+- デプロイ後: トップページ+認証+API+DB+OGP確認<br>
+- *.vercel.appではなくカスタムドメイン使用
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-lp">lp-design</span></td>
+<td>products/*/lp/**</td>
+<td>
+<span class="phase-tag pt-p2">P2</span>#1 LP構成設計<br>
+<span class="phase-tag pt-p2">P2</span>#2 LP実装+品質レビュー CL-12
+</td>
+<td>
+- 必須入力7項目を提出<br>
+- 競合LP分析（3〜5社）を実施<br>
+- PASONA 7セクション固定順序<br>
+- 参考サイト選定: 感情定義が先
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-video">video-production</span></td>
+<td>products/*/video/**</td>
+<td>
+<span class="phase-tag pt-p2">P2</span>#3 動画配信戦略<br>
+<span class="phase-tag pt-p2">P2</span>#4 出口動画制作 CL-13<br>
+<span class="phase-tag pt-p3">P3</span>#2 入口動画制作 CL-13
+</td>
+<td>
+- 戦略テーブル（エントリ/エグジット/ファネル）を先に作成<br>
+- テロップ情報源: 現在のLP+検証済み仮説のみ<br>
+- ツール: Remotion+NanoBana2のみ使用
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-delivery">delivery-onboarding</span></td>
+<td>products/*/docs/delivery*<br>products/*/docs/provisioning*<br>products/*/docs/operation-manual*</td>
+<td>
+<span class="phase-tag pt-p2">P2</span>#22 自動返信+通知設定<br>
+<span class="phase-tag pt-p2">P2</span>#24 プロビジョニング手順書<br>
+<span class="phase-tag pt-p2">P2</span>#25 納品テンプレート
+</td>
+<td>
+- 登録方式+初期設定+手動作業の所要時間を明記<br>
+- 運用マニュアル: 開発用語禁止+役割別分離<br>
+- メール: 4種類のテンプレート使用
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-clone">ui-clone</span></td>
+<td>products/*/tmp/clone/**<br>products/*/tmp/*clone*</td>
+<td>
+<span class="phase-tag pt-p2">P2</span>#2 LP実装時（模写アプローチの場合）
+</td>
+<td>
+- CSS計測表17項目を提出<br>
+- スクショ撮影+照合の5ステップ実施<br>
+- 100%コピー→部分変更の順序遵守
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-research">research-bank</span></td>
+<td>docs/research-bank/**</td>
+<td>
+<span class="phase-tag pt-p0">P0</span>#4 市場検証（リサーチ結果保存時）<br>
+<span class="phase-tag pt-p0">P0</span>#5 競合調査（リサーチ結果保存時）
+</td>
+<td>
+- リサーチバンクSOP（データバンク運用ルール）遵守<br>
+- 保存形式・命名規則に従う
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-struct">structural-ops</span></td>
+<td>products/*/<br>archive/**</td>
+<td>
+（PCタスク外。新プロダクト作成・構造変更時に発火）
+</td>
+<td>
+- 1プロダクト=1ディレクトリ遵守<br>
+- git mvで履歴保持+旧パス参照更新<br>
+- 構造診断: ①フォルダ→②到達範囲→③重複
+</td>
+</tr>
+
+<tr>
+<td><span class="badge b-ag">ag-task</span></td>
+<td>products/*/handoff*</td>
+<td>
+（PCタスク外。エージェント間引き継ぎ時に発火）
+</td>
+<td>
+- モデル割り当てルール遵守<br>
+- ハンドオフプロトコルに従った記録
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<!-- ===== カバレッジ ===== -->
+<div class="section">
+<div class="section-header sh-coverage">SOP → rulesカバレッジ（32本中28本）</div>
+<table>
+<thead><tr><th>rulesファイル</th><th>カバーするSOP</th><th style="width:60px">本数</th></tr></thead>
+<tbody>
+<tr><td><span class="badge b-always">session-lifecycle</span></td><td>git-workflow.md / mission-log-ops.md / handoff-protocol.md</td><td class="center">3</td></tr>
+<tr><td><span class="badge b-product">product-development</span></td><td>product-cycle.md / agent-rules.md</td><td class="center">2</td></tr>
+<tr><td><span class="badge b-risk">risk-assessment</span></td><td>risk-diagnosis-sop.md / risk-registry.md / dead-end-registry.md</td><td class="center">3</td></tr>
+<tr><td><span class="badge b-quality">quality-templates</span></td><td>external-service-check-template.md / comparison-sop.md / failure-scenario-template.md / test-template-guide.md / design-doc-templates.md / feature-inventory-sop.md</td><td class="center">6</td></tr>
+<tr><td><span class="badge b-legal">legal</span></td><td>legal-reference.md</td><td class="center">1</td></tr>
+<tr><td><span class="badge b-deploy">deployment</span></td><td>vercel-deploy-checklist.md</td><td class="center">1</td></tr>
+<tr><td><span class="badge b-lp">lp-design</span></td><td>lp-design-sop.md / reference-site-selection-sop.md</td><td class="center">2</td></tr>
+<tr><td><span class="badge b-video">video-production</span></td><td>video-production-sop.md / antigravity-tools-reference.md / antigravity-remotion-setup.md</td><td class="center">3</td></tr>
+<tr><td><span class="badge b-clone">ui-clone</span></td><td>ui-clone-sop.md</td><td class="center">1</td></tr>
+<tr><td><span class="badge b-research">research-bank</span></td><td>research-bank-sop.md</td><td class="center">1</td></tr>
+<tr><td><span class="badge b-struct">structural-ops</span></td><td>folder-lifecycle.md / structural-diagnosis.md</td><td class="center">2</td></tr>
+<tr><td><span class="badge b-delivery">delivery-onboarding</span></td><td>onboarding-ops-templates.md / email-template-guide.md</td><td class="center">2</td></tr>
+<tr><td><span class="badge b-ag">ag-task</span></td><td>agent-task-protocol.md</td><td class="center">1</td></tr>
+<tr style="background:#f8fafc"><td colspan="2" style="text-align:right;font-weight:700">合計</td><td class="center" style="font-weight:700">28</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 意図的除外 ===== -->
+<div class="section">
+<div class="section-header sh-base">意図的除外（4本）</div>
+<table>
+<thead><tr><th>SOP</th><th>除外理由</th></tr></thead>
+<tbody>
+<tr><td class="excluded">project-promotion.md</td><td>司令塔のみ。稀な操作。マスター指示で直接SOPを読めば十分</td></tr>
+<tr><td class="excluded">shared-asset-ops.md</td><td>同上</td></tr>
+<tr><td class="excluded">memory/patrol.md</td><td>memoryシステム管轄。SOPではない</td></tr>
+<tr><td class="excluded">docs/md-inventory.md</td><td>棚卸し用途。SOPではない</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 検証手順 ===== -->
+<div class="section">
+<div class="section-header sh-rules">検証手順</div>
+<div class="note" style="font-size:.88rem;line-height:1.8;padding:20px 24px">
+<strong>方法:</strong> 新規プロダクトのPC表をP0から実行し、各タスクで期待する行動が発生するか記録する。<br><br>
+<strong>手順:</strong><br>
+1. テスト用プロダクトのPC表を作成（全タスク × で初期化）<br>
+2. P0 #1 から順にタスクを実行<br>
+3. 各タスク完了時に「期待する行動」列の項目が実行されたか記録<br>
+4. 実行された = 発火の証拠。実行されなかった = 未発火 or ルール無視<br><br>
+<strong>注意:</strong><br>
+- 全73タスクを通す必要はない。各rulesファイルにつき最低1タスクで確認すれば十分<br>
+- 常時発火の2ファイル（session-lifecycle / product-development）は全タスクで自動確認される<br>
+- structural-ops / ag-task はPCタスク外のため、別途トリガーして確認<br>
+- <strong>最小検証セット（11タスク）:</strong> P0#5, P0#13, P1#7, P1#12, P2#1, P2#4, P2#13, P2#14, P2#16, P2#24, P0#4（research-bank保存時）
+</div>
+</div>
+
+<!-- ===== 検証結果 ===== -->
+<div class="section">
+<div class="section-header" style="background:#dcfce7;color:#166534;border-left-color:#16a34a">検証結果（2026-04-02 Session 108 — kobarakuローリングテスト）</div>
+<div class="note" style="font-size:.88rem;line-height:1.8;padding:20px 24px">
+<strong>テストベッド:</strong> コバラク（products/kobaraku/）<br>
+<strong>方法:</strong> 各ルールのpaths発火条件に該当するファイルをkobarakuディレクトリ内に作成 → 読み込み → system-reminderへの自動注入を確認 → テスト用ファイル削除<br>
+<strong>結果: 13/13ルール発火。自動注入率 100%</strong>
+</div>
+<table>
+<thead><tr><th style="width:30px">#</th><th style="width:120px">PCタスク</th><th>読み込んだファイル（paths発火トリガー）</th><th style="width:160px">発火したルール</th><th style="width:50px">結果</th></tr></thead>
+<tbody>
+<tr><td class="center">1</td><td>— (常時)</td><td>pathsなし（全会話で自動注入）</td><td><span class="badge b-always">session-lifecycle</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">2</td><td>— (常時)</td><td>products/kobaraku/**（任意のファイルアクセス）</td><td><span class="badge b-product">product-development</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">3</td><td>— (構造)</td><td>products/kobaraku/（ディレクトリアクセス）</td><td><span class="badge b-struct">structural-ops</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">4</td><td><span class="phase-tag pt-p0">P0</span>#4</td><td>docs/research-bank/kobaraku-market-test.md</td><td><span class="badge b-research">research-bank</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">5</td><td><span class="phase-tag pt-p0">P0</span>#5</td><td>products/kobaraku/docs/kobaraku-comparison-test.md</td><td><span class="badge b-quality">quality-templates</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">6</td><td><span class="phase-tag pt-p0">P0</span>#13</td><td>products/kobaraku/risk-diagnosis.md</td><td><span class="badge b-risk">risk-assessment</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">7</td><td><span class="phase-tag pt-p1">P1</span>#7</td><td>products/kobaraku/docs/external-service-check.md</td><td><span class="badge b-quality">quality-templates</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">8</td><td><span class="phase-tag pt-p1">P1</span>#12</td><td>products/kobaraku/docs/cl3-failure-scenario.md</td><td><span class="badge b-quality">quality-templates</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">9</td><td><span class="phase-tag pt-p2">P2</span>#1</td><td>products/kobaraku/lp/index.html</td><td><span class="badge b-lp">lp-design</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">10</td><td><span class="phase-tag pt-p2">P2</span>#4</td><td>products/kobaraku/video/strategy.md</td><td><span class="badge b-video">video-production</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">11</td><td><span class="phase-tag pt-p2">P2</span>#13</td><td>products/kobaraku/terms.html</td><td><span class="badge b-legal">legal</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">12</td><td><span class="phase-tag pt-p2">P2</span>#14</td><td>（P0#13と同一トリガー: risk-diagnosis.md）</td><td><span class="badge b-risk">risk-assessment</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">13</td><td><span class="phase-tag pt-p2">P2</span>#16</td><td>products/kobaraku/.vercel/project.json</td><td><span class="badge b-deploy">deployment</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">14</td><td><span class="phase-tag pt-p2">P2</span>#24</td><td>products/kobaraku/docs/delivery-checklist.md</td><td><span class="badge b-delivery">delivery-onboarding</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">15</td><td>— (模写)</td><td>products/kobaraku/tmp/clone/reference.html</td><td><span class="badge b-clone">ui-clone</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr><td class="center">16</td><td>— (引き継ぎ)</td><td>products/kobaraku/handoff.md</td><td><span class="badge b-ag">ag-task</span></td><td class="center" style="color:#166534;font-weight:700">✅</td></tr>
+<tr style="background:#dcfce7"><td colspan="4" style="text-align:right;font-weight:700;color:#166534">合計</td><td class="center" style="font-weight:700;color:#166534">13/13</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</body>
+</html>

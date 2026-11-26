@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><title>trimmer-system Check-out 2026-06-04</title>
+<style>
+body{font-family:'Zen Kaku Gothic New',sans-serif;max-width:900px;margin:0 auto;padding:24px;color:#222;background:#f7f7fb;line-height:1.7}
+h1{font-size:1.4rem;border-bottom:3px solid #4a90e2;padding-bottom:8px}
+h2{font-size:1.1rem;margin-top:28px;color:#2a5a8a;border-left:5px solid #4a90e2;padding-left:10px}
+.alert{background:#fff3f3;border:2px solid #e85c5c;border-radius:8px;padding:12px 16px;margin:16px 0}
+.alert b{color:#c0392b}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:0.9rem}
+th,td{border:1px solid #ccc;padding:6px 10px;text-align:left}
+th{background:#eaf1fb}
+code{background:#eee;padding:1px 5px;border-radius:4px;font-size:0.85em}
+.h{color:#c0392b;font-weight:700}.m{color:#e08a00}.l{color:#888}
+</style></head><body>
+
+<h1>trimmer-system Check-out — 2026-06-04（branch: master）</h1>
+<p>次セッションは <b>本ファイルを先に Read</b> してから着手すること。</p>
+
+<div class="alert">
+<b>⚠️ 最重要</b>
+<ol>
+<li><b>描画モードのチカチカは解決済</b>（マスター実機OK）。真因は<b>背後 <code>.hc</code> カードの <code>:hover{transform}</code> 振動</b>。<code>inset:0</code>全画面化+<code>body.is-drawing-active</code>で背後hover無効化。commit <code>b92e58e4</code>・Version <code>63fd6e3f</code>。</li>
+<li><b>教訓（P3記録済）</b>: 実ブラウザ特有バグ（hover/scrollbar/GPU）は<b>headless再現不可</b>→headed/実機で再現してから直す。目先修正を繰り返すな。A版正常/B版不具合なら<b>差分が真因</b>。今回これを怠り4回修正を外しマスター解任寸前まで苛立たせた。</li>
+<li><code>src/assets/beauty-report-reference.jpg</code> が <code>D</code>（削除）で working tree 残存（P1#1・<b>マスター判断待ち・触るな</b>）。</li>
+</ol>
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+<li>pc-checkin → 認証方針確定（<code>/api/*</code> 無認証でマスター決定・CLAUDE.md §2記載）</li>
+<li>描画モード不具合の修正を5回試行（4失敗→1成功）。最終的に hover振動が真因と確定し解決</li>
+<li>サブ10+2体リサーチで根本原因を確定（CSS仕様・Konva・hover振動アンチパターン）</li>
+<li>worker に <code>Cache-Control:no-store</code> 追加（HTML配信・キャッシュ滞留防止）</li>
+</ul>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+<tr><th>hash</th><th>種別</th><th>内容</th></tr>
+<tr><td>d7d37b4e</td><td>docs</td><td>/api/* 無認証で確定（CLAUDE.md §2 + memory）</td></tr>
+<tr><td>e12b8b54</td><td>fix(失敗)</td><td>描画ピンチ gesturestart（iOS無効・後にrevert）</td></tr>
+<tr><td>ac484e9e</td><td>fix(失敗)</td><td>svh化（チカチカ回帰を生み revert）</td></tr>
+<tr><td>e1a6f5db</td><td>revert</td><td>描画修正2回分を取り消し</td></tr>
+<tr><td>8784fba7</td><td>fix(失敗)</td><td>dispatchEvent削除+Cache-Control:no-store（チカチカ未解決）</td></tr>
+<tr><td><b>b92e58e4</b></td><td><b>fix(成功)</b></td><td><b>hover振動解消（inset:0全画面化+背後hover無効化）</b></td></tr>
+<tr><td>29594f51</td><td>chore</td><td>memory記録（P3失敗事例+P1解決済）</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<ul>
+<li><code>worker/src/index.js</code>: 全HTMLレスポンスが <code>HTML_HEADERS</code>(no-store) 経由に統一（commit 8784fba7）</li>
+<li><code>ponchi-v2.html</code> CSS: <code>.draw-section.is-drawing</code> は <code>inset:0</code> 全画面。<code>body.is-drawing-active</code> で <code>.hc</code>/<code>.owner-pet-item</code>/<code>.opt</code> の hover-transform を描画中だけ無効化</li>
+</ul>
+
+<h2>D. 残作業（P1）</h2>
+<table>
+<tr><th>優先</th><th>内容</th></tr>
+<tr><td class="h">H</td><td><code>src/assets/beauty-report-reference.jpg</code> 削除(D)のマスター判断（復元/削除確定/保留）。CLAUDE.md §1(src/assets) と memory P4(docs/) でパス記述食い違いあり要確認</td></tr>
+<tr><td class="m">M</td><td>固定素材差替（SALTY DOG ロゴ・歯/爪解剖図 → 塩田様素材受領後）。未追跡の icon-tooth.png/icon-magnifier.png/health-icon-proposal-3set.png あり</td></tr>
+<tr><td class="l">L</td><td>残小: E2E-4 体重月入力 headless不可視 / QRコード生成 / PC編集版Konva統一 / テスト顧客クリーンアップ</td></tr>
+</table>
+
+<h2>F. 本セッション生成物（gitignore・参照可）</h2>
+<p><code>test-results/*.cjs</code>（Playwright probe 約20本）。chikachika再現・dead-owner・verify-fix 等。次回の描画系デバッグで流用可。</p>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本HTML + <code>products/trimmer-system/memory.md</code> を Read</li>
+<li>機械検証: 機密混入0件 ✓ / <code>npm run build</code> EXIT 0 ✓ / 未コミット修正なし（D jpgは保留）</li>
+<li>P1#1（jpg削除）をマスターに確認してから着手</li>
+</ol>
+</body></html>

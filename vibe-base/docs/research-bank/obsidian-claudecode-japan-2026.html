@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Obsidian × Claude Code 国内事業活用 数値根拠 — Research Bank</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #242836;
+  --border: #2e3348;
+  --text: #e4e4e7;
+  --text2: #9ca3af;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --ok: #10b981;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', 'Noto Sans JP', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+header.report { padding: 2rem 0 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+header.report h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+header.report h1 span { color: var(--accent2); }
+header.report p.subtitle { color: var(--text2); margin-top: 0.5rem; font-size: 0.9rem; }
+
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 2rem; font-size: 0.85rem; }
+.meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+.meta-label { color: var(--text2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.meta-value { color: var(--text); font-weight: 600; }
+
+.tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 0.3rem; }
+.tag-market { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.tag-tech { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.tag-platform { background: rgba(20, 184, 166, 0.15); color: #2dd4bf; border: 1px solid rgba(20, 184, 166, 0.3); }
+.tag-pricing { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+
+section { margin: 2.5rem 0; }
+h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent2); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+h3 { font-size: 1.05rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--text); }
+h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--accent2); }
+
+p { margin: 0.5rem 0; }
+ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+li { margin: 0.25rem 0; }
+
+.callout { padding: 0.9rem 1.1rem; border-radius: 6px; margin: 1rem 0; border-left: 3px solid; }
+.callout-warn { background: rgba(245, 158, 11, 0.08); border-color: var(--warn); }
+.callout-danger { background: rgba(239, 68, 68, 0.08); border-color: var(--danger); }
+.callout-ok { background: rgba(16, 185, 129, 0.08); border-color: var(--ok); }
+.callout-info { background: rgba(99, 102, 241, 0.08); border-color: var(--accent); }
+.callout strong { color: var(--text); }
+
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; background: var(--surface); border-radius: 6px; overflow: hidden; }
+th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--surface2); color: var(--accent2); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+td { color: var(--text); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+td strong { color: var(--accent2); }
+
+a { color: var(--accent2); text-decoration: none; word-break: break-all; }
+a:hover { text-decoration: underline; }
+
+.source-list { font-size: 0.8rem; }
+.source-list li { margin: 0.4rem 0; }
+
+.unconfirmed { color: var(--warn); font-style: italic; }
+
+.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 2rem; }
+.toc h3 { margin-top: 0; color: var(--text2); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.toc ol { margin: 0.5rem 0 0 1.2rem; font-size: 0.85rem; }
+
+footer.report { margin-top: 3rem; padding: 1.5rem 0; border-top: 1px solid var(--border); color: var(--text2); font-size: 0.8rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header class="report">
+  <h1>Obsidian × Claude Code <span>国内事業活用 数値根拠</span> 2026</h1>
+  <p class="subtitle">国内中小DX市場・1人IT顧問単価・補助金・飲食店DX + 海外Obsidian連携手段の合成根拠データ。個人事業（屋号「小さな会社のDX屋さん」）の意思決定用。</p>
+</header>
+
+<div class="meta">
+  <div class="meta-item"><span class="meta-label">調査日</span><span class="meta-value">2026-04-30</span></div>
+  <div class="meta-item"><span class="meta-label">調査軸</span><span class="meta-value">3本（軸1/軸2 はレート制限のため未完）</span></div>
+  <div class="meta-item"><span class="meta-label">ソース数</span><span class="meta-value">26件（国内）+ 16件（海外、参考）</span></div>
+  <div class="meta-item"><span class="meta-label">タグ</span><span class="meta-value"><span class="tag tag-market">market</span><span class="tag tag-tech">tech</span><span class="tag tag-platform">platform</span><span class="tag tag-pricing">pricing</span></span></div>
+  <div class="meta-item"><span class="meta-label">関連プロダクト</span><span class="meta-value">横断（全14プロダクト + 事業戦略）</span></div>
+  <div class="meta-item"><span class="meta-label">再利用用途</span><span class="meta-value">価格設定 / 補助金判断 / 飲食店ターゲット判断 / Obsidian×AI連携設計</span></div>
+</div>
+
+<div class="toc">
+  <h3>目次</h3>
+  <ol>
+    <li><a href="#s1">国内DX市場の数値根拠（中小企業需要・予算）</a></li>
+    <li><a href="#s2">1人IT顧問・スポット業務の単価相場</a></li>
+    <li><a href="#s3">補助金活用（持続化・IT導入）の現実</a></li>
+    <li><a href="#s4">飲食店向けDX市場（普及率・廃業率の両面）</a></li>
+    <li><a href="#s5">Obsidian × Claude Code 連携手段（海外側で判明済み）</a></li>
+    <li><a href="#synthesis">統合分析: マスター文脈への適用所感</a></li>
+    <li><a href="#unconfirmed">未調査領域・資料未確認項目</a></li>
+    <li><a href="#sources">ソース一覧</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+<h2>1. 国内DX市場の数値根拠</h2>
+
+<table>
+<thead><tr><th>指標</th><th>中央値 / 最頻値</th><th>分布</th><th>ソース</th></tr></thead>
+<tbody>
+<tr><td>中小企業のIT投資（売上比）</td><td><strong>中央値 1.0%</strong></td><td>製造業1.0% / 金融業5.5% / 全体平均1.3%</td><td>NRI / JUAS（2024）</td></tr>
+<tr><td>DX投資額（取り組み中の中小企業）</td><td><strong>最頻値「100万〜500万」21.9%</strong></td><td>100万未満17.4% / 500万-1000万8.1% / 1000万以上13.8%（41.2%が500万未満）</td><td>東京商工リサーチ（2024）</td></tr>
+<tr><td>デジタル化4段階分布</td><td><strong>段階2が最頻値 52.3%</strong></td><td>段階1: 12.5%（前年30.8%から減）/ 段階3+4: 35%</td><td>中小企業白書2025</td></tr>
+<tr><td>DX「未着手 or 予定なし」</td><td>約2割（19.8%）</td><td>取組企業40.7% / 検討中38.7%</td><td>東京商工リサーチ（2024）</td></tr>
+<tr><td>DX取組内容ランキング1位</td><td><strong>「自社HP作成・更新」が全段階で最多</strong></td><td>2位「顧客データ一元管理」 / 3位「受発注オンライン化」</td><td>中小企業白書2025</td></tr>
+<tr><td>DXの主目的</td><td>業務効率化 81.0%</td><td>人手不足解消18.8% / 売上向上は副次的</td><td>東商デジタルシフト調査（2025/1）</td></tr>
+<tr><td>DX推進の課題TOP2</td><td>「費用負担」「人材不足」</td><td>段階問わず両者が最多</td><td>中小企業白書2025</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-info">
+<strong>解釈:</strong> 「100万〜500万」が最頻値ゾーン。マスターの個人事業として狙うべきレンジは1社あたり<strong>月数万円〜年100万円台</strong>（IT顧問+スポット案件）。HP制作の需要は依然1位、マスターの主軸プロダクト「homepage」は需要の谷ではない。<strong>段階2に過半数が滞留</strong>しており、段階3への引き上げが最大の市場ボリューム。
+</div>
+</section>
+
+<section id="s2">
+<h2>2. 1人IT顧問・スポット業務の単価相場</h2>
+
+<table>
+<thead><tr><th>業務</th><th>中央値 / 最頻値</th><th>分布</th><th>ソース</th></tr></thead>
+<tbody>
+<tr><td>IT顧問 月額（メール電話のみ）</td><td><strong>月 1〜2万円</strong></td><td>訪問なしの最低帯</td><td>パソナProShare</td></tr>
+<tr><td>IT顧問 月額(中規模・月数回訪問)</td><td><strong>最頻値 月3〜10万円</strong></td><td>レンジ月3万-100万。中小向け実勢10万円帯</td><td>パソナJOBHUB / 顧問バンク</td></tr>
+<tr><td>IT顧問 時間単価</td><td>5,000〜30,000円/h</td><td>中小向け実勢: 5,000-15,000円/h</td><td>パソナProShare</td></tr>
+<tr><td>税理士顧問料（参考）</td><td>個人月2-3万円 / 法人月3-5万円</td><td>「顧問料受容ライン」感覚値</td><td>ビスカス</td></tr>
+<tr><td>VBA/Excel自動化 スポット</td><td><strong>40〜70万円（中央値約57.5万円）</strong></td><td>最低40万 / 最高101万 / 簡易ツール10-20万</td><td>フォスターフリーランス</td></tr>
+<tr><td>HP制作（中小・標準10-20p）</td><td><strong>中央値 30〜100万円</strong></td><td>30万以下: フリーランス / 30-100万: 中小制作会社 / 100-300万: 中堅</td><td>Web幹事 / PRONIアイミツ</td></tr>
+<tr><td>HP制作（小規模・会社案内）</td><td><strong>30〜50万円</strong></td><td>フリーランス10-20万も可</td><td>プロベル / JPC</td></tr>
+<tr><td>LP制作</td><td><strong>中央値40万円 / 最頻30-60万円</strong></td><td>4分の3が60万円以下 / 平均55.4万円</td><td>Web幹事 / Stocksun</td></tr>
+<tr><td>AIチャットボット 初期</td><td><strong>シナリオ型: 無料〜10万 / AI型: 20-100万</strong></td><td>生成AI型は急速に低価格化</td><td>ds-b / Helpfeel</td></tr>
+<tr><td>AIチャットボット 月額</td><td><strong>シナリオ型: 数千円〜 / AI型: 月3-10万円</strong></td><td>カスタマイズで月30-100万円</td><td>RICOH / sAIチャット</td></tr>
+<tr><td>kintone構築（中小）</td><td>初期数万-数十万 / 月1ユーザー1,800円〜</td><td>IT補助金で最大450万まで補助可</td><td>システム幹事 / ペパコミ</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-ok">
+<strong>マスターの「1万円から」価格は市場の最低帯にハマっている（強み）:</strong> IT顧問の最低帯（月1-2万）にぴったり一致。税理士顧問料以下の価格設定であり、参入時のフックとして強い。
+</div>
+
+<div class="callout callout-warn">
+<strong>注意:</strong> 月1-2万円帯は「メール電話のみ・訪問なし」が前提。マスターが稼働時間を投下する設計だと採算割れする。「<strong>1万円フロント → 50万円HP/LPバックエンド</strong>」の二段構成が必須。
+</div>
+</section>
+
+<section id="s3">
+<h2>3. 補助金活用の現実</h2>
+
+<table>
+<thead><tr><th>補助金名</th><th>補助率</th><th>上限</th><th>採択率</th><th>ソース</th></tr></thead>
+<tbody>
+<tr><td><strong>持続化補助金（一般・通常枠）</strong></td><td>2/3</td><td>50万円（特例最大250万）</td><td><strong>51.0%</strong>（2025年第17回）</td><td>中小企業庁</td></tr>
+<tr><td>持続化補助金（創業型）</td><td>2/3</td><td>200万円（インボイス特例+50万）</td><td><strong>37.9%</strong>（第1回・3,883件中1,473件）</td><td>中小企業庁</td></tr>
+<tr><td>持続化補助金（災害支援枠）</td><td>—</td><td>—</td><td>87.9%（第7次）</td><td>中小企業庁</td></tr>
+<tr><td><strong>IT導入補助金2025（通常枠）</strong></td><td>1/2（最賃近2/3）</td><td>〜450万円</td><td>1次 50.7%</td><td>中小機構</td></tr>
+<tr><td>IT導入補助金（インボイス枠）</td><td>最大3/4</td><td>—</td><td>1次 57.6%</td><td>中小機構</td></tr>
+<tr><td>IT導入補助金（セキュリティ枠）</td><td>2/3（小規模）</td><td>150万円（2年）</td><td>1次 100%</td><td>中小機構</td></tr>
+<tr><td>IT導入補助金 全体推移</td><td>—</td><td>—</td><td>1次 55.4% → 4-8次 40%台（<strong>回を重ねるほど厳格化</strong>）</td><td>補助金ポータル</td></tr>
+<tr><td>2026年改称後</td><td>—</td><td>—</td><td>「<strong>デジタル化・AI導入補助金</strong>」へ名称変更</td><td>中小機構</td></tr>
+</tbody>
+</table>
+
+<h3>補助金活用の隠れコスト</h3>
+<ul>
+<li><strong>事業期間: 全体10〜12ヶ月</strong>（経費は申請者立替・後払い）</li>
+<li>実績報告の事務負荷が重い: 経費支出管理票で「何を/いつ/いくつ/どこから/いくらで/何のために」を全項目記載</li>
+<li>入金後1年経過で「事業効果・賃金引上げ等状況報告」の追加提出義務</li>
+<li>不備があれば補助金支払い遅延が「相当期間」発生</li>
+</ul>
+
+<div class="callout callout-danger">
+<strong>国内固有の罠①: 補助金代行を本業化するな</strong><br>
+持続化補助金（採択率51%、上限50万）は使いやすいが、事務工数10-12ヶ月+1年後の事後報告で「補助金が決まらないと動けない顧客」「補助金代行が本業化する自分」の罠が発生する。マスターの「1万円から」モデルとは噛み合わない。<strong>補助金は顧客への提案カードに留め、代行ビジネスにはしない</strong>判断が合理。
+</div>
+</section>
+
+<section id="s4">
+<h2>4. 飲食店向けDX市場（普及率・廃業率の両面）</h2>
+
+<table>
+<thead><tr><th>指標</th><th>数値</th><th>ソース</th></tr></thead>
+<tbody>
+<tr><td>国内POSレジ市場（ターミナル型）</td><td>2023年: <strong>約450億円・10.7万台</strong> → 2027年: <strong>約700億円・17.5万台</strong>（年率約12%）</td><td>矢野経済研究所</td></tr>
+<tr><td>セルフオーダー（自スマホ）利用経験率</td><td><strong>67.5%</strong>（2025/8、2021年26.0%から+41.5pt）</td><td>リクルート / HotPepper</td></tr>
+<tr><td>テーブルトップオーダー利用経験率</td><td><strong>77.4%</strong></td><td>リクルート / HotPepper</td></tr>
+<tr><td>テイクアウトモバイルオーダー</td><td>50.4%</td><td>リクルート / HotPepper</td></tr>
+<tr><td>セルフオーダー今後利用意向</td><td>52.5%（前回比+4.9pt）</td><td>リクルート / HotPepper</td></tr>
+<tr><td>日本の飲食店総数</td><td><strong>約67万店</strong>、従業員約436万人。減少傾向</td><td>統計局/経済センサス</td></tr>
+<tr><td>個人経営比率</td><td><strong>約60%が個人経営</strong>、法人形態でも資本金1000万未満が3/4</td><td>農水省</td></tr>
+<tr><td>飲食店廃業率</td><td><strong>5.6%</strong>（中小企業庁全業種で最高） / 14.7%（日本公庫）</td><td>中小企業庁/日本公庫</td></tr>
+<tr><td>開業3年以内の廃業率</td><td><strong>70%</strong>（1年30-38% / 3年合計70%超）</td><td>プレジデント / foods-route</td></tr>
+<tr><td>2024年飲食店倒産件数</td><td><strong>894件（過去最多）</strong></td><td>帝国データバンク</td></tr>
+<tr><td>業態別3年廃業率</td><td>ラーメン・カフェ・そば/うどん 60%超 / 寿司・和食は安定傾向</td><td>foods-route</td></tr>
+<tr><td>個人飲食店の営業利益率</td><td><strong>5%が多数</strong></td><td>飲食店ドットコム</td></tr>
+<tr><td>個人飲食店の1日売上目安</td><td><strong>3-5万円（=月90-150万円）</strong></td><td>aumo</td></tr>
+<tr><td>飲食店向けDX優先順位</td><td>1位 予約管理 / 2位 モバイルオーダー / 3位 キャッシュレス決済</td><td>POS+ / Leap</td></tr>
+</tbody>
+</table>
+
+<div class="callout callout-ok">
+<strong>追い風:</strong> モバイルオーダー普及4年で2.6倍、POS市場5年で1.6倍。個店IT予算1%≒月1万円は支払える。マスターの「1万円から」モデルが飲食店へ刺さる根拠がここにある。
+</div>
+
+<div class="callout callout-danger">
+<strong>逆風（致命級）:</strong> 3年廃業率70%、年間倒産過去最多。<strong>1店との長期契約は回収不能リスクが高い</strong>。短納期・低単価・複数店分散が鉄則。
+</div>
+
+<div class="callout callout-info">
+<strong>戦略案:</strong> ①複数店オーナー（5-10店経営者）に重点 / ②商工会議所経由のロット獲得 / ③1店あたり月1-2万の薄利＋ナレッジ転用で複数店展開。マスターの foodee/aiueo プロダクトはこの構造に合致するか要再確認。
+</div>
+</section>
+
+<section id="s5">
+<h2>5. Obsidian × Claude Code 連携手段（海外側で判明済み）</h2>
+
+<h3>5-1. 主要連携手段（2025〜2026最新）</h3>
+
+<table>
+<thead><tr><th>手段</th><th>状態</th><th>マスター適用</th></tr></thead>
+<tbody>
+<tr><td><strong>Obsidian 公式 MCP server</strong></td><td>未存在（2026年4月時点）</td><td>該当なし</td></tr>
+<tr><td><strong>kepano/obsidian-skills</strong>（公式 Agent Skills 集）</td><td>2025年末〜2026年初頭リリース。obsidian-markdown / obsidian-bases / obsidian-canvas / obsidian-cli / obsidian-cleanup の5本</td><td><strong>導入推奨</strong>（特に obsidian-markdown）</td></tr>
+<tr><td>iansinnott/obsidian-claude-code-mcp</td><td>Star 264、ライセンス0BSD、port 22360 WebSocket連携</td><td>モバイル運用始まったら検討（中期）</td></tr>
+<tr><td>Anthropic 公式 Filesystem MCP server</td><td>directory access bypass バグ既修正、Roots機能で実行時変更可</td><td>不要（vault直接で足りる）</td></tr>
+<tr><td><strong>vault に CLAUDE.md 置き + Claude Code 直起動</strong></td><td>最も推奨される現実解</td><td><strong>最短実装</strong></td></tr>
+<tr><td>Smart Connections（プラグイン）</td><td>2026年改訂で Smart Chat 分離・有料化（Smart Chat Pro）</td><td>避ける（月額重複）</td></tr>
+<tr><td>Copilot for Obsidian</td><td>2026年Q1で Web タブ読込・YouTube clipper追加</td><td>避ける（月額）</td></tr>
+<tr><td>Obsidian Bases（コアプラグイン v1.9.10〜）</td><td>frontmatter を field として table/kanban/calendar/gallery 表示</td><td>14プロダクト進捗ダッシュボードに使える（中期）</td></tr>
+</tbody>
+</table>
+
+<h3>5-2. 注目運用パターン</h3>
+<ul>
+<li><strong>Karpathy LLM Wiki</strong>（2026-04 gist爆発）: ingest / query / lint の3操作のみで vault を「LLM が維持する増分知識ベース」に変換。3コマンドで運用</li>
+<li><strong>vault size 制約</strong>: 2,000ノート超で全文検索遅延、5,000超でアクティブ/アーカイブ分割推奨</li>
+<li><strong>Mauricio Gomes / Code With Seb</strong>: vault に CLAUDE.md 置く→Claude Code 運用の最短手順を文書化</li>
+<li><strong>Eleanor Konik</strong>: Claude + Obsidian MCP で組織運営の整理を解決</li>
+<li><strong>ソロプレナー界隈の流れ</strong>: voice-note→ニュースレター変換、daily note の #idea タグ走査によるコンテンツパイプライン量産</li>
+</ul>
+
+<h3>5-3. コスト感（中央値・最頻値）</h3>
+<ul>
+<li>Claude Sonnet 4.6: 入力 $3/M tok・出力 $15/M tok</li>
+<li>Claude Opus 4.6: 入力 $5/M・出力 $25/M</li>
+<li>Claude Haiku: 入力 $1/M・出力 $5/M</li>
+<li><strong>Prompt cache hit は標準入力の10%</strong></li>
+<li>Pro $20/月 / Max $100〜$200/月 が個人事業の最頻帯</li>
+</ul>
+</section>
+
+<section id="synthesis">
+<h2>統合分析: マスター文脈への適用所感（迎合なし）</h2>
+
+<p>マスター現状: 屋号「小さな会社のDX屋さん」、3本柱（HP/PC業務/アプリ）、1万円〜、14プロダクト全件未売上、5/24 AI教室1,000円×3名が初売上、Obsidian vault `事業戦略/事業棚卸/` に36ノート。</p>
+
+<h3>① マスターの「1万円から」は市場の最低帯にハマっている（強み）</h3>
+<p>IT顧問月1-2万、個人飲食店IT予算1%≒月1万、税理士顧問料以下。<strong>参入時のフックとして強い</strong>。ただし二段構成（フロント1万円→バックエンドHP/LP30-100万 or VBA案件40-70万）が必須。</p>
+
+<h3>② 国内固有の罠①: 補助金依存はビジネスを歪める</h3>
+<p>持続化補助金（採択率51%、上限50万）は使いやすいが、<strong>事務工数10-12ヶ月+1年後の事後報告</strong>で「補助金が決まらないと動けない顧客」「補助金代行が本業化する自分」の罠。提案カードに留め、代行業を本業にしない。</p>
+
+<h3>③ 国内固有の罠②: コンサル料下落圧力</h3>
+<p>AIチャットボット月額が1万円未満SaaS化した影響で、<strong>「AIで代替できる顧問業務」の単価は今後も下がる</strong>。マスターは「AIを使って自分で構築する側」であって、「AI代替リスクのある顧問業務側」ではない設計を死守すべし。</p>
+
+<h3>④ 国内固有の罠③: HP/LP制作は供給過剰</h3>
+<p>LP制作中央値40万、HP制作30-50万帯はフリーランスが大量参入。<strong>価格戦争ではなく「業務効率化＋HP一体提案」</strong>で差別化必須。VBA案件（中央値57.5万）の方が供給薄く、参入余地が広い。</p>
+
+<h3>⑤ 飲食店ターゲットの両面リスク</h3>
+<p>追い風（モバイルオーダー普及67.5%・POS市場5年で1.6倍）と逆風（3年廃業率70%・年間倒産過去最多）が同居。<strong>1店との長期契約はNG</strong>、複数店オーナー or 商工会議所経由のロット獲得が合理。マスターの飲食店向け6プロダクト（Aiueo/foodee/Kobaraku/おもてなし/クチコミ/video-studio）は、<strong>「1店オーナー対象」設計のまま走るな、複数店展開できる構造かを再確認</strong>。</p>
+
+<h3>⑥ Obsidian × Claude Code 連携の今すぐ取れる5案</h3>
+<ol>
+<li><strong>vault 内 CLAUDE.md + Claude Code 直起動</strong>（最短・コストゼロ・36ノート規模なら最適）</li>
+<li><strong>kepano/obsidian-skills の obsidian-markdown のみ導入</strong>（Wikilink構文崩れ防止、リスクほぼゼロ）</li>
+<li><strong>Karpathy LLM Wiki の3コマンド（/ingest-url, /process-inbox, /lint-wiki）だけ実装</strong>（フル実装はNG、ノート100未満で副作用過多）</li>
+<li><strong>週次レポート（毎週木正午締切）の自動草稿化</strong>（解釈はマスター、構造化のみAI）</li>
+<li><strong>NotebookLM ↔ vault の接続線明文化</strong>（NLM→vault 片方向同期から開始）</li>
+</ol>
+
+<h3>⑦ 中期検討候補（3〜6ヶ月後）</h3>
+<ol>
+<li>Obsidian Bases で14プロダクト進捗ダッシュボード（pc-progress.html との役割分離を明文化してから）</li>
+<li>iansinnott/obsidian-claude-code-mcp 経由のモバイル/Desktop連携（出先運用が始まったら）</li>
+<li>コンテンツパイプライン化（#気付き/#思い付きタグ→ブログ草稿）</li>
+</ol>
+
+<h3>⑧ 避けるべき領域</h3>
+<div class="callout callout-danger">
+<strong>Smart Chat Pro / Copilot Plus 等の月額プラグイン課金</strong>: 14プロダクト全件未売上の現状で月$10-$20を積むのは事業規律違反。Claude Code（Max プラン）と機能重複大。<strong>初売上から3ヶ月の黒字運用を見届けてから検討</strong>。
+</div>
+<div class="callout callout-danger">
+<strong>Karpathy LLM Wiki のフル実装</strong>: ノート100未満では副作用（誤改変・不要トラバース）が得るものより大きい。3コマンドだけ留め、500ノート級になってから本格運用。
+</div>
+<div class="callout callout-danger">
+<strong>補助金代行ビジネス化</strong>: 事務工数10-12ヶ月＋1年後事後報告で個人事業の体力を吸う。提案カードまで。
+</div>
+<div class="callout callout-danger">
+<strong>飲食店1店との長期契約</strong>: 3年廃業率70%。複数店分散かロット獲得経路に絞る。
+</div>
+
+<h3>⑨ 実行優先度（マスター現状から逆算）</h3>
+<table>
+<thead><tr><th>優先度</th><th>アクション</th><th>根拠</th></tr></thead>
+<tbody>
+<tr><td>★★★（即時）</td><td>vault `事業戦略/` に CLAUDE.md 配置 + Claude Code を vault 内起動</td><td>コストゼロ、36ノートを直接活用</td></tr>
+<tr><td>★★★（即時）</td><td>5/24 AI教室の継続化検討（3名→ランチ会展開）</td><td>交流会経由35.6%（最頻値）の販路を強化</td></tr>
+<tr><td>★★★（即時）</td><td>VBA案件（中央値57.5万）への営業を biz-efficiency 既存 eff-vba01 から強化</td><td>HP/LP より供給薄、参入余地大</td></tr>
+<tr><td>★★（短期）</td><td>「1万円フロント→30-50万HP/LP・40-70万VBA」の二段価格表を明文化</td><td>稼働投下時の採算割れ防止</td></tr>
+<tr><td>★★（短期）</td><td>商工会・商工会議所への登録（補助金は提案カードまで）</td><td>地域中小企業への接触経路</td></tr>
+<tr><td>★（中期）</td><td>kepano/obsidian-skills の markdown 導入</td><td>vault 構造の堅牢化</td></tr>
+<tr><td>★（中期）</td><td>Obsidian Bases で14プロダクト経営者ビュー</td><td>判断負荷削減</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="unconfirmed">
+<h2>未調査領域・資料未確認項目</h2>
+
+<div class="callout callout-warn">
+<strong>本調査の制約:</strong> 軸1（国内技術者界隈の連携事例）と軸2（AI事業家・個人事業主の活用パターン）は<strong>API レート制限（00:10 リセット）でエージェント実行未完</strong>。本レポートは軸3（国内DX市場・26ソース）+ 海外側既知データ（16ソース）の合成版。
+</div>
+
+<h3>次回リトライ対象（軸1・軸2）</h3>
+<ul>
+<li>軸1: 国内技術者界隈の Obsidian × Claude Code 運用事例（Zenn/Qiita/note/X日本語圏 2025〜2026の最新記事10件以上）</li>
+<li>軸2: AI事業家・個人事業主・小規模法人の活用パターン（中小DXコンサルの案件管理・ナレッジ商品化・収益モデル）</li>
+</ul>
+
+<h3>軸3で未確認だった項目</h3>
+<ul>
+<li>個人飲食店の月次IT予算実額の調査データ（推定値で代替）</li>
+<li>商工会議所経由DX案件の単価分布</li>
+<li>1人IT顧問の年収中央値（業界別調査が個別すぎて欠損）</li>
+</ul>
+</section>
+
+<section id="sources">
+<h2>ソース一覧</h2>
+
+<h3>国内（軸3、26件）</h3>
+<ol class="source-list">
+<li><a href="https://www.ipa.go.jp/digital/chousa/dx-trend/dx-trend-2025.html">IPA「DX動向2025」</a>（2025）</li>
+<li><a href="https://www.meti.go.jp/policy/it_policy/investment/dx-chukenchushotebiki/dx-chukenchushotebiki_2025.pdf">経産省「中堅・中小企業等向けDX推進の手引き2025」</a>（2025/3）</li>
+<li><a href="https://www.chusho.meti.go.jp/pamflet/hakusyo/2025/chusho/b1_1_5.html">中小企業庁「2025年版 中小企業白書 第1部第1章第5節」</a>（2025）</li>
+<li><a href="https://www.chusho.meti.go.jp/pamflet/hakusyo/2025/shokibo/b1_1_5.html">中小企業庁「2025年版 小規模企業白書 第5節」</a>（2025）</li>
+<li><a href="https://www.chusho.meti.go.jp/koukai/hojyokin/saitaku/2025/250926001.html">中小企業庁「持続化補助金 一般型 第17回採択」</a>（2025/9）</li>
+<li><a href="https://www.chusho.meti.go.jp/koukai/hojyokin/saitaku/2025/250926002.html">中小企業庁「持続化補助金 創業型 第1回採択」</a>（2025/9）</li>
+<li><a href="https://it-shien.smrj.go.jp/">中小機構「IT導入補助金（デジタル化・AI導入補助金2026）」</a>（2026）</li>
+<li><a href="https://www.tdb.co.jp/report/economic/30km_rqwmztw/">帝国データバンク「業績好調な中小企業のDX取り組み動向調査」</a>（2024）</li>
+<li><a href="https://www.tokyo-cci.or.jp/file.jsp?id=1205203">東京商工会議所「中小企業のデジタルシフト・DX実態調査」</a>（2025/1/10）</li>
+<li><a href="https://www.tsr-net.co.jp/data/detail/1197929_1527.html">東京商工リサーチ「DXへの取り組み、中小企業は4割にとどまる」</a>（2024）</li>
+<li><a href="https://www.hotpepper.jp/ggs/wp-content/uploads/2025/09/セルフオーダー250918.pdf">リクルート/HotPepper「セルフオーダーに関する調査」</a>（2025/9）</li>
+<li><a href="https://www.st.inc/news/2025-03-31-mo-research">STORES「モバイルオーダーに関する消費者の意識調査」</a>（2025/3）</li>
+<li><a href="https://pasona-proshare.com/column/professional/itkomon">パソナProShare「IT顧問料金相場」</a>（2025）</li>
+<li><a href="https://professional-agent.lancers.jp/column/consultant/itconsultant_itconsultant04/">ランサーズ「フリーランスITコンサル単価相場2025」</a>（2025）</li>
+<li><a href="https://web-kanji.com/posts/market-price">Web幹事「ホームページ制作費用相場2026」</a>（2025-26）</li>
+<li><a href="https://web-kanji.com/posts/landing-page-price">Web幹事「LP制作費用相場（中央値40万円）」</a>（2025）</li>
+<li><a href="https://stock-sun.com/column/lp-production-cost/">Stocksun「LP制作費用相場（平均55.4万円）」</a>（2025）</li>
+<li><a href="https://www.foster-net.co.jp/media/vba-anken-tanka/">フォスターフリーランス「VBA案件単価」</a>（2024-25）</li>
+<li><a href="https://ds-b.jp/dsmagazine/chatbot-cost/">ds-b「AIチャットボット料金・導入費用相場」</a>（2025）</li>
+<li><a href="https://bizcan.jp/column/posregi-share/">矢野経済研究所（POSレジ市場予測、Bizcan経由）</a>（2025）</li>
+<li><a href="https://president.jp/articles/-/101584">プレジデント「飲食店3年廃業率70%」</a>（2024-25）</li>
+<li><a href="https://foods-route.jp/content/restaurant-closure-rate">foods-route「飲食店廃業率2025最新版」</a>（2025）</li>
+<li><a href="https://www.stat.go.jp/library/faq/faq06/faq06a03.html">統計局「経済センサス 飲食店事業所数」</a></li>
+<li><a href="https://mirasapo-plus.go.jp/hint/6666/">中小企業庁「経営計画・補助事業計画の書き方」</a></li>
+<li><a href="https://www.nri.com/jp/media/column/scs_blog/20230509_1.html">NRI「日本企業のIT投資予算」</a>（2023）</li>
+<li><a href="https://juas.or.jp/cms/media/2024/04/JUAS_IT2024.pdf">JUAS「企業IT動向調査2024」</a>（2024）</li>
+</ol>
+
+<h3>海外（参考、16件）</h3>
+<ol class="source-list">
+<li><a href="https://github.com/iansinnott/obsidian-claude-code-mcp">iansinnott/obsidian-claude-code-mcp (GitHub)</a></li>
+<li><a href="https://github.com/kepano/obsidian-skills">kepano/obsidian-skills (GitHub)</a></li>
+<li><a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">karpathy llm-wiki (Gist)</a></li>
+<li><a href="https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem">Anthropic Filesystem MCP Server (GitHub)</a></li>
+<li><a href="https://embracethered.com/blog/posts/2025/anthropic-filesystem-mcp-server-bypass/">Anthropic Filesystem MCP Server: Directory Access Bypass — Embrace The Red</a></li>
+<li><a href="https://www.practical-devsecops.com/mcp-security-vulnerabilities/">MCP Security Vulnerabilities — Practical DevSecOps</a></li>
+<li><a href="https://blog.starmorph.com/blog/obsidian-claude-code-integration-guide">Obsidian + Claude Code: The Complete Integration Guide — Starmorph</a></li>
+<li><a href="https://www.codewithseb.com/blog/claude-code-obsidian-second-brain-guide">Claude Code + Obsidian: AI Second Brain — Code With Seb</a></li>
+<li><a href="https://mauriciogomes.com/teaching-claude-code-my-obsidian-vault">Teaching Claude Code My Obsidian Vault — Mauricio Gomes</a></li>
+<li><a href="https://www.eleanorkonik.com/p/how-claude-obsidian-mcp-solved-my">Claude + Obsidian + MCP — Eleanor Konik</a></li>
+<li><a href="https://www.haihai.ai/obsidian-mcp/">Writing 2,000 words in 90 minutes — haihai.ai</a></li>
+<li><a href="https://blakecrosley.com/guides/obsidian">Obsidian as AI Infrastructure — Blake Crosley</a></li>
+<li><a href="https://ericmjl.github.io/blog/2026/3/6/mastering-personal-knowledge-management-with-obsidian-and-ai/">Personal Knowledge Management with Obsidian and AI — ericmjl</a>（2026/3）</li>
+<li><a href="https://news.ycombinator.com/item?id=46878200">HN: Show HN: Obsidian meets Claude Code</a>（2026/2）</li>
+<li><a href="https://news.ycombinator.com/item?id=46475889">HN: Ask HN: If you use Obsidian with Claude Code</a>（2026/1）</li>
+<li><a href="https://northflank.com/blog/claude-rate-limits-claude-code-pricing-cost">Claude Code Pricing — Northflank</a></li>
+</ol>
+</section>
+
+<footer class="report">
+Research Bank — vibe-base / 2026-04-30 / 軸1・軸2 リトライ対象（00:10以降）
+</footer>
+
+</div>
+
+</body>
+</html>

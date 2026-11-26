@@ -1,0 +1,666 @@
+<title>Buffer自動投稿 かんたんナビ｜はじめてでも作れる</title>
+<style>
+  :root{
+    --paper:#F4F6F5; --surface:#FFFFFF; --surface-2:#EEF2F0;
+    --ink:#17211C; --muted:#586961; --faint:#8A9992;
+    --line:#E1E7E3; --line-strong:#CDD6D1;
+    --brand:#0F766E; --brand-strong:#0B5E57; --brand-tint:#E4F1EE;
+    --signal:#B45309; --signal-tint:#FBEEDD;
+    --danger:#B42318; --danger-tint:#FBE9E7;
+    --ok:#0E7C57; --ok-tint:#E1F3EA;
+    --radius:14px; --radius-sm:9px;
+    --maxw:1120px;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(23,33,28,.04),0 8px 24px -12px rgba(23,33,28,.14);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0E1512; --surface:#141D18; --surface-2:#1A241E;
+      --ink:#E7EEEA; --muted:#9DACA4; --faint:#6E7D75;
+      --line:#243029; --line-strong:#334037;
+      --brand:#2DD4BF; --brand-strong:#5EEAD4; --brand-tint:#123029;
+      --signal:#F59E0B; --signal-tint:#2A2113;
+      --danger:#F87171; --danger-tint:#33201F;
+      --ok:#34D399; --ok-tint:#12251C;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#F4F6F5; --surface:#FFFFFF; --surface-2:#EEF2F0;
+    --ink:#17211C; --muted:#586961; --faint:#8A9992;
+    --line:#E1E7E3; --line-strong:#CDD6D1;
+    --brand:#0F766E; --brand-strong:#0B5E57; --brand-tint:#E4F1EE;
+    --signal:#B45309; --signal-tint:#FBEEDD;
+    --danger:#B42318; --danger-tint:#FBE9E7;
+    --ok:#0E7C57; --ok-tint:#E1F3EA;
+    --shadow:0 1px 2px rgba(23,33,28,.04),0 8px 24px -12px rgba(23,33,28,.14);
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1512; --surface:#141D18; --surface-2:#1A241E;
+    --ink:#E7EEEA; --muted:#9DACA4; --faint:#6E7D75;
+    --line:#243029; --line-strong:#334037;
+    --brand:#2DD4BF; --brand-strong:#5EEAD4; --brand-tint:#123029;
+    --signal:#F59E0B; --signal-tint:#2A2113;
+    --danger:#F87171; --danger-tint:#33201F;
+    --ok:#34D399; --ok-tint:#12251C;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); line-height:1.8;
+    font-size:17px; -webkit-font-smoothing:antialiased; text-underline-offset:3px;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+
+  .topbar{position:sticky; top:0; z-index:20; background:color-mix(in srgb,var(--paper) 86%,transparent); backdrop-filter:saturate(1.4) blur(10px); border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex; align-items:center; gap:16px; height:58px}
+  .brandmark{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.01em}
+  .brandmark .dot{width:11px;height:11px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 4px var(--brand-tint)}
+  .brandmark small{font:600 11px/1 var(--mono); color:var(--faint); letter-spacing:.14em; text-transform:uppercase}
+  .themebtn{margin-left:auto; border:1px solid var(--line-strong); background:var(--surface); color:var(--muted); border-radius:999px; padding:7px 14px; font:600 12.5px var(--sans); cursor:pointer; display:inline-flex; gap:7px; align-items:center}
+  .themebtn:hover{color:var(--ink); border-color:var(--brand)}
+  .themebtn:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+
+  .hero{padding:60px 0 24px}
+  .eyebrow{font:600 12px/1 var(--mono); letter-spacing:.2em; text-transform:uppercase; color:var(--brand-strong); margin:0 0 18px}
+  .hero h1{font-size:clamp(1.9rem,4.4vw,3rem); line-height:1.16; margin:0 0 16px; font-weight:800; letter-spacing:-.01em; text-wrap:balance; max-width:22ch}
+  .hero p.lead{font-size:clamp(1.02rem,2vw,1.22rem); color:var(--muted); margin:0; max-width:62ch; text-wrap:pretty}
+  .hero .thesis{margin-top:24px; padding:18px 20px; background:var(--brand-tint); color:var(--brand-strong); border-radius:var(--radius); border:1px solid color-mix(in srgb,var(--brand) 24%,transparent); font-weight:700; font-size:1.02rem; display:flex; gap:12px; align-items:flex-start; max-width:66ch}
+  .hero .thesis span.k{font-size:1.3rem; line-height:1.3}
+  .howto{margin-top:16px; font-size:.92rem; color:var(--muted); max-width:66ch; display:flex; gap:10px; align-items:flex-start}
+  .howto .k{color:var(--signal)}
+
+  .layout{display:grid; grid-template-columns:216px 1fr; gap:52px; padding:20px 0 80px; align-items:start}
+  nav.toc{position:sticky; top:76px}
+  nav.toc ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px}
+  nav.toc a{display:flex; gap:10px; align-items:baseline; text-decoration:none; color:var(--muted); padding:8px 12px; border-radius:9px; font-size:14px; font-weight:600; line-height:1.35; border-left:2px solid transparent}
+  nav.toc a .n{font:600 11px var(--mono); color:var(--faint); min-width:16px}
+  nav.toc a:hover{background:var(--surface-2); color:var(--ink)}
+  nav.toc a.active{color:var(--brand-strong); background:var(--brand-tint); border-left-color:var(--brand)}
+  nav.toc a.active .n{color:var(--brand)}
+
+  main{min-width:0}
+  section{scroll-margin-top:80px; padding:14px 0 46px; border-top:1px solid var(--line)}
+  section:first-child{border-top:none}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin:10px 0 20px}
+  .sec-head .idx{font:700 13px var(--mono); color:var(--brand); letter-spacing:.08em; padding-top:4px}
+  h2{font-size:clamp(1.4rem,2.6vw,1.85rem); margin:0; font-weight:800; letter-spacing:-.01em; text-wrap:balance}
+  .sec-head p{margin:6px 0 0; color:var(--muted); font-size:.98rem}
+  h3{font-size:1.12rem; margin:26px 0 10px; font-weight:750}
+  p{margin:0 0 14px}
+
+  a.lnk{color:var(--brand-strong); font-weight:700; text-decoration:underline; text-decoration-color:color-mix(in srgb,var(--brand) 50%,transparent); text-underline-offset:3px; word-break:break-all}
+  a.lnk:hover{text-decoration-color:var(--brand)}
+  a.lnk::after{content:" ↗"; font-size:.8em; text-decoration:none; color:var(--brand); white-space:nowrap}
+  a.lnk:focus-visible{outline:2px solid var(--brand); outline-offset:2px; border-radius:3px}
+
+  code,.mono{font-family:var(--mono); font-size:.86em}
+  code.chip{background:var(--surface-2); border:1px solid var(--line); padding:2px 7px; border-radius:6px; color:var(--ink); white-space:nowrap}
+  .kbd{font-family:var(--mono); font-size:.8em; background:var(--surface); border:1px solid var(--line-strong); border-bottom-width:2px; border-radius:5px; padding:1px 6px; color:var(--ink)}
+
+  .flowrow{display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:0; align-items:stretch; margin:8px 0 4px}
+  .fcard{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px 18px; box-shadow:var(--shadow)}
+  .fcard .emo{font-size:1.9rem; line-height:1}
+  .fcard h4{margin:12px 0 6px; font-size:1.05rem; font-weight:750}
+  .fcard p{margin:0; font-size:.9rem; color:var(--muted)}
+  .arrow{display:flex; align-items:center; justify-content:center; color:var(--brand); font-size:1.4rem; padding:0 10px; font-family:var(--mono)}
+
+  .route{list-style:none; margin:18px 0 0; padding:0; position:relative}
+  .route::before{content:""; position:absolute; left:23px; top:22px; bottom:26px; width:2px; background:linear-gradient(var(--brand),color-mix(in srgb,var(--signal) 70%,var(--brand)))}
+  .route li{position:relative; display:grid; grid-template-columns:48px 1fr; gap:16px; padding:0 0 20px}
+  .route li:last-child{padding-bottom:0}
+  .node{width:48px; height:48px; border-radius:50%; background:var(--surface); border:2px solid var(--brand); color:var(--brand-strong); display:flex; align-items:center; justify-content:center; font-size:1.3rem; z-index:1; box-shadow:0 0 0 4px var(--paper)}
+  .route .rbody{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm); padding:13px 16px; box-shadow:var(--shadow)}
+  .route .rbody b{font-size:1rem; font-weight:750}
+  .route .rbody .tech{display:block; margin-top:3px; font-family:var(--mono); font-size:.78rem; color:var(--faint)}
+  .route li.terminal .node{border-color:var(--signal); color:var(--signal); background:var(--signal-tint)}
+
+  .glo{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:6px}
+  .term{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm); padding:15px 17px}
+  .term dt{font-weight:800; font-size:1rem; display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .term dt .en{font:600 11px var(--mono); color:var(--brand); letter-spacing:.05em; text-transform:lowercase; background:var(--brand-tint); padding:2px 7px; border-radius:5px}
+  .term dd{margin:8px 0 0; color:var(--muted); font-size:.92rem}
+  .term dd .why{display:block; margin-top:4px; color:var(--faint); font-size:.86rem}
+
+  .panels{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:6px}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow)}
+  .panel .ptag{font:600 11px var(--mono); letter-spacing:.12em; text-transform:uppercase; color:var(--brand)}
+  .panel h4{margin:8px 0 12px; font-size:1.12rem; font-weight:800}
+  .rules{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+  .rules li{padding-left:22px; position:relative; font-size:.92rem; color:var(--muted)}
+  .rules li::before{content:""; position:absolute; left:2px; top:.7em; width:8px; height:8px; border-radius:50%; background:var(--brand); opacity:.55}
+
+  .steps{display:flex; flex-direction:column; gap:16px; margin-top:8px; counter-reset:step}
+  .step{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+  .step-h{display:flex; gap:16px; align-items:center; padding:16px 20px; background:linear-gradient(180deg,var(--surface-2),var(--surface))}
+  .step-n{counter-increment:step; flex:0 0 auto; width:40px; height:40px; border-radius:11px; background:var(--signal); color:#fff; display:flex; align-items:center; justify-content:center; font:800 18px var(--mono)}
+  :root[data-theme="dark"] .step-n{color:#1A1206}
+  .step-n::before{content:counter(step)}
+  .step-h h4{margin:0; font-size:1.16rem; font-weight:800; line-height:1.3}
+  .step-h .who{margin-left:auto; font:600 11px var(--mono); letter-spacing:.04em; padding:5px 10px; border-radius:999px; white-space:nowrap}
+  .who.self{background:var(--signal-tint); color:var(--signal)}
+  .who.ai{background:var(--brand-tint); color:var(--brand-strong)}
+  .step-b{padding:18px 20px 20px}
+  .step-b p:last-child{margin-bottom:0}
+  .step-b p.intro{color:var(--muted); font-size:.95rem}
+
+  ol.clicks{margin:6px 0 0; padding:0; list-style:none; counter-reset:clk; display:flex; flex-direction:column; gap:11px}
+  ol.clicks>li{position:relative; padding-left:34px; font-size:.95rem}
+  ol.clicks>li::before{counter-increment:clk; content:counter(clk); position:absolute; left:0; top:0; width:23px; height:23px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line-strong); color:var(--muted); font:700 12px var(--mono); display:flex; align-items:center; justify-content:center}
+  ol.clicks>li b{color:var(--ink)}
+
+  .linkbtn{display:inline-flex; align-items:center; gap:8px; margin:4px 0; padding:9px 14px; background:var(--brand); color:#fff; border-radius:9px; text-decoration:none; font-weight:700; font-size:.92rem; box-shadow:var(--shadow); word-break:break-all}
+  :root[data-theme="dark"] .linkbtn{color:#08120F}
+  .linkbtn:hover{background:var(--brand-strong)}
+  .linkbtn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+  .linkbtn .u{font:600 11px var(--mono); opacity:.85; font-weight:600}
+  .linkbtn::after{content:"↗"}
+
+  .check{margin:14px 0 0; display:flex; gap:11px; align-items:flex-start; background:var(--ok-tint); border:1px solid color-mix(in srgb,var(--ok) 34%,transparent); border-radius:var(--radius-sm); padding:12px 15px; font-size:.9rem}
+  .check .ci{color:var(--ok); font-size:1.05rem; line-height:1.5}
+  .check b{color:var(--ok)}
+
+  .callout{border-radius:var(--radius-sm); padding:14px 16px; margin:14px 0 0; font-size:.9rem; border:1px solid; display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start}
+  .callout .ci{font-size:1.1rem; line-height:1.4}
+  .callout b{font-weight:750}
+  .callout.warn{background:var(--danger-tint); border-color:color-mix(in srgb,var(--danger) 35%,transparent); color:var(--ink)}
+  .callout.warn b{color:var(--danger)}
+  .callout.tip{background:var(--brand-tint); border-color:color-mix(in srgb,var(--brand) 30%,transparent); color:var(--ink)}
+  .callout.tip b{color:var(--brand-strong)}
+  .callout p{margin:0 0 6px}
+  .callout p:last-child{margin:0}
+
+  .subbox{margin:16px 0 0; border:1px dashed var(--line-strong); border-radius:var(--radius-sm); padding:16px 18px; background:var(--surface-2)}
+  .subbox .subtag{font:700 12px var(--mono); color:var(--signal); letter-spacing:.05em; display:flex; align-items:center; gap:8px; margin-bottom:10px}
+
+  .compare{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px}
+  .cc{border:1px solid var(--line); border-radius:var(--radius-sm); padding:16px 18px; background:var(--surface)}
+  .cc.on{border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-tint)}
+  .cc h4{margin:0 0 8px; font-size:1rem; display:flex; align-items:center; gap:8px}
+  .cc .badge{font:700 10px var(--mono); padding:3px 7px; border-radius:5px; letter-spacing:.05em}
+  .cc.on .badge{background:var(--brand); color:#fff}
+  :root[data-theme="dark"] .cc.on .badge{color:#08120F}
+  .cc.off .badge{background:var(--surface-2); color:var(--faint)}
+  .cc p{margin:0; font-size:.88rem; color:var(--muted)}
+
+  .tablewrap{overflow-x:auto; margin-top:8px; border:1px solid var(--line); border-radius:var(--radius-sm)}
+  table{border-collapse:collapse; width:100%; font-size:.9rem; min-width:520px}
+  th,td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{background:var(--surface-2); font-weight:750; font-size:.82rem; color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  td code{font-family:var(--mono); font-size:.82em; color:var(--danger); font-weight:600}
+  td b{color:var(--brand-strong)}
+
+  .phrase{display:grid; grid-template-columns:1fr; gap:10px; margin-top:8px}
+  .say{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--brand); border-radius:9px; padding:13px 16px}
+  .say .cxt{font-size:.8rem; color:var(--faint); font-family:var(--mono); letter-spacing:.03em}
+  .say .q{margin-top:5px; font-weight:700; font-size:1rem}
+  .say .q::before{content:"「"} .say .q::after{content:"」"}
+
+  .prompt{margin:14px 0 0; border:1px solid var(--brand); border-radius:var(--radius-sm); overflow:hidden; box-shadow:var(--shadow)}
+  .prompt.big{border-width:2px}
+  .prompt-h{display:flex; align-items:center; gap:10px; padding:9px 12px 9px 14px; background:var(--brand-tint)}
+  .prompt-tag{font:700 12px var(--mono); color:var(--brand-strong); letter-spacing:.02em; display:flex; align-items:center; gap:7px}
+  .copybtn{margin-left:auto; border:1px solid var(--brand); background:var(--brand); color:#fff; border-radius:7px; padding:6px 14px; font:700 12.5px var(--sans); cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:6px}
+  :root[data-theme="dark"] .copybtn{color:#08120F}
+  .copybtn:hover{background:var(--brand-strong)}
+  .copybtn.done{background:var(--ok); border-color:var(--ok)}
+  :root[data-theme="dark"] .copybtn.done{color:#08120F}
+  .copybtn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+  .prompt-body{padding:14px 16px; background:var(--surface); font-family:var(--sans); font-size:.93rem; line-height:1.75; white-space:pre-wrap; word-break:break-word; color:var(--ink)}
+  .prompt-fill{background:var(--signal-tint); color:var(--signal); border-radius:4px; padding:0 4px; font-weight:700}
+
+  .linkdir{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px}
+  .ld{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm); padding:14px 16px; box-shadow:var(--shadow)}
+  .ld .lt{font-weight:750; font-size:.95rem; margin-bottom:3px}
+  .ld .ld-d{font-size:.84rem; color:var(--muted); margin-bottom:8px}
+
+  footer{border-top:1px solid var(--line); padding:30px 0 60px; color:var(--faint); font-size:.84rem}
+  footer .wrap{display:flex; flex-wrap:wrap; gap:8px 20px; align-items:center}
+  footer .mono{font-family:var(--mono)}
+
+  .reveal{opacity:0; transform:translateY(12px)}
+  .reveal.in{opacity:1; transform:none; transition:opacity .5s ease,transform .5s ease}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1; transform:none}}
+
+  @media (max-width:860px){
+    .layout{grid-template-columns:1fr; gap:0}
+    nav.toc{display:none}
+    .flowrow{grid-template-columns:1fr; gap:10px}
+    .flowrow .arrow{transform:rotate(90deg); padding:2px 0}
+    .glo,.panels,.compare,.linkdir{grid-template-columns:1fr}
+    body{font-size:16px}
+  }
+</style>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brandmark"><span class="dot"></span>Buffer自動投稿 かんたんナビ <small>for beginners</small></div>
+    <button class="themebtn" id="themebtn" type="button" aria-label="配色を切り替え"><span id="themeico">◐</span><span id="themetxt">テーマ</span></button>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">はじめてでも、この通りにやれば完成します</p>
+    <h1>AIが毎日、SNS投稿を自動で作って積んでおく</h1>
+    <p class="lead">Buffer（バッファー：予約投稿ツール）と連携して、SNSへの投稿を自動化するしくみと、その作り方を「パソコンが苦手な人」目線で最初から最後まで案内します。</p>
+    <div class="thesis"><span class="k">🧭</span><div>やることは大きく2つだけ。<b>AIの「作業部屋」を1回作る</b> → <b>「毎日◯時に働いて」とセットする</b>。あとはあなたのパソコンの電源が切れていても、勝手に動き続けます。</div></div>
+    <p class="howto"><span class="k">📘</span><span>この資料の使い方：アカウントを何も持っていない前提で、<b>「作り方」</b>の手順を上から実行すれば完成します。<b>画面操作はできる限りClaudeが代行</b>し、あなたはパスワードやGoogleの「許可」など本人しかできない所だけ。青い文字（<a class="lnk" href="https://claude.ai/code" target="_blank" rel="noopener">このようなリンク</a>）はクリックで開きます。各ステップの緑チェックで「できたか」を確認しながら進めてください。</span></p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="目次">
+      <ol>
+        <li><a href="#overview"><span class="n">01</span>まず何をするの？</a></li>
+        <li><a href="#flow"><span class="n">02</span>裏側の流れ（絵）</a></li>
+        <li><a href="#glossary"><span class="n">03</span>言葉の意味</a></li>
+        <li><a href="#generation"><span class="n">04</span>文章は誰が書く？</a></li>
+        <li><a href="#routine"><span class="n">05</span>Routineって何？</a></li>
+        <li><a href="#setup"><span class="n">06</span>作り方（ゼロから）</a></li>
+        <li><a href="#update"><span class="n">07</span>あとで直したい時</a></li>
+        <li><a href="#cautions"><span class="n">08</span>注意とエラー対処</a></li>
+        <li><a href="#links"><span class="n">09</span>リンク集</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section id="overview" class="reveal">
+        <div class="sec-head"><span class="idx">01</span><div><h2>まず何をするの？ ── たとえ話で</h2><p>むずかしい言葉の前に、やりたいことのイメージを。</p></div></div>
+        <p>ひとことで言うと <b>「AIに毎日SNSの投稿を作らせて、予約投稿ツール（Buffer）に“積んで”おく」</b> こと。Bufferは投稿を預かってくれる係で、時間になったら代わりに投稿してくれます。流れは3つだけ。</p>
+        <div class="flowrow">
+          <div class="fcard"><div class="emo">✍️</div><h4>① AIが作る</h4><p>決めたルールどおりに、AIが投稿の文章（と画像）を毎日つくります。</p></div>
+          <div class="arrow">→</div>
+          <div class="fcard"><div class="emo">🗂️</div><h4>② Bufferに積む</h4><p>作った投稿を「順番待ちの列」に入れて預けます。まだ表には出しません。</p></div>
+          <div class="arrow">→</div>
+          <div class="fcard"><div class="emo">📣</div><h4>③ Bufferが出す</h4><p>予約の時間になったら、BufferがX・Threads・Instagramへ自動で投稿します。</p></div>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><div><b>ここが大事：</b>AIの仕事は「作って預ける」まで。実際にSNSへ出すのはBufferの役目です。だからこのしくみを “キュー（＝順番待ちの列）補充型” と呼びます。</div></div>
+      </section>
+
+      <section id="flow" class="reveal">
+        <div class="sec-head"><span class="idx">02</span><div><h2>裏側の流れ ── 1本道の絵</h2><p>上から下へ、順番に起きています。灰色の小さい字はIT用語の正式名なので、今は読み飛ばしてOK。</p></div></div>
+        <ol class="route">
+          <li><div class="node">⏰</div><div class="rbody"><b>目覚まし時計が鳴る（毎日 昼12時）</b><span class="tech">クラウドRoutine が決まった時刻に自動で起動</span></div></li>
+          <li><div class="node">🏠</div><div class="rbody"><b>AIの「作業部屋」が立ち上がる</b><span class="tech">環境: カギ（トークン）＋ 外線電話（api.buffer.com への通信許可）</span></div></li>
+          <li><div class="node">📥</div><div class="rbody"><b>必要な材料一式を取り込む</b><span class="tech">GitHub の「あなたの空リポジトリ」を clone（コピー取得）</span></div></li>
+          <li><div class="node">✍️</div><div class="rbody"><b>AIが投稿を書く（X 2本・Threads 2本・IG 1本）</b><span class="tech">ルール（プロンプト）に従って本文と画像を生成</span></div></li>
+          <li><div class="node">🗂️</div><div class="rbody"><b>Bufferの「順番待ちの列」に積む</b><span class="tech">api.buffer.com に addToQueue で登録</span></div></li>
+          <li class="terminal"><div class="node">📣</div><div class="rbody"><b>時間になったらBufferが自動で投稿</b><span class="tech">Buffer → X / Threads / Instagram</span></div></li>
+          <li><div class="node">🧾</div><div class="rbody"><b>結果を記録して終わり</b><span class="tech">成功／失敗を result.json に書き出し</span></div></li>
+        </ol>
+      </section>
+
+      <section id="glossary" class="reveal">
+        <div class="sec-head"><span class="idx">03</span><div><h2>言葉の意味 ── これだけ知ればOK</h2><p>手順で出てくる言葉を、身近なものにたとえて説明します。</p></div></div>
+        <dl class="glo">
+          <div class="term"><dt>GitHub <span class="en">github</span></dt><dd>プログラムやファイルを保管しておくネット上の倉庫サービス。<span class="why">なぜ要る？→ AIがこの倉庫（あなたの空リポジトリ）を作業場所として使うため。無料アカウントが必要。※このガイドで唯一「Googleで続ける」が使えないサイトです。</span></dd></div>
+          <div class="term"><dt>環境 <span class="en">environment</span></dt><dd>AIの「作業部屋」。中にカギ（トークン）と外線電話（通信許可）を置いておく設定のまとまり。<span class="why">なぜ要る？→ AIが安全に材料と道具を持って作業する場所だから。</span></dd></div>
+          <div class="term"><dt>Routine <span class="en">routine</span></dt><dd>「目覚まし時計」。決めた時刻にAIを起こして、決めた仕事をさせるしくみ。<span class="why">なぜ要る？→ 毎日あなたが操作しなくても自動で回すため。</span></dd></div>
+          <div class="term"><dt>トークン <span class="en">token</span></dt><dd>Bufferに入るための「カギ／通行証」になる秘密の文字列。<span class="why">なぜ要る？→ これが無いとAIがBufferを操作できません。人に見せてはダメ。</span></dd></div>
+          <div class="term"><dt>キューに積む <span class="en">addToQueue</span></dt><dd>「順番待ちの列に入れる」。すぐ投稿せず、Bufferの配信待ちリストに追加すること。</dd></div>
+          <div class="term"><dt>クラウド <span class="en">cloud</span></dt><dd>Anthropic（アンソロピック）が用意したネット上のコンピュータのこと。<span class="why">なぜ便利？→ 自分のパソコンが切れていても、そこで動き続けるから。</span></dd></div>
+        </dl>
+      </section>
+
+      <section id="generation" class="reveal">
+        <div class="sec-head"><span class="idx">04</span><div><h2>文章は誰が書くの？</h2><p>じつは「文章を作る機械」は無くて、AIがルールを読んでその場で書いています。</p></div></div>
+        <div class="panels">
+          <div class="panel">
+            <div class="ptag">text ── X / Threads</div>
+            <h4>ルールに沿ってAIが執筆</h4>
+            <p style="font-size:.92rem;color:var(--muted)">「どんな役で・どう書くか」を決めた指示（プロンプト）に従い、AIが毎回その場で文章を作ります。</p>
+            <ul class="rules">
+              <li>役：中小企業の社長さん向けの「AI活用アドバイザー」</li>
+              <li>40〜140字・ていねいな「ですます」・呼びかけは「御社」</li>
+              <li>URL・絵文字・ハッシュタグ・大げさな言葉は使わない</li>
+              <li>最後は「御社の◯◯は？」と問いかけて締める</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="ptag">image ── Instagram</div>
+            <h4>Instagramは画像が必須</h4>
+            <p style="font-size:.92rem;color:var(--muted)">Instagramは文字だけでは投稿できない決まりなので、カード画像を用意して一緒に添えます。</p>
+            <ul class="rules">
+              <li>画像を作り、ネット上の公開URLとして添付する</li>
+              <li>画像の置き場所は今のところ仮ぐみ（今後きちんと固定予定）</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout tip"><span class="ci">🧠</span><div><b>つまり：</b>文章を作っているのはAI本体、その“書き方の説明書”がプロンプトです。だから「文章を変えたい」＝「プロンプトを直す」ことになります（→ 手順07）。</div></div>
+      </section>
+
+      <section id="routine" class="reveal">
+        <div class="sec-head"><span class="idx">05</span><div><h2>Routine（ルーティン）って何？</h2><p>この自動化の心臓部。よく「Coworkのこと？」と聞かれますが、別物です。</p></div></div>
+        <p><b>クラウドRoutine</b>とは、<a class="lnk" href="https://claude.ai/code" target="_blank" rel="noopener">claude.ai/code</a>（Claude Code on the web）にある「決まった時刻に自動で動かすタイマー」のこと。時間になると<b>ネット上のAIが自動で起き上がり</b>、決めた作業をこなします。Anthropicのクラウドで動くので、あなたのパソコンの電源は関係ありません。</p>
+        <div class="compare">
+          <div class="cc on"><h4>クラウドRoutine <span class="badge">これを使う</span></h4><p>claude.ai側のネット上で定時に自動実行。設定はクラウドに保存され、パソコン無しで動き続ける。Bufferの自動投稿はこちら。</p></div>
+          <div class="cc off"><h4>Cowork <span class="badge">別物</span></h4><p>パソコンのアプリ側のしくみで、予定はパソコン内に保存される。今回のBufferの自動投稿とは別系統です。混同しないよう注意。</p></div>
+        </div>
+      </section>
+
+      <section id="setup" class="reveal">
+        <div class="sec-head"><span class="idx">06</span><div><h2>作り方 ── 上から順に</h2><p>アカウントを何も持っていない前提で、ゼロから作ります。<b style="color:var(--brand-strong)">🟢 緑＝Claudeが画面操作を代行</b>／<b style="color:var(--signal)">🟠 オレンジ＝あなただけができる認証・入力</b>（パスワード・確認コード・Googleの「許可」・カギのコピー）。新規登録は原則<b>「Googleで続ける」</b>を使います。</p></div></div>
+
+        <div class="callout tip"><span class="ci">🪄</span><div><b>いちばん楽な始め方（二画面方式）：</b>下のプロンプトをコピーして、Claude Codeの入力欄に貼るだけ。<b>この資料を見ながら、Claude Codeにも同じ流れでナビさせる</b>ので迷子になりません。<b>画面操作はできる限りClaudeが代行</b>し、あなたはパスワードやGoogleの「許可」など本人しかできない所だけ行えばOK。</div></div>
+        <div class="prompt big">
+          <div class="prompt-h"><span class="prompt-tag">🪄 全部おまかせプロンプト（これ1つでOK）</span><button class="copybtn" type="button">コピー</button></div>
+          <div class="prompt-body">BufferとSNSの自動投稿をゼロからセットアップしたいです。私はアカウントを何も持っていない前提で、パソコン操作も得意ではありません。手順書（ナビ資料）はこちら：
+https://claude.ai/code/artifact/237dbdb4-0054-4011-9ef7-d2d0421fa752
+この資料を開けるなら読み、下の流れで私をナビしてください。ルール：
+・画面操作はできる限りあなた（Claude）が代行してください。私が行うのは、パスワード・二段階認証コード・Googleの「許可」ボタン・カギ（トークン）のコピーなど、本人しかできない所だけにしてください。
+・新規アカウントは、その画面に「Googleで続ける／Sign in with Google」があれば必ずそれを使ってナビしてください（Googleアカウントを共通の入口にします）。無い場合だけメール登録。
+・私が操作する所は「どの画面のどこを押すか」を1ステップずつ指示し、私が「できた」と言うまで次に進まない。
+・各ステップの最初に、資料のどの番号か（例：手順⑥）を教える。
+
+【この順でナビして】
+① Googleアカウントを用意（無ければ作成。これを共通ログインに使う）
+② claude.ai に登録（「Googleで続ける」）
+③ GitHubに登録（Google非対応なので②と同じGoogleのメールで）
+④ Claude Code と GitHub を接続
+⑤ 私用の空リポジトリを作って選ぶ
+⑥ Bufferに登録（「Googleで続ける」）してパーソナルAPIキー（トークン）を取得
+⑦ 環境を作成（環境変数 BUFFER_API_TOKEN と、通信許可 api.buffer.com）
+⑧ お試し：投稿を1本、下書きでBufferのキューに追加
+⑨ 毎日12時（日本時間）に自動実行するRoutineを登録
+
+まずは私が今どこまで出来ているか（Googleアカウントの有無など）を1つずつ聞いて、①から順にナビを始めてください。トークンの値は絶対に出力しないでください。</div>
+        </div>
+
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>Googleアカウントを用意する（共通の入口）</h4><span class="who self">あなた・初回だけ</span></div>
+            <div class="step-b">
+              <p class="intro">これから作るサービスは、ほとんど<b>「Googleで続ける」</b>で登録します。だから最初にGoogleアカウント（Gmail）を1つ用意します。すでにGmail等を使っていれば、それでOK。</p>
+              <p><b>持っていない人（新規作成）：</b></p>
+              <a class="linkbtn" href="https://accounts.google.com/signup" target="_blank" rel="noopener">Googleアカウント作成 <span class="u">accounts.google.com/signup</span></a>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>Gmailにログインできる（＝Googleアカウントが使える）状態ならOK。以降このアカウントを使い回します。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>Claude Code に登録する（Googleで）</h4><span class="who ai">Claudeが操作</span></div>
+            <div class="step-b">
+              <p class="intro">自動化の操作画面（claude.ai/code）を開いて、①のGoogleで登録します。画面を進めるのはClaudeに任せ、あなたはGoogleの<b>「許可」</b>を押すだけ。</p>
+              <a class="linkbtn" href="https://claude.ai/code" target="_blank" rel="noopener">Claude Code をひらく <span class="u">claude.ai/code</span></a>
+              <ol class="clicks">
+                <li>ログイン画面で <b>「Continue with Google（Googleで続ける）」</b> を選ぶ</li>
+                <li>Googleの画面で①のアカウントを選び、<b>「許可」</b>を押す</li>
+              </ol>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>ログイン後、下の方に文字を入力する欄（チャット入力欄）が見えていればOK。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>GitHubに登録する（唯一の例外）</h4><span class="who self">あなた・初回だけ</span></div>
+            <div class="step-b">
+              <p class="intro">材料の倉庫役の <b>GitHub</b> だけは「Googleで続ける」に対応していません。ここだけメール登録ですが、<b>①と同じGoogleのメールアドレス</b>を使えば管理がラクです。画面はClaudeが進め、あなたは<b>メールに届く確認コード</b>だけ入力します。</p>
+              <a class="linkbtn" href="https://github.com/signup" target="_blank" rel="noopener">GitHub 新規登録をひらく <span class="u">github.com/signup</span></a>
+              <ol class="clicks">
+                <li><b>①のGoogleのメールアドレス</b>を入れて進む</li>
+                <li>パスワードと、好きな<b>ユーザー名</b>（半角英数字）を決める</li>
+                <li>「人間ですか？」の<b>かんたんな認証</b>をクリア</li>
+                <li>メールに届く<b>確認コード（数字）</b>を入力する → 完成</li>
+              </ol>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>GitHubにログインし、画面右上に自分のユーザー名が出ていればOK。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>Claude Code と GitHub をつなぐ</h4><span class="who ai">Claudeが操作</span></div>
+            <div class="step-b">
+              <p class="intro">1回つなげば次からは不要。画面はClaudeが進めます。あなたは最後の<b>「Authorize（許可）」</b>を押すだけ。</p>
+              <ol class="clicks">
+                <li>claude.ai/code で <b>「GitHubを接続」</b>の案内をクリック</li>
+                <li><b>Claude GitHub App をインストール</b>する画面に進む</li>
+                <li>最後に <b>「Install &amp; Authorize（インストールして許可）」</b>を押す</li>
+              </ol>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>接続後、リポジトリを選ぶ場所に自分のGitHubアカウントが出てくればOK。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>自分用の「空っぽの倉庫（リポジトリ）」を作って選ぶ</h4><span class="who ai">Claudeが操作</span></div>
+            <div class="step-b">
+              <p class="intro">Claudeが作業する場所として、あなた専用の空のリポジトリを1つ用意します。<b>Claudeに頼めば作成まで代行</b>できます。中身は空でOK（作業はClaudeが後から入れます）。</p>
+              <div class="prompt">
+                <div class="prompt-h"><span class="prompt-tag">📋 空リポジトリを作ってもらう</span><button class="copybtn" type="button">コピー</button></div>
+                <div class="prompt-body">私のGitHubに、SNS自動投稿用の空のリポジトリを1つ作ってください（名前はおまかせ。例：sns-auto）。作成できたら、そのリポジトリ名（ユーザー名/リポジトリ名）を教えてください。</div>
+              </div>
+              <ol class="clicks" style="margin-top:12px">
+                <li>作れたら、claude.ai/code の入力欄の下の<b>リポジトリ選択ボタン</b>で、その<b>自分のリポジトリ</b>を選ぶ（手動作成なら <a class="lnk" href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a> でも可）</li>
+                <li>モードは <b>「Accept edits」</b>のままでOK</li>
+              </ol>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>リポジトリ選択欄に、自分で作ったリポジトリ名が表示されていればOK。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>Bufferに登録して「カギ（トークン）」を取る</h4><span class="who ai">Claudeが操作</span><span class="who self" style="margin-left:8px">許可・コピーはあなた</span></div>
+            <div class="step-b">
+              <p class="intro">予約投稿ツール Buffer に登録し、AIをBufferにつなぐ通行証＝<b>パーソナルAPIキー（トークン）</b>を取ります。登録は<b>「Googleで続ける」</b>で。画面はClaudeが案内、あなたはGoogleの許可と、最後のキーのコピーだけ。</p>
+              <a class="linkbtn" href="https://buffer.com/" target="_blank" rel="noopener">Buffer をひらく <span class="u">buffer.com</span></a>
+              <ol class="clicks">
+                <li>Bufferの登録画面で <b>「Continue with Google（Googleで続ける）」</b> を選び、①のアカウントで登録</li>
+                <li>開発者ページ（<a class="lnk" href="https://developers.buffer.com/" target="_blank" rel="noopener">developers.buffer.com</a>）で <b>パーソナルAPIキーを発行（Generate）</b></li>
+                <li>表示された文字列（40文字前後）を<b>コピー</b>し、メモ帳など安全な所に一時保存</li>
+              </ol>
+              <div class="subbox">
+                <div class="subtag">🔑 発行ボタンが見つからない時の裏ワザ</div>
+                <ol class="clicks">
+                  <li>Bufferにログインしたまま <span class="kbd">F12</span> で「開発者ツール」を開く</li>
+                  <li><b>「Network（ネットワーク）」</b>タブを選び、画面を少し操作する</li>
+                  <li>一覧から <code class="mono">api.buffer.com</code> 宛ての通信を1つクリック → <b>「Headers」→ Authorization: Bearer</b> の後ろの文字列をコピー</li>
+                </ol>
+              </div>
+              <div class="callout warn"><span class="ci">🚫</span><div><b>大事：</b>「開発者アプリを新規登録」する古い方法は<b>受付終了</b>。取るのは “パーソナルAPIキー1個” だけ。<b>このカギはチャットやメールに貼らない・人に見せない</b>。</div></div>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>40文字前後の文字列を1つコピーできていればOK（中身は見せず、手元に控えるだけ）。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>AIの「作業部屋（環境）」を作る</h4><span class="who self">あなた・値の貼付は本人</span></div>
+            <div class="step-b">
+              <p class="intro">GitHubをつなぐと「環境を作る」フォームが出ます。Claudeが手順を指示しますが、<b>カギ（トークン）の貼り付けだけは秘密なので、あなた自身</b>が行います。次の3つを入れて、最後に <b>「Create environment」</b>を押します。</p>
+              <ol class="clicks">
+                <li><b>Name（名前）</b>：好きな名札。例 <code class="chip">buffer-auto</code></li>
+                <li><b>Environment variables（環境変数）</b>の欄に、⑥で取ったカギをこの形で1行入れる：<br><code class="chip">BUFFER_API_TOKEN=ここにカギを貼る</code><br>※ <b>クォート（" "）で囲まない</b>。囲むと壊れます。</li>
+                <li><b>Network access（通信の許可）</b>：<b>「Custom」</b>を選ぶ → 出てきた欄に <code class="chip">api.buffer.com</code> と入れる → <b>「Also include default list…」にチェック</b></li>
+              </ol>
+              <div class="callout tip"><span class="ci">🔒</span><div>カギは<b>この環境変数の中だけ</b>に置きます。専用の金庫機能はまだ無いので、環境を編集できる人には見える点だけ覚えておいてください。</div></div>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>環境の設定に <b>BUFFER_API_TOKEN</b> が登録され、通信許可に <code class="mono">api.buffer.com</code> が入っていればOK。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>まず「お試し」で1本だけ動かす</h4><span class="who ai">Claudeにお願い</span></div>
+            <div class="step-b">
+              <p class="intro">いきなり毎日にせず、手で1回だけ動かして確かめます。まずは表に出ない「下書き」で安全にテスト。下のプロンプトをコピーして、Claude Codeの入力欄に貼るだけ。</p>
+              <div class="prompt">
+                <div class="prompt-h"><span class="prompt-tag">📋 その1：下書きでお試し</span><button class="copybtn" type="button">コピー</button></div>
+                <div class="prompt-body">環境変数 BUFFER_API_TOKEN を使って、Buffer に投稿を1本、下書きとして追加してください。手順は次の通りです。
+1) まず https://api.buffer.com にGraphQLで問い合わせ、私のチャンネル一覧を取得し、X（旧Twitter）のchannelIdを特定する。
+2) 中小企業の経営者向けのX投稿を1本、日本語で作成する（40〜140字・ですます調・二人称は「御社」・URL/絵文字/ハッシュタグ/誇大表現は使わない・末尾は「御社の◯◯は？」型の問いかけで締める）。
+3) createPost mutation を https://api.buffer.com にPOSTする（headers: Authorization: Bearer $BUFFER_API_TOKEN、input: mode=addToQueue, schedulingType=automatic, saveToDraft=true）。
+実行後、成功/失敗と、作成した本文を教えてください。トークンの値は絶対に出力しないでください。</div>
+              </div>
+              <div class="callout tip"><span class="ci">🧪</span><div>下書きが無事できたら、次のプロンプトで<b>本番の予約</b>に切り替えます（saveToDraft を外すだけ）。</div></div>
+              <div class="prompt">
+                <div class="prompt-h"><span class="prompt-tag">📋 その2：本番のキューに積む</span><button class="copybtn" type="button">コピー</button></div>
+                <div class="prompt-body">先ほどと同じ手順で、今度は下書きではなく本番のキューに積んでください（saveToDraft を外す）。Bufferのキューに予約登録できたら、post.id と status を教えてください。トークンの値は絶対に出力しないでください。</div>
+              </div>
+              <div class="check"><span class="ci">✅</span><div><b>できたか確認：</b>AIが「成功しました」と返し、Bufferの管理画面に下書き（または予約）が実際に現れていればOK。</div></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-h"><div class="step-n"></div><h4>毎日自動にする（目覚まし時計をセット）</h4><span class="who ai">Claudeにお願い</span></div>
+            <div class="step-b">
+              <p class="intro">お試しが成功したら、最後に下のプロンプトを貼るだけで自動化は完成です。</p>
+              <div class="prompt">
+                <div class="prompt-h"><span class="prompt-tag">📋 毎日自動にする</span><button class="copybtn" type="button">コピー</button></div>
+                <div class="prompt-body">今のこの「投稿を生成して Buffer のキューに追加する」処理を、毎日 昼12時（日本時間 JST）に自動実行するクラウド Routine として登録してください。時刻は UTC に換算してください（12:00 JST = 03:00 UTC）。登録できたら、トリガーID（trig_… で始まるもの）を教えてください。</div>
+              </div>
+              <div class="callout tip"><span class="ci">🕛</span><div>時刻の世界標準時（UTC）への変換も登録も<b>Claude Codeがやってくれます</b>。時間を変えたければ「毎日◯時」の数字を書き換えるだけでOK。</div></div>
+              <div class="check"><span class="ci">🎉</span><div><b>これで完成！</b>翌日から、あなたが何もしなくても「投稿を作る→Bufferに積む→時間になったら配信」が毎日回ります。</div></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="update" class="reveal">
+        <div class="sec-head"><span class="idx">07</span><div><h2>あとで内容を直したい時</h2><p>初心者がいちばん間違えやすい所です。</p></div></div>
+        <p>投稿の“書き方の説明書”（プロンプト）は、<b>倉庫（GitHub）の中ではなく、Routine本体に保存</b>されています。だから倉庫のファイルを直しても投稿は変わりません。変えたい時は、下のプロンプトを貼って、〔　〕の中を書き換えて送ります。</p>
+        <div class="prompt">
+          <div class="prompt-h"><span class="prompt-tag">📋 内容を変更する</span><button class="copybtn" type="button">コピー</button></div>
+          <div class="prompt-body">Buffer自動投稿のRoutineの今のプロンプトを見せてください。そのうえで、次のように直してください：〔ここに変えたい内容を書く。例：投稿の文字数を200字までにして／IGの画像を毎回新しく生成するようにして〕</div>
+        </div>
+        <p style="margin-top:16px">今ちゃんと動いているか不安なときは、これで結果を確認できます。</p>
+        <div class="prompt">
+          <div class="prompt-h"><span class="prompt-tag">📋 動いているか確認する</span><button class="copybtn" type="button">コピー</button></div>
+          <div class="prompt-body">Buffer自動投稿の最新の実行結果（result.json）を確認して、直近の投稿がちゃんと成功しているか、失敗しているかを教えてください。</div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><div><b>よくある誤解：</b>「倉庫の説明書ファイルを直した＝反映された」ではありません。倉庫の中の説明文は古いことがあるので、実際の動きを変えるにはRoutine本体を直します。上のプロンプトなら、Claude Codeが正しい場所（Routine本体）を直してくれます。</div></div>
+      </section>
+
+      <section id="cautions" class="reveal">
+        <div class="sec-head"><span class="idx">08</span><div><h2>注意とエラー対処</h2><p>安全に使うための注意と、詰まった時の早見表です。</p></div></div>
+        <div class="panels" style="margin-bottom:8px">
+          <div class="panel">
+            <div class="ptag">安全のために</div>
+            <h4>カギ（トークン）は絶対に見せない</h4>
+            <ul class="rules">
+              <li>チャットやメール、倉庫（GitHub）に値を貼らない</li>
+              <li>置き場所は環境変数だけ（専用の金庫はまだ無い）</li>
+              <li>環境を編集できる人には見える前提で扱う</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="ptag">無料プランの制限</div>
+            <h4>順番待ちは10件まで</h4>
+            <ul class="rules">
+              <li>無料プランは配信待ちを10件までしか積めない</li>
+              <li>超えると <code class="mono">LimitReachedError</code> というエラーになる</li>
+              <li>Instagramの画像置き場は今のところ仮ぐみ</li>
+            </ul>
+          </div>
+        </div>
+        <h3>エラー早見表（AIがこう返してきたら）</h3>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>出たメッセージ</th><th>意味（やさしく）</th><th>どうする</th></tr></thead>
+            <tbody>
+              <tr><td><code>UnauthorizedError</code></td><td>カギが違う／入ってない</td><td>環境の <b>BUFFER_API_TOKEN</b> を入れ直す</td></tr>
+              <tr><td><code>LimitReachedError</code></td><td>順番待ちが10件で満杯</td><td>たまった投稿を減らす／上限内にする</td></tr>
+              <tr><td>ネットワークエラー</td><td>Bufferに電話がつながらない</td><td>通信許可に <code>api.buffer.com</code> が入っているか確認</td></tr>
+              <tr><td><code>InvalidInputError</code></td><td>入力のどこかが間違い</td><td>投稿先の指定や入力値をAIに確認してもらう</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="links" class="reveal">
+        <div class="sec-head"><span class="idx">09</span><div><h2>リンク集 ── 使うページまとめ</h2><p>この資料で開くページを1か所に。クリックで開きます。</p></div></div>
+        <div class="linkdir">
+          <div class="ld"><div class="lt">① Googleアカウント作成</div><div class="ld-d">すべての共通ログインの入口</div><a class="lnk" href="https://accounts.google.com/signup" target="_blank" rel="noopener">accounts.google.com/signup</a></div>
+          <div class="ld"><div class="lt">② Claude Code（操作画面）</div><div class="ld-d">「Googleで続ける」で登録</div><a class="lnk" href="https://claude.ai/code" target="_blank" rel="noopener">claude.ai/code</a></div>
+          <div class="ld"><div class="lt">③ GitHub 新規登録</div><div class="ld-d">唯一Google非対応・Googleのメールで登録</div><a class="lnk" href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a></div>
+          <div class="ld"><div class="lt">⑤ 空リポジトリ作成（手動時）</div><div class="ld-d">Claudeに頼めば代行可</div><a class="lnk" href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a></div>
+          <div class="ld"><div class="lt">⑥ Buffer 登録</div><div class="ld-d">「Googleで続ける」で登録</div><a class="lnk" href="https://buffer.com/" target="_blank" rel="noopener">buffer.com</a></div>
+          <div class="ld"><div class="lt">⑥ Buffer 開発者ページ</div><div class="ld-d">パーソナルAPIキーを発行</div><a class="lnk" href="https://developers.buffer.com/" target="_blank" rel="noopener">developers.buffer.com</a></div>
+        </div>
+        <div class="callout tip" style="margin-top:16px"><span class="ci">🧭</span><div><b>迷ったら：</b>Claude Codeの入力欄に、やりたいことを日本語でそのまま書けば大丈夫。「Bufferの自動投稿を作りたい。手順を教えて」と打てば、AIが今の画面に合わせて案内してくれます。</div></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">Buffer自動投稿 かんたんナビ</span>
+    <span>初心者向け講義資料（仕組み＋この通りで完成できる手順）</span>
+    <span>※ 実際のカギ（トークン）等の秘密情報は載せていません</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var btn=document.getElementById('themebtn');
+  var ico=document.getElementById('themeico');
+  function sysDark(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;}
+  function apply(mode){
+    if(mode==='dark'||mode==='light'){root.setAttribute('data-theme',mode);}
+    else{root.removeAttribute('data-theme');}
+    var eff=root.getAttribute('data-theme')||(sysDark()?'dark':'light');
+    ico.textContent=eff==='dark'?'☾':'☀';
+  }
+  apply(null);
+  btn.addEventListener('click',function(){
+    var eff=root.getAttribute('data-theme')||(sysDark()?'dark':'light');
+    apply(eff==='dark'?'light':'dark');
+  });
+
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var map={};
+  links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a;});
+  var secs=Array.prototype.slice.call(document.querySelectorAll('main section'));
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(l){l.classList.remove('active');});
+          var m=map[e.target.id]; if(m)m.classList.add('active');
+        }
+      });
+    },{rootMargin:'-45% 0px -50% 0px',threshold:0});
+    secs.forEach(function(s){io.observe(s);});
+    var ro=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){e.target.classList.add('in'); ro.unobserve(e.target);} });
+    },{rootMargin:'0px 0px -8% 0px',threshold:.06});
+    document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
+  }else{
+    document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in');});
+  }
+
+  // copy-to-clipboard for prompt cards
+  function copyText(text){
+    var ok=false;
+    try{
+      var ta=document.createElement('textarea');
+      ta.value=text; ta.setAttribute('readonly','');
+      ta.style.position='absolute'; ta.style.left='-9999px'; ta.style.top='0';
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0,text.length);
+      ok=document.execCommand('copy');
+      document.body.removeChild(ta);
+    }catch(e){ ok=false; }
+    if(!ok && navigator.clipboard){ try{ navigator.clipboard.writeText(text); ok=true; }catch(e2){} }
+    return ok;
+  }
+  document.querySelectorAll('.copybtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var card=btn.closest('.prompt');
+      if(!card) return;
+      var body=card.querySelector('.prompt-body');
+      var text=(body.innerText||body.textContent||'').trim();
+      var ok=copyText(text);
+      var orig=btn.getAttribute('data-orig')||btn.textContent;
+      btn.setAttribute('data-orig',orig);
+      btn.textContent= ok ? 'コピーしました ✓' : 'コピー失敗…手動で選択を';
+      btn.classList.toggle('done',ok);
+      setTimeout(function(){ btn.textContent=orig; btn.classList.remove('done'); },1900);
+    });
+  });
+})();
+</script>

@@ -1,0 +1,696 @@
+{
+  "1_html_base_font_size": "16px",
+  "2_font_family": {
+    "h1": {
+      "fontFamily": "\"Noto Sans JP\", -apple-system",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "lineHeight": "27.2px",
+      "letterSpacing": "normal"
+    },
+    "h2": {
+      "fontFamily": "\"Noto Sans JP\", -apple-system",
+      "fontSize": "38px",
+      "fontWeight": "700",
+      "lineHeight": "60.8px",
+      "letterSpacing": "1.9px"
+    },
+    "h3": {
+      "fontFamily": "\"Noto Sans JP\", -apple-system",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "lineHeight": "24.5px",
+      "letterSpacing": "0.42px"
+    },
+    "p": {
+      "fontFamily": "\"Noto Sans JP\", -apple-system",
+      "fontSize": "8px",
+      "fontWeight": "400",
+      "lineHeight": "12px",
+      "letterSpacing": "normal"
+    },
+    "small": {
+      "fontFamily": "\"Noto Sans JP\", -apple-system",
+      "fontSize": "10px",
+      "fontWeight": "400",
+      "lineHeight": "17.5px",
+      "letterSpacing": "normal"
+    },
+    "button": {
+      "fontFamily": "arial, helvetica",
+      "fontSize": "15.84px",
+      "fontWeight": "400",
+      "lineHeight": "normal",
+      "letterSpacing": "normal"
+    }
+  },
+  "3_font_size": {
+    "h1": "16px",
+    "h2": "38px",
+    "h3": "14px",
+    "p": "8px",
+    "small": "10px",
+    "button": "15.84px"
+  },
+  "4_font_weight": {
+    "h1": "400",
+    "h2": "700",
+    "h3": "700",
+    "p": "400",
+    "small": "400",
+    "button": "400"
+  },
+  "5_line_height": {
+    "h1": "27.2px",
+    "h2": "60.8px",
+    "h3": "24.5px",
+    "p": "12px",
+    "small": "17.5px",
+    "button": "normal"
+  },
+  "6_letter_spacing": {
+    "h1": "normal",
+    "h2": "1.9px",
+    "h3": "0.42px",
+    "p": "normal",
+    "small": "normal",
+    "button": "normal"
+  },
+  "7_text_colors": {
+    "h1": "rgba(8, 22, 26, 0.9)",
+    "h2": "rgba(8, 22, 26, 0.9)",
+    "h3": "rgb(26, 173, 144)",
+    "p": "rgba(8, 22, 26, 0.9)",
+    "a": "rgba(8, 22, 26, 0.9)",
+    "button": "rgba(8, 22, 26, 0.9)",
+    "span": "rgba(8, 22, 26, 0.9)",
+    "li": "rgb(255, 255, 255)"
+  },
+  "8_bg_colors": {
+    "body": "rgb(255, 255, 255)",
+    "footer": "rgb(57, 69, 72)"
+  },
+  "9_borders": [
+    {
+      "tag": "a",
+      "class": "ButtonBasic hover:shadow-elevation-lv-1 ",
+      "borderColor": "rgb(238, 140, 71)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "div",
+      "class": "AppHeaderDef__Dropdown",
+      "borderColor": "rgba(8, 22, 26, 0.2) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "a",
+      "class": "Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "div",
+      "class": "AppHeaderDef__Dropdown",
+      "borderColor": "rgba(8, 22, 26, 0.2) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink ExternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink ExternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink ExternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "a",
+      "class": "AppLink InternalLink Nav__Item__Link",
+      "borderColor": "rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.9) rgba(8, 22, 26, 0.2)",
+      "borderWidth": "0px"
+    }
+  ],
+  "10_padding": [
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "padding": "8px 32px"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "padding": "0px 32px"
+    },
+    {
+      "tag": "div",
+      "class": "AppHeaderDef__Nav__List__Item__Link",
+      "padding": "0px 17.6px"
+    },
+    {
+      "tag": "div",
+      "class": "AppHeaderDef__Nav__List__Item__Link",
+      "padding": "0px 17.6px"
+    },
+    {
+      "tag": "div",
+      "class": "AppHeaderDef__Nav__List__Item__Link",
+      "padding": "0px 17.6px"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "padding": "0px 32px"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "padding": "0px 32px"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "padding": "0px 32px"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "padding": "0px 32px"
+    },
+    {
+      "tag": "div",
+      "class": "CtaButtonGeneric",
+      "padding": "48px 16px"
+    },
+    {
+      "tag": "div",
+      "class": "CtaButtonGeneric__SpeechBubble",
+      "padding": "8px 16px"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "padding": "0px 32px"
+    },
+    {
+      "tag": "div",
+      "class": "PriceCard shadow-elevation-lv-2",
+      "padding": "16px"
+    },
+    {
+      "tag": "div",
+      "class": "PriceCard__Speach",
+      "padding": "0px 6px"
+    },
+    {
+      "tag": "div",
+      "class": "SpeachBalloonBasic type-teal PriceCard__",
+      "padding": "6px 18px"
+    }
+  ],
+  "11_margin": [
+    {
+      "tag": "div",
+      "class": "tf-c-modal__content",
+      "margin": "32px auto"
+    },
+    {
+      "tag": "div",
+      "class": "tf-p-button-with-square__icon",
+      "margin": "6px"
+    },
+    {
+      "tag": "div",
+      "class": "tf-p-button-with-square__title",
+      "margin": "4px"
+    },
+    {
+      "tag": "div",
+      "class": "tf-p-button-with-square__arrow",
+      "margin": "12px"
+    },
+    {
+      "tag": "div",
+      "class": "AppHeaderDef__Nav",
+      "margin": "0px 0px 0px 189.922px"
+    },
+    {
+      "tag": "div",
+      "class": "AppHeaderDef__Nav__List__Item AppHeaderD",
+      "margin": "0px 12px"
+    },
+    {
+      "tag": "div",
+      "class": "Nav",
+      "margin": "0px auto"
+    },
+    {
+      "tag": "div",
+      "class": "Nav",
+      "margin": "0px auto"
+    },
+    {
+      "tag": "div",
+      "class": "Nav",
+      "margin": "0px auto"
+    },
+    {
+      "tag": "div",
+      "class": "AppBreadcrumbs",
+      "margin": "0px 0px 15px"
+    },
+    {
+      "tag": "div",
+      "class": "TopHeroVisual mb-10 md:mb-16 md:mt-0",
+      "margin": "0px 0px 64px"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "margin": "0px 132px"
+    },
+    {
+      "tag": "div",
+      "class": "TextBasic mb-6",
+      "margin": "16px 0px 24px"
+    },
+    {
+      "tag": "div",
+      "class": "CtaButtonUnit hidden md:block",
+      "margin": "0px 0px 16px"
+    },
+    {
+      "tag": "div",
+      "class": "CtaButtonUnit block md:hidden mt-8",
+      "margin": "32px 0px 16px"
+    }
+  ],
+  "12_gap": [
+    {
+      "tag": "div",
+      "class": "grid grid-cols-1 md:grid-cols-2 md:gap-5",
+      "gap": "20px",
+      "display": "grid"
+    },
+    {
+      "tag": "div",
+      "class": "md:mt-2 flex justify-center items-center",
+      "gap": "16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 12px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 12px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 12px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 12px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row flex j",
+      "gap": "24px 16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "flex flex-wrap gap-8 md:gap-6 justify-ce",
+      "gap": "24px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "CtaButtonGeneric__Content grid grid-cols",
+      "gap": "24px",
+      "display": "grid"
+    }
+  ],
+  "13_max_width": [
+    {
+      "tag": "div",
+      "class": "tf-c-modal__content",
+      "maxWidth": "920px"
+    },
+    {
+      "tag": "iframe",
+      "class": "",
+      "maxWidth": "100%"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "maxWidth": "100%"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "maxWidth": "100%"
+    },
+    {
+      "tag": "div",
+      "class": "WrapperCommon container mx-auto px-4 md:",
+      "maxWidth": "1176px"
+    },
+    {
+      "tag": "div",
+      "class": "CtaButtonUnit hidden md:block",
+      "maxWidth": "422px"
+    },
+    {
+      "tag": "img",
+      "class": "slide",
+      "maxWidth": "100%"
+    },
+    {
+      "tag": "img",
+      "class": "slide",
+      "maxWidth": "100%"
+    },
+    {
+      "tag": "div",
+      "class": "CtaButtonUnit block md:hidden mt-8",
+      "maxWidth": "422px"
+    },
+    {
+      "tag": "img",
+      "class": "",
+      "maxWidth": "100%"
+    }
+  ],
+  "14_heights": {
+    "footer": "473.046875px",
+    "button": "0px",
+    "h1": "168.09375px",
+    "h2": "60.796875px",
+    "h3": "24.5px"
+  },
+  "15_border_radius": [
+    {
+      "tag": "div",
+      "class": "tf-c-modal__content",
+      "borderRadius": "4px"
+    },
+    {
+      "tag": "div",
+      "class": "tf-c-modal__btn-close",
+      "borderRadius": "50%"
+    },
+    {
+      "tag": "div",
+      "class": "tf-p-button-with-square tf-p-button-with",
+      "borderRadius": "6px 0px 0px 6px"
+    },
+    {
+      "tag": "a",
+      "class": "ButtonBasic hover:shadow-elevation-lv-1 ",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "a",
+      "class": "ButtonBasic hover:shadow-elevation-lv-1 ",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "span",
+      "class": "Bar",
+      "borderRadius": "4px"
+    },
+    {
+      "tag": "span",
+      "class": "Bar",
+      "borderRadius": "4px"
+    },
+    {
+      "tag": "span",
+      "class": "Bar",
+      "borderRadius": "4px"
+    },
+    {
+      "tag": "a",
+      "class": "ButtonBasic hover:shadow-elevation-lv-1 ",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "a",
+      "class": "ButtonBasic hover:shadow-elevation-lv-1 ",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "slider-wrapper shadow-elevation-lv-2 rou",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "a",
+      "class": "ButtonBasic hover:shadow-elevation-lv-1 ",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "a",
+      "class": "ButtonBasic hover:shadow-elevation-lv-1 ",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "rounded-lg w-full h-[232px] image-contai",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "rounded-lg w-full h-[232px] image-contai",
+      "borderRadius": "8px"
+    }
+  ],
+  "16_box_shadow": [
+    {
+      "tag": "div",
+      "class": "tf-c-modal__content",
+      "boxShadow": "rgba(0, 0, 0, 0.3) 15px 15px 40px 1px"
+    },
+    {
+      "tag": "div",
+      "class": "slider-wrapper shadow-elevation-lv-2 rou",
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(12, 52, 49, 0.13) 4px 6px 16px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    },
+    {
+      "tag": "div",
+      "class": "CasesBrandsInfo__Logos__List__Row__Item",
+      "boxShadow": "rgb(255, 255, 255) 0px 0px 10px 5px"
+    }
+  ],
+  "17_opacity": [
+    {
+      "tag": "div",
+      "class": "LazyShow",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "LazyShow",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "LazyShow text-center",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "LazyShow",
+      "opacity": "0"
+    },
+    {
+      "tag": "svg",
+      "class": "[object SVGAnimatedString]",
+      "opacity": "0.25"
+    },
+    {
+      "tag": "svg",
+      "class": "[object SVGAnimatedString]",
+      "opacity": "0.25"
+    },
+    {
+      "tag": "svg",
+      "class": "[object SVGAnimatedString]",
+      "opacity": "0.25"
+    },
+    {
+      "tag": "svg",
+      "class": "[object SVGAnimatedString]",
+      "opacity": "0.25"
+    },
+    {
+      "tag": "svg",
+      "class": "[object SVGAnimatedString]",
+      "opacity": "0.25"
+    },
+    {
+      "tag": "div",
+      "class": "LazyShow",
+      "opacity": "0"
+    }
+  ]
+}

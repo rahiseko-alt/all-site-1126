@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Aiueo App 機能別競合比較表</title>
+<style>
+  body { font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; margin: 20px; background: #f8f9fa; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  p.sub { color: #666; font-size: 13px; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); font-size: 14px; }
+  th, td { border: 1px solid #d0d0d0; padding: 7px 10px; text-align: left; }
+  th { background: #2c3e50; color: #fff; font-weight: 600; position: sticky; top: 0; }
+  tr.cat td { background: #34495e; color: #fff; font-weight: 700; font-size: 14px; }
+  tr:nth-child(even):not(.cat) { background: #f4f6f8; }
+  tr:hover:not(.cat) { background: #eaf0f6; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .partial { color: #d97706; font-weight: 700; }
+  .unique { background: #ecfdf5; }
+  .gap { background: #fef2f2; }
+  .legend { margin: 12px 0 20px; font-size: 13px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+  .summary { margin-top: 24px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .summary-box { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; flex: 1; min-width: 220px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .summary-box h3 { margin: 0 0 8px; font-size: 15px; }
+  .summary-box ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; }
+  .num { text-align: center; width: 30px; color: #888; }
+  .comp { text-align: center; width: 70px; font-size: 15px; }
+  .note { font-size: 12px; color: #666; min-width: 160px; cursor: text; }
+  .note:empty::before { content: 'メモ/質問を入力...'; color: #ccc; font-style: italic; }
+  .note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+  .score-table { margin-top: 24px; width: auto; font-size: 14px; }
+  .score-table th { background: #2c3e50; color: #fff; padding: 6px 16px; }
+  .score-table td { padding: 6px 16px; text-align: center; }
+  .dev { text-align: center; width: 50px; }
+  .dev input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
+  .prog { text-align: center; width: 80px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .prog-live { color: #16a34a; }
+  .prog-new { color: #2563eb; background: #dbeafe; }
+  .prog-fix { color: #7c3aed; background: #ede9fe; }
+  .prog-wip { color: #d97706; background: #FFF3E0; }
+  .prog-skip { color: #6b7280; background: #f3f4f6; }
+  .prog-no { color: #bbb; }
+  .toolbar { margin: 16px 0; display: flex; gap: 12px; align-items: center; }
+  .toolbar button { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .toolbar button:hover { background: #1d4ed8; }
+  .toolbar .status { font-size: 13px; color: #16a34a; font-weight: 600; display: none; }
+</style>
+</head>
+<body>
+
+<h1>Aiueo App 機能別 競合比較表</h1>
+<p class="sub">2026-03-15 更新 | 大手3社: Square / Airレジ / スマレジ | 進捗列追加</p>
+
+<div class="toolbar">
+  <button onclick="saveChecklist()">保存（Claudeに送信用）</button>
+  <span class="status" id="saveStatus">保存しました</span>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#16a34a"></span> ○ 対応</span>
+  <span><span class="dot" style="background:#d97706"></span> △ 部分対応</span>
+  <span><span class="dot" style="background:#dc2626"></span> × 未対応</span>
+  <span><span class="dot" style="background:#ecfdf5;border:1px solid #a7f3d0"></span> Aiueo独自</span>
+  <span><span class="dot" style="background:#fef2f2;border:1px solid #fca5a5"></span> 致命的ギャップ</span>
+  <span><span class="dot" style="background:#dbeafe;border:1px solid #93c5fd"></span> ☑ 開発対象</span>
+</div>
+
+<table id="compTable">
+<thead>
+  <tr><th style="width:30px">#</th><th>機能</th><th class="comp">Aiueo</th><th class="comp">Square</th><th class="comp">Airレジ</th><th class="comp">スマレジ</th><th class="dev">開発</th><th>進捗</th><th>備考</th></tr>
+</thead>
+<tbody>
+
+<tr class="cat"><td colspan="9">注文システム</td></tr>
+<tr><td class="num">1</td><td>QRコード注文</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="1"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">2</td><td>Webブラウザ完結（DL不要）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp partial">△</td><td class="dev"><input type="checkbox" data-id="2"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">スマレジはiPad前提</td></tr>
+<tr><td class="num">3</td><td>メニュー表示・カテゴリ絞込</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="3"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">4</td><td>カート・数量調整</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="4"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">5</td><td>トッピング・カスタマイズ</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="5"></td><td class="prog prog-fix">3/15改修</td><td class="note" contenteditable="true">バグ修正済(重複追加)</td></tr>
+<tr><td class="num">6</td><td>テーブル番号QR自動入力</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="6"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">7</td><td>セッション内合計追跡</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="7"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">8</td><td>テイクアウト注文</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="8"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">Okageも対応</td></tr>
+<tr><td class="num">9</td><td>デリバリー注文</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="9"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">Okageも対応</td></tr>
+<tr><td class="num">10</td><td>事前注文（時間指定）</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="10"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">Okageも対応</td></tr>
+
+<tr class="cat"><td colspan="9">決済・会計</td></tr>
+<tr><td class="num">11</td><td>テーブル別会計</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="11"></td><td class="prog prog-fix">3/15改修</td><td class="note" contenteditable="true">レジ全面書き換え</td></tr>
+<tr><td class="num">12</td><td>税率別表示（10%/8%）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="12"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">13</td><td>インボイス番号表示</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="13"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">14</td><td>誤操作防止（2段階確認）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="14"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr class="gap"><td class="num">15</td><td>オンライン決済</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="15"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">全社対応。Aiueoだけない</td></tr>
+<tr><td class="num">16</td><td>クーポン・割引</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="16"></td><td class="prog prog-new">3/15新規</td><td class="note" contenteditable="true">PBクーポン+プリセット割引</td></tr>
+<tr class="unique"><td class="num">17</td><td>割り勘</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="17"></td><td class="prog prog-new">3/15新規</td><td class="note" contenteditable="true">商品ピッキング式。Aiueo独自</td></tr>
+
+<tr class="cat"><td colspan="9">管理画面</td></tr>
+<tr><td class="num">18</td><td>リアルタイム注文一覧</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="18"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">19</td><td>注文ステータス管理</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="19"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">20</td><td>メニュー編集（CRUD）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="20"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">21</td><td>画像ギャラリー管理</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="21"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">22</td><td>売上レポート（日別）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="22"></td><td class="prog prog-fix">3/15改修</td><td class="note" contenteditable="true">ダッシュボードUI改修+KPI</td></tr>
+<tr><td class="num">23</td><td>CSVエクスポート</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="23"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr class="unique"><td class="num">24</td><td>会計ソフト形式（freee/弥生/MF）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="24"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">大手3社+Aiueoのみ。他社は非対応</td></tr>
+<tr><td class="num">25</td><td>キッチンディスプレイ（KDS）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="25"></td><td class="prog prog-new">3/15新規</td><td class="note" contenteditable="true">全面実装済。部分提供+復活+信号色</td></tr>
+<tr class="gap"><td class="num">26</td><td>レシートプリンター</td><td class="comp partial">△</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="26"></td><td class="prog prog-wip">途中</td><td class="note" contenteditable="true">チビ券デモ済。CloudPRNT未統合</td></tr>
+<tr class="gap"><td class="num">27</td><td>複数店舗管理</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="27"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">全社対応。Aiueoだけない</td></tr>
+<tr><td class="num">28</td><td>時間帯メニュー切替</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="28"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">L.B.B./ユビレジも対応</td></tr>
+
+<tr class="cat"><td colspan="9">認証・権限</td></tr>
+<tr><td class="num">29</td><td>ロール別アクセス制御</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="29"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr class="unique"><td class="num">30</td><td>トークン発行・失効管理</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="30"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Aiueo独自</td></tr>
+<tr class="unique"><td class="num">31</td><td>QRでロール共有</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="31"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Aiueo独自</td></tr>
+
+<tr class="cat"><td colspan="9">多言語・インバウンド</td></tr>
+<tr class="unique"><td class="num">32</td><td>多言語メニュー（日/英/中）</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="32"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">ユビレジのみ対応。Aiueoの強み</td></tr>
+<tr class="unique"><td class="num">33</td><td>自動翻訳（DeepL）</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="33"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Aiueo独自</td></tr>
+<tr class="unique"><td class="num">34</td><td>アレルゲン表示・フィルタ（7種）</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="34"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Aiueo独自</td></tr>
+<tr class="unique"><td class="num">35</td><td>ベジタリアン/ハラール対応</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="35"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Aiueo独自</td></tr>
+
+<tr class="cat"><td colspan="9">スタッフ管理</td></tr>
+<tr class="unique"><td class="num">36</td><td>シフト希望提出（モバイル）</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="36"></td><td class="prog prog-skip">除外</td><td class="note" contenteditable="true">コード有。マスター判断でルーティング除外</td></tr>
+<tr class="unique"><td class="num">37</td><td>シフト承認/却下</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="37"></td><td class="prog prog-skip">除外</td><td class="note" contenteditable="true">コード有。マスター判断でルーティング除外</td></tr>
+<tr class="unique"><td class="num">38</td><td>シフトカレンダー</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="38"></td><td class="prog prog-skip">除外</td><td class="note" contenteditable="true">コード有。マスター判断でルーティング除外</td></tr>
+<tr><td class="num">39</td><td>スタッフ投げ銭</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="39"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">diniiのみ</td></tr>
+
+<tr class="cat"><td colspan="9">顧客エンゲージメント</td></tr>
+<tr><td class="num">40</td><td>LINE連携</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="40"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">L.B.B./diniiも対応</td></tr>
+<tr><td class="num">41</td><td>顧客データ蓄積・リピーター分析</td><td class="comp no">×</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="41"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">diniiも対応</td></tr>
+<tr><td class="num">42</td><td>セグメント別マーケティング</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="42"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">diniiのみ</td></tr>
+<tr><td class="num">43</td><td>プッシュ通知・来店促進</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="43"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">diniiのみ</td></tr>
+
+<tr class="cat"><td colspan="9">技術基盤</td></tr>
+<tr class="unique"><td class="num">44</td><td>PWA（ホーム画面追加）</td><td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="44"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Aiueo独自</td></tr>
+<tr><td class="num">45</td><td>リアルタイム同期（WebSocket）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="45"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">46</td><td>レスポンシブ（モバイル/PC）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp partial">△</td><td class="dev"><input type="checkbox" data-id="46"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">スマレジはiPad専用</td></tr>
+<tr><td class="num">47</td><td>音声通知（新規注文）</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="dev"><input type="checkbox" data-id="47"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true"></td></tr>
+<tr><td class="num">48</td><td>オフラインキャッシュ</td><td class="comp partial">△</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="dev"><input type="checkbox" data-id="48"></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">全社なし。AiueoはSW有/未活用</td></tr>
+
+</tbody>
+</table>
+
+<table class="score-table">
+<thead>
+  <tr><th></th><th>○ 対応</th><th>△ 部分</th><th>× 未対応</th></tr>
+</thead>
+<tbody>
+  <tr><td><strong>Aiueo</strong></td><td class="yes">35</td><td class="partial">2</td><td class="no">11</td></tr>
+  <tr><td><strong>Square</strong></td><td class="yes">33</td><td>0</td><td class="no">15</td></tr>
+  <tr><td><strong>Airレジ</strong></td><td class="yes">30</td><td>0</td><td class="no">18</td></tr>
+  <tr><td><strong>スマレジ</strong></td><td class="yes">27</td><td class="partial">2</td><td class="no">19</td></tr>
+</tbody>
+</table>
+
+<div class="summary">
+  <div class="summary-box" style="border-left: 4px solid #dc2626;">
+    <h3>致命的ギャップ（3社全てにあり/Aiueoにない）</h3>
+    <ul>
+      <li>#15 オンライン決済</li>
+      <li><s>#25 KDS</s> → <strong style="color:#16a34a">3/15解消（全面実装+デプロイ済）</strong></li>
+      <li>#26 レシートプリンター — △途中（チビ券デモ済、CloudPRNT未）</li>
+      <li>#27 複数店舗管理</li>
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #16a34a;">
+    <h3>Aiueo独自の武器（3社全てにない）</h3>
+    <ul>
+      <li><strong style="color:#2563eb">#17 商品ピッキング式割り勘 — 3/15新規</strong></li>
+      <li>#30-31 トークン発行・QRロール共有</li>
+      <li>#32-35 多言語+DeepL翻訳+アレルゲン+ハラール</li>
+      <li>#36-38 シフト管理内蔵（⏸ルーティング除外中）</li>
+      <li>#44 PWA</li>
+      <li>#48 オフラインキャッシュ（部分）</li>
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #2563eb;">
+    <h3>Squareだけが持つ機能</h3>
+    <ul>
+      <li>#9 デリバリー注文</li>
+      <li>#28 時間帯メニュー切替</li>
+      <li>#40 LINE連携</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'aiueo-dev-checklist';
+const NOTES_KEY = 'aiueo-dev-notes';
+
+// localStorage から復元
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      JSON.parse(saved).forEach(id => {
+        const cb = document.querySelector(`input[data-id="${id}"]`);
+        if (cb) cb.checked = true;
+      });
+    }
+    const notes = localStorage.getItem(NOTES_KEY);
+    if (notes) {
+      const map = JSON.parse(notes);
+      Object.entries(map).forEach(([id, text]) => {
+        const cb = document.querySelector(`input[data-id="${id}"]`);
+        if (cb) {
+          const noteCell = cb.closest('tr').querySelector('.note');
+          if (noteCell && text) noteCell.textContent = text;
+        }
+      });
+    }
+  } catch(e) {}
+}
+
+// localStorage に保存
+function persistState() {
+  const checked = [];
+  const notes = {};
+  document.querySelectorAll('input[data-id]').forEach(cb => {
+    const id = cb.dataset.id;
+    if (cb.checked) checked.push(id);
+    const noteCell = cb.closest('tr').querySelector('.note');
+    if (noteCell && noteCell.textContent.trim()) {
+      notes[id] = noteCell.textContent.trim();
+    }
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(checked));
+  localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+}
+
+// チェック変更時に自動保存
+document.querySelectorAll('input[data-id]').forEach(cb => {
+  cb.addEventListener('change', persistState);
+});
+
+// 備考編集時に自動保存
+document.querySelectorAll('.note').forEach(cell => {
+  cell.addEventListener('blur', persistState);
+});
+
+// マークダウンファイルとして保存
+async function saveChecklist() {
+  const lines = ['# Aiueo 開発指示チェックリスト', '',
+    `> 更新日時: ${new Date().toISOString().slice(0,19).replace('T',' ')}`, '',
+    '## チェック済み（開発対象）', ''];
+
+  const uncheckedLines = ['', '## 未チェック（対象外 / 未定）', ''];
+
+  document.querySelectorAll('input[data-id]').forEach(cb => {
+    const row = cb.closest('tr');
+    const id = cb.dataset.id;
+    const name = row.children[1].textContent;
+    const aiueo = row.children[2].textContent;
+    const note = row.children[7] ? row.children[7].textContent.trim() : '';
+    const line = `- #${id} ${name} [Aiueo: ${aiueo}]${note ? ' — ' + note : ''}`;
+
+    if (cb.checked) {
+      lines.push(line);
+    } else if (aiueo === '×' || aiueo === '△') {
+      uncheckedLines.push(line);
+    }
+  });
+
+  const content = lines.concat(uncheckedLines).join('\n') + '\n';
+
+  const blob = new Blob([content], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'aiueo-dev-checklist.md';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showSaved();
+}
+
+function showSaved() {
+  const el = document.getElementById('saveStatus');
+  el.style.display = 'inline';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+loadState();
+</script>
+
+</body>
+</html>

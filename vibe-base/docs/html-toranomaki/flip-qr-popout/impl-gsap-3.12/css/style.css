@@ -1,0 +1,94 @@
+/* Flip QR Popout — 枠は残り中身だけ飛び出す（GSAP Flip / data-flip-id 共有） */
+:root {
+    --bg-dark: #07080a;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent: #22d3ee;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stage { width: 100%; max-width: 720px; padding: 48px 24px; text-align: center; }
+
+.eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 18px;
+}
+
+.title { font-size: 54px; font-weight: 700; line-height: 1.05; text-transform: uppercase; margin-bottom: 22px; }
+
+.lead {
+    font-family: 'Inter', sans-serif; color: var(--text-secondary);
+    max-width: 540px; margin: 0 auto 50px; line-height: 1.7;
+}
+
+/* ---- ドック（枠が残る場所） ---- */
+.qr-dock { display: flex; gap: 32px; justify-content: center; }
+
+.qr-dock-btn {
+    background: none; border: none; padding: 0; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 10px; font-family: inherit;
+}
+
+.qr-thumb {
+    display: block; width: 96px; height: 96px;
+    background: #fff; padding: 10px; border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.qr-dock-btn:hover .qr-thumb {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(34, 211, 238, 0.3);
+}
+
+.qr-mini { width: 100%; height: 100%; display: block; }
+.qr-mini.hidden { visibility: hidden; }   /* Flip 後に枠だけ残す */
+
+.qr-dock-label {
+    font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em; color: var(--text-secondary);
+}
+
+.hint {
+    margin-top: 40px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; letter-spacing: 0.08em; color: var(--text-secondary);
+}
+
+/* ---- 拡大ステージ: pointer-events:none がジッター対策の核 ---- */
+.qr-stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;            /* カーソルを拾わない＝カクつかない */
+    z-index: 10000;
+}
+
+.qr-full {
+    display: none;
+    width: min(78vw, 360px); height: min(78vw, 360px);
+    background: #fff; padding: 20px; border-radius: 22px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+.qr-full.active { display: block; }
+
+.qr-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(7, 8, 10, 0.82);
+    backdrop-filter: blur(4px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+    z-index: 9999;
+}
+.qr-backdrop.show { opacity: 1; pointer-events: auto; cursor: zoom-out; }
+
+@media (max-width: 600px) { .title { font-size: 38px; } }

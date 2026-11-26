@@ -1,0 +1,593 @@
+{
+  "1_html_base_font_size": "18px",
+  "2_font_family": {
+    "h2": {
+      "fontFamily": "euclidcircularb, -apple-system",
+      "fontSize": "32px",
+      "fontWeight": "600",
+      "lineHeight": "41px",
+      "letterSpacing": "-0.32px"
+    },
+    "p": {
+      "fontFamily": "euclidcircularb, -apple-system",
+      "fontSize": "16px",
+      "fontWeight": "500",
+      "lineHeight": "24px",
+      "letterSpacing": "-0.16px"
+    },
+    "nav_a": {
+      "fontFamily": "euclidcircularb, -apple-system",
+      "fontSize": "18px",
+      "fontWeight": "400",
+      "lineHeight": "28.8px",
+      "letterSpacing": "normal"
+    },
+    "button": {
+      "fontFamily": "euclidcircularb, -apple-system",
+      "fontSize": "14px",
+      "fontWeight": "400",
+      "lineHeight": "18px",
+      "letterSpacing": "-0.14px"
+    }
+  },
+  "3_font_size": {
+    "h2": "32px",
+    "p": "16px",
+    "nav_a": "18px",
+    "button": "14px"
+  },
+  "4_font_weight": {
+    "h2": "600",
+    "p": "500",
+    "nav_a": "400",
+    "button": "400"
+  },
+  "5_line_height": {
+    "h2": "41px",
+    "p": "24px",
+    "nav_a": "28.8px",
+    "button": "18px"
+  },
+  "6_letter_spacing": {
+    "h2": "-0.32px",
+    "p": "-0.16px",
+    "nav_a": "normal",
+    "button": "-0.14px"
+  },
+  "7_text_colors": {
+    "h2": "rgb(8, 15, 26)",
+    "p": "rgb(8, 15, 26)",
+    "a": "rgb(8, 15, 26)",
+    "button": "rgb(245, 247, 249)",
+    "span": "rgb(8, 15, 26)",
+    "li": "rgb(0, 0, 0)"
+  },
+  "8_bg_colors": {},
+  "9_borders": [
+    {
+      "tag": "a",
+      "class": "css-1d2qrfl e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "p",
+      "class": "eeseciy2 css-fi2mqr e87tzgl0",
+      "borderColor": "rgb(8, 15, 26) rgb(8, 15, 26) rgba(0, 0, 0, 0)",
+      "borderWidth": "0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-16zrfh0 eruvst31",
+      "borderColor": "rgb(211, 219, 229)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-v1hba0 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "a",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "a",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1ch1ydn e3pck4z0",
+      "borderColor": "rgb(239, 242, 246)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-v1hba0 e9q1mbs0",
+      "borderColor": "rgba(0, 0, 0, 0) rgb(211, 219, 229) rgb(211, 219, 229)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1ed7xlc eruvst31",
+      "borderColor": "rgb(211, 219, 229)",
+      "borderWidth": "1px"
+    }
+  ],
+  "10_padding": [
+    {
+      "tag": "div",
+      "class": "css-ede3rs e7yfnxm5",
+      "padding": "18px 0px 4px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1ol126k ed0ypr80",
+      "padding": "10px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-znnvoc e17uzsj60",
+      "padding": "16px"
+    },
+    {
+      "tag": "div",
+      "class": "css-2qoas3 e1dg6kzn2",
+      "padding": "16px"
+    },
+    {
+      "tag": "div",
+      "class": "css-16zrfh0 eruvst31",
+      "padding": "24px 24px 18px"
+    },
+    {
+      "tag": "div",
+      "class": "css-sey7lb eruvst32",
+      "padding": "20px 0px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1bjw3bw e1dg6kzn7",
+      "padding": "8px 16px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "padding": "12px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "padding": "12px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "padding": "12px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "padding": "12px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "padding": "12px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "padding": "12px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1ch1ydn e3pck4z0",
+      "padding": "24px"
+    },
+    {
+      "tag": "div",
+      "class": "css-v1hba0 e9q1mbs0",
+      "padding": "10px 16px"
+    }
+  ],
+  "11_margin": [
+    {
+      "tag": "div",
+      "class": "css-vq71th e7yfnxm6",
+      "margin": "0px 112px"
+    },
+    {
+      "tag": "div",
+      "class": "css-11647cm e9q1mbs2",
+      "margin": "0px -16px 0px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "menuWrapper",
+      "margin": "0px 112px"
+    },
+    {
+      "tag": "p",
+      "class": "css-x2g7gn e87tzgl0",
+      "margin": "12px 0px"
+    },
+    {
+      "tag": "p",
+      "class": "css-9q4eg7 e87tzgl0",
+      "margin": "0px 0px 8px"
+    },
+    {
+      "tag": "p",
+      "class": "css-9q4eg7 e87tzgl0",
+      "margin": "0px 0px 8px"
+    },
+    {
+      "tag": "p",
+      "class": "css-x2g7gn e87tzgl0",
+      "margin": "12px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1q82eza e1dg6kzn2",
+      "margin": "0px 0px 0px -16px"
+    },
+    {
+      "tag": "p",
+      "class": "css-x2g7gn e87tzgl0",
+      "margin": "12px 0px"
+    },
+    {
+      "tag": "p",
+      "class": "css-9q4eg7 e87tzgl0",
+      "margin": "0px 0px 8px"
+    },
+    {
+      "tag": "p",
+      "class": "css-9q4eg7 e87tzgl0",
+      "margin": "0px 0px 8px"
+    },
+    {
+      "tag": "p",
+      "class": "css-x2g7gn e87tzgl0",
+      "margin": "12px 0px"
+    },
+    {
+      "tag": "p",
+      "class": "css-9q4eg7 e87tzgl0",
+      "margin": "0px 0px 8px"
+    },
+    {
+      "tag": "p",
+      "class": "css-9q4eg7 e87tzgl0",
+      "margin": "0px 0px 8px"
+    },
+    {
+      "tag": "p",
+      "class": "css-x2g7gn e87tzgl0",
+      "margin": "12px 0px"
+    }
+  ],
+  "12_gap": [
+    {
+      "tag": "a",
+      "class": "css-1d2qrfl e9q1mbs0",
+      "gap": "8px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "menuWrapper",
+      "gap": "20px",
+      "display": "flex"
+    },
+    {
+      "tag": "nav",
+      "class": "css-1e87lnf ezz5p1j0",
+      "gap": "40px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1s4hacz e89zbqe0",
+      "gap": "16px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-s1x8tq eeseciy0",
+      "gap": "8px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-2qoas3 e1dg6kzn2",
+      "gap": "32px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1ngat5n e1dg6kzn6",
+      "gap": "32px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-12jznn7 e1dg6kzn9",
+      "gap": "32px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1c1kq07 eruvst30",
+      "gap": "8px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-v1hba0 e9q1mbs0",
+      "gap": "8px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1bjw3bw e1dg6kzn7",
+      "gap": "22px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "gap": "8px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "gap": "8px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "gap": "8px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "gap": "8px",
+      "display": "flex"
+    }
+  ],
+  "13_max_width": [
+    {
+      "tag": "div",
+      "class": "css-rt2uno e1wpxynn0",
+      "maxWidth": "3840px"
+    },
+    {
+      "tag": "div",
+      "class": "css-vq71th e7yfnxm6",
+      "maxWidth": "1216px"
+    },
+    {
+      "tag": "div",
+      "class": "menuWrapper",
+      "maxWidth": "1216px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1s4hacz e89zbqe0",
+      "maxWidth": "921px"
+    },
+    {
+      "tag": "ul",
+      "class": "css-r3uq5u eeseciy1",
+      "maxWidth": "264px"
+    },
+    {
+      "tag": "img",
+      "class": "",
+      "maxWidth": "100%"
+    },
+    {
+      "tag": "div",
+      "class": "css-w84pl5 e89zbqe0",
+      "maxWidth": "1151px"
+    },
+    {
+      "tag": "ul",
+      "class": "css-81vraj eeseciy1",
+      "maxWidth": "264px"
+    },
+    {
+      "tag": "img",
+      "class": "",
+      "maxWidth": "100%"
+    },
+    {
+      "tag": "img",
+      "class": "",
+      "maxWidth": "100%"
+    }
+  ],
+  "14_heights": {
+    "header": "72px",
+    "nav": "44px",
+    "footer": "1391.796875px",
+    "button": "18px",
+    "h2": "82px"
+  },
+  "15_border_radius": [
+    {
+      "tag": "a",
+      "class": "css-1d2qrfl e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-znnvoc e17uzsj60",
+      "borderRadius": "16px"
+    },
+    {
+      "tag": "div",
+      "class": "css-s1x8tq eeseciy0",
+      "borderRadius": "8px 0px 0px 8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-2qoas3 e1dg6kzn2",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-16zrfh0 eruvst31",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-v1hba0 e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1bjw3bw e1dg6kzn7",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "div",
+      "class": "css-117p9l0 e4cg1hw0",
+      "borderRadius": "48px"
+    },
+    {
+      "tag": "div",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderRadius": "8px"
+    },
+    {
+      "tag": "a",
+      "class": "css-1470c97 e9q1mbs0",
+      "borderRadius": "8px"
+    }
+  ],
+  "16_box_shadow": [],
+  "17_opacity": [
+    {
+      "tag": "div",
+      "class": "css-znnvoc e17uzsj60",
+      "opacity": "0"
+    },
+    {
+      "tag": "ul",
+      "class": "css-r3uq5u eeseciy1",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "css-2qoas3 e1dg6kzn2",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "css-1ch1ydn e3pck4z0",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "css-znnvoc e17uzsj60",
+      "opacity": "0"
+    },
+    {
+      "tag": "ul",
+      "class": "css-81vraj eeseciy1",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "css-1q82eza e1dg6kzn2",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "css-1ch1ydn e3pck4z0",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "css-207n97 e17uzsj60",
+      "opacity": "0"
+    },
+    {
+      "tag": "div",
+      "class": "css-znnvoc e17uzsj60",
+      "opacity": "0"
+    }
+  ]
+}

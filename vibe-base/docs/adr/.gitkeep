@@ -1,0 +1,4 @@
+このフォルダは ADR (Architecture Decision Record) を格納します。
+Nygard 標準フォーマット (Title / Status / Context / Decision / Consequences)。
+1 決定 = 1 ファイル (例: 0001-rationale-6-axes.md)。
+本エージェントの memory.md P2 索引から参照されます。

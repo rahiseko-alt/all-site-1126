@@ -1,0 +1,309 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: #020608;
+  color: #f8fafc;
+  font-family: 'Outfit', -apple-system, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #020608;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* WebGL Canvas */
+.webgl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* UI Overlay Container */
+.ui-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Scroll Wrapper to define physical height */
+.scroll-container {
+  position: relative;
+  z-index: 2; /* Sits over Canvas to intercept scroll but doesn't block click on UI elements unless active */
+  width: 100%;
+}
+
+.scroll-section {
+  height: 100vh;
+  width: 100%;
+  pointer-events: none; /* Let scroll events pass to body/Lenis */
+}
+
+/* Make the descent section (2nd section) physically longer for the 10-second dive */
+.scroll-section:nth-child(2) {
+  height: 300vh;
+}
+
+/* Scene UI layouts */
+.scene-ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  opacity: 0; /* Animated via GSAP */
+  transform: translateY(20px); /* Animated via GSAP */
+  pointer-events: none;
+}
+
+/* Content blocks */
+.content {
+  max-width: 800px;
+  text-align: center;
+  pointer-events: auto; /* Enable clicks/interaction inside content */
+}
+
+.content.left-align {
+  text-align: left;
+  margin-right: auto;
+  margin-left: 10%;
+  max-width: 500px;
+  background: rgba(2, 6, 8, 0.4);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.content.right-align {
+  text-align: right;
+  margin-left: auto;
+  margin-right: 10%;
+  max-width: 500px;
+  background: rgba(2, 6, 8, 0.4);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Typography styles */
+.glow-text {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
+  margin-bottom: 1.5rem;
+}
+
+.glow-text-sub {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.2rem;
+}
+
+.sub-text {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+}
+
+/* Footer / Metadata */
+.footer {
+  margin-top: 3rem;
+}
+
+.copyright {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  color: #475569;
+  letter-spacing: 0.1em;
+}
+
+/* Navigation Indicator (Dots) */
+.nav-indicator {
+  position: fixed;
+  right: 2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.nav-dot:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.2);
+}
+
+.nav-dot.active {
+  background: #a78bfa;
+  transform: scale(1.4);
+  box-shadow: 0 0 10px #a78bfa;
+}
+
+/* Lenis smooth scrolling rules */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Hybrid Blur Overlay (Scheme A) */
+.hybrid-blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 5; /* Sits between canvas (1) and UI overlay (10) */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(0px);
+  filter: url(#svg-rgb-shift);
+}
+
+/* Floating Control Panel & Performance HUD */
+.control-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  pointer-events: auto; /* Enable button clicks */
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #e2e8f0;
+}
+
+.panel-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-label {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.mode-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%);
+  border-color: transparent;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
+}
+
+.fps-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+}
+
+#fps-val {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #34d399;
+}
+

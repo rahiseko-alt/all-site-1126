@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swipe File — WEBデザイン参考DB</title>
+<style>
+  :root{--bg:#0d0d0d;--fg:#e0e0e0;--card:#1a1a1a;--accent:#7eb8f7;--line:#333}
+  *{box-sizing:border-box}
+  body{font-family:'Segoe UI','Yu Gothic',sans-serif;background:var(--bg);color:var(--fg);max-width:1100px;margin:0 auto;padding:24px;line-height:1.7}
+  h1{color:#fff;border-bottom:2px solid var(--line);padding-bottom:8px}
+  .lead{color:#aaa;font-size:14px}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+  .tag{background:#1e2a3a;color:var(--accent);border:1px solid var(--line);border-radius:14px;padding:3px 12px;font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px}
+  .entry{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px}
+  .entry h3{margin:0 0 6px;font-size:16px}
+  .entry a{color:var(--accent);word-break:break-all}
+  .entry .tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+  .entry .tags span{font-size:11px;background:#222;border-radius:10px;padding:2px 8px;color:#9cc}
+  .memo{font-size:13px;color:#cfcfcf;margin-top:8px}
+  .empty{color:#777;text-align:center;padding:60px 0;border:1px dashed var(--line);border-radius:8px}
+</style>
+</head>
+<body>
+<h1>📎 Swipe File — WEBデザイン参考DB</h1>
+<p class="lead">
+  恒久の参照DB。"学ぶがコピーしない"。WEBデザイン手順化フロー Step3（参考リサーチ）の成果を毎回ここに追記する。<br>
+  正本フロー → <code>docs/standards/web-design-flow.md</code>（設定3）。市場/競合データは <code>docs/research-bank/</code>（別物）。
+</p>
+
+<h2>タグ体系（背骨）</h2>
+<div class="filters">
+  <span class="tag">コンセプト感情: 信頼 / 高揚 / 緊張 / 親密 / 先鋭 …</span>
+  <span class="tag">骨格タイプ: 横スクロール / ピン留め / 3D / 分割 / マスク遷移 …</span>
+  <span class="tag">業種</span>
+  <span class="tag">技術: GSAP / Three.js / SVG歪み / 可変フォント …</span>
+</div>
+
+<h2>エントリ</h2>
+<!-- 1エントリ = 1参考。テンプレ:
+<div class="entry">
+  <h3>サイト名</h3>
+  <a href="URL">URL</a>
+  <p class="memo">抽出メモ: 採用する「形式・次元・操作」を1-2行で（骨格パラダイム視点）</p>
+  <div class="tags"><span>感情:○○</span><span>骨格:○○</span><span>業種:○○</span><span>技術:○○</span></div>
+</div>
+-->
+<div class="grid">
+  <div class="empty">まだエントリがありません。<br>案件の参考リサーチ（Step3）で良い実物を見つけたら、上記テンプレに沿って追記してください。</div>
+</div>
+
+</body>
+</html>

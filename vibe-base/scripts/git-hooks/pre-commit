@@ -1,0 +1,88 @@
+#!/bin/sh
+# scripts/git-hooks/pre-commit — git tracked 正本
+# install-git-hooks.mjs で .git/hooks/pre-commit にコピーされる
+# 用途:
+#   1. ESLint check (ai-concierge/app)
+#   2. memory.md 直近5件制チェック
+#   3. settings.local.json 強制 add ガード（G4-5）
+#   4. staged ファイル全件シークレットパターン検知（G4-5）
+
+# ── 1. ESLint check for ai-concierge/app ──
+APP_DIR="products/ai-concierge/app"
+STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep "^$APP_DIR/src/")
+if [ -n "$STAGED" ]; then
+  echo "Running ESLint on ai-concierge/app..."
+  cd "$APP_DIR" && npx eslint src/ --max-warnings=0
+  if [ $? -ne 0 ]; then
+    echo "ESLint failed. Fix errors before committing."
+    exit 1
+  fi
+  cd - > /dev/null
+fi
+
+# ── 2. memory.md 直近5件制チェック ──
+if [ -f memory.md ]; then
+  count=$(grep -cE '^## .*(Check-out|Patch)' memory.md)
+  if [ "$count" -gt 5 ]; then
+    echo "ERROR: memory.md has $count entries (max 5)"
+    echo "Archive old entries per docs/ops/memory-ops.md:"
+    echo "  1. Move old entries to archive/{agent}-memory-YYYYMM.md"
+    echo "  2. Keep only latest 5 in memory.md"
+    echo "  3. Re-stage and commit"
+    exit 1
+  fi
+fi
+
+# ── 3. settings.local.json 強制 add ガード（G4-5）──
+STAGED_LOCAL=$(git diff --cached --name-only --diff-filter=ACM | grep -E '(^|/)\.claude/settings\.local\.json$' || true)
+if [ -n "$STAGED_LOCAL" ]; then
+  echo "ERROR: .claude/settings.local.json が staged されています（公式仕様 違反）"
+  echo "$STAGED_LOCAL" | sed 's/^/  - /'
+  echo ""
+  echo "対処:"
+  echo "  1. git rm --cached <file> で追跡解除"
+  echo "  2. ルート .gitignore に **/.claude/settings.local.json があるか確認"
+  echo "  3. 再度 git add せずにコミット（git add -A / git add . でも settings.local.json は除外される設計）"
+  echo ""
+  echo "根拠: memory/project_settings-spec-audit-result.md / 公式仕様準拠監査"
+  exit 1
+fi
+
+# ── 4. staged ファイル全件シークレット検知（G4-5）──
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -n "$STAGED_FILES" ]; then
+  HAS_SECRET=0
+  IFS='
+'
+  for f in $STAGED_FILES; do
+    [ -f "$f" ] || continue
+    # バイナリ・大容量はスキップ
+    case "$f" in
+      *.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico|*.pdf|*.zip|*.tar.gz|*.tgz|*.xlsx|*.xlsm|*.xls|*.db|*.sqlite|*.woff|*.woff2|*.ttf|*.otf|*.mp4|*.mov|*.webm) continue ;;
+    esac
+    OUT=$(node .claude/hooks/check-secret-patterns.mjs --file "$f" 2>&1)
+    if [ $? -ne 0 ]; then
+      echo "$OUT"
+      HAS_SECRET=1
+    fi
+  done
+  unset IFS
+  if [ "$HAS_SECRET" = "1" ]; then
+    echo ""
+    echo "ERROR: 上記 staged ファイルにシークレットパターンが混入しています"
+    echo "対処:"
+    echo "  1. 該当ファイルからシークレット原文を削除"
+    echo "  2. 環境変数参照に置換（例: \${API_KEY}）"
+    echo "  3. 再度 git add してコミット"
+    echo ""
+    echo "誤検知の場合（テストデータ等）: コミット時のみ HOOKS_SKIP_SECRET=1 で一時バイパス可"
+    if [ "$HOOKS_SKIP_SECRET" = "1" ]; then
+      echo ""
+      echo "（HOOKS_SKIP_SECRET=1 で バイパス、コミット続行）"
+    else
+      exit 1
+    fi
+  fi
+fi
+
+exit 0

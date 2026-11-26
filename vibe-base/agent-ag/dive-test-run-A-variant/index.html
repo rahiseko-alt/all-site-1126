@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dive into the Dark - Immersive 3D Experience</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- Hybrid Blur Overlay (For Scheme A) -->
+    <div class="hybrid-blur-overlay"></div>
+
+    <!-- WebGL Canvas -->
+    <canvas class="webgl"></canvas>
+
+    <!-- Performance & Control Panel -->
+    <div class="control-panel">
+        <div class="panel-section">
+            <span class="panel-label">MODE:</span>
+            <div class="mode-buttons">
+                <button class="mode-btn active" data-mode="hybrid">Hybrid (CPU/CSS)</button>
+                <button class="mode-btn" data-mode="post">Post-Process (GPU)</button>
+                <button class="mode-btn" data-mode="off">OFF</button>
+            </div>
+        </div>
+        <div class="panel-section fps-section">
+            <span class="panel-label">FPS:</span>
+            <span id="fps-val">--</span>
+        </div>
+    </div>
+
+
+    <!-- UI Overlay (Fixed positioning) -->
+    <div class="ui-overlay">
+        <!-- Scene 0 UI: Start -->
+        <section class="scene-ui active" id="scene-0">
+            <div class="content">
+                <h1 class="glow-text">DIVE INTO THE DARK</h1>
+                <p class="sub-text">[Scroll] to begin the descent</p>
+            </div>
+        </section>
+
+        <!-- Scene 1 UI: Descent -->
+        <section class="scene-ui" id="scene-1">
+            <div class="content left-align">
+                <h2 class="glow-text-sub">THE DESCENT</h2>
+                <p class="sub-text">Sinking deeper into the abyss, leaving the surface light behind.</p>
+            </div>
+        </section>
+
+        <!-- Scene 2 UI: Crystals -->
+        <section class="scene-ui" id="scene-2">
+            <div class="content right-align">
+                <h2 class="glow-text-sub">FLOATING ESSENCE</h2>
+                <p class="sub-text">Crystals of pure energy, drifting in the endless dark.</p>
+            </div>
+        </section>
+
+        <!-- Scene 3 UI: Depth -->
+        <section class="scene-ui" id="scene-3">
+            <div class="content">
+                <h2 class="glow-text-sub">THE CORE</h2>
+                <p class="sub-text">At the absolute bottom, where time stands still.</p>
+                <div class="footer">
+                    <span class="copyright">© 2026 Immersive Lab.</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scroll Container (Defines the scrolling height) -->
+    <div class="scroll-container">
+        <div class="scroll-section"></div>
+        <div class="scroll-section"></div>
+        <div class="scroll-section"></div>
+        <div class="scroll-section"></div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+
+    <!-- SVG Filter for Scheme A (Hybrid RGB Shift) -->
+    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0">
+        <defs>
+            <filter id="svg-rgb-shift">
+                <!-- Red Channel Shift -->
+                <feColorMatrix in="SourceGraphic" type="matrix" result="red-chan"
+                               values="1 0 0 0 0
+                                       0 0 0 0 0
+                                       0 0 0 0 0
+                                       0 0 0 1 0" />
+                <feOffset in="red-chan" dx="0" dy="0" result="red-shifted" id="svg-red-offset" />
+
+                <!-- Green Channel (Static) -->
+                <feColorMatrix in="SourceGraphic" type="matrix" result="green-chan"
+                               values="0 0 0 0 0
+                                       0 1 0 0 0
+                                       0 0 0 0 0
+                                       0 0 0 1 0" />
+
+                <!-- Blue Channel Shift -->
+                <feColorMatrix in="SourceGraphic" type="matrix" result="blue-chan"
+                               values="0 0 0 0 0
+                                       0 0 0 0 0
+                                       0 0 1 0 0
+                                       0 0 0 1 0" />
+                <feOffset in="blue-chan" dx="0" dy="0" result="blue-shifted" id="svg-blue-offset" />
+
+                <!-- Blend Channels -->
+                <feBlend in="red-shifted" in2="green-chan" mode="screen" result="rg-blend" />
+                <feBlend in="rg-blend" in2="blue-shifted" mode="screen" />
+            </filter>
+        </defs>
+    </svg>
+</body>
+</html>

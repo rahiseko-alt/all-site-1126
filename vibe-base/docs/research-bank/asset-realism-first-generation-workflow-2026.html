@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本物照合ファーストの3D/画像アセット生成工程 — Research Bank</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e4e7;--text2:#9ca3af;--accent:#818cf8;--ok:#10b981;--warn:#f59e0b;--danger:#ef4444}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.75;max-width:1120px;margin:0 auto;padding:2rem 1.4rem 5rem}
+h1{font-size:1.5rem} h2{font-size:1.15rem;margin-top:2rem;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:.35rem} h3{font-size:1rem;margin-top:1.2rem}
+a{color:var(--accent)} .meta,.box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:1rem 0}
+.ok{border-left:4px solid var(--ok)} .warn{border-left:4px solid var(--warn)} .danger{border-left:4px solid var(--danger)}
+table{width:100%;border-collapse:collapse;margin:1rem 0;background:var(--surface);font-size:.86rem} th,td{border:1px solid var(--border);padding:.55rem;vertical-align:top} th{background:var(--surface2);color:var(--accent)}
+code{background:var(--surface2);padding:.1rem .3rem;border-radius:4px}
+li{margin:.35rem 0}
+</style>
+</head>
+<body>
+<h1>本物照合ファーストの3D/画像アセット生成工程</h1>
+<div class="meta">
+<b>調査日:</b> 2026-06-06<br>
+<b>調査テーマ:</b> 「変なものを作ってから本物に近づける」ではなく「本物に近しい設計図を先に作ってから詰める」工程は妥当か<br>
+<b>対象:</b> 動物・食品・建造物などカテゴリ横断の生成ワークフロー<br>
+<b>主要ソース:</b> Infinigen, BlenderProc, Khronos glTF Asset Auditor, T3Bench, 3DGen-Bench, GPTEval3D/Eval3D
+</div>
+
+<div class="box ok">
+<b>結論:</b> ユーザー案は素人考えではなく、GitHub上の実装・研究ベンチマークと整合する。実務的には「Reference-first / schema-first / multi-view-eval」の組み合わせとして定式化できる。生成前にカテゴリ別の本物照合基準を作らず、出力後に感覚で直す運用は破綻しやすい。
+</div>
+
+<h2>根拠1. Procedural realism は「本物の構造を先にモデル化」する</h2>
+<p><a href="https://github.com/princeton-vl/infinigen">Infinigen</a> は photorealistic worlds を procedural generation で作るプロジェクトで、個別asset/materialの作り方として Blender UIで設計→ノード/コード化→seed付きFactoryで再生成→繰り返しテストする流れを示している。これは「いったん変なものを出して後から直す」より、対象カテゴリの構造・素材・ばらつきを generator に先に埋め込む思想に近い。</p>
+<p>特に <a href="https://github.com/princeton-vl/infinigen/blob/main/docs/ImplementingAssets.md">ImplementingAssets.md</a> は、asset generator を Factory として定義し、ランダム化パラメータを持たせ、Blender UIを視覚デバッグに使って繰り返し検証する前提になっている。</p>
+
+<h2>根拠2. Photorealistic pipeline は物理・材質・カメラを分離して検証する</h2>
+<p><a href="https://github.com/DLR-RM/BlenderProc">BlenderProc</a> は photorealistic rendering pipeline として、物体pose、physics/collision、PBR material、lighting、camera、segmentation等を分離した工程で扱う。つまり、写りが悪いから後から色だけ直すのではなく、物体配置・物理接触・材質・照明・カメラを別軸の検証対象にする。</p>
+
+<h2>根拠3. 3D commerce では schema pass/fail が先にある</h2>
+<p><a href="https://github.com/KhronosGroup/gltf-asset-auditor">Khronos glTF Asset Auditor</a> は glTF asset を JSON schema の要件に照らして Pass/Fail/Not Tested にする。検査項目には file size, triangle count, material count, clean origin, beveled edges, non-manifold edges, dimensions, PBR safe colors, texture resolution, texel density, UV overlap/gutter などがある。</p>
+<p>重要なのは「見てから何となく直す」ではなく、先に schema を作っておき、品質の一部を機械判定すること。</p>
+
+<h2>根拠4. 3D生成評価は単一スコアではなく多軸・多視点</h2>
+<p><a href="https://github.com/THU-LYJ-Lab/T3Bench">T3Bench</a> は text-to-3D の評価で multi-view images を使い、subjective quality と text alignment を分けて評価する。<a href="https://github.com/3DTopia/3DGen-Bench">3DGen-Bench</a> は human preference dataset を持つ包括ベンチマーク。<a href="https://github.com/eval3d/eval3d-codebase">Eval3D</a> や GPTEval3D 系は、人間選好に近い細粒度評価を目指す。</p>
+<p>ここから、カテゴリ横断運用では「正面1枚で何となくOK」では足りず、multi-view、構造、材質、意味整合、技術品質を分ける必要がある。</p>
+
+<h2>導出フレーム: Asset Realism Contract</h2>
+<table>
+<tr><th>契約項目</th><th>内容</th><th>例: ドーナツ</th></tr>
+<tr><td>実物構造</td><td>対象が実物として成立する部品構成・接続・内外関係</td><td>生地本体、穴、表面コーティング、垂れ、スプリンクルは別部品</td></tr>
+<tr><td>カテゴリ固有の破綻禁止</td><td>そのカテゴリで一発アウトになる条件</td><td>穴が円盤で塞がる、コーティングが板状、食品がプラスチック質</td></tr>
+<tr><td>材質PBR範囲</td><td>roughness/specular/base color/SSS/normal/bump等の許容帯</td><td>グレーズは薄膜光沢、生地は多孔質で粗い、砂糖菓子は微光沢</td></tr>
+<tr><td>幾何チェック</td><td>manifold、厚み、bevel、接触、交差、スケール、重力方向</td><td>コーティングは生地曲面に沿い、外周/穴周りから垂れる</td></tr>
+<tr><td>参照照合</td><td>実物/高品質CGの参照画像を複数角度で照合</td><td>上面、斜め、断面/穴周辺、接写の4系統</td></tr>
+<tr><td>multi-view QA</td><td>最終前に複数視点で同じ破綻がないか確認</td><td>正面で良くても穴内側・外周垂れを別視点で確認</td></tr>
+</table>
+
+<h2>推奨工程</h2>
+<ol>
+<li><b>カテゴリ選定:</b> 動物/食品/建造物などを先に分類し、カテゴリ別 checklist を選ぶ。</li>
+<li><b>Reference board:</b> 5〜12枚の実物/高品質CG参照を集め、形・材質・破綻例を分ける。</li>
+<li><b>Asset Realism Contract:</b> 生成前に、部品構造、禁止破綻、PBR範囲、幾何条件、multi-view視点を文書化する。</li>
+<li><b>First build:</b> 参照構造に近いベースを作る。出力後に大改造する前提にしない。</li>
+<li><b>Gate QA:</b> 各段階で「本物として成立するか」をPass/Failする。Failなら次工程へ進まない。</li>
+<li><b>Polish:</b> 合格したベースだけ、照明・色・細部密度・ノイズを詰める。</li>
+</ol>
+
+<h2>今回の失敗への適用</h2>
+<div class="box danger">
+ドーナツでは Contract がなかったため、「コーティングは生地表面に密着した薄膜である」という最重要条件を落とした。smooth, Cycles, sprinkles など周辺改善で PASS してしまったが、カテゴリ固有の破綻禁止を先に置いていれば smoke 段階で停止できた。
+</div>
+
+<h2>Sources</h2>
+<ul>
+<li><a href="https://github.com/princeton-vl/infinigen">princeton-vl/infinigen</a></li>
+<li><a href="https://github.com/princeton-vl/infinigen/blob/main/docs/ImplementingAssets.md">Infinigen ImplementingAssets.md</a></li>
+<li><a href="https://github.com/DLR-RM/BlenderProc">DLR-RM/BlenderProc</a></li>
+<li><a href="https://github.com/KhronosGroup/gltf-asset-auditor">KhronosGroup/gltf-asset-auditor</a></li>
+<li><a href="https://github.com/KhronosGroup/glTF-Sample-Assets">KhronosGroup/glTF-Sample-Assets</a></li>
+<li><a href="https://github.com/THU-LYJ-Lab/T3Bench">THU-LYJ-Lab/T3Bench</a></li>
+<li><a href="https://github.com/3DTopia/3DGen-Bench">3DTopia/3DGen-Bench</a></li>
+<li><a href="https://github.com/eval3d/eval3d-codebase">eval3d/eval3d-codebase</a></li>
+<li><a href="https://wutong16.github.io/publication/18_gpteval3d/">GPTEval3D project page</a></li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,80 @@
+# NPM Audit 週次定期実行ワークフロー
+# Session 254: マスター指示書 §6 提案候補「npm audit pip-audit の定期実行」着手。
+# Dependabot（自動 PR）と CI npm audit（監視）の二重チェックで業界標準ラインに到達。
+#
+# 設計方針:
+# - 週次（水曜 09:00 JST = 水曜 00:00 UTC）に全プロダクト走査
+# - critical/high 検出時は warning 表示（fail しない＝運用負荷下げる）
+# - workflow_dispatch でマニュアル実行可
+# - matrix で並列実行（早く終わる）
+
+name: NPM Audit Weekly
+
+on:
+  schedule:
+    # 水曜 00:00 UTC = 水曜 09:00 JST（マスター稼働時間に合わせる）
+    - cron: "0 0 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: "audit ${{ matrix.directory }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - "."
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run npm audit
+        working-directory: ${{ matrix.directory }}
+        shell: bash
+        run: |
+          if [ ! -f package.json ]; then
+            echo "::notice::no package.json in ${{ matrix.directory }}, skip"
+            exit 0
+          fi
+
+          if [ ! -f package-lock.json ] && [ ! -f yarn.lock ]; then
+            echo "::warning::no lockfile in ${{ matrix.directory }} — manifest scan only"
+            exit 0
+          fi
+
+          # JSON で取得して critical/high を抽出
+          AUDIT_JSON=$(npm audit --json 2>/dev/null || true)
+
+          CRITICAL=$(echo "$AUDIT_JSON" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const j=JSON.parse(d);console.log(j.metadata?.vulnerabilities?.critical||0)}catch(e){console.log(0)}})")
+          HIGH=$(echo "$AUDIT_JSON" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const j=JSON.parse(d);console.log(j.metadata?.vulnerabilities?.high||0)}catch(e){console.log(0)}})")
+          MOD=$(echo "$AUDIT_JSON" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const j=JSON.parse(d);console.log(j.metadata?.vulnerabilities?.moderate||0)}catch(e){console.log(0)}})")
+          LOW=$(echo "$AUDIT_JSON" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const j=JSON.parse(d);console.log(j.metadata?.vulnerabilities?.low||0)}catch(e){console.log(0)}})")
+
+          echo "[${{ matrix.directory }}] critical=$CRITICAL / high=$HIGH / moderate=$MOD / low=$LOW"
+
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            echo "::warning title=npm audit::${{ matrix.directory }} critical=$CRITICAL high=$HIGH"
+          fi
+
+  summary:
+    name: Audit Summary
+    runs-on: ubuntu-latest
+    needs: audit
+    if: always()
+    steps:
+      - name: Report
+        run: |
+          echo "## NPM Audit Weekly Result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "全 directory の audit 結果は各 job のログを参照。" >> $GITHUB_STEP_SUMMARY
+          echo "critical/high 検出時は ::warning:: で個別表示。" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Dependabot（.github/dependabot.yml）と組み合わせて二重チェック。" >> $GITHUB_STEP_SUMMARY

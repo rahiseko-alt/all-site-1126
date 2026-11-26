@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Session 4 Check-out レポート (2026-05-27)</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 980px; margin: 2em auto; padding: 0 1em; line-height: 1.7; color: #222; }
+h1 { border-bottom: 3px solid #333; padding-bottom: 0.3em; }
+h2 { border-left: 4px solid #0066cc; padding-left: 0.6em; margin-top: 2em; }
+h3 { color: #0066cc; }
+code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+pre { background: #f4f4f4; padding: 1em; border-radius: 5px; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+th, td { border: 1px solid #ccc; padding: 0.5em 0.8em; text-align: left; }
+th { background: #f0f0f0; }
+.warn { background: #fff3cd; border-left: 4px solid #ffc107; padding: 0.8em 1em; margin: 1em 0; }
+.ok { background: #d4edda; border-left: 4px solid #28a745; padding: 0.8em 1em; margin: 1em 0; }
+.danger { background: #f8d7da; border-left: 4px solid #dc3545; padding: 0.8em 1em; margin: 1em 0; }
+.meta { color: #666; font-size: 0.9em; }
+</style>
+</head>
+<body>
+
+<h1>Session 4 Check-out レポート</h1>
+<p class="meta">日付: 2026-05-27 / 司令塔エージェント (cwd = vibe-base モノレポルート)</p>
+
+<h2>A. 本セッション主要成果</h2>
+
+<h3>1. Track I Step 2 plan 起草完了 (Plan Mode・1 file)</h3>
+<ul>
+<li><code>~/.claude/plans/track-i-splendid-sunrise.md</code> — schema gate PASS</li>
+<li>受入基準 6 項目すべて検証コマンド付き (sha256 / diff -q / wc -l / path-resolver 等)</li>
+<li>承認後モード: 新セッション (<code>claude --add-dir ~/.claude/skills</code>) で orchestrator 直 Write 1 回 + verify-agent 連鎖</li>
+<li><strong>実 Write は未実施</strong>。本セッション (cwd=vibe-base) では <code>~/.claude/</code> への Write 不可</li>
+</ul>
+
+<h3>2. 前セッション残骸 71 files 一括コミット (a78c1d3)</h3>
+<table>
+<tr><th>分類</th><th>件数</th><th>内容</th></tr>
+<tr><td>v2 hook 新規配布</td><td>30</td><td>pc-version-gate-v2.mjs + rules-coverage-gate-v2.mjs を vibe-base ルート + 14 product</td></tr>
+<tr><td>aiueo frontend 改修</td><td>4</td><td>hook 2 件改修 + scripts/check-pc-version.mjs + check-rules-coverage.sh 新設</td></tr>
+<tr><td>.codex/agents/</td><td>4</td><td>code-reviewer / debugger / fullstack-developer / research-analyst</td></tr>
+<tr><td>n8n product scaffolding</td><td>20+</td><td>AGENTS.md / .claude/ / n8n-workspace/ / scripts/</td></tr>
+<tr><td>google-system-dev hooks</td><td>8</td><td>LF→CRLF 改行変換のみ (実質変更なし)</td></tr>
+<tr><td>その他</td><td>5</td><td>scripts/fix-hooks-write.mjs / .gitignore 更新 / products/n8n/.gitignore</td></tr>
+<tr><td><strong>合計</strong></td><td><strong>71</strong></td><td>3716 insertions / 34 deletions</td></tr>
+</table>
+
+<h3>3. n8n_data シークレット漏洩防止 (重要)</h3>
+<div class="danger">
+<strong>検知:</strong> <code>products/n8n/n8n-workspace/n8n_data/</code> に n8n ランタイム DB (database.sqlite 585KB + WAL 4.1MB + config 56B) が untracked 状態で存在。これらは <strong>n8n credentials 暗号鍵 + OAuth トークン + API キー</strong> を内包する。<br>
+<strong>対処:</strong> <code>products/n8n/.gitignore</code> を新設し <code>n8n-workspace/n8n_data/</code> を ignored 化。コミット前に <code>git check-ignore -v</code> で適用確認 → コミット安全。<br>
+<strong>付随:</strong> <code>.allow-destructive</code> も vibe-base <code>.gitignore</code> に追加 (承認マーカー 10 分 TTL の残骸を恒久 ignored 化)。
+</div>
+
+<h3>4. memory.md P1 ドリフト訂正 (タグ ≠ 中身検知)</h3>
+<div class="warn">
+Check-in 時点で memory.md P1 が「Track I Step 2 完遂済・SKILL.md byte-identical 配置 + 実機 reload 確認」と記述されていたが、<code>~/.claude/skills/checkout/</code> は実体 MISSING。「タグ ≠ 中身」型再発 (MEMORY.md P1 #5 / Session 191 教訓 #1)。P1 を「plan 起草完了・実 Write 未」に書き戻し。
+</div>
+
+<h3>5. 行動ログ 2026-05-27.md 数日間まとめ</h3>
+<ul>
+<li>master 行動ログ未作成 → 司令塔 EXIT 前ヒアリング義務 (session-lifecycle.md) 実行</li>
+<li>6 項目 (時間配分 / 接触件数 / 実装件数 / 売上実績 / 学習蓄積 / 日記) で <code>事業戦略/事業棚卸/行動ログ/2026-05-27.md</code> に反映</li>
+<li>主要内容: 井上さん経由で 2 名紹介予定 (1 名は外国人 → 外国人向け漢字アプリ顧客候補) / 飯沼さん Claude Code 仲間連携 / 櫻井さん知人紹介継続 / ココナラ 2 件目 1 万円 / AI 教室 5/24 実施 (利益 0・修行) / Shift AI 来週&来月作業会 / フリーランスコミュニティ今週土曜参加予定 / 5 月 AI 売上累計 18,000 円 (目標未達・焦らず継続)</li>
+</ul>
+
+<h2>B. 機械検証 (Check-in)</h2>
+<div class="ok">
+11 OK / 1 WARN / 0 NG (進行可)<br>
+WARN: runbook.md 不在 3 件 (code-review-skills / google-system-dev / n8n) — 過去 Check-in でも継続 WARN・本セッションスコープ外
+</div>
+
+<h2>C. 次セッション着手指示</h2>
+
+<h3>Track I Step 2 実行 (新セッション必須)</h3>
+<ol>
+<li>master が <code>claude --add-dir ~/.claude/skills</code> で新セッション起動</li>
+<li>新セッションで以下 2 file を Read:
+  <ul>
+    <li><code>~/.claude/plans/track-i-splendid-sunrise.md</code> (本 plan)</li>
+    <li><code>tmp/track-i-write-command.md</code> (Write 命令書・112 行)</li>
+  </ul>
+</li>
+<li>plan「実装ステップ」7 件を順次実行</li>
+<li>verify-agent を呼出し受入基準 6 項目を機械検証 (orchestration-discipline.md 規律 3 準拠)</li>
+<li>全 PASS 後 Step 3 (commands 整合最終確認) へ進行</li>
+</ol>
+
+<h3>memory.md P1 残件</h3>
+<ol>
+<li>Track I Step 2 (上記)</li>
+<li>feed-check 横展開 Task B (任意・priority L)</li>
+</ol>
+
+<h2>D. P3 失敗事例 (客観 7 基準照合)</h2>
+<div class="ok">該当なし。本セッションは 1 plan + 1 commit + memory 更新の小規模セッション。Plan Mode 再入なし・force reset なし・三打席抵触なし・マスター差し戻し 0 件・プロセス kill なし・機械検証 NG なし。</div>
+
+<h2>E. コミット履歴 (本セッション分)</h2>
+<pre>a78c1d3 chore: 前セッション残骸 一括整理 — v2 hook 配布 / n8n scaffold / codex agents / シークレット保護</pre>
+<p class="meta">本 Check-out レポート + memory.md 更新は次コミットで保存予定</p>
+
+</body>
+</html>

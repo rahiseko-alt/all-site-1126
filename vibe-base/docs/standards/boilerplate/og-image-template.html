@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>OGP Image Template — vest1</title>
+<!--
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  vest1: OGP画像テンプレート
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ## 5W2H
+
+  What:    SNSでURLをシェアした時に表示されるサムネイル画像の元HTML
+  Why:     画像付きカードはテキストリンクよりクリック率が高い。全LPで必要
+  Who:     エージェントがプロダクトごとにコピーして編集 → スクショ → OGP画像として使用
+  When:    LP制作時（P2）。デプロイ前にOGP画像を用意する
+  Where:   各プロダクトの lp/public/ に og-image.png として配置
+  How:     1. 本ファイルをコピー
+           2. EDIT HERE の箇所をプロダクト固有の内容に置換
+           3. ブラウザで開いてスクリーンショット（1200x630px）
+           4. LPの <meta property="og:image" content="https://ドメイン/og-image.png"> で指定
+  How much: 編集+スクショで5分。デザイン調整込みで15分
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    /* EDIT HERE: 背景色。ダーク=#0a0e1a / ライト=#f8fafc */
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    overflow: hidden;
+    background: #0a0e1a;
+    background-image:
+      /* EDIT HERE: アクセントカラーに合わせて変更 */
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(59,130,246,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 20%, rgba(139,92,246,0.12) 0%, transparent 60%);
+    display: flex;
+    align-items: center;
+    padding: 0 72px;
+    gap: 48px;
+  }
+
+  .left { flex: 1.2; }
+  .right { flex: 0.8; display: flex; align-items: center; justify-content: center; }
+
+  /* バッジ（プロダクト名ラベル） */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    /* EDIT HERE: アクセントカラー */
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.25);
+    color: #60a5fa;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    margin-bottom: 28px;
+  }
+  .badge-dot {
+    width: 8px; height: 8px;
+    background: #3b82f6;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #3b82f6;
+  }
+
+  /* 見出し */
+  h1 {
+    font-size: 52px;
+    font-weight: 900;
+    color: #f1f5f9;
+    line-height: 1.3;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+  h1 span {
+    /* EDIT HERE: 強調色 */
+    color: #60a5fa;
+  }
+
+  /* 説明文 */
+  .desc {
+    font-size: 20px;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  /* CTAボタン */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    /* EDIT HERE: ボタンカラー */
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 14px 32px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(59,130,246,0.3);
+  }
+
+  /* 右側: プロダクトのビジュアル */
+  .visual {
+    width: 340px;
+    height: 400px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    transform: rotate(2deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* EDIT HERE: プロダクトのスクショやモックアップに差し替え */
+  }
+  .visual-placeholder {
+    color: rgba(255,255,255,0.15);
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+
+<div class="left">
+  <!-- EDIT HERE: プロダクト名 -->
+  <div class="badge">
+    <span class="badge-dot"></span>
+    プロダクト名
+  </div>
+
+  <!-- EDIT HERE: キャッチコピー（2行以内。強調箇所を<span>で囲む） -->
+  <h1>課題を<br><span>解決する一言</span></h1>
+
+  <!-- EDIT HERE: サブコピー（2行以内。具体的なベネフィット） -->
+  <p class="desc">ベネフィットを1〜2行で。<br>数値があれば入れる。</p>
+
+  <!-- EDIT HERE: CTA文言 -->
+  <div class="cta">
+    無料で試す &rarr;
+  </div>
+</div>
+
+<div class="right">
+  <!-- EDIT HERE: プロダクトのUI画像やモックアップに差し替え -->
+  <div class="visual">
+    <div class="visual-placeholder">
+      ここにプロダクトの<br>UIモックアップ or スクショ<br>を配置
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

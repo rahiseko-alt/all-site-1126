@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRコード発行・設置ガイド</title>
+<style>
+  @media print {
+    body { margin: 0; }
+    .no-print { display: none !important; }
+    .page { page-break-after: always; box-shadow: none !important; margin: 0 !important; padding: 40px !important; }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background: #f5f5f7; color: #1d1d1f; line-height: 1.6; }
+  .page { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 16px; padding: 48px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .header { text-align: center; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #e5e5e5; }
+  .header h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .header p { font-size: 14px; color: #86868b; margin-top: 4px; }
+  h2 { font-size: 18px; font-weight: 600; margin: 28px 0 16px; padding-top: 20px; border-top: 1px solid #e5e5e5; }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .step-block { margin-bottom: 24px; }
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .step-num { width: 32px; height: 32px; background: #0066cc; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; flex-shrink: 0; }
+  .step-title { font-size: 17px; font-weight: 600; }
+  .step-body { margin-left: 44px; font-size: 15px; color: #424245; }
+  .step-body p { margin-bottom: 8px; }
+  .url-box { background: #f5f5f7; border-radius: 8px; padding: 12px 16px; font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; word-break: break-all; margin: 8px 0; }
+  .role-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  .role-table th { text-align: left; padding: 10px 12px; background: #f5f5f7; font-weight: 600; font-size: 13px; color: #86868b; }
+  .role-table td { padding: 10px 12px; border-bottom: 1px solid #e5e5e5; }
+  .role-badge { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 13px; font-weight: 500; }
+  .badge-ordering { background: #d1fae5; color: #065f46; }
+  .badge-kitchen { background: #ffedd5; color: #9a3412; }
+  .badge-cashier { background: #dbeafe; color: #1e40af; }
+  .badge-daddy { background: #fee2e2; color: #991b1b; }
+  .tip { background: #eff6ff; border-left: 3px solid #0066cc; border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 14px; color: #1e40af; margin: 12px 0; }
+  .screenshot-placeholder { background: #f5f5f7; border: 2px dashed #d1d1d6; border-radius: 12px; padding: 40px; text-align: center; color: #86868b; font-size: 14px; margin: 12px 0; }
+  .no-print { text-align: center; margin: 20px auto; }
+  .no-print button { background: #0066cc; color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 15px; cursor: pointer; }
+  .no-print button:hover { background: #0055b3; }
+  .editable { outline: none; border-bottom: 2px dashed #0066cc40; }
+  .editable:focus { border-bottom-color: #0066cc; }
+</style>
+</head>
+<body>
+
+<div class="no-print" style="padding:16px; text-align:center; color:#86868b; font-size:13px;">
+  青い下線部分をクリックして直接編集できます。編集後に印刷してください。
+</div>
+
+<div class="page">
+  <div class="header">
+    <h1>QRコード発行・設置ガイド</h1>
+    <p>Aiueo モバイルオーダーシステム</p>
+  </div>
+
+  <h2>QRコードの役割</h2>
+  <p style="font-size:15px; color:#424245; margin-bottom:16px;">
+    QRコードをスキャンすると、端末に役割が割り当てられます。用途に応じて発行してください。
+  </p>
+
+  <table class="role-table">
+    <thead>
+      <tr><th>役割</th><th>用途</th><th>設置場所</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="role-badge badge-ordering">Ordering</span></td>
+        <td>お客様がスマホで注文する画面</td>
+        <td>各テーブル（ラミネート推奨）</td>
+      </tr>
+      <tr>
+        <td><span class="role-badge badge-kitchen">Kitchen</span></td>
+        <td>厨房で注文を確認する画面</td>
+        <td>厨房のタブレット（1回スキャン）</td>
+      </tr>
+      <tr>
+        <td><span class="role-badge badge-cashier">Cashier</span></td>
+        <td>レジで会計する画面</td>
+        <td>レジ端末（1回スキャン）</td>
+      </tr>
+      <tr>
+        <td><span class="role-badge badge-daddy">Daddy</span></td>
+        <td>オーナー管理画面（全権限）</td>
+        <td>オーナー様の端末（1回スキャン）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>発行手順</h2>
+
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">管理画面にログイン</div>
+    </div>
+    <div class="step-body">
+      <p>ブラウザで以下のURLにアクセスし、メールとパスワードでログインします。</p>
+      <div class="url-box"><span class="editable" contenteditable="true">https://aiueo-xxx.vercel.app/?view=admin</span></div>
+    </div>
+  </div>
+
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">「Roles & QR」タブを開く</div>
+    </div>
+    <div class="step-body">
+      <p>左側メニューの「Roles & QR」をタップします。</p>
+    </div>
+  </div>
+
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">役割を選んで発行</div>
+    </div>
+    <div class="step-body">
+      <p>画面上部のフォームで:</p>
+      <p>1. 「役割を選択」から用途に合った役割を選ぶ</p>
+      <p>2. 「ラベル」に端末やテーブルの名前を入力（例: テーブル1、厨房iPad）</p>
+      <p>3. 「発行」ボタンをタップ</p>
+      <div class="tip">
+        テーブルごとにOrderingのQRを発行する場合は、「テーブル1」「テーブル2」のように分けて発行すると管理しやすくなります。
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">QRコードを印刷</div>
+    </div>
+    <div class="step-body">
+      <p>発行されたQRコードが画面に表示されます。</p>
+      <p><strong>印刷方法:</strong> ブラウザの印刷機能（Ctrl+P / Cmd+P）を使用</p>
+      <p><strong>画像保存:</strong> QRコードを長押し（右クリック）→「画像を保存」</p>
+      <div class="tip">
+        テーブル設置用はラミネート加工すると長持ちします。
+      </div>
+    </div>
+  </div>
+
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">端末でスキャンして設置</div>
+    </div>
+    <div class="step-body">
+      <p>印刷したQRコードを各端末のカメラでスキャンします。</p>
+      <p>スキャン後、ブラウザが開いてその役割の画面が表示されます。</p>
+      <div class="tip">
+        Kitchen / Cashier / Daddy は端末に1回スキャンすればOKです。ブラウザを閉じるまで役割を保持します。
+      </div>
+    </div>
+  </div>
+
+  <h2>よくある質問</h2>
+
+  <div style="margin-bottom:16px;">
+    <p style="font-size:15px; font-weight:600; margin-bottom:4px;">QRコードの有効期限は？</p>
+    <p style="font-size:14px; color:#424245;">発行から1年間です。期限切れ時は管理画面から再発行してください。</p>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <p style="font-size:15px; font-weight:600; margin-bottom:4px;">不要なQRを無効にするには？</p>
+    <p style="font-size:14px; color:#424245;">管理画面の「Roles & QR」タブで、該当トークンの「無効化」ボタンをタップしてください。</p>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <p style="font-size:15px; font-weight:600; margin-bottom:4px;">端末を変えたい場合は？</p>
+    <p style="font-size:14px; color:#424245;">新しい端末で同じQRコードをスキャンするだけでOKです。</p>
+  </div>
+</div>
+
+<div class="no-print">
+  <button onclick="window.print()">印刷する</button>
+</div>
+
+</body>
+</html>

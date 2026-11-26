@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ナンバー八面体</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; }
+  body { background: #000000; font-family:"Hiragino Sans","Yu Gothic",sans-serif; }
+  canvas { display:block; }
+  .hint { display:none; }
+  #label { display:none; }
+  #error { position:fixed; inset:0; display:none; align-items:center; justify-content:center; color:#ff8a8a; font-size:15px; text-align:center; padding:40px; line-height:1.8; }
+  #reset {
+    width:100%;
+    background:rgba(30,40,60,0.85); color:#cfe4ff;
+    border:1px solid rgba(120,200,255,0.5); border-radius:8px;
+    padding:9px 18px; font-size:14px; font-family:inherit; cursor:pointer;
+    letter-spacing:0.05em; transition:background 0.15s, transform 0.1s;
+  }
+  #reset:hover { background:rgba(50,70,110,0.95); }
+  #reset:active { transform:scale(0.95); }
+
+  #panelToggle {
+    position:fixed; top:20px; right:20px; z-index:11;
+    width:42px; height:42px; border-radius:8px; cursor:pointer;
+    background:linear-gradient(145deg, #1a1d24, #0a0c10);
+    border:1px solid rgba(255,255,255,0.3);
+    color:#cfe4ff; font-size:18px; line-height:1;
+    box-shadow:0 2px 10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition:transform 0.1s, border-color 0.15s;
+  }
+  #panelToggle:hover { border-color:rgba(120,200,255,0.7); }
+  #panelToggle:active { transform:scale(0.93); }
+  #panel {
+    position:fixed; top:70px; right:20px; z-index:11; width:230px;
+    background:linear-gradient(145deg, rgba(22,25,32,0.97), rgba(8,10,14,0.97));
+    border:1px solid rgba(255,255,255,0.25); border-radius:10px;
+    box-shadow:0 6px 24px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.07);
+    padding:16px; color:#dce6f5; font-size:12px;
+    display:none;
+  }
+  #panel.open { display:block; }
+  #panel h4 { font-size:11px; letter-spacing:0.1em; color:#7fb0e0; margin-bottom:12px; font-weight:600; text-transform:uppercase; }
+  #panel .row { margin-bottom:13px; }
+  #panel label { display:block; margin-bottom:4px; color:#aebed4; }
+  #panel label span { float:right; color:#cfe4ff; }
+  #panel input[type=range] { width:100%; accent-color:#6fb0ff; cursor:pointer; }
+  #panel .dirbtns { display:flex; gap:6px; }
+  #panel .dirbtns button {
+    flex:1; background:rgba(40,48,64,0.8); color:#cfe4ff;
+    border:1px solid rgba(255,255,255,0.2); border-radius:6px;
+    padding:6px 0; font-size:12px; cursor:pointer; font-family:inherit;
+  }
+  #panel .dirbtns button.active { background:rgba(70,110,180,0.9); border-color:rgba(120,200,255,0.7); }
+</style>
+</head>
+<body>
+<button id="panelToggle" title="調整パネル">⚙</button>
+<div id="panel">
+  <h4>調整パネル</h4>
+  <div class="row">
+    <button id="reset">↻ Reset</button>
+  </div>
+  <div class="row">
+    <label>回転速度 <span id="v_speed"></span></label>
+    <input type="range" id="r_speed" min="0" max="0.02" step="0.001">
+  </div>
+  <div class="row">
+    <label>回転方向</label>
+    <div class="dirbtns">
+      <button id="dir_r" data-dir="1">右回り ↻</button>
+      <button id="dir_l" data-dir="-1">左回り ↺</button>
+    </div>
+  </div>
+  <div class="row">
+    <label>図形の大きさ <span id="v_size"></span></label>
+    <input type="range" id="r_size" min="0.5" max="2.5" step="0.05">
+  </div>
+  <div class="row">
+    <label>面の不透明度 <span id="v_opacity"></span></label>
+    <input type="range" id="r_opacity" min="0.7" max="1" step="0.05">
+  </div>
+  <div class="row">
+    <label>文字サイズ <span id="v_font"></span></label>
+    <input type="range" id="r_font" min="14" max="70" step="2">
+  </div>
+  <div class="row">
+    <label>光の強さ <span id="v_light"></span></label>
+    <input type="range" id="r_light" min="0" max="3" step="0.1">
+  </div>
+  <div class="row">
+    <label>登場の遅さ(接近) <span id="v_intro"></span></label>
+    <input type="range" id="r_intro" min="60" max="400" step="10">
+  </div>
+  <div class="row">
+    <label>登場前の静止 <span id="v_hold"></span></label>
+    <input type="range" id="r_hold" min="0" max="180" step="5">
+  </div>
+  <div class="row">
+    <label>到達後の自動回転まで <span id="v_settle"></span></label>
+    <input type="range" id="r_settle" min="0" max="180" step="5">
+  </div>
+</div>
+<div id="error">3Dライブラリの読み込みに失敗しました。<br>ネットワーク制限をご確認ください（F12 → Console で詳細確認）</div>
+<script>
+const CDN_LIST = ["https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js","https://unpkg.com/three@0.128.0/build/three.min.js"];
+const MEDIA = {
+  image: "./assets/octa/slide_5.png",
+  video: "./assets/octa/fandijk.mp4"
+};
+function loadScript(i){ if(i>=CDN_LIST.length){ document.getElementById("error").style.display="flex"; return; } const s=document.createElement("script"); s.src=CDN_LIST[i]; s.onload=init; s.onerror=()=>loadScript(i+1); document.head.appendChild(s); }
+function init(){
+  const faceDefs = [
+    { kind:"image", label:"画像面" },
+    { kind:"video", label:"動画面" },
+    { kind:"text", label:"レベル0\n(ターミナル)" },
+    { kind:"text", label:"レベル1\n(CLI)" },
+    { kind:"text", label:"レベル2\n(IDE統合)" },
+    { kind:"text", label:"レベル3\n(Desktop版)" },
+    { kind:"text", label:"レベル4\n(Web版)" },
+    { kind:"text", label:"クリックで回転" }
+  ];
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+  camera.position.z = 4.6;
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  document.body.appendChild(renderer.domElement);
+
+  scene.fog = new THREE.Fog(0x000000, 6, 22);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.22));
+  const keyPoint = new THREE.PointLight(0xffffff, 1.1, 30, 1.5);
+  keyPoint.position.set(3, 4, 6); scene.add(keyPoint);
+  const fill = new THREE.DirectionalLight(0x5577cc, 0.35);
+  fill.position.set(-4, -2, -3); scene.add(fill);
+
+  function makeStarSprite(){
+    const c=document.createElement("canvas"); c.width=c.height=64;
+    const g=c.getContext("2d");
+    const grd=g.createRadialGradient(32,32,0, 32,32,32);
+    grd.addColorStop(0,"rgba(255,255,255,1)"); grd.addColorStop(0.2,"rgba(255,255,255,0.9)");
+    grd.addColorStop(0.5,"rgba(200,220,255,0.35)"); grd.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=grd; g.fillRect(0,0,64,64);
+    return new THREE.CanvasTexture(c);
+  }
+  const starSprite = makeStarSprite();
+  function makeStars(count, spread, size, color, opacity){
+    const g = new THREE.BufferGeometry(); const arr = [], colors = []; const base = new THREE.Color(color);
+    for(let i=0;i<count;i++){ const r = spread * (0.5 + Math.random()*0.5); const theta = Math.random()*Math.PI*2; const phi = Math.acos(2*Math.random()-1);
+      arr.push(r*Math.sin(phi)*Math.cos(theta), r*Math.sin(phi)*Math.sin(theta), r*Math.cos(phi));
+      const b = 0.25 + Math.pow(Math.random(), 2.0) * 0.75; colors.push(base.r*b, base.g*b, base.b*b);}
+    g.setAttribute("position", new THREE.Float32BufferAttribute(arr,3)); g.setAttribute("color", new THREE.Float32BufferAttribute(colors,3));
+    const m = new THREE.PointsMaterial({ size, map:starSprite, transparent:true, opacity, vertexColors:true, fog:false, sizeAttenuation:true, depthWrite:false, blending:THREE.AdditiveBlending });
+    return new THREE.Points(g, m);
+  }
+  const starsNear = makeStars(160, 30, 0.7, 0xffffff, 1.0);
+  const starsMid  = makeStars(380, 55, 0.5, 0xdce8ff, 0.9);
+  const starsFar  = makeStars(650, 90, 0.35, 0xaabbee, 0.7);
+  scene.add(starsNear, starsMid, starsFar);
+
+  const cfg = { spinSpeed: 0.004, spinDir: 1, size: 1.25, opacity: 1, fontSize: 40, lightPower: 1.1, introDur: 210, holdDur: 60, settleDur: 30 };
+  const group = new THREE.Group();
+  const octa = new THREE.OctahedronGeometry(1.9, 0);
+  const pos = octa.attributes.position;
+  const palette = [0x142033,0x2a1f42,0x183524,0x4b300f,0x22343f,0x3f2027,0x1f2842,0x3c2d14];
+  const mediaTextures = [];
+  const mediaVideos = [];
+
+  function makeLabelTexture(text, hex){
+    const c=document.createElement("canvas"); c.width=c.height=512; const g=c.getContext("2d");
+    g.clearRect(0,0,512,512);
+    g.beginPath(); g.moveTo(256,26); g.lineTo(486,486); g.lineTo(26,486); g.closePath();
+    g.fillStyle="#"+hex.toString(16).padStart(6,"0"); g.fill();
+    g.lineWidth=11; g.strokeStyle="rgba(255,255,255,0.65)"; g.stroke();
+    const lines = text.split("\n");
+    g.fillStyle="#f4f8ff"; g.textAlign="center"; g.textBaseline="middle";
+    const fs = Math.round(cfg.fontSize * 2.1); g.font = "700 "+fs+"px 'Yu Gothic', sans-serif";
+    const lineH = fs * 1.25; const baseY = 260 - ((lines.length - 1) * lineH) / 2;
+    lines.forEach((line, i) => g.fillText(line, 256, baseY + i * lineH));
+    const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
+  }
+  function makeImageTexture(){
+    const t = new THREE.TextureLoader().load(MEDIA.image);
+    t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.anisotropy = 8;
+    mediaTextures.push(t); return t;
+  }
+  function makeVideoTexture(){
+    const video = document.createElement("video");
+    video.src = MEDIA.video; video.loop = true; video.muted = true; video.autoplay = true; video.playsInline = true; video.crossOrigin = "anonymous";
+    video.play().catch(()=>{});
+    const vt = new THREE.VideoTexture(video);
+    vt.minFilter = THREE.LinearFilter; vt.magFilter = THREE.LinearFilter; vt.format = THREE.RGBFormat; vt.anisotropy = 8;
+    mediaVideos.push(video); mediaTextures.push(vt); return vt;
+  }
+
+  const faceMeshes = [];
+  const FACE_INSET = 0.08;
+  const baseUv = [
+    new THREE.Vector2(0.5, 1),
+    new THREE.Vector2(0, 0),
+    new THREE.Vector2(1, 0)
+  ];
+  for(let i=0;i<8;i++){
+    const tg = new THREE.BufferGeometry(); const a = i * 3; const raw = [];
+    for(let k=0;k<3;k++) raw.push(pos.getX(a+k),pos.getY(a+k),pos.getZ(a+k));
+
+    const v0 = new THREE.Vector3(raw[0], raw[1], raw[2]);
+    const v1 = new THREE.Vector3(raw[3], raw[4], raw[5]);
+    const v2 = new THREE.Vector3(raw[6], raw[7], raw[8]);
+    const center = new THREE.Vector3().add(v0).add(v1).add(v2).multiplyScalar(1/3);
+
+    // 面の向きとUVを同時に外向きへ揃える。頂点だけ反転するとテクスチャが鏡像になる。
+    const normal = new THREE.Vector3().subVectors(v1, v0).cross(new THREE.Vector3().subVectors(v2, v0));
+    let p0 = v0, p1 = v1, p2 = v2;
+    let uv0 = baseUv[0], uv1 = baseUv[1], uv2 = baseUv[2];
+    if(normal.dot(center) < 0){
+      p1 = v2;
+      p2 = v1;
+      uv1 = baseUv[2];
+      uv2 = baseUv[1];
+    }
+
+    // 全面を同率で内側へ寄せて、画像/動画面でも隙間を維持する
+    function inset(v){
+      return new THREE.Vector3(
+        v.x + (center.x - v.x) * FACE_INSET,
+        v.y + (center.y - v.y) * FACE_INSET,
+        v.z + (center.z - v.z) * FACE_INSET
+      );
+    }
+    p0 = inset(p0); p1 = inset(p1); p2 = inset(p2);
+    const verts = [p0.x,p0.y,p0.z, p1.x,p1.y,p1.z, p2.x,p2.y,p2.z];
+
+    tg.setAttribute("position", new THREE.Float32BufferAttribute(verts,3));
+    tg.setAttribute("uv", new THREE.Float32BufferAttribute([uv0.x,uv0.y, uv1.x,uv1.y, uv2.x,uv2.y],2));
+    tg.computeVertexNormals();
+
+    const def = faceDefs[i];
+    let map;
+    if(def.kind === "image") map = makeImageTexture();
+    else if(def.kind === "video") map = makeVideoTexture();
+    else map = makeLabelTexture(def.label, palette[i]);
+
+    const mat = new THREE.MeshStandardMaterial({
+      map, side: THREE.FrontSide, transparent:true, opacity:0, depthWrite:true, metalness:0.18, roughness:0.58
+    });
+    const m = new THREE.Mesh(tg, mat);
+    m.userData.faceIndex = i;
+    m.userData.faceDef = def;
+    group.add(m); faceMeshes.push(m);
+  }
+  scene.add(group);
+
+  const EDGE_MAX = 0.35;
+  const octaEdges = new THREE.LineSegments(new THREE.EdgesGeometry(octa), new THREE.LineBasicMaterial({ color:0xffffff, transparent:true, opacity:0 }));
+  group.add(octaEdges);
+
+  const faceMats = faceMeshes.map(m => m.material);
+  let fadeAmount = 0;
+  function applyFade(a){ for(const mt of faceMats) mt.opacity = a * cfg.opacity; octaEdges.material.opacity = a * EDGE_MAX; }
+  applyFade(0);
+
+  function rebuildLabelTextures(){
+    for(const m of faceMeshes){
+      if(m.userData.faceDef.kind !== "text") continue;
+      const old = m.material.map;
+      m.material.map = makeLabelTexture(m.userData.faceDef.label, palette[m.userData.faceIndex]);
+      m.material.needsUpdate = true;
+      if(old) old.dispose();
+    }
+  }
+
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  let hoveredFace = -1, autospin = true, dragging = false, hovering = false;
+  let rotX = 0.25, rotY = 0, lastX = 0, lastY = 0;
+  let intro = true, introT = 0, holdT = 0, spinFast = 0, settleTimer = 0;
+  const FAR_Z = -60;
+  function startIntro(){ intro = true; introT = 0; holdT = 0; spinFast = 0; settleTimer = 0; autospin = false; dragging = false; hovering = false; hoveredFace = -1;
+    group.position.z = FAR_Z; group.scale.setScalar(cfg.size); rotX = 0.25; rotY = 0; fadeAmount = 0; applyFade(0); document.body.style.cursor = "default"; }
+  startIntro();
+  document.getElementById("reset").addEventListener("click", startIntro);
+  window.addEventListener("pointerdown", ()=>{ for(const v of mediaVideos) v.play().catch(()=>{}); });
+
+  const panel = document.getElementById("panel");
+  document.getElementById("panelToggle").addEventListener("click", ()=> panel.classList.toggle("open"));
+  function bindSlider(id, vid, key, fmt, onChange){ const el = document.getElementById(id), vlabel = document.getElementById(vid); el.value = cfg[key]; vlabel.textContent = fmt(cfg[key]);
+    el.addEventListener("input", ()=>{ cfg[key] = parseFloat(el.value); vlabel.textContent = fmt(cfg[key]); if(onChange) onChange(cfg[key]); }); }
+  const f2 = v => v.toFixed(2), f3 = v => v.toFixed(3), fInt = v => Math.round(v), fSec = v => (v/60).toFixed(1)+"秒";
+  bindSlider("r_speed","v_speed","spinSpeed", f3);
+  bindSlider("r_size","v_size","size", v=>v.toFixed(2)+"x", v=> group.scale.setScalar(v));
+  bindSlider("r_opacity","v_opacity","opacity", f2, ()=> applyFade(fadeAmount));
+  bindSlider("r_font","v_font","fontSize", v=>Math.round(v)+"px", ()=> rebuildLabelTextures());
+  bindSlider("r_light","v_light","lightPower", f2);
+  bindSlider("r_intro","v_intro","introDur", fInt);
+  bindSlider("r_hold","v_hold","holdDur", fSec);
+  bindSlider("r_settle","v_settle","settleDur", fSec);
+  const dirR = document.getElementById("dir_r"), dirL = document.getElementById("dir_l");
+  function updateDirBtns(){ dirR.classList.toggle("active", cfg.spinDir===1); dirL.classList.toggle("active", cfg.spinDir===-1); }
+  dirR.addEventListener("click", ()=>{ cfg.spinDir=1; updateDirBtns(); }); dirL.addEventListener("click", ()=>{ cfg.spinDir=-1; updateDirBtns(); }); updateDirBtns();
+
+  function setPointer(e){ pointer.x=(e.clientX/innerWidth)*2-1; pointer.y=-(e.clientY/innerHeight)*2+1; }
+  window.addEventListener("mousemove",(e)=>{
+    if(intro) return;
+    if(dragging){ rotY += (e.clientX-lastX)*0.01; rotX += (e.clientY-lastY)*0.01; lastX=e.clientX; lastY=e.clientY; return; }
+    setPointer(e); raycaster.setFromCamera(pointer,camera);
+    const hits=raycaster.intersectObjects(faceMeshes);
+    if(hits.length>0){ hoveredFace=hits[0].object.userData.faceIndex; hovering=true; autospin=false; document.body.style.cursor="grab"; }
+    else { hoveredFace=-1; hovering=false; if(!dragging) autospin=true; document.body.style.cursor="default"; }
+  });
+  window.addEventListener("mousedown",(e)=>{ if(intro) return; setPointer(e); raycaster.setFromCamera(pointer,camera);
+    if(raycaster.intersectObjects(faceMeshes).length>0){ dragging=true; autospin=false; lastX=e.clientX; lastY=e.clientY; document.body.style.cursor="grabbing"; }});
+  window.addEventListener("mouseup",()=>{ if(dragging){ dragging=false; document.body.style.cursor=hovering?"grab":"default"; if(!hovering) autospin=true; } });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    keyPoint.intensity = cfg.lightPower;
+    starsNear.rotation.y += 0.0002; starsMid.rotation.y += 0.00012; starsFar.rotation.y += 0.00007;
+    const tw = Date.now()*0.001;
+    starsNear.material.opacity = 0.85 + Math.sin(tw*1.3)*0.15;
+    starsMid.material.opacity  = 0.75 + Math.sin(tw*0.9+1)*0.15;
+    starsFar.material.opacity  = 0.6  + Math.sin(tw*0.6+2)*0.12;
+    if(intro){
+      if(holdT < cfg.holdDur){ holdT++; group.position.z = FAR_Z; renderer.render(scene,camera); return; }
+      introT += 1/cfg.introDur; if(introT >= 1) introT = 1;
+      const e = 1 - Math.pow(1 - introT, 3);
+      group.position.z = FAR_Z + (-FAR_Z) * e;
+      fadeAmount = Math.min(1, introT / 0.35); applyFade(fadeAmount);
+      const speed = (1 - e) * 2.7; spinFast += speed * cfg.spinDir; rotY = spinFast; rotX = 0.25;
+      group.rotation.x = rotX; group.rotation.y = rotY;
+      if(introT >= 1){ intro = false; autospin = false; settleTimer = cfg.settleDur; }
+      renderer.render(scene,camera); return;
+    }
+    if(settleTimer > 0 && !hovering && !dragging){ settleTimer--; if(settleTimer === 0) autospin = true; }
+    if(autospin) rotY += cfg.spinSpeed * cfg.spinDir;
+    group.rotation.x = rotX; group.rotation.y = rotY;
+    renderer.render(scene,camera);
+  }
+  animate();
+  window.addEventListener("resize",()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+}
+loadScript(0);
+</script>
+</body>
+</html>

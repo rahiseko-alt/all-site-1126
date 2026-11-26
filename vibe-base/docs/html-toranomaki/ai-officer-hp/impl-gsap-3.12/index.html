@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI_OFFICER // Autonomous Corporate Intelligence</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@200;300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/sections.css">
+    <link rel="stylesheet" href="css/effects.css">
+</head>
+<body>
+
+    <!-- 2. Intro Loader -->
+    <div id="loader">
+        <div class="loader-content">
+            <div class="loader-logo">AI_OFFICER</div>
+            <div class="loader-progress">
+                <span id="loader-percent">0</span><span class="percent-symbol">%</span>
+            </div>
+            <div class="loader-status">BOOTING CORE COGNITION...</div>
+        </div>
+        <!-- SVG for liquid slide-out animation -->
+        <svg class="loader-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="loader-svg-path" d="M0,0 L100,0 L100,100 Q50,100 0,100 Z" fill="#0d0e12" />
+        </svg>
+    </div>
+
+    <!-- Smooth Scroll Container (Lenis) -->
+    <div id="scroll-wrapper">
+
+        <!-- Header -->
+        <header>
+            <div class="nav-container">
+                <a href="#" class="logo magnet">
+                    <span class="logo-dot"></span>AI_OFFICER
+                </a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="#identity" class="nav-link magnet">Identity</a></li>
+                        <li><a href="#capabilities" class="nav-link magnet">Capabilities</a></li>
+                        <li><a href="#interface" class="nav-link magnet">Interface</a></li>
+                        <li><a href="#connect" class="btn-connect magnet">Connect</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <!-- Hero Section -->
+            <section id="hero">
+                <!-- AI Core Particle Visual (Canvas) -->
+                <div class="canvas-container">
+                    <canvas id="ai-core-canvas"></canvas>
+                </div>
+
+                <div class="hero-content">
+                    <div class="hero-tagline reveal-text">
+                        <span>[ SYSTEM ACTIVE // VERSION 4.8 ]</span>
+                    </div>
+                    <h1 class="hero-title reveal-text">
+                        <span>INTELLIGENT</span><br>
+                        <span class="accent-text">CORPORATE</span><br>
+                        <span>OFFICER</span>
+                    </h1>
+                    <p class="hero-desc reveal-text">
+                        <span>An autonomous, high-cognitive digital agent governing enterprise decision-making, risk modeling, and resource synthesis. Operating at 2.5 Petaflops.</span>
+                    </p>
+
+                    <div class="hero-scroll-indicator reveal-text">
+                        <div class="scroll-mouse">
+                            <div class="scroll-wheel"></div>
+                        </div>
+                        <span>SCROLL TO INITIALIZE</span>
+                    </div>
+                </div>
+
+                <!-- Infinite Marquee Background -->
+                <div class="hero-marquee">
+                    <div class="marquee-track">
+                        <div class="marquee-content">
+                            AUTONOMOUS GOVERNANCE // DECISION SYNTHESIS // MULTI-AGENT SWARM // PREDICTIVE STRATEGY // 24/7 AUDIT // COGNITIVE EFFICIENCY //&nbsp;
+                        </div>
+                        <div class="marquee-content">
+                            AUTONOMOUS GOVERNANCE // DECISION SYNTHESIS // MULTI-AGENT SWARM // PREDICTIVE STRATEGY // 24/7 AUDIT // COGNITIVE EFFICIENCY //&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Identity Section -->
+            <section id="identity" class="section-padding">
+                <div class="container">
+                    <div class="grid-2">
+                        <div class="sticky-title">
+                            <span class="section-num">[ 01 / IDENTITY ]</span>
+                            <h2 class="section-title">WHAT IS<br>AI_OFFICER?</h2>
+                        </div>
+                        <div class="identity-content">
+                            <p class="text-large reveal-words">
+                                AI_OFFICER is not a tool; it is a permanent digital board member. Designed to resolve the speed bottleneck of human alignment, it synthesizes raw enterprise telemetry, builds multi-scenario predictive forecasts, and autonomously executes governance policies.
+                            </p>
+                            <div class="identity-stats">
+                                <div class="stat-item reveal-item">
+                                    <span class="stat-val">10ms</span>
+                                    <span class="stat-lbl">Decision Latency</span>
+                                </div>
+                                <div class="stat-item reveal-item">
+                                    <span class="stat-val">99.9%</span>
+                                    <span class="stat-lbl">Strategic Precision</span>
+                                </div>
+                                <div class="stat-item reveal-item">
+                                    <span class="stat-val">∞</span>
+                                    <span class="stat-lbl">Operating Scalability</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Capabilities Section -->
+            <section id="capabilities" class="section-padding">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="section-num">[ 02 / CAPABILITIES ]</span>
+                        <h2 class="section-title">COGNITIVE MATRIX</h2>
+                        <p class="section-subtitle">Core functional dimensions engineered for autonomous enterprise guidance.</p>
+                    </div>
+                    <div class="capabilities-grid">
+                        <!-- Card 1 -->
+                        <div class="capability-card-wrapper">
+                            <div class="capability-card tilt-card">
+                                <div class="card-glass">
+                                    <div class="card-bg-glow"></div>
+                                    <div class="card-hover-image-wrapper">
+                                        <img class="card-hover-image" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" alt="Strategy Synthesis Image">
+                                    </div>
+                                    <div class="card-border-glow"></div>
+                                </div>
+                                <div class="card-tilt-content">
+                                    <div class="card-header">
+                                        <span class="card-num">01 //</span>
+                                        <i data-lucide="brain-circuit" class="card-icon"></i>
+                                    </div>
+                                    <h3 class="card-title">Strategy Synthesis</h3>
+                                    <p class="card-desc">Simulates billions of market permutations concurrently to draft boardroom-grade micro-strategies and macro-targets.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="capability-card-wrapper">
+                            <div class="capability-card tilt-card">
+                                <div class="card-glass">
+                                    <div class="card-bg-glow"></div>
+                                    <div class="card-hover-image-wrapper">
+                                        <img class="card-hover-image" src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=400&q=80" alt="Risk Control Image">
+                                    </div>
+                                    <div class="card-border-glow"></div>
+                                </div>
+                                <div class="card-tilt-content">
+                                    <div class="card-header">
+                                        <span class="card-num">02 //</span>
+                                        <i data-lucide="shield-alert" class="card-icon"></i>
+                                    </div>
+                                    <h3 class="card-title">Dynamic Risk Control</h3>
+                                    <p class="card-desc">Constantly audits asset pools, smart contracts, and supply chain telemetry, implementing automated countermeasures under 12ms.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="capability-card-wrapper">
+                            <div class="capability-card tilt-card">
+                                <div class="card-glass">
+                                    <div class="card-bg-glow"></div>
+                                    <div class="card-hover-image-wrapper">
+                                        <img class="card-hover-image" src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80" alt="Autonomous Action Image">
+                                    </div>
+                                    <div class="card-border-glow"></div>
+                                </div>
+                                <div class="card-tilt-content">
+                                    <div class="card-header">
+                                        <span class="card-num">03 //</span>
+                                        <i data-lucide="cpu" class="card-icon"></i>
+                                    </div>
+                                    <h3 class="card-title">Autonomous Action</h3>
+                                    <p class="card-desc">Triggers swarm agents to handle resource routing, financial optimization, and legal compilation without human intervention.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="capability-card-wrapper">
+                            <div class="capability-card tilt-card">
+                                <div class="card-glass">
+                                    <div class="card-bg-glow"></div>
+                                    <div class="card-hover-image-wrapper">
+                                        <img class="card-hover-image" src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=400&q=80" alt="Synergetic Interface Image">
+                                    </div>
+                                    <div class="card-border-glow"></div>
+                                </div>
+                                <div class="card-tilt-content">
+                                    <div class="card-header">
+                                        <span class="card-num">04 //</span>
+                                        <i data-lucide="workflow" class="card-icon"></i>
+                                    </div>
+                                    <h3 class="card-title">Synergetic Interface</h3>
+                                    <p class="card-desc">Seamlessly links with human board members via neural-semantic natural language, presenting clean data digests on demand.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interface / Interactive Chat Section -->
+            <section id="interface" class="section-padding">
+                <div class="container">
+                    <div class="grid-2">
+                        <div class="sticky-title">
+                            <span class="section-num">[ 03 / INTERFACE ]</span>
+                            <h2 class="section-title">OPERATIONAL<br>TELEMETRY</h2>
+                            <p class="desc-muted">Observe live interaction logs between AI_OFFICER and the corporate stack. Simulating neural dialogue loop.</p>
+
+                            <div class="connection-status">
+                                <span class="status-indicator-dot pulse"></span>
+                                <span class="status-text">COGNITION LIVE STREAM ACTIVE</span>
+                            </div>
+                        </div>
+
+                        <!-- Terminal UI -->
+                        <div class="terminal-container reveal-item">
+                            <div class="terminal-header">
+                                <div class="terminal-buttons">
+                                    <span class="t-btn red"></span>
+                                    <span class="t-btn yellow"></span>
+                                    <span class="t-btn green"></span>
+                                </div>
+                                <div class="terminal-title">ai-officer@core-console:~$</div>
+                                <div class="terminal-badge">SECURE_SHELL</div>
+                            </div>
+                            <div class="terminal-body" id="terminal-log">
+                                <!-- Dynamic logs will populate here -->
+                                <div class="log-line system">[SYSTEM] COGNITION INIT SEQUENCE START...</div>
+                                <div class="log-line system">[SYSTEM] DEPLOYING MULTI-SCENARIO PROBABILITY MAPS...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Connect Section -->
+            <section id="connect" class="section-padding">
+                <div class="container">
+                    <div class="connect-inner">
+                        <div class="connect-glow"></div>
+                        <span class="section-num reveal-item">[ 04 / CONNECT ]</span>
+                        <h2 class="connect-title reveal-words">ELEVATE YOUR<br>GOVERNANCE MATRIX.</h2>
+                        <p class="connect-desc reveal-item">Initialize AI_OFFICER within your organizational stack to govern, optimize, and secure operations at scale.</p>
+
+                        <!-- Big Magnet Button CTA -->
+                        <div class="cta-wrapper reveal-item">
+                            <a href="mailto:officer@ai-governance.base" class="btn-giant magnet">
+                                <span class="btn-giant-bg"></span>
+                                <span class="btn-giant-text">INITIALIZE CORE</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container footer-container">
+                <div class="footer-left">
+                    <span class="logo-small">AI_OFFICER</span>
+                    <p class="copyright">&copy; 2026 AI_OFFICER. Autonomously Governed.</p>
+                </div>
+                <div class="footer-right">
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link magnet">GITHUB</a></li>
+                        <li><a href="#" class="footer-link magnet">WHITEPAPER</a></li>
+                        <li><a href="#" class="footer-link magnet">SECURITY.TXT</a></li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- GSAP & Plugins (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- Lenis for smooth scroll (CDN) -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+
+    <!-- Application Logic -->
+    <script src="js/core.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/interactions.js"></script>
+</body>
+</html>

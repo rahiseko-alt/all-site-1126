@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-05-30 (session 2) — review-analysis スマホアイコン</title>
+<style>
+body{font-family:sans-serif;max-width:860px;margin:40px auto;padding:0 20px;color:#222}
+h1{font-size:1.4rem;border-bottom:3px solid #333;padding-bottom:8px}
+h2{font-size:1.1rem;margin-top:2rem;border-left:4px solid #555;padding-left:10px}
+.alert-red{background:#fff0f0;border:2px solid #c00;border-radius:6px;padding:14px 18px;margin:16px 0}
+.alert-yellow{background:#fffbe6;border:2px solid #e6a817;border-radius:6px;padding:12px 16px;margin:12px 0}
+table{border-collapse:collapse;width:100%;margin:10px 0}
+th,td{border:1px solid #ccc;padding:6px 10px;font-size:.9rem;vertical-align:top}
+th{background:#f5f5f5}
+code{background:#f0f0f0;padding:2px 5px;border-radius:3px;font-size:.85rem}
+ul{margin:6px 0;padding-left:1.4rem}
+li{margin:3px 0}
+.pass{color:#080}
+.fail{color:#c00}
+.note{font-size:.85rem;color:#555}
+</style>
+</head>
+<body>
+
+<h1>Check-out レポート — 2026-05-30 (session 2)<br>
+<span style="font-size:.9rem;font-weight:normal">review-analysis スマホアイコン設定 完遂</span></h1>
+
+<p class="note">次セッションは <code>memory.md</code> 冒頭の <code>@</code> 参照から本ファイルを <strong>必ず先に Read</strong> してから着手すること。</p>
+
+<div class="alert-red">
+<strong>⚠️ 重要発見: Vercel Root Directory に末尾スペース混入（3日間デプロイ全 Error）</strong><br>
+review-app の Vercel プロジェクト設定の Root Directory が
+<code>"products/review-analysis/bot/review-app<b> </b>"</code>（末尾スペースあり）になっており、
+2026-05-27 以降の全デプロイが即 Error だった。<br>
+本セッションでマスターが Vercel ダッシュボードから修正し解消。<br>
+<b>他製品も同様の罠がある可能性あり。</b> 次回デプロイ Error 時に疑うこと。
+</div>
+
+<div class="alert-yellow">
+<strong>⚠️ Next.js middleware が icon/manifest URL を認証 redirect していた</strong><br>
+<code>src/app/apple-icon.png</code>・<code>icon.png</code>・<code>manifest.webmanifest</code> が
+middleware の matcher 除外リストに入っておらず、未ログイン状態では <code>/login</code> にリダイレクト → HTML が返っていた。<br>
+commit <code>28adefc</code> で修正済・本番反映済。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+  <li>review-analysis スマホアイコン（iOS apple-icon / Android PWA / maskable）を新規作成・本番デプロイ</li>
+  <li>元画像（ChatGPT生成 1254×1254 PNG）から白余白を自動検出してフルブリードクロップ</li>
+  <li>四隅ピクセル実測で黒（TL/TR=44,44,45）確認 → iOS 角丸マスクで白角なし</li>
+  <li>PWA manifest（<code>src/app/manifest.ts</code>）新規追加</li>
+  <li>Vercel Root Directory 末尾スペース問題を発見・マスター修正で3日間の Error 解消</li>
+  <li>middleware の icon/manifest 除外漏れを発見・修正・本番デプロイ</li>
+  <li>マスター実機確認 → アイコン表示 OK</li>
+</ul>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+<tr><th>hash</th><th>種別</th><th>内容</th></tr>
+<tr><td><code>34b5776</code></td><td>feat</td><td>review-analysis: PWA icons + manifest 追加（フルブリード版）</td></tr>
+<tr><td><code>28adefc</code></td><td>fix</td><td>review-analysis: middleware の icon/manifest 除外漏れ修正</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<ul>
+  <li><strong>review-analysis 本番</strong>（<code>app.review.kouheikosehira.com</code>）: アイコン・manifest 反映済</li>
+  <li><strong>他製品への横展開</strong>: 他製品も middleware に同様の除外漏れがある可能性あり（foodee, aiueo 等 Next.js 製品）</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table>
+<tr><th>優先度</th><th>内容</th></tr>
+<tr><td>L</td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否の決定（Codex CLI 用別実装の温存可否・実害なし）</td></tr>
+<tr><td>L</td><td>tmp/ 中間ファイルの整理（gen-icons*.cjs / _corners.txt / _preview-180.png 等 — gitignored につき実害なし）</td></tr>
+</table>
+
+<h2>E. 本セッション新規追加ファイル</h2>
+<ul>
+  <li><code>products/review-analysis/bot/review-app/src/app/apple-icon.png</code> (180×180)</li>
+  <li><code>products/review-analysis/bot/review-app/src/app/icon.png</code> (512×512)</li>
+  <li><code>products/review-analysis/bot/review-app/src/app/manifest.ts</code></li>
+  <li><code>products/review-analysis/bot/review-app/public/icon-192.png</code></li>
+  <li><code>products/review-analysis/bot/review-app/public/icon-512.png</code></li>
+  <li><code>products/review-analysis/bot/review-app/public/icon-maskable-512.png</code></li>
+  <li>生成スクリプト（<code>products/review-analysis/tmp/gen-icons*.cjs</code> 他） ← gitignored</li>
+</ul>
+
+<h2>F. Wave A 機械検証結果</h2>
+<table>
+<tr><th>#</th><th>項目</th><th>結果</th></tr>
+<tr><td>1</td><td>unstaged ファイル</td><td class="pass">PASS（0件）</td></tr>
+<tr><td>2</td><td>tsc typecheck</td><td class="pass">PASS（EXIT 0）</td></tr>
+<tr><td>3</td><td>secret-grep</td><td class="pass">PASS（0件）</td></tr>
+<tr><td>4</td><td>code-reviewer diff レビュー</td><td class="pass">no issues</td></tr>
+</table>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+  <li>pc-checkin を実行</li>
+  <li>残作業 H/M 件数: H=0 / M=0 / L=2</li>
+  <li>tmp/ 中間ファイルは gitignored のため放置可（気になれば手動削除）</li>
+  <li>他製品（foodee / aiueo 等 Next.js）の middleware も icon 除外漏れを確認するか判断</li>
+</ol>
+
+<p class="note">生成: 2026-05-30 | branch: master | commit: 28adefc</p>
+</body>
+</html>

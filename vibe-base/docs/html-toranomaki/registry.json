@@ -1,0 +1,551 @@
+{
+  "_comment": "HTML虎の巻 単一正本メタ層。build-portfolio.mjs / toranomaki-intake.mjs / html-toranomaki-add(skill) が読み書きする。スキーマ変更時は RULES.md §8 と両スクリプトを同期更新すること。order は 1..N 連番（欠番禁止）。portfolio:true のみ公開ビルド対象。",
+  "version": 1,
+  "schema": {
+    "slug": "テーマフォルダ名（kebab-case・docs/html-toranomaki/{slug}/ と一致）",
+    "title": "ポータル表示名（日本語可）",
+    "titleEn": "英語ラベル（任意・公開ビルドのカード title 属性に使用）",
+    "blurb": "クライアント向け 1〜2 文紹介（知識層を含めない）",
+    "tags": "分類タグ配列",
+    "impl": "公開ビルド対象の impl フォルダ名（docs/html-toranomaki/{slug}/{impl}/）",
+    "portfolio": "true=ポータル公開 / false=虎の巻のみ（後日昇格で true 化）",
+    "order": "ポータル AUTO 区画内の表示順（1..N 連番・昇順）",
+    "codeVisible": "予約フラグ。常に false（知識層 concept/research は公開ビルドへ非コピー＝実行JSのみ可視）"
+  },
+  "entries": [
+    {
+      "slug": "webgl-dye-flow",
+      "title": "染料の流れ",
+      "titleEn": "WebGL Dye Flow",
+      "blurb": "水面に落とした染料がゆらめき広がるような、有機的でなめらかな流体シミュレーション。放置すると自動で色相が巡る演出に切り替わります。",
+      "tags": [
+        "webgl",
+        "fluid",
+        "shader",
+        "interactive"
+      ],
+      "impl": "impl-webgl-2.0",
+      "portfolio": true,
+      "order": 1,
+      "codeVisible": false
+    },
+    {
+      "slug": "webgl-constellations-demo",
+      "title": "Three.js Constellations",
+      "titleEn": "Three.js Constellations",
+      "blurb": "Interactive particle constellation simulation with customizable settings (rainbow colors, thickness, dynamic distance, drift speed).",
+      "tags": [
+        "threejs",
+        "particles",
+        "constellations",
+        "lightning",
+        "interactive"
+      ],
+      "impl": "impl-threejs-r160",
+      "portfolio": true,
+      "order": 2,
+      "codeVisible": false
+    },
+    {
+      "slug": "webgl-spatial-dive",
+      "title": "WebGL 空間ダイブ",
+      "titleEn": "WebGL Spatial Dive",
+      "blurb": "奥行きのある3D空間へ吸い込まれるように没入する、Three.js のパーティクル空間演出。",
+      "tags": [
+        "webgl",
+        "threejs",
+        "3d",
+        "particles",
+        "immersive"
+      ],
+      "impl": "impl-threejs-r128",
+      "portfolio": true,
+      "order": 3,
+      "codeVisible": false
+    },
+    {
+      "slug": "webgl-shaders-ocean-demo",
+      "title": "WebGL 海景シェーダー",
+      "titleEn": "WebGL Shaders Ocean",
+      "blurb": "Three.js の水面・空・ポストプロセスを組み合わせ、太陽光が揺らめく海景をリアルタイム描画するシェーダーデモ。",
+      "tags": [
+        "webgl",
+        "threejs",
+        "shader",
+        "ocean",
+        "postprocessing"
+      ],
+      "impl": "impl-threejs-r169",
+      "portfolio": true,
+      "order": 4,
+      "codeVisible": false
+    },
+    {
+      "slug": "webgl-card-distortion",
+      "title": "WebGL カード歪み",
+      "titleEn": "WebGL Card Distortion",
+      "blurb": "カードにマウスを重ねると外枠ごとゼリーのように波打ち、クリックで正円の波紋が広がる、curtains.js による高品位なインタラクティブ歪みエフェクト。",
+      "tags": [
+        "webgl",
+        "curtainsjs",
+        "distortion",
+        "ripple",
+        "interactive"
+      ],
+      "impl": "impl-curtainsjs-8.1",
+      "portfolio": true,
+      "order": 5,
+      "codeVisible": false
+    },
+    {
+      "slug": "webgl-card-distortion-hover",
+      "title": "WebGL カードぐにゃーん（ホバー）",
+      "titleEn": "WebGL Card Distortion (Hover)",
+      "blurb": "マウス追従でカードの外枠が滑らかに波打つ、ホバー歪みに特化した curtains.js の最小構成デモ。",
+      "tags": [
+        "webgl",
+        "curtainsjs",
+        "distortion",
+        "hover",
+        "interactive"
+      ],
+      "impl": "impl-curtainsjs-8.1",
+      "portfolio": true,
+      "order": 6,
+      "codeVisible": false
+    },
+    {
+      "slug": "webgl-card-distortion-ripple",
+      "title": "WebGL カード歪み（クリック波紋）",
+      "titleEn": "WebGL Card Distortion (Ripple)",
+      "blurb": "クリック地点からアスペクト比補正された正円の波紋が広がる、波紋表現に特化した curtains.js デモ。",
+      "tags": [
+        "webgl",
+        "curtainsjs",
+        "ripple",
+        "click",
+        "interactive"
+      ],
+      "impl": "impl-curtainsjs-8.1",
+      "portfolio": true,
+      "order": 7,
+      "codeVisible": false
+    },
+    {
+      "slug": "dennis-snellenberg-portfolio",
+      "title": "Dennis Snellenberg 再現",
+      "titleEn": "Dennis Snellenberg Recreation",
+      "blurb": "Dennis Snellenbergのポートフォリオに見られる、GSAP/Lenisを用いた高品位なマグネット、プレローダー、カーソル追従画像プレビュー等のインタラクション再現。",
+      "tags": [
+        "gsap",
+        "lenis",
+        "magnetic",
+        "preloader",
+        "scrolltrigger"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 8,
+      "codeVisible": false
+    },
+    {
+      "slug": "glassmorphism-tilt-card",
+      "title": "ガラスモーフィズム 3D Tilt カード",
+      "titleEn": "Glassmorphism 3D Tilt Card",
+      "blurb": "backdrop-filterすりガラス、マウス追従スポットライト、Vercel風mask合成ボーダーグロー、背面パララックス透過画像、3D Tilt、スクロールフェード、セクション常駐カスタムカーソルの7技術を統合した高密度インタラクティブカード。",
+      "tags": [
+        "gsap",
+        "glassmorphism",
+        "3d-tilt",
+        "scrolltrigger",
+        "custom-cursor",
+        "css-mask"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 9,
+      "codeVisible": false
+    },
+    {
+      "slug": "ai-officer-hp",
+      "title": "AI オフィサー LP",
+      "titleEn": "AI Officer HP",
+      "blurb": "起動ローダーからニューラルネット背景、3Dティルトカード、疑似ターミナルまでを一画面に統合したダークテーマの企業向けAIエージェント・ランディングページ。マウスに吸い付くマグネットボタンと慣性スクロールで没入感を演出します。",
+      "tags": [
+        "gsap",
+        "lenis",
+        "canvas",
+        "3d-tilt",
+        "dark",
+        "landing-page",
+        "glassmorphism"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 10,
+      "codeVisible": false
+    },
+    {
+      "slug": "variable-font-drum",
+      "title": "可変フォント 3D ドラム",
+      "titleEn": "Variable Font Drum",
+      "blurb": "スクロールに連動して文字列が3Dドラム状に回転。正面を向いた行ほど太く・横広く・濃くなる、可変フォント2軸（太さ・横幅）の連続制御デモ。",
+      "tags": [
+        "gsap",
+        "scrolltrigger",
+        "variable-font",
+        "css-3d",
+        "typography"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 11,
+      "codeVisible": false
+    },
+    {
+      "slug": "flip-qr-popout",
+      "title": "飛び出すQR",
+      "titleEn": "Flip QR Popout",
+      "blurb": "QRサムネをクリックすると、枠は元の位置に残ったまま中身だけが中央へ飛び出して拡大する。GSAP Flip の data-flip-id 共有エレメントと pointer-events:none ステージでジッターなく滑らかに動く。",
+      "tags": [
+        "gsap",
+        "flip",
+        "qr",
+        "interactive",
+        "shared-element"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 12,
+      "codeVisible": false
+    },
+    {
+      "slug": "stagger-boxes",
+      "title": "ウェーブリボン",
+      "titleEn": "Stagger Boxes",
+      "blurb": "横長の薄い棒を100本積層し、スクロール連動で一本ずつ時間差スライド＋回転。棒の集合がリボン状にうねって流れ、背後の「SCROLL UP」が現れるGSAP ScrollTrigger stagger デモ。",
+      "tags": [
+        "gsap",
+        "scrolltrigger",
+        "stagger",
+        "pin",
+        "scroll"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 13,
+      "codeVisible": false
+    },
+    {
+      "slug": "add-to-cart",
+      "title": "ショッピングカート追加ボタン",
+      "titleEn": "Add to Cart Button",
+      "blurb": "ボタンをクリックするとローディング車輪アニメーションを経てカートに入る、MorphSVGPluginを活用したマイクロインタラクション。",
+      "tags": [
+        "gsap",
+        "morphsvg",
+        "button",
+        "micro-interaction"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 14,
+      "codeVisible": false
+    },
+    {
+      "slug": "draggable-liquid-tube",
+      "title": "ドラッグ可能な液体シリンダー",
+      "titleEn": "Draggable Liquid Tube",
+      "blurb": "ドラッグ操作とInertiaPluginによる慣性スクロールで液面を上下させる、温度計風のシリンダーUIアニメーション。",
+      "tags": [
+        "gsap",
+        "draggable",
+        "inertia",
+        "interactive",
+        "svg"
+      ],
+      "impl": "impl-gsap-3.12",
+      "portfolio": true,
+      "order": 15,
+      "codeVisible": false
+    },
+    {
+      "slug": "animejs-layout-id-attribute",
+      "title": "Anime.js Layout ID Attribute",
+      "titleEn": "Anime.js Layout ID Attribute",
+      "blurb": "同じ data-layout-id を持つ要素をコンテナ間で移動させる Anime.js v4 の createLayout (FLIP) アニメーションデモ。",
+      "tags": [
+        "animejs",
+        "flip",
+        "layout",
+        "interactive"
+      ],
+      "impl": "impl-animejs-v4",
+      "portfolio": true,
+      "order": 16,
+      "codeVisible": false
+    },
+    {
+      "slug": "animejs-add-items",
+      "title": "Anime.js 動的追加トランジション",
+      "titleEn": "Anime.js Add Items",
+      "blurb": "グリッドに要素が追加されると既存要素が滑らかに押し退けられ、新要素が下からふわっと浮き上がる Anime.js v4 createLayout デモ。",
+      "tags": [
+        "animejs",
+        "layout",
+        "add",
+        "transition",
+        "interactive"
+      ],
+      "impl": "impl-animejs-4.4",
+      "portfolio": true,
+      "order": 17,
+      "codeVisible": false
+    },
+    {
+      "slug": "animejs-shuffle-items",
+      "title": "Anime.js シャッフル整列",
+      "titleEn": "Anime.js Shuffle Items",
+      "blurb": "要素の並び替えを自動検知し、元の位置から新しい位置へ心地よく移動させる Anime.js v4 createLayout のシャッフルデモ。",
+      "tags": [
+        "animejs",
+        "layout",
+        "shuffle",
+        "sort",
+        "interactive"
+      ],
+      "impl": "impl-animejs-4.4",
+      "portfolio": true,
+      "order": 18,
+      "codeVisible": false
+    },
+    {
+      "slug": "hover-color-buttons",
+      "title": "ホバー色変化ボタン",
+      "titleEn": "Hover Color Buttons",
+      "blurb": "ボタンやナビ項目がホバーで項目ごとに別々のブランド色へ点灯する。nth-child 固定色とインライン CSS 変数の2方式で、色追加が CSS 改変なしに行える軽量な素CSS実装。",
+      "tags": [
+        "css",
+        "hover",
+        "buttons",
+        "interactive",
+        "no-js"
+      ],
+      "impl": "impl-vanilla-1.0",
+      "portfolio": true,
+      "order": 19,
+      "codeVisible": false
+    },
+    {
+      "slug": "hover-reveal-icon",
+      "title": "隠密マーク（ホバー出現アイコン）",
+      "titleEn": "Hover Reveal Icon",
+      "blurb": "普段は完全に非表示のアイコンが、カーソルを近づけた時だけ下から浮き上がりブランド色で出現する。黒塗りでは隠しきれない問題を opacity:0 で解決した素CSSの隠密マーク。",
+      "tags": [
+        "css",
+        "hover",
+        "icon",
+        "reveal",
+        "no-js"
+      ],
+      "impl": "impl-vanilla-1.0",
+      "portfolio": true,
+      "order": 20,
+      "codeVisible": false
+    },
+    {
+      "slug": "css-solarsystem-demo",
+      "title": "3D CSS 太陽系",
+      "titleEn": "3D CSS Solar System",
+      "blurb": "純粋なCSS 3Dトランスフォームだけで太陽系の公転・自転・昼夜の陰影を再現したインタラクティブ作品。2D/3D切替・速度/サイズ/距離スケールをワンクリックで切り替えられます。",
+      "tags": [
+        "css",
+        "3d-transform",
+        "animation",
+        "vanilla",
+        "jquery",
+        "interactive"
+      ],
+      "impl": "impl-vanilla-1.0",
+      "portfolio": true,
+      "order": 21,
+      "codeVisible": false
+    },
+    {
+      "slug": "threejs-water-tunnel-dive",
+      "title": "3Dスクロール水流トンネル潜行",
+      "titleEn": "3D Scroll Water Tunnel Dive",
+      "blurb": "スクロール速度と連動して視野角が広がり、カメラが微小にブレながら、Simplex Noiseでうねる光の気泡トンネルを滑らかに潜り抜けるインタラクティブな3D演出です。",
+      "tags": [
+        "Three.js",
+        "GSAP",
+        "Lenis",
+        "Simplex Noise",
+        "Interactive 3D",
+        "Scroll-driven"
+      ],
+      "impl": "impl-threejs-r173",
+      "portfolio": true,
+      "order": 22,
+      "codeVisible": false
+    },
+    {
+      "slug": "flubber-morphing",
+      "title": "Flubber モーフィング",
+      "titleEn": "Flubber Morphing Algorithm",
+      "blurb": "GSAP単体では不自然になりやすい「全く頂点数や構造が異なる図形同士」の変形を、人間の直感に最も近い形で完璧に補間する究極のオープンソースアルゴリズム「Flubber」のデモです。",
+      "tags": [
+        "flubber",
+        "morphing",
+        "svg",
+        "gsap",
+        "interpolation"
+      ],
+      "impl": "impl-flubber-0.4",
+      "portfolio": true,
+      "order": 23,
+      "codeVisible": false
+    },
+    {
+      "slug": "gsap-cover-flow",
+      "title": "GSAP Cover Flow ポートフォリオUI",
+      "titleEn": "GSAP Cover Flow ポートフォリオUI",
+      "blurb": "GSAP の ScrollTrigger と Draggable を用いて、スクロールやドラッグで無限にループする 3D Cover Flow カルーセルを実装。",
+      "tags": [
+        "gsap",
+        "scrolltrigger",
+        "3d",
+        "carousel"
+      ],
+      "impl": "impl-gsap-3.7.0",
+      "portfolio": true,
+      "order": 24,
+      "codeVisible": false
+    },
+    {
+      "slug": "gsap-drawsvg",
+      "title": "GSAP DrawSVG (一筆書きアニメーション)",
+      "titleEn": "DrawSVG",
+      "blurb": "SVGの線を徐々に表示・非表示させます。サインが書かれるような演出や、ダイナミックなイラストの描画に最適です。",
+      "tags": [
+        "gsap",
+        "drawsvg",
+        "interactive"
+      ],
+      "impl": "impl-gsap-3.15",
+      "portfolio": true,
+      "order": 25,
+      "codeVisible": false
+    },
+    {
+      "slug": "gsap-inertia-draggable",
+      "title": "GSAP Inertia & Draggable (慣性ドラッグUI)",
+      "titleEn": "Inertia & Draggable",
+      "blurb": "ドラッグ可能な要素に超リアルな「慣性」を追加します。フリックして投げると、自然に減速したり壁で滑らかに跳ね返ったりします。",
+      "tags": [
+        "gsap",
+        "inertia & draggable",
+        "interactive"
+      ],
+      "impl": "impl-gsap-3.15",
+      "portfolio": true,
+      "order": 26,
+      "codeVisible": false
+    },
+    {
+      "slug": "gsap-morphsvg",
+      "title": "GSAP MorphSVG (完璧な図形変形)",
+      "titleEn": "MorphSVG",
+      "blurb": "どんなSVGパスでも、頂点の数に関係なく別のパスへと完璧にモーフィング（変形）させます。最適な補間を自動計算し、不自然なねじれを防ぐ最強プラグインです。",
+      "tags": [
+        "gsap",
+        "morphsvg",
+        "interactive"
+      ],
+      "impl": "impl-gsap-3.15",
+      "portfolio": true,
+      "order": 27,
+      "codeVisible": false
+    },
+    {
+      "slug": "gsap-scrambletext",
+      "title": "GSAP ScrambleText (サイバー解読エフェクト)",
+      "titleEn": "ScrambleText",
+      "blurb": "ハッカー風のテキスト解読エフェクトです。目的の文字列に定着するまで文字をランダムな記号でシャッフルさせます。",
+      "tags": [
+        "gsap",
+        "scrambletext",
+        "interactive"
+      ],
+      "impl": "impl-gsap-3.15",
+      "portfolio": true,
+      "order": 28,
+      "codeVisible": false
+    },
+    {
+      "slug": "gsap-scrollsmoother",
+      "title": "GSAP ScrollSmoother (極上スクロール)",
+      "titleEn": "ScrollSmoother",
+      "blurb": "ページ全体に慣性が効いた「バターのようになめらかなスクロール感」を追加するプレミアムプラグイン。パララックス（視差）効果もネイティブにサポートします。",
+      "tags": [
+        "gsap",
+        "scrollsmoother",
+        "interactive"
+      ],
+      "impl": "impl-gsap-3.15",
+      "portfolio": true,
+      "order": 29,
+      "codeVisible": false
+    },
+    {
+      "slug": "gsap-splittext",
+      "title": "GSAP SplitText (テキスト分割アニメーション)",
+      "titleEn": "SplitText",
+      "blurb": "あらゆるテキストを一瞬で「1文字ずつ」「1単語ずつ」「1行ずつ」に分割し、複雑なタイポグラフィ・アニメーションの実装を極めて簡単にするプラグインです。",
+      "tags": [
+        "gsap",
+        "splittext",
+        "interactive"
+      ],
+      "impl": "impl-gsap-3.15",
+      "portfolio": true,
+      "order": 30,
+      "codeVisible": false
+    },
+    {
+      "slug": "ascii-flow-field",
+      "title": "ASCII フローフィールド",
+      "titleEn": "ASCII Flow Field",
+      "blurb": "手続き生成した流体ノイズを ASCII 文字へ変換した、白地に流れる全画面背景。写真や 3D モデルに頼らず計算だけで生成する。",
+      "tags": [
+        "three.js",
+        "AsciiEffect",
+        "GLSL",
+        "generative",
+        "background"
+      ],
+      "impl": "impl-threejs-r158",
+      "portfolio": true,
+      "order": 31,
+      "codeVisible": false
+    },
+    {
+      "slug": "lucas-aufrere-rotonde",
+      "title": "Lucas Aufrère — Rotonde 3D カルーセル",
+      "titleEn": "Lucas Aufrere — Rotonde 3D Carousel",
+      "blurb": "Three.js r171 + R3F による 3D 円環カルーセル。6 枚の湾曲画像カードが半径 9 の円周上に並び、慣性ホイール・矢印スナップ・ポインタドラッグで回転する。GLSL 注入による Z 平坦化（uFlatProgress）と輝度デサチュレーション（uSaturation）を搭載。",
+      "tags": [
+        "Three.js",
+        "R3F",
+        "GLSL",
+        "troika-three-text",
+        "WebGL",
+        "carousel"
+      ],
+      "impl": "impl-threejs-r171",
+      "portfolio": false,
+      "order": 32,
+      "codeVisible": false
+    }
+  ]
+}

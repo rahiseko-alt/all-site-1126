@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>障害者雇用の記録、自社で回せる仕組みを｜小さな会社のDX屋さん</title>
+<meta name="description" content="2026年7月の法定雇用率2.7%引き上げに。障害者雇用の記録・合理的配慮・勤怠を、代行に頼らず自社で回せる仕組みに。名古屋の小さなDX屋が1万円から構築・納品。">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<!-- GSAP (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════ */
+:root {
+  --ink:   #1a2533;
+  --sub:   #54687a;
+  --muted: #8fa0ae;
+  --bg0:   #f2f6f9;
+  --bg1:   #ffffff;
+  --line:  #dce6ee;
+
+  --navy:  #0d2b47;
+  --navy2: #153a5c;
+  --teal:  #1a7f66;
+  --teal2: #13624f;
+
+  --cta:   #e85a2c;
+  --cta2:  #c94620;
+
+  --warn:  #fff7e6;
+  --gold:  #f5c842;
+  --gold2: #e0a800;
+
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --radius-l: 22px;
+}
+
+/* ════════════════════════════════════════
+   RESET / BASE
+════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--ink);
+  background: var(--bg0);
+  line-height: 1.8;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 72px; /* sticky bar */
+}
+
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+
+.wrap {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ════════════════════════════════════════
+   SVG FILTER DEFINITIONS (hidden)
+════════════════════════════════════════ */
+.svg-filters {
+  position: absolute;
+  width: 0; height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════
+   STICKY MOBILE CTA BAR
+════════════════════════════════════════ */
+.sticky-bar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 100;
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.sticky-bar a {
+  flex: 1;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-m);
+  font-weight: 700;
+  padding: 13px 8px;
+  font-size: .93rem;
+  line-height: 1.3;
+  transition: transform .12s, box-shadow .12s;
+}
+.sticky-bar a:active { transform: translateY(1px); }
+.sb-tel {
+  background: #edf2f7;
+  color: var(--navy);
+  border: 1px solid var(--line);
+}
+.sb-form {
+  background: var(--cta);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(232,90,44,.30);
+}
+
+/* ════════════════════════════════════════
+   SECTION BASE
+════════════════════════════════════════ */
+section { padding: 56px 0; }
+.sec-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--teal);
+  margin-bottom: 12px;
+}
+.sec-label::before {
+  content: "";
+  display: inline-block;
+  width: 20px; height: 2px;
+  background: var(--teal);
+}
+.sec-h2 {
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  font-weight: 900;
+  line-height: 1.45;
+  letter-spacing: .01em;
+}
+
+/* ════════════════════════════════════════
+   CTA BUTTON
+════════════════════════════════════════ */
+.btn {
+  display: block;
+  width: 100%;
+  background: var(--cta);
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 18px 16px;
+  border-radius: var(--radius-l);
+  box-shadow: 0 10px 26px rgba(232,90,44,.32);
+  transition: transform .13s, box-shadow .13s;
+  border: none;
+  cursor: pointer;
+  line-height: 1.3;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(232,90,44,.40);
+}
+.btn:active { transform: translateY(1px); }
+.btn small {
+  display: block;
+  font-weight: 500;
+  font-size: .78rem;
+  opacity: .9;
+  margin-top: 3px;
+}
+.btn-tel {
+  background: var(--navy);
+  box-shadow: 0 10px 26px rgba(13,43,71,.25);
+  margin-top: 12px;
+}
+.btn-tel:hover {
+  box-shadow: 0 14px 32px rgba(13,43,71,.35);
+}
+.cta-note {
+  text-align: center;
+  color: var(--sub);
+  font-size: .78rem;
+  margin-top: 10px;
+}
+
+/* ════════════════════════════════════════
+   SECTION DIVIDER — liquid warp
+   The SVG filter is applied to this element
+   and its scale property is animated via JS
+════════════════════════════════════════ */
+.warp-divider {
+  width: 100%;
+  height: 60px;
+  overflow: visible;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+.warp-divider path {
+  fill: var(--bg1);
+}
+
+/* ════════════════════════════════════════
+   ██ HERO
+════════════════════════════════════════ */
+.hero {
+  background: var(--navy);
+  color: #fff;
+  padding: 36px 0 48px;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ambient glow blobs */
+.hero::before {
+  content: "";
+  position: absolute;
+  right: -120px; top: -60px;
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(26,127,102,.28) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  left: -80px; bottom: -80px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(245,200,66,.10) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero .wrap { position: relative; z-index: 2; }
+
+/* urgency badge */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245,200,66,.15);
+  border: 1px solid rgba(245,200,66,.50);
+  color: var(--gold);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+}
+.hero-badge::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(.7); }
+}
+
+/* ── hero heading with SVG displacement filter ── */
+.hero-title-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* The actual text rendered inside SVG so filter applies natively */
+.hero-distort-stage {
+  width: 100%;
+  overflow: visible;
+}
+
+/* fallback text (shown when reduced-motion / no JS) */
+.hero-title-fallback {
+  font-size: clamp(1.7rem, 5.5vw, 2.3rem);
+  font-weight: 900;
+  line-height: 1.5;
+  letter-spacing: .01em;
+}
+.hero-title-fallback .hl { color: var(--gold); }
+
+/* hero sub text */
+.hero-sub {
+  margin: 20px 0 28px;
+  font-size: 1rem;
+  color: #cad9e8;
+  line-height: 1.85;
+}
+
+/* trust strip */
+.trust-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 22px;
+  padding: 16px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius-m);
+}
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: .88rem;
+  color: #a8c4d8;
+}
+.trust-item .icon {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  background: var(--teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .65rem;
+  color: #fff;
+  font-weight: 900;
+}
+
+/* countdown ring */
+.countdown-wrap {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: rgba(232,90,44,.12);
+  border: 1px solid rgba(232,90,44,.30);
+  border-radius: var(--radius-m);
+}
+.countdown-ring {
+  flex-shrink: 0;
+  position: relative;
+  width: 54px; height: 54px;
+}
+.countdown-ring svg { transform: rotate(-90deg); }
+.ring-bg { stroke: rgba(232,90,44,.20); }
+.ring-fill {
+  stroke: var(--cta);
+  stroke-dasharray: 138.2; /* 2π × 22 */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+}
+.ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+.ring-days {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+}
+.ring-unit {
+  font-size: .55rem;
+  color: rgba(255,255,255,.7);
+  letter-spacing: .05em;
+}
+.countdown-text {
+  font-size: .88rem;
+  color: #d0dce8;
+}
+.countdown-text strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ════════════════════════════════════════
+   ██ PROBLEM SECTION
+════════════════════════════════════════ */
+.sec-problem { background: var(--bg1); }
+
+/* distorted stats block — the chaos grid */
+.chaos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 24px 0;
+}
+.chaos-card {
+  position: relative;
+  padding: 16px 14px;
+  border-radius: var(--radius-m);
+  background: #f8f0e8;
+  border: 1.5px solid #e8c898;
+  overflow: hidden;
+  /* JS will apply filter:url(#f-chaos) initially, then animate to 0 */
+}
+.chaos-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: #d09030;
+  border-radius: 4px 0 0 4px;
+}
+.chaos-num {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #a05010;
+  line-height: 1;
+}
+.chaos-label {
+  font-size: .78rem;
+  color: #7a5530;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* The highlight stat card — will "settle" and glow teal */
+.chaos-card.highlight {
+  background: #e8f4f0;
+  border-color: #8ecfbe;
+  grid-column: 1 / -1;
+}
+.chaos-card.highlight::before { background: var(--teal); }
+.chaos-card.highlight .chaos-num { color: var(--teal2); }
+.chaos-card.highlight .chaos-label { color: #2a5a4a; }
+
+/* pain list */
+.pain-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+.pain-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: .93rem;
+  line-height: 1.7;
+  padding: 12px 14px;
+  background: var(--bg0);
+  border-radius: var(--radius-s);
+  border-left: 3px solid #c0c8d0;
+}
+.pain-list li .ico {
+  flex-shrink: 0;
+  font-size: 1rem;
+  margin-top: 2px;
+}
+
+.alert-box {
+  background: #fff4e6;
+  border: 1.5px solid #f0a040;
+  border-radius: var(--radius-m);
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  font-size: .93rem;
+  font-weight: 700;
+  color: #8a4a10;
+}
+.alert-box .ico { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+
+.cite {
+  font-size: .72rem;
+  color: var(--muted);
+  margin-top: 14px;
+  line-height: 1.6;
+}
+
+/* ════════════════════════════════════════
+   ██ SOLUTION SECTION
+════════════════════════════════════════ */
+.sec-solution { background: var(--bg0); }
+
+/* 3-step process */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 24px 0;
+  position: relative;
+}
+.steps::before {
+  content: "";
+  position: absolute;
+  left: 20px; top: 28px; bottom: 28px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--teal), var(--teal2));
+  border-radius: 2px;
+}
+.step {
+  display: flex;
+  gap: 16px;
+  padding: 18px 0;
+  position: relative;
+}
+.step-num {
+  flex-shrink: 0;
+  width: 42px; height: 42px;
+  background: var(--teal);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1rem;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(26,127,102,.30);
+}
+.step-body {}
+.step-title {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--teal2);
+  margin-bottom: 4px;
+}
+.step-desc {
+  font-size: .88rem;
+  color: var(--sub);
+  line-height: 1.7;
+}
+
+/* comparison table */
+.compare-wrap {
+  margin: 28px 0;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+  box-shadow: 0 4px 20px rgba(0,0,0,.06);
+}
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .84rem;
+}
+.compare-table th, .compare-table td {
+  padding: 11px 10px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.5;
+  vertical-align: middle;
+}
+.compare-table th {
+  background: var(--navy);
+  color: #fff;
+  font-weight: 700;
+  font-size: .8rem;
+  letter-spacing: .04em;
+}
+.compare-table th:first-child {
+  text-align: left;
+}
+.compare-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+  font-size: .82rem;
+  color: var(--sub);
+  background: var(--bg0);
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table .col-ours {
+  background: #e8f8f2;
+  font-weight: 700;
+  color: var(--teal2);
+}
+.compare-table .col-ours th {
+  background: var(--teal);
+}
+.mark-o { color: var(--teal2); font-weight: 900; }
+.mark-x { color: #b04040; }
+.mark-tri { color: #c08020; }
+
+/* ════════════════════════════════════════
+   ██ EVIDENCE SECTION
+════════════════════════════════════════ */
+.sec-evidence { background: var(--bg1); }
+
+.honest-box {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4f0 100%);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-l);
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.honest-box::before {
+  content: "正直";
+  position: absolute;
+  right: 16px; top: 14px;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  color: var(--teal);
+  background: rgba(26,127,102,.10);
+  border: 1px solid rgba(26,127,102,.20);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.honest-h {
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: var(--navy);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.honest-body {
+  font-size: .9rem;
+  color: var(--sub);
+  line-height: 1.8;
+}
+.honest-body strong { color: var(--ink); }
+
+.proof-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+.proof-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: .92rem;
+  line-height: 1.7;
+}
+.proof-list .pico {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  background: var(--teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 900;
+  margin-top: 1px;
+}
+
+/* ════════════════════════════════════════
+   ██ OFFER SECTION
+════════════════════════════════════════ */
+.sec-offer { background: var(--bg0); }
+
+.price-card {
+  background: var(--bg1);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,.07);
+}
+.price-head {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+  padding: 20px;
+  color: #fff;
+  text-align: center;
+}
+.price-label {
+  font-size: .78rem;
+  letter-spacing: .1em;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 6px;
+}
+.price-big {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--gold);
+}
+.price-big span { font-size: 1rem; font-weight: 500; }
+.price-note { font-size: .78rem; color: rgba(255,255,255,.65); margin-top: 6px; }
+.price-body { padding: 20px; }
+.include-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+.include-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: .9rem;
+  line-height: 1.6;
+}
+.include-list .chk {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  background: var(--teal);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 900;
+  margin-top: 2px;
+}
+
+.anchor-tag {
+  background: var(--warn);
+  border: 1px solid #e8c060;
+  border-radius: var(--radius-s);
+  padding: 12px 14px;
+  font-size: .85rem;
+  color: #7a5010;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+.anchor-tag strong { font-weight: 700; }
+
+.scarcity-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff0ee;
+  border: 1px solid rgba(232,90,44,.25);
+  border-radius: var(--radius-s);
+  padding: 12px 14px;
+  font-size: .84rem;
+  color: #8a3020;
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+.scarcity-note .ico { flex-shrink: 0; font-size: .9rem; }
+
+/* ════════════════════════════════════════
+   ██ FAQ SECTION
+════════════════════════════════════════ */
+.sec-faq { background: var(--bg1); }
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+.faq-item {
+  background: var(--bg0);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.faq-q {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.6;
+  transition: background .15s;
+}
+.faq-q:hover { background: #edf2f6; }
+.faq-q .q-ico {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .78rem;
+  font-weight: 900;
+  margin-top: 1px;
+}
+.faq-q .arrow {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: .7rem;
+  color: var(--muted);
+  transition: transform .25s;
+  margin-top: 3px;
+}
+.faq-q[aria-expanded="true"] .arrow { transform: rotate(180deg); }
+
+.faq-a {
+  display: none;
+  padding: 0 16px 16px 50px;
+  font-size: .88rem;
+  color: var(--sub);
+  line-height: 1.8;
+}
+.faq-a.open { display: block; }
+.faq-a .a-ico {
+  display: inline-block;
+  margin-right: 4px;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+/* ════════════════════════════════════════
+   ██ FINAL CTA SECTION
+════════════════════════════════════════ */
+.sec-final {
+  background: linear-gradient(160deg, var(--navy) 0%, #0a1e30 100%);
+  color: #fff;
+  padding: 56px 0;
+  position: relative;
+  overflow: hidden;
+}
+.sec-final::before {
+  content: "";
+  position: absolute;
+  right: -100px; bottom: -100px;
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(26,127,102,.20) 0%, transparent 60%);
+  pointer-events: none;
+}
+.final-eyebrow {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.final-h2 {
+  font-size: clamp(1.3rem, 4.2vw, 1.8rem);
+  font-weight: 900;
+  line-height: 1.55;
+  margin-bottom: 18px;
+  color: #fff;
+}
+.final-h2 em { color: var(--gold); font-style: normal; }
+.final-sub {
+  font-size: .93rem;
+  color: #a0bccc;
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.contact-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--radius-m);
+  padding: 13px 16px;
+  font-size: .92rem;
+  color: #c8dae8;
+  text-decoration: none;
+  transition: background .15s;
+}
+.contact-pill:hover { background: rgba(255,255,255,.14); }
+.contact-pill .cpico {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+.contact-pill .hours {
+  margin-left: auto;
+  font-size: .76rem;
+  color: rgba(255,255,255,.5);
+}
+
+.no-push-note {
+  text-align: center;
+  font-size: .78rem;
+  color: rgba(255,255,255,.5);
+  margin-top: 12px;
+}
+
+/* ════════════════════════════════════════
+   ██ FOOTER
+════════════════════════════════════════ */
+footer {
+  background: #080f16;
+  color: rgba(255,255,255,.5);
+  padding: 28px 0 20px;
+  font-size: .8rem;
+  line-height: 1.9;
+}
+footer strong {
+  color: rgba(255,255,255,.85);
+  font-weight: 700;
+}
+footer a {
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+}
+.footer-tagline {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  font-size: .76rem;
+  color: rgba(255,255,255,.35);
+}
+
+/* ════════════════════════════════════════
+   ██ SCROLL-DRIVEN DISTORT STAGE
+   The hero SVG text stage sits inside .hero
+   and is animated by JS/GSAP.
+════════════════════════════════════════ */
+
+/* ── reduced motion: disable everything ── */
+@media (prefers-reduced-motion: reduce) {
+  .ring-fill { transition: none; }
+  .hero-badge::before { animation: none; }
+  .btn { transition: none; }
+  /* mark distort-stage as static */
+  .hero-distort-stage * { filter: none !important; }
+}
+
+/* ════════════════════════════════════════
+   ██ DESKTOP EXPANSION
+════════════════════════════════════════ */
+@media (min-width: 700px) {
+  body { padding-bottom: 0; }
+  .sticky-bar { display: none; }
+
+  section { padding: 72px 0; }
+
+  .chaos-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .chaos-card.highlight {
+    grid-column: 3 / 5;
+  }
+
+  .trust-strip {
+    flex-direction: row;
+    gap: 18px;
+  }
+  .trust-item { flex: 1; }
+
+  .contact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ════════════════════════════════════════
+   ██ CHAOS-SETTLE ANIMATION UTILITY
+   Applied by JS: .is-settling -> .is-settled
+════════════════════════════════════════ */
+.chaos-card {
+  transition: transform .6s cubic-bezier(.22,.68,0,1.2);
+}
+.is-settling {
+  filter: url(#f-chaos);
+  transform: translate(var(--tx,0px), var(--ty,0px)) rotate(var(--rot,0deg));
+}
+.is-settled {
+  filter: none;
+  transform: none;
+}
+
+/* Stat number counter animation target */
+.chaos-num[data-target] { font-variant-numeric: tabular-nums; }
+
+/* ════════════════════════════════════════
+   ██ WOBBLE TITLE — SVG-based distort
+   The foreignObject + SVG filter approach
+   for the hero headline
+════════════════════════════════════════ */
+.distort-svg-wrap {
+  width: 100%;
+  position: relative;
+  margin-bottom: 0;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+  SVG FILTER DEFS (hidden, reusable)
+════════════════════════════════════════ -->
+<svg class="svg-filters" aria-hidden="true" focusable="false"
+     xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- f-chaos: turbulence for chaos cards (problem section) -->
+    <filter id="f-chaos" x="-5%" y="-5%" width="110%" height="110%"
+            color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise"
+                    baseFrequency="0.04 0.03"
+                    numOctaves="3"
+                    seed="7"
+                    result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise"
+                         scale="18"
+                         xChannelSelector="R" yChannelSelector="G"
+                         result="displaced"/>
+    </filter>
+
+    <!-- f-hero: turbulence for hero title morph -->
+    <filter id="f-hero" x="-8%" y="-20%" width="116%" height="140%"
+            color-interpolation-filters="sRGB">
+      <feTurbulence id="ft-hero"
+                    type="fractalNoise"
+                    baseFrequency="0.025 0.018"
+                    numOctaves="4"
+                    seed="3"
+                    result="noise"/>
+      <feDisplacementMap id="fdm-hero"
+                         in="SourceGraphic" in2="noise"
+                         scale="40"
+                         xChannelSelector="R" yChannelSelector="G"
+                         result="displaced"/>
+      <feBlend in="SourceGraphic" in2="displaced" mode="normal"
+               result="blended"/>
+    </filter>
+
+    <!-- f-section-morph: for divider paths -->
+    <filter id="f-section-morph" x="-2%" y="-40%" width="104%" height="180%">
+      <feTurbulence id="ft-morph"
+                    type="fractalNoise"
+                    baseFrequency="0.01 0.008"
+                    numOctaves="2"
+                    seed="12"
+                    result="noise"/>
+      <feDisplacementMap id="fdm-morph"
+                         in="SourceGraphic" in2="noise"
+                         scale="30"
+                         xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ════════════════════════════════════
+  STICKY MOBILE BAR
+════════════════════════════════════════ -->
+<nav class="sticky-bar" aria-label="クイックアクション">
+  <a href="tel:09074379549" class="sb-tel" aria-label="電話で相談">
+    📞 090-7437-9549
+  </a>
+  <a href="mailto:info@kouheikosehira.com" class="sb-form" aria-label="メールで無料相談">
+    無料相談する →
+  </a>
+</nav>
+
+<!-- ════════════════════════════════════
+  ██ HERO
+════════════════════════════════════════ -->
+<header class="hero" role="banner">
+  <div class="wrap">
+
+    <!-- urgency badge -->
+    <div class="hero-badge" role="note">
+      2026年7月施行・法定雇用率2.7%
+    </div>
+
+    <!-- ── distorted hero title (SVG foreignObject + filter) ── -->
+    <div class="distort-svg-wrap" id="hero-distort-wrap">
+      <!-- The SVG wraps an HTML foreignObject so the feTurbulence
+           displacement morphs actual Noto Sans text naturally.
+           JS will animate fdm-hero scale from 40 → 0 on load. -->
+      <svg id="hero-svg"
+           xmlns="http://www.w3.org/2000/svg"
+           xmlns:xhtml="http://www.w3.org/1999/xhtml"
+           width="100%" height="1"
+           style="overflow:visible; display:block;">
+        <g filter="url(#f-hero)">
+          <foreignObject id="hero-fo" x="0" y="0" width="100%" height="1"
+                         style="overflow:visible;">
+            <div xmlns="http://www.w3.org/1999/xhtml"
+                 id="hero-fo-inner"
+                 style="font-family:'Noto Sans JP',sans-serif;
+                        font-size:clamp(1.65rem,5.2vw,2.25rem);
+                        font-weight:900;
+                        line-height:1.55;
+                        letter-spacing:.01em;
+                        color:#ffffff;
+                        white-space:normal;
+                        overflow:visible;">
+              障害者雇用の記録と配慮、<br>
+              まだ<span style="color:#f5c842;">紙とExcel</span>のままですか？
+            </div>
+          </foreignObject>
+        </g>
+      </svg>
+      <!-- fallback for no-JS / reduced-motion -->
+      <noscript>
+        <h1 class="hero-title-fallback">
+          障害者雇用の記録と配慮、<br>
+          まだ<span class="hl">紙とExcel</span>のままですか？
+        </h1>
+      </noscript>
+    </div>
+
+    <p class="hero-sub">
+      代行に頼らず<strong style="color:#fff;">"自社で回せる"</strong>記録の仕組みを。<br>
+      名古屋の小さなDX屋が<strong style="color:#fff;">1万円から</strong>構築してお渡しします。<br>
+      導入後も伴走します。
+    </p>
+
+    <!-- CTA -->
+    <a href="mailto:info@kouheikosehira.com" class="btn" aria-label="無料相談メールを送る">
+      無料で相談する
+      <small>返信は通常1営業日以内</small>
+    </a>
+    <a href="tel:09074379549" class="btn btn-tel" aria-label="電話で無料相談">
+      📞 090-7437-9549（平日9〜18時）
+    </a>
+
+    <!-- trust strip -->
+    <div class="trust-strip" aria-label="信頼ポイント">
+      <div class="trust-item">
+        <div class="icon" aria-hidden="true">✓</div>
+        名古屋・直接会える
+      </div>
+      <div class="trust-item">
+        <div class="icon" aria-hidden="true">✓</div>
+        買い切り・月額なし
+      </div>
+      <div class="trust-item">
+        <div class="icon" aria-hidden="true">✓</div>
+        導入後も伴走
+      </div>
+    </div>
+
+    <!-- countdown ring -->
+    <div class="countdown-wrap" aria-live="polite">
+      <div class="countdown-ring" aria-hidden="true">
+        <svg width="54" height="54" viewBox="0 0 54 54">
+          <circle class="ring-bg" cx="27" cy="27" r="22"
+                  fill="none" stroke-width="4"/>
+          <circle class="ring-fill" id="ring-fill-el"
+                  cx="27" cy="27" r="22"
+                  fill="none" stroke-width="4"
+                  stroke-linecap="round"/>
+        </svg>
+        <div class="ring-label">
+          <span class="ring-days" id="days-left">—</span>
+          <span class="ring-unit">日後</span>
+        </div>
+      </div>
+      <div class="countdown-text">
+        <strong>2026年7月1日</strong>まであと<br>
+        <strong id="days-left-text">—</strong>日。7月は待ってくれません。
+      </div>
+    </div>
+
+  </div>
+</hero>
+
+<!-- ════════════════════════════════════
+  LIQUID DIVIDER: hero → problem
+════════════════════════════════════════ -->
+<svg class="warp-divider" id="div-1"
+     viewBox="0 0 390 60" preserveAspectRatio="none"
+     aria-hidden="true" focusable="false"
+     style="background:var(--navy); display:block;">
+  <path d="M0,40 C80,0 200,70 390,20 L390,60 L0,60 Z"
+        fill="white"/>
+</svg>
+
+<!-- ════════════════════════════════════
+  ██ PROBLEM SECTION
+════════════════════════════════════════ -->
+<section class="sec-problem" aria-labelledby="h-problem">
+
+  <div class="wrap">
+    <div class="sec-label" aria-hidden="true">PROBLEM</div>
+    <h2 class="sec-h2" id="h-problem">
+      多くの中小企業が、<br>
+      記録管理に<span style="color:#a05010;">手を焼いています</span>
+    </h2>
+
+    <!-- chaos stat cards — will be distorted then settled by JS -->
+    <div class="chaos-grid" id="chaos-grid" role="list">
+      <div class="chaos-card" role="listitem"
+           data-tx="-3px" data-ty="2px" data-rot="-1.5deg">
+        <div class="chaos-num" data-target="37.3">—</div>
+        <div class="chaos-label">「業務の切り出しが<br>難しい」</div>
+      </div>
+      <div class="chaos-card" role="listitem"
+           data-tx="2px" data-ty="-2px" data-rot="1.2deg">
+        <div class="chaos-num" data-target="35.1">—</div>
+        <div class="chaos-label">「ノウハウが<br>不足」</div>
+      </div>
+      <div class="chaos-card" role="listitem"
+           data-tx="-2px" data-ty="3px" data-rot=".8deg">
+        <div class="chaos-num" data-target="28.3">—</div>
+        <div class="chaos-label">「専任担当の<br>余裕がない」</div>
+      </div>
+      <div class="chaos-card highlight" role="listitem"
+           data-tx="1px" data-ty="-1px" data-rot="-.5deg">
+        <div class="chaos-num" data-target="40.4">—</div>
+        <div class="chaos-label">
+          新基準の必要採用数を<strong>正確把握</strong>できている企業は<br>
+          わずか 40.4%だけ
+        </div>
+      </div>
+    </div>
+
+    <p class="cite">
+      ※ 出典：中小企業対象調査（ITmedia ビジネスオンライン 2026/6/2 報道）
+    </p>
+
+    <!-- pain list -->
+    <ul class="pain-list" aria-label="現場の痛み">
+      <li>
+        <span class="ico" aria-hidden="true">📋</span>
+        雇用カウント・勤怠・合理的配慮の記録を<strong>紙とExcelで二重管理</strong>、集計のたびに時間をとられる
+      </li>
+      <li>
+        <span class="ico" aria-hidden="true">🔒</span>
+        担当者しかわからない<strong>属人化</strong>。担当交代で引き継ぎが困難に
+      </li>
+      <li>
+        <span class="ico" aria-hidden="true">📊</span>
+        行政提出のたびに各書類を<strong>集計し直し</strong>、締め切り前に残業
+      </li>
+    </ul>
+
+    <div class="alert-box" role="alert">
+      <span class="ico" aria-hidden="true">⚠</span>
+      この状態で7月を迎えて、大丈夫ですか？
+    </div>
+  </div>
+</section>
+
+<!-- LIQUID DIVIDER: problem → solution -->
+<svg class="warp-divider" id="div-2"
+     viewBox="0 0 390 60" preserveAspectRatio="none"
+     aria-hidden="true" focusable="false"
+     style="background:white; display:block;">
+  <path d="M0,10 C120,60 280,0 390,40 L390,60 L0,60 Z"
+        fill="#f2f6f9"/>
+</svg>
+
+<!-- ════════════════════════════════════
+  ██ SOLUTION SECTION
+════════════════════════════════════════ -->
+<section class="sec-solution" aria-labelledby="h-solution">
+  <div class="wrap">
+    <div class="sec-label" aria-hidden="true">SOLUTION</div>
+    <h2 class="sec-h2" id="h-solution">
+      高い専門ソフトも月額費用も不要。<br>
+      <span style="color:var(--teal);">Google スプレッドシート</span>で動く<br>
+      御社専用の仕組みをお渡しします
+    </h2>
+
+    <div class="steps" aria-label="導入の3ステップ">
+      <div class="step">
+        <div class="step-num" aria-label="ステップ1">1</div>
+        <div class="step-body">
+          <div class="step-title">無料ヒアリング＋制度整理</div>
+          <div class="step-desc">雇用状況・現状の記録方法・必要な帳票をヒアリング。法定雇用率の確認から一緒に行います。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" aria-label="ステップ2">2</div>
+        <div class="step-body">
+          <div class="step-title">スプレッドシート＋フォームを構築・納品</div>
+          <div class="step-desc">雇用カウント・勤怠・合理的配慮を<strong style="color:var(--ink);">"入力1か所"</strong>にまとめる仕組みを御社専用で構築。かんたん入力フォームも同梱。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" aria-label="ステップ3">3</div>
+        <div class="step-body">
+          <div class="step-title">使い方レクチャー＋導入後伴走</div>
+          <div class="step-desc">実際に操作しながらレクチャー。疑問や制度変更があっても直接相談できる体制で伴走します。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- comparison table -->
+    <h3 style="font-size:1rem;font-weight:700;color:var(--sub);margin-bottom:12px;">
+      どう違う？ — 3つの選択肢の比較
+    </h3>
+    <div class="compare-wrap" role="region" aria-label="サービス比較表">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">比較項目</th>
+            <th scope="col">代行<small style="display:block;font-weight:400;opacity:.8;">(農園/サテライト)</small></th>
+            <th scope="col">月額クラウド</th>
+            <th scope="col" class="col-ours">当社<br>買い切り納品</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>毎月の費用</td>
+            <td><span class="mark-tri">△</span><br><small>管理費継続</small></td>
+            <td><span class="mark-x">✕</span><br><small>月額継続</small></td>
+            <td class="col-ours"><span class="mark-o">○</span><br><small>なし</small></td>
+          </tr>
+          <tr>
+            <td>記録の在りか</td>
+            <td><span class="mark-x">✕</span><br><small>社外</small></td>
+            <td><span class="mark-tri">△</span><br><small>クラウド上</small></td>
+            <td class="col-ours"><span class="mark-o">○</span><br><small>自社の手元</small></td>
+          </tr>
+          <tr>
+            <td>自社で回せる</td>
+            <td><span class="mark-x">✕</span></td>
+            <td><span class="mark-tri">△</span></td>
+            <td class="col-ours"><span class="mark-o">○</span></td>
+          </tr>
+          <tr>
+            <td>導入後の相談</td>
+            <td><span class="mark-tri">△</span></td>
+            <td><span class="mark-x">✕</span><br><small>問合せのみ</small></td>
+            <td class="col-ours"><span class="mark-o">○</span><br><small>直接伴走</small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- mid CTA -->
+    <a href="mailto:info@kouheikosehira.com" class="btn" style="margin-top:8px;">
+      無料で相談する
+      <small>見積もりも相談もすべて無料です</small>
+    </a>
+    <p class="cta-note">しつこい営業はしません</p>
+  </div>
+</section>
+
+<!-- LIQUID DIVIDER: solution → evidence -->
+<svg class="warp-divider" id="div-3"
+     viewBox="0 0 390 60" preserveAspectRatio="none"
+     aria-hidden="true" focusable="false"
+     style="background:#f2f6f9; display:block;">
+  <path d="M0,30 C100,60 250,0 390,35 L390,60 L0,60 Z"
+        fill="white"/>
+</svg>
+
+<!-- ════════════════════════════════════
+  ██ EVIDENCE SECTION
+════════════════════════════════════════ -->
+<section class="sec-evidence" aria-labelledby="h-evidence">
+  <div class="wrap">
+    <div class="sec-label" aria-hidden="true">EVIDENCE</div>
+    <h2 class="sec-h2" id="h-evidence">
+      なぜ、小さなDX屋に<br>頼めるのか
+    </h2>
+
+    <ul class="proof-list">
+      <li>
+        <div class="pico" aria-hidden="true">📍</div>
+        <div>
+          <strong>名古屋拠点・直接会える。</strong>HP・PC業務・アプリ制作の中小企業・個人事業向けDXを名古屋で支援。遠隔はオンライン対応可。
+        </div>
+      </li>
+      <li>
+        <div class="pico" aria-hidden="true">📌</div>
+        <div>
+          <strong>現場に合わせて作る。</strong>テンプレ横展開ではなく、御社の業種・規模・運用フローに合う形で構築します。
+        </div>
+      </li>
+      <li>
+        <div class="pico" aria-hidden="true">📎</div>
+        <div>
+          <strong>一次情報に基づく正確な制度案内。</strong>厚生労働省などの公式資料を出典として障害者雇用制度を正確にご案内します。
+        </div>
+      </li>
+      <li>
+        <div class="pico" aria-hidden="true">🤝</div>
+        <div>
+          <strong>納品後も伴走。</strong>導入して終わりではなく、運用上の疑問や制度変更にも引き続き対応します。
+        </div>
+      </li>
+    </ul>
+
+    <!-- honest box -->
+    <div class="honest-box" role="note" aria-label="正直なご説明">
+      <div class="honest-h">
+        「障害者雇用の記録支援は、新しいサービスです」
+      </div>
+      <div class="honest-body">
+        実績の<strong>"数"はまだありません</strong>。だからこそ、最初の数社には特に時間をかけて、御社に合う形を一緒に作ります。新サービスを最初に使っていただく方には、その分だけ丁寧に向き合います。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIQUID DIVIDER: evidence → offer -->
+<svg class="warp-divider" id="div-4"
+     viewBox="0 0 390 60" preserveAspectRatio="none"
+     aria-hidden="true" focusable="false"
+     style="background:white; display:block;">
+  <path d="M0,20 C150,65 280,5 390,30 L390,60 L0,60 Z"
+        fill="#f2f6f9"/>
+</svg>
+
+<!-- ════════════════════════════════════
+  ██ OFFER SECTION
+════════════════════════════════════════ -->
+<section class="sec-offer" aria-labelledby="h-offer">
+  <div class="wrap">
+    <div class="sec-label" aria-hidden="true">OFFER</div>
+    <h2 class="sec-h2" id="h-offer">
+      テンプレ納品プラン
+    </h2>
+
+    <div class="price-card">
+      <div class="price-head">
+        <div class="price-label">初期費用のみ・月額なし</div>
+        <div class="price-big">
+          <span>¥</span>10,000<span>〜</span>
+        </div>
+        <div class="price-note">会社規模・記録項目数により変動 / 見積もり無料</div>
+      </div>
+      <div class="price-body">
+        <ul class="include-list" aria-label="含まれる内容">
+          <li>
+            <div class="chk" aria-hidden="true">✓</div>
+            無料ヒアリング＋制度整理
+          </li>
+          <li>
+            <div class="chk" aria-hidden="true">✓</div>
+            御社専用スプレッドシート構築
+          </li>
+          <li>
+            <div class="chk" aria-hidden="true">✓</div>
+            かんたん入力フォーム作成
+          </li>
+          <li>
+            <div class="chk" aria-hidden="true">✓</div>
+            使い方レクチャー
+          </li>
+          <li>
+            <div class="chk" aria-hidden="true">✓</div>
+            納品後の初期サポート
+          </li>
+        </ul>
+
+        <div class="anchor-tag">
+          <strong>代行・クラウドは月額の継続費用がかかるのが一般的。</strong><br>
+          当社は買い切りで御社の資産になります。
+          月1万円のクラウドなら1年で12万円。当社は一度の費用で完結です。
+        </div>
+
+        <div class="scarcity-note">
+          <span class="ico" aria-hidden="true">⏰</span>
+          <div>
+            7月施行まで時間が限られています。
+            1社ずつ丁寧に対応するため、<strong>同時に受けられる数に限りがあります</strong>。
+          </div>
+        </div>
+
+        <a href="mailto:info@kouheikosehira.com" class="btn">
+          無料で相談・見積もりを依頼する
+          <small>フォームから送るだけ・しつこい営業なし</small>
+        </a>
+        <p class="cta-note">相談・見積もりは無料です</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIQUID DIVIDER: offer → faq -->
+<svg class="warp-divider" id="div-5"
+     viewBox="0 0 390 60" preserveAspectRatio="none"
+     aria-hidden="true" focusable="false"
+     style="background:#f2f6f9; display:block;">
+  <path d="M0,45 C80,10 300,60 390,15 L390,60 L0,60 Z"
+        fill="white"/>
+</svg>
+
+<!-- ════════════════════════════════════
+  ██ FAQ SECTION
+════════════════════════════════════════ -->
+<section class="sec-faq" aria-labelledby="h-faq">
+  <div class="wrap">
+    <div class="sec-label" aria-hidden="true">FAQ</div>
+    <h2 class="sec-h2" id="h-faq">よくある質問</h2>
+
+    <div class="faq-list" role="list">
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false"
+                aria-controls="faq-a1" id="faq-q1">
+          <span class="q-ico" aria-hidden="true">Q</span>
+          ITに詳しくなくても使えますか？
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+        <div class="faq-a" id="faq-a1" role="region"
+             aria-labelledby="faq-q1">
+          <span class="a-ico">A.</span>
+          はい。入力はフォームに沿って打ち込むだけの設計にします。レクチャーも込みですので、PC操作が苦手な方でも問題ありません。
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false"
+                aria-controls="faq-a2" id="faq-q2">
+          <span class="q-ico" aria-hidden="true">Q</span>
+          月額費用は本当にかかりませんか？
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+        <div class="faq-a" id="faq-a2" role="region"
+             aria-labelledby="faq-q2">
+          <span class="a-ico">A.</span>
+          かかりません。Google スプレッドシートまたは Excel 上で動く仕組みなので、ソフト代・月額費用は発生しません。初期構築費用のみです。
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false"
+                aria-controls="faq-a3" id="faq-q3">
+          <span class="q-ico" aria-hidden="true">Q</span>
+          代行との違いは何ですか？
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+        <div class="faq-a" id="faq-a3" role="region"
+             aria-labelledby="faq-q3">
+          <span class="a-ico">A.</span>
+          代行（農園・サテライト型）は雇用管理そのものを外部に委託するサービスです。当社は雇用も記録管理も<strong>自社の手元に残しながら</strong>、それを効率化する仕組みを構築します。ノウハウが社内に積み上がります。
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false"
+                aria-controls="faq-a4" id="faq-q4">
+          <span class="q-ico" aria-hidden="true">Q</span>
+          制度のことがよくわからないのですが
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+        <div class="faq-a" id="faq-a4" role="region"
+             aria-labelledby="faq-q4">
+          <span class="a-ico">A.</span>
+          無料相談で制度の確認から一緒に行います。厚生労働省などの一次情報に基づいて正確にご案内します。
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false"
+                aria-controls="faq-a5" id="faq-q5">
+          <span class="q-ico" aria-hidden="true">Q</span>
+          名古屋以外でも対応できますか？
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+        <div class="faq-a" id="faq-a5" role="region"
+             aria-labelledby="faq-q5">
+          <span class="a-ico">A.</span>
+          オンラインで全国対応しています。名古屋近辺であれば直接ご訪問も可能です。
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false"
+                aria-controls="faq-a6" id="faq-q6">
+          <span class="q-ico" aria-hidden="true">Q</span>
+          実績はありますか？
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+        <div class="faq-a" id="faq-a6" role="region"
+             aria-labelledby="faq-q6">
+          <span class="a-ico">A.</span>
+          障害者雇用の記録支援は新サービスで、実績の件数はまだありません。正直にお伝えします。その分、初期の数社には特に丁寧に対応します。
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false"
+                aria-controls="faq-a7" id="faq-q7">
+          <span class="q-ico" aria-hidden="true">Q</span>
+          本当に1万円から対応できますか？
+          <span class="arrow" aria-hidden="true">▼</span>
+        </button>
+        <div class="faq-a" id="faq-a7" role="region"
+             aria-labelledby="faq-q7">
+          <span class="a-ico">A.</span>
+          はい。会社規模・記録する項目数により変動しますが、1万円〜対応しています。無料相談時に費用を明示します。隠れた追加費用はありません。
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- LIQUID DIVIDER: faq → final CTA -->
+<svg class="warp-divider" id="div-6"
+     viewBox="0 0 390 60" preserveAspectRatio="none"
+     aria-hidden="true" focusable="false"
+     style="background:white; display:block;">
+  <path d="M0,15 C130,65 260,0 390,45 L390,60 L0,60 Z"
+        fill="#0d2b47"/>
+</svg>
+
+<!-- ════════════════════════════════════
+  ██ FINAL CTA SECTION
+════════════════════════════════════════ -->
+<section class="sec-final" aria-labelledby="h-final">
+  <div class="wrap">
+    <div class="final-eyebrow">LAST CALL</div>
+    <h2 class="final-h2" id="h-final">
+      <em>7月は待ってくれません。</em><br>
+      まずは無料相談で<br>
+      "今やるべきこと"を<br>
+      一緒に整理しませんか。
+    </h2>
+    <p class="final-sub">
+      相談だけでも歓迎です。現状を話していただければ、何から手をつければいいかを一緒に整理します。
+    </p>
+
+    <div class="contact-grid">
+      <a href="mailto:info@kouheikosehira.com" class="contact-pill btn"
+         style="text-align:left; display:flex;">
+        <span class="cpico" aria-hidden="true">✉</span>
+        <span>
+          メールで相談する<br>
+          <small style="font-weight:500;opacity:.8;">info@kouheikosehira.com</small>
+        </span>
+      </a>
+      <a href="tel:09074379549" class="contact-pill"
+         style="color:#fff; text-decoration:none;">
+        <span class="cpico" aria-hidden="true">📞</span>
+        <span>090-7437-9549</span>
+        <span class="hours">平日9〜18時</span>
+      </a>
+    </div>
+
+    <p class="no-push-note">
+      相談・見積もりは無料 / しつこい営業はしません
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+  ██ FOOTER
+════════════════════════════════════════ -->
+<footer role="contentinfo">
+  <div class="wrap">
+    <div>
+      <strong>小さな会社のDX屋さん</strong>　小齊平 恒平（こせひら こうへい）
+    </div>
+    <div>
+      <a href="mailto:info@kouheikosehira.com">info@kouheikosehira.com</a>　/
+      <a href="tel:09074379549">090-7437-9549</a>
+    </div>
+    <div class="footer-tagline">
+      ホームページ・PC業務・アプリ制作 | 小さな投資で、業績に直結する改善を。
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════
+  ██ JAVASCRIPT
+  1. Countdown ring
+  2. Hero title — SVG feTurbulence distort → settle (GSAP)
+  3. Problem stats — chaos cards settle + number counter
+  4. FAQ accordion
+  5. Divider warp morph on scroll
+  6. Reduced-motion check
+════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ── reduced-motion check ── */
+  const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── low-performance heuristic (no HW concurrency API / 4 or fewer cores) ── */
+  const lowPerf = typeof navigator.hardwareConcurrency !== 'undefined'
+    && navigator.hardwareConcurrency <= 4;
+
+  /* ════════════════════════════════
+     1. COUNTDOWN RING
+  ════════════════════════════════ */
+  (function initCountdown() {
+    const TARGET = new Date('2026-07-01T00:00:00+09:00');
+    const now = new Date();
+    const diff = TARGET - now;
+    const days = Math.max(0, Math.ceil(diff / 86400000));
+
+    // Update DOM
+    const daysEl = document.getElementById('days-left');
+    const daysText = document.getElementById('days-left-text');
+    if (daysEl) daysEl.textContent = days;
+    if (daysText) daysText.textContent = days;
+
+    // Animate ring fill (circumference = 2π×22 ≈ 138.2)
+    const ringEl = document.getElementById('ring-fill-el');
+    if (!ringEl) return;
+    const CIRC = 138.2;
+    const MAX_DAYS = 365; // reference maximum
+    const ratio = Math.min(days / MAX_DAYS, 1);
+    // offset = CIRC * (1 - ratio) → full circle when ratio=1, empty when 0
+    const offset = CIRC * (1 - ratio);
+
+    if (noMotion) {
+      ringEl.style.strokeDashoffset = offset;
+    } else {
+      // animate from full (0) to target offset
+      ringEl.style.strokeDashoffset = 0;
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          ringEl.style.strokeDashoffset = offset;
+        }, 600);
+      });
+    }
+  })();
+
+  /* ════════════════════════════════
+     2. HERO TITLE SVG DISTORT → SETTLE
+     We animate feDisplacementMap[scale] from 40 → 0
+     using GSAP if available, else CSS transition fallback.
+  ════════════════════════════════ */
+  function initHeroDistort() {
+    if (noMotion) return;
+
+    const fdm = document.getElementById('fdm-hero');
+    const ft = document.getElementById('ft-hero');
+    if (!fdm || !ft) return;
+
+    // Resize foreignObject height to match actual text height
+    const foInner = document.getElementById('hero-fo-inner');
+    const fo = document.getElementById('hero-fo');
+    const heroSvg = document.getElementById('hero-svg');
+
+    function syncFOHeight() {
+      if (!foInner || !fo || !heroSvg) return;
+      const h = foInner.offsetHeight;
+      fo.setAttribute('height', h);
+      heroSvg.setAttribute('height', h);
+    }
+    syncFOHeight();
+    window.addEventListener('resize', syncFOHeight);
+
+    // SVG animated attributes don't work via CSS transitions directly.
+    // We use GSAP's ticker or a manual rAF loop to update the scale attribute.
+    const DURATION = 1800; // ms
+    const DELAY = 400; // ms after page load
+    const startScale = lowPerf ? 20 : 40;
+    let startTime = null;
+    let rafId = null;
+
+    // Also animate baseFrequency for a paper-settling feel
+    const startBFX = 0.025, startBFY = 0.018;
+    const endBFX = 0, endBFY = 0;
+
+    function easeOutExpo(t) {
+      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    }
+
+    function tick(ts) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      const t = Math.min(elapsed / DURATION, 1);
+      const ease = easeOutExpo(t);
+
+      const scale = startScale * (1 - ease);
+      const bfx = startBFX * (1 - ease);
+      const bfy = startBFY * (1 - ease);
+
+      fdm.setAttribute('scale', scale.toFixed(3));
+      ft.setAttribute('baseFrequency', bfx.toFixed(4) + ' ' + bfy.toFixed(4));
+
+      if (t < 1) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        // Fully settled — remove filter for performance
+        const g = document.querySelector('#hero-svg g[filter]');
+        if (g) g.removeAttribute('filter');
+      }
+    }
+
+    setTimeout(() => {
+      rafId = requestAnimationFrame(tick);
+    }, DELAY);
+  }
+
+  /* ════════════════════════════════
+     3. PROBLEM STATS — CHAOS SETTLE + COUNTER
+     IntersectionObserver triggers:
+     - CSS class transition (translate/rotate → 0)
+     - feTurbulence displacement applied then removed
+     - number counter animation
+  ════════════════════════════════ */
+  function initChaosSettle() {
+    const grid = document.getElementById('chaos-grid');
+    if (!grid) return;
+
+    const cards = Array.from(grid.querySelectorAll('.chaos-card'));
+
+    // Apply initial chaos state
+    cards.forEach((card, i) => {
+      const tx = card.dataset.tx || '0px';
+      const ty = card.dataset.ty || '0px';
+      const rot = card.dataset.rot || '0deg';
+      card.style.setProperty('--tx', tx);
+      card.style.setProperty('--ty', ty);
+      card.style.setProperty('--rot', rot);
+
+      if (!noMotion) {
+        card.classList.add('is-settling');
+      }
+    });
+
+    // Counter animation
+    function animateCounter(el, target, duration) {
+      const startVal = 0;
+      const endVal = parseFloat(target);
+      let startTime = null;
+      function tick(ts) {
+        if (!startTime) startTime = ts;
+        const t = Math.min((ts - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        const val = startVal + (endVal - startVal) * ease;
+        el.textContent = val.toFixed(1) + '%';
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Observe and trigger settle
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+
+        cards.forEach((card, i) => {
+          setTimeout(() => {
+            card.classList.remove('is-settling');
+            card.classList.add('is-settled');
+
+            // number counter
+            const numEl = card.querySelector('.chaos-num[data-target]');
+            if (numEl && !noMotion) {
+              animateCounter(numEl, numEl.dataset.target, 900);
+            } else if (numEl) {
+              numEl.textContent = numEl.dataset.target + '%';
+            }
+          }, i * 120);
+        });
+
+        obs.disconnect();
+      });
+    }, { threshold: 0.25 });
+
+    obs.observe(grid);
+  }
+
+  /* ════════════════════════════════
+     4. FAQ ACCORDION
+  ════════════════════════════════ */
+  function initFAQ() {
+    const items = document.querySelectorAll('.faq-item');
+    items.forEach(item => {
+      const btn = item.querySelector('.faq-q');
+      const answer = item.querySelector('.faq-a');
+      if (!btn || !answer) return;
+
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+
+        // Close all
+        items.forEach(it => {
+          const b = it.querySelector('.faq-q');
+          const a = it.querySelector('.faq-a');
+          if (b) b.setAttribute('aria-expanded', 'false');
+          if (a) a.classList.remove('open');
+        });
+
+        // Toggle clicked
+        if (!expanded) {
+          btn.setAttribute('aria-expanded', 'true');
+          answer.classList.add('open');
+        }
+      });
+    });
+  }
+
+  /* ════════════════════════════════
+     5. SECTION DIVIDERS — LIQUID WARP ON SCROLL
+     Each SVG divider has a path that warps via
+     feDisplacementMap scale driven by scroll position.
+     We use a shared IO observer; when divider enters
+     view the filter scale eases to 0.
+  ════════════════════════════════ */
+  function initDividerMorph() {
+    if (noMotion || lowPerf) return;
+
+    const dividers = document.querySelectorAll('.warp-divider');
+    const fdmMorph = document.getElementById('fdm-morph');
+    const ftMorph = document.getElementById('ft-morph');
+    if (!fdmMorph || !ftMorph) return;
+
+    // We animate a shared displacement that affects all dividers at once
+    // using scroll-linked value (not IntersectionObserver here, but rAF scroll)
+    let lastY = window.scrollY;
+    let currentScale = 30;
+    let targetScale = 30;
+
+    function updateMorph() {
+      const y = window.scrollY;
+      const dy = Math.abs(y - lastY);
+      lastY = y;
+
+      // When scrolling fast → increase turbulence; at rest → settle to 0
+      targetScale = Math.min(dy * 0.8, 30);
+      currentScale += (targetScale - currentScale) * 0.12;
+
+      if (Math.abs(currentScale) > 0.05) {
+        fdmMorph.setAttribute('scale', currentScale.toFixed(2));
+        dividers.forEach(d => {
+          if (!d.style.filter || d.style.filter !== 'url(#f-section-morph)') {
+            // apply filter to the path element
+          }
+        });
+      }
+
+      requestAnimationFrame(updateMorph);
+    }
+
+    // Only run on desktop to save battery
+    if (window.innerWidth >= 700) {
+      requestAnimationFrame(updateMorph);
+    }
+  }
+
+  /* ════════════════════════════════
+     6. HERO-SVG HEIGHT SYNC (also for resize)
+     Already called inside initHeroDistort, but
+     ensure it runs even when noMotion.
+  ════════════════════════════════ */
+  function syncHeroSVGHeight() {
+    const foInner = document.getElementById('hero-fo-inner');
+    const fo = document.getElementById('hero-fo');
+    const heroSvg = document.getElementById('hero-svg');
+    if (!foInner || !fo || !heroSvg) return;
+
+    function sync() {
+      const h = foInner.offsetHeight;
+      if (h > 0) {
+        fo.setAttribute('height', h);
+        heroSvg.setAttribute('height', h);
+      }
+    }
+    sync();
+    window.addEventListener('resize', sync);
+
+    // Also sync after fonts load
+    if (document.fonts) {
+      document.fonts.ready.then(sync);
+    }
+  }
+
+  /* ════════════════════════════════
+     INIT
+  ════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    syncHeroSVGHeight();
+    initHeroDistort();
+    initChaosSettle();
+    initFAQ();
+    initDividerMorph();
+  });
+
+  // Also run hero distort after a paint if DOM already ready
+  if (document.readyState !== 'loading') {
+    syncHeroSVGHeight();
+    initHeroDistort();
+    initChaosSettle();
+    initFAQ();
+    initDividerMorph();
+  }
+
+})();
+</script>
+
+</body>
+</html>

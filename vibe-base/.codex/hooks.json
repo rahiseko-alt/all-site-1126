@@ -1,0 +1,85 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\pre-edit.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\hook-runner.mjs' --hook=area-gate -- node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\area-gate.mjs'",
+            "statusMessage": "運用エリアゲート検証中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\hook-runner.mjs' --hook=check-notebook-query -- node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\check-notebook-query.mjs'",
+            "statusMessage": "create-image: ベスプラ参照確認中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\hook-runner.mjs' --hook=pre-bash-destructive -- node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\pre-bash-destructive.mjs'",
+            "statusMessage": "破壊的コマンド検知中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\hook-runner.mjs' --hook=secret-write-gate -- node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\secret-write-gate.mjs'",
+            "statusMessage": "settings.local.json シークレット混入チェック中..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\post-bash.js'"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\post-write.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\hook-runner.mjs' --hook=rules-coverage-gate -- node 'C:\\Users\\user\\Desktop\\ClaudeCode\\vibe-base\\.codex\\hooks\\rules-coverage-gate.mjs'",
+            "statusMessage": "ルールカバレッジ検証中..."
+          }
+        ]
+      }
+    ]
+  }
+}

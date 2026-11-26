@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-03 — WEBデザイン手順化(DD)確定 + ブルーロックLPでフロー検証</title>
+<style>
+  body{font-family:'Segoe UI','Yu Gothic',sans-serif;max-width:940px;margin:0 auto;padding:24px;background:#0d0d0d;color:#e0e0e0;line-height:1.7}
+  h1{color:#fff;border-bottom:2px solid #333;padding-bottom:8px}
+  h2{color:#7eb8f7;margin-top:30px}
+  .alert-red{background:#3a0a0a;border-left:4px solid #e53935;padding:12px 16px;border-radius:4px;margin:16px 0}
+  .must{background:#1a2a1a;border:1px solid #66bb6a;padding:12px;border-radius:4px}
+  code{background:#1e1e1e;padding:2px 6px;border-radius:3px;font-size:13px}
+  table{border-collapse:collapse;width:100%;margin:10px 0}
+  th,td{border:1px solid #333;padding:7px 10px;text-align:left;font-size:14px;vertical-align:top}
+  th{background:#1a1a1a;color:#aaa}
+  .h{color:#ef5350;font-weight:bold}.m{color:#ffa726;font-weight:bold}.l{color:#66bb6a}
+  ol li,ul li{margin:4px 0}
+</style>
+</head>
+<body>
+<h1>📋 Check-out — 2026-06-03</h1>
+<p>branch: <code>master</code></p>
+<div class="must"><strong>🔴 次セッション必読:</strong> 本ファイルを冒頭で Read。設計フローの正本 plan は <code>~/.claude/plans/humble-leaping-aho.md</code>（承認済・未実装）。</div>
+
+<div class="alert-red">
+<strong>⚠️ 最重要</strong><br>
+1. <strong>WEBデザインの作り方を「手順化フロー10ステップ（Double Diamond 骨格）」＋「設定（既存フレーム準拠）」として確定</strong>。実装計画は承認済だが <strong>未実装（Phase1-5 残）</strong>。正本 plan = <code>~/.claude/plans/humble-leaping-aho.md</code>。<br>
+2. <strong>金太郎飴の根本理解を確立</strong>：判定軸＝<strong>骨格パラダイム</strong>（技術/アニメ機構の有無では判定しない。"全幅ブロックを縦に通過するだけ"か"スクロール/操作/次元を再発明したか"）。機械ゲートは<strong>廃止</strong>→ judge（生成と評価の分離）＋マスター目で担保。<br>
+3. <code>products/trimmer-system/</code> の js 変更・png は<strong>他AI領域＝コミットしない</strong>（git status 残置）。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li><strong>/feed-check 実行</strong>（default 7経路・88取得→<strong>15保存</strong>＋分析レポート＋Gmail下書き）。検証で<strong>二重保存1件（nippon c15514）を検出・除去</strong>（dedup窓を固定値で切った過失）。</li>
+<li><strong>WEBデザインスキル確立を大幅前進</strong>：手順化フロー<strong>10ステップ確定（Double Diamond: Discover/Define/Develop/Deliver）</strong>＋ワイヤーフレーム/運用改善ループ取込。設定も全て既存フレームに準拠＝<strong>技術リスト=ThoughtWorks Tech Radar（Adopt/Trial/Assess/Hold）／ judge=LLM-as-a-Judge（参照あり＋golden setに失敗例必須＋rubricは"手順"で記述）／ 知識doc=Swipe File ／ サブ運用=subagent-ops</strong>。</li>
+<li><strong>金太郎飴ゲート廃止</strong>：機械では"良い"を合格判定できない→ judge＋マスター目に。<strong>ものさし実例</strong>＝ダメ:<code>index/pro-2/pro-3</code>・良:<code>pro-1</code>（<code>tmp/lp-shogaisha-koyo/</code>）。</li>
+<li><strong>design系スキル8件全廃＋旧hook3本撤去＋dangling整理の実装計画を承認</strong>（plan: humble-leaping-aho.md）。<strong>未実装</strong>。糞思想（旧"発明の階層"設計思想）は削除済。</li>
+<li><strong>DDフローを実走検証</strong>：ブルーロックLP（hero＋2ページ）を Step1→10 で制作 → <strong>judge PASS（非金太郎飴）</strong> → <code>portfolio/bluelock-lp/</code> に <strong>git追跡で格納（commit eabc2968）</strong>。実画像4枚はマスター提供・著作権表記あり。</li>
+</ol>
+
+<h2>B. 完了 commit</h2>
+<table><tr><th>hash</th><th>内容</th></tr>
+<tr><td><code>eabc2968</code></td><td>chore(portfolio): ブルーロックLP格納（DDフロー検証成果物・hero+2ページ）</td></tr>
+<tr><td>本Check-out</td><td>chore(memory): 引継ぎHTML + memory.md @参照/P1/P3 更新</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<ul>
+<li><code>portfolio/</code> を新設（保管用・開発しない・git追跡）。第1住人＝bluelock-lp。</li>
+<li>design ガバナンス載せ替え（PC表退役前提・全product hook伝播）は<strong>承認済・未着手</strong>。着手時は plan の Phase0（設定の決め切り）から。</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table><tr><th>優先</th><th>内容</th></tr>
+<tr><td><span class="h">H</span></td><td><strong>design ガバナンス載せ替えの実装</strong>（plan humble-leaping-aho.md）：手順化doc作成→rule改訂(lp-design.md/web-design.md)→旧hook3本撤去(measure/animation-gate系・propagate)→skill8本削除→全product反映→検証。順序固定・kill-switch常備</td></tr>
+<tr><td><span class="h">H</span></td><td>フリノバLP ヒーロー仕上げ（<code>tmp/fn-hero2/hero-pro-1/2/3.html</code> から採用1本選定）。design思想は <code>2026-06-02-checkout.html</code> ★参照</td></tr>
+<tr><td><span class="m">M</span></td><td>フリノバLP を <code>products/shift-ai/</code> 配下の企画として配置検討</td></tr>
+<tr><td><span class="l">L</span></td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否 / <code>tmp/</code> 掃除（<code>blender-4.5.10-windows-x64.zip</code> 399MB 等の大物）</td></tr>
+</table>
+
+<h2>E. 配備済 subagent/skill/hook</h2>
+<p>新規スキル/hook の追加なし。frontend-engineer-agent / general-purpose(judge・指紋抽出) / Explore を多用。</p>
+
+<h2>F. 本セッション生成物（tmp/・portfolio/）</h2>
+<ul>
+<li><code>portfolio/bluelock-lp/</code>（git追跡）— ブルーロックLP 完成版（hero+2ページ・assets 4枚）</li>
+<li><code>tmp/bluelock-lp/</code> — 同上の元（スクラッチ・ブラウザ閉後に削除可）</li>
+<li><code>tmp/lp-shogaisha-koyo/</code> — judge の<strong>ものさし実例</strong>（index/pro-1/pro-2/pro-3）＝今後の金太郎飴判定の正本基準</li>
+<li><code>~/.claude/plans/humble-leaping-aho.md</code> — design ガバナンス載せ替え plan（正本・承認済）</li>
+<li><code>~/.claude/projects/.../memory/project_web-design-skill-mission.md</code> — WEBデザインミッション仕様（#2 設計思想は0に削除済）</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本HTML を Read。</li>
+<li>plan <code>~/.claude/plans/humble-leaping-aho.md</code> を Read（フロー10ステップ＋設定＋実装Phase）。</li>
+<li>design ガバナンス載せ替え実装（Phase0 設定の決め切りから）or フリノバLP仕上げ、をマスター指示で選択。</li>
+<li>機械検証: シークレット 0件 PASS。コードレビュー: 該当 0件（doc/静的HTMLのみ）。</li>
+</ol>
+</body>
+</html>

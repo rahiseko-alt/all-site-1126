@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vest1 重複4件 レビュー</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #e4e6ed;
+    --text-dim: #8b8fa3;
+    --accent: #6c7bf7;
+    --accent-dim: rgba(108,123,247,0.12);
+    --green: #34d399;
+    --green-dim: rgba(52,211,153,0.12);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.12);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; line-height: 1.6; padding: 40px 24px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 32px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .card-num { background: var(--accent-dim); color: var(--accent); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+  .card-title { font-size: 1.05rem; font-weight: 600; flex: 1; min-width: 200px; }
+  .card-body { padding: 20px; }
+  .card-body h3 { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; margin-top: 16px; }
+  .card-body h3:first-child { margin-top: 0; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .compare-col { background: var(--surface2); border-radius: 8px; padding: 16px; }
+  .compare-col-title { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .compare-col-path { font-family: 'Fira Code', monospace; font-size: 0.72rem; color: var(--accent); margin-bottom: 10px; word-break: break-all; }
+  .compare-col ul { font-size: 0.82rem; color: var(--text-dim); padding-left: 16px; }
+  .compare-col ul li { margin-bottom: 4px; }
+  .compare-col .tag { display: inline-block; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+  .tag-md { background: rgba(52,211,153,0.15); color: var(--green); }
+  .tag-html { background: rgba(251,191,36,0.15); color: var(--amber); }
+  .tag-old { background: var(--red-dim); color: var(--red); }
+  .tag-current { background: var(--green-dim); color: var(--green); }
+  .tag-copy { background: rgba(108,123,247,0.15); color: var(--accent); }
+  .tag-origin { background: var(--green-dim); color: var(--green); }
+  .verdict { border-top: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .verdict-badge { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 6px; white-space: nowrap; }
+  .verdict-delete { background: var(--red-dim); color: var(--red); }
+  .verdict-keep { background: var(--green-dim); color: var(--green); }
+  .verdict-both { background: var(--amber-dim); color: var(--amber); }
+  .verdict-text { font-size: 0.85rem; color: var(--text-dim); }
+  .note { background: var(--surface2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 0.82rem; color: var(--text-dim); }
+  .summary-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  .summary-table th, .summary-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .summary-table th { color: var(--text-dim); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .action-list { list-style: none; padding: 0; margin-top: 12px; }
+  .action-list li { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-dim); }
+  .action-list li::before { content: "→"; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>vest1 重複4件 — 比較レビュー</h1>
+<p class="subtitle">同種のvest1候補が複数存在。どちらを正本にするか、または削除するかを判断する</p>
+
+<!-- #5 client-credentials -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#5</span>
+    <span class="card-title">クライアント納品メッセージ — md vs html</span>
+  </div>
+  <div class="card-body">
+    <h3>比較</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-md">md</span> テキスト版</div>
+        <div class="compare-col-path">docs/templates/client-credentials.md</div>
+        <ul>
+          <li>47行。プレーンテキスト</li>
+          <li>ココナラトーク・LINE等のテキストチャネルにコピペして送る用</li>
+          <li><code>{{変数}}</code> 方式で置換箇所を明示</li>
+          <li>値の取得方法テーブル付き</li>
+          <li>Aiueo固有の文言（「Aiueoモバイルオーダーシステム」）</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-html">html</span> 印刷版</div>
+        <div class="compare-col-path">docs/templates/client-credentials.html</div>
+        <ul>
+          <li>117行。印刷対応CSS付き</li>
+          <li>ブラウザで開いて直接編集（contenteditable）→ 印刷して紙で渡す用</li>
+          <li>Apple風デザイン。ステップUIと情報カード</li>
+          <li>@media print で印刷レイアウト最適化済み</li>
+          <li>Aiueo固有の文言（「Aiueo モバイルオーダーシステム」）</li>
+        </ul>
+      </div>
+    </div>
+    <h3>分析</h3>
+    <div class="note">
+      md版とhtml版は <strong>用途が違う</strong>。md=テキストチャネル送付用、html=印刷渡し用。重複ではなく、同じ情報の配信チャネル違い。<br>
+      両方ともAiueo固有の文言が入っているが、vest1（docs/standards/templates/）にコピー済みのものはmd版のみ。<br>
+      現状vest1にあるのはmd版のコピー。html版はvest1未登録。
+    </div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-both">推奨: 両方残す</span>
+    <span class="verdict-text">用途が異なる（テキスト送付 vs 印刷渡し）。vest1のmd版を汎用化済みなので、html版も汎用化してvest1に追加が理想。ただし急ぎではない</span>
+  </div>
+</div>
+
+<!-- #6 client-qr-guide -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#6</span>
+    <span class="card-title">QRコード発行ガイド — md vs html</span>
+  </div>
+  <div class="card-body">
+    <h3>比較</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-md">md</span> テキスト版</div>
+        <div class="compare-col-path">docs/templates/client-qr-guide.md</div>
+        <ul>
+          <li>49行。プレーンテキスト</li>
+          <li>テキストチャネルにコピペして送る用</li>
+          <li><code>{{変数}}</code> 方式</li>
+          <li>手順4ステップ+補足</li>
+          <li>Aiueo固有（Ordering/Kitchen/Cashier/Daddy）</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-html">html</span> 印刷版</div>
+        <div class="compare-col-path">docs/templates/client-qr-guide.html</div>
+        <ul>
+          <li>181行。印刷対応CSS付き</li>
+          <li>ブラウザで直接編集→印刷用</li>
+          <li>ロール一覧テーブル（色分けバッジ付き）</li>
+          <li>手順5ステップ+Tip+FAQ 3件</li>
+          <li>Aiueo固有（Ordering/Kitchen/Cashier/Daddy）</li>
+        </ul>
+      </div>
+    </div>
+    <h3>分析</h3>
+    <div class="note">
+      #5と同じパターン。md=テキスト送付用、html=印刷渡し用。用途違いなので重複ではない。<br>
+      ただし <strong>QRコード発行はAiueo固有機能</strong>（QRでロール認証する仕組み自体がAiueo特有）。他プロダクトでQRガイドが必要になるケースは限定的。<br>
+      vest1に置く意味は薄い。Aiueo固有品として <code>products/aiueo/</code> 配下に移す方が適切。
+    </div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-both">推奨: 両方残すが移動</span>
+    <span class="verdict-text">Aiueo固有品。docs/templates/ から products/aiueo/docs/ に移動して、vest1対応表からは除外が妥当</span>
+  </div>
+</div>
+
+<!-- #7 PC表v5旧提案版 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#7</span>
+    <span class="card-title">PC表テンプレート — 旧提案版 vs 現行版</span>
+  </div>
+  <div class="card-body">
+    <h3>比較</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-old">旧版</span></div>
+        <div class="compare-col-path">docs/pc-template-v5-proposal.html</div>
+        <ul>
+          <li>タイトル: 「PC表ひな形 v5 再設計案」</li>
+          <li>提案段階で止まっているファイル</li>
+          <li>現行版(v9.1)に完全に置き換わった</li>
+          <li>参照しているファイルはゼロ（grep確認済み）</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-current">現行版</span></div>
+        <div class="compare-col-path">docs/ops/pc-template.html</div>
+        <ul>
+          <li>PC表テンプレート v9.1</li>
+          <li>全プロダクトが派生元として使用中</li>
+          <li>vest1として docs/standards/templates/ にコピー済み</li>
+          <li>定期的にバージョンアップされている</li>
+        </ul>
+      </div>
+    </div>
+    <h3>分析</h3>
+    <div class="note">完全に旧版。v5提案は現行v9.1に置き換わっており、参照しているファイルもない。削除して問題なし。</div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-delete">推奨: 旧版を削除</span>
+    <span class="verdict-text">docs/pc-template-v5-proposal.html を削除。gitに履歴が残るので復元可能</span>
+  </div>
+</div>
+
+<!-- #8 pricing-guide -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#8</span>
+    <span class="card-title">料金設定ガイド — docs/ vs hearing-bot/</span>
+  </div>
+  <div class="card-body">
+    <h3>比較</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-origin">共有正本</span></div>
+        <div class="compare-col-path">docs/pricing-guide.md</div>
+        <ul>
+          <li>「全プロダクト共有資料」と明記</li>
+          <li>CLAUDE.md §3 参照資料テーブルに登録済み</li>
+          <li>出典: マスター提供 app_pricing_guide_v2.docx</li>
+          <li>hearing-botで初回適用と記載</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-copy">hearing-bot版</span></div>
+        <div class="compare-col-path">products/hearing-bot/pricing-guide.md</div>
+        <ul>
+          <li>冒頭に「共有版（正本）: docs/pricing-guide.md」と注記済み</li>
+          <li>内容は共有版と同一（差分なし）</li>
+          <li>hearing-bot CLAUDE.md から直接参照されている</li>
+          <li>元はここで作られ、後にdocs/に共有資産化された</li>
+        </ul>
+      </div>
+    </div>
+    <h3>分析</h3>
+    <div class="note">
+      hearing-bot版の冒頭に「共有版（正本）: docs/pricing-guide.md（本ファイルから共有資産化済み）」と書いてある。<br>
+      つまり <strong>共有資産化は完了しているが、元ファイルが残っている状態</strong>。内容は同一。<br>
+      hearing-bot CLAUDE.md が <code>pricing-guide.md</code> を直接参照しているので、削除する場合はCLAUDE.mdの参照パスを <code>../../docs/pricing-guide.md</code> に変更する必要あり。
+    </div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-delete">推奨: hearing-bot版を削除</span>
+    <span class="verdict-text">共有資産化済みの旧元ファイル。hearing-bot/CLAUDE.md の参照パスを docs/pricing-guide.md に変更し、hearing-bot版を削除</span>
+  </div>
+</div>
+
+<!-- サマリー -->
+<div class="card" style="margin-top: 36px;">
+  <div class="card-header">
+    <span class="card-title">判断サマリー + 実行アクション</span>
+  </div>
+  <table class="summary-table">
+    <thead>
+      <tr><th>#</th><th>名前</th><th>推奨</th><th>アクション</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">5</td>
+        <td>client-credentials md/html</td>
+        <td><span class="verdict-badge verdict-both" style="font-size:0.7rem">両方残す</span></td>
+        <td style="color:var(--text-dim)">用途違い（テキスト送付 vs 印刷）。現状維持</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">6</td>
+        <td>client-qr-guide md/html</td>
+        <td><span class="verdict-badge verdict-both" style="font-size:0.7rem">移動</span></td>
+        <td style="color:var(--text-dim)">Aiueo固有品。docs/templates/ → products/aiueo/docs/ へ移動。vest1から除外</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">7</td>
+        <td>PC表v5旧提案版</td>
+        <td><span class="verdict-badge verdict-delete" style="font-size:0.7rem">削除</span></td>
+        <td style="color:var(--text-dim)">現行v9.1に完全置換済み。参照ゼロ。削除</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">8</td>
+        <td>pricing-guide 2箇所</td>
+        <td><span class="verdict-badge verdict-delete" style="font-size:0.7rem">hearing-bot版を削除</span></td>
+        <td style="color:var(--text-dim)">共有資産化済みの元ファイル。CLAUDE.md参照パス変更→削除</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="padding: 20px;">
+    <h3 style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 12px;">承認後に実行するアクション</h3>
+    <ul class="action-list">
+      <li><strong>#6:</strong> git mv docs/templates/client-qr-guide.{md,html} → products/aiueo/docs/</li>
+      <li><strong>#6:</strong> vest1対応表(README.md)から #10 client-qr-guide を除外</li>
+      <li><strong>#7:</strong> git rm docs/pc-template-v5-proposal.html</li>
+      <li><strong>#8:</strong> hearing-bot/CLAUDE.md の pricing-guide.md 参照パスを ../../docs/pricing-guide.md に変更</li>
+      <li><strong>#8:</strong> git rm products/hearing-bot/pricing-guide.md</li>
+      <li><strong>全件:</strong> vest1-inventory.md の重複リストを更新（解決済みとマーク）</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

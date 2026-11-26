@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日記エディタ — 2026-04-13</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Hiragino Mincho ProN', 'Georgia', serif;
+  background: #fafaf8;
+  color: #1a1a1a;
+  line-height: 1.9;
+}
+.page {
+  max-width: 680px;
+  margin: 80px auto;
+  padding: 0 24px 120px;
+}
+.date {
+  font-size: .78rem;
+  color: #999;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+.title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -.5px;
+  margin-bottom: 48px;
+  line-height: 1.4;
+}
+
+/* ── About ── */
+.about-block { margin-bottom: 48px; }
+.diary-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  margin-bottom: 20px;
+  line-height: 1.3;
+}
+.about-lead {
+  font-size: .85rem;
+  color: #999;
+  font-family: 'Helvetica Neue', sans-serif;
+  margin-bottom: 20px;
+  letter-spacing: .3px;
+}
+.about-body {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  margin-bottom: 28px;
+}
+.about-purpose {
+  border-left: 3px solid #1a1a1a;
+  padding-left: 20px;
+}
+.purpose-label {
+  font-size: .8rem;
+  color: #888;
+  letter-spacing: 1px;
+  font-family: 'Helvetica Neue', sans-serif;
+  margin-bottom: 8px;
+}
+.about-purpose ol {
+  padding-left: 20px;
+  font-size: .95rem;
+  line-height: 2;
+  color: #333;
+}
+
+/* ── ブロック ── */
+.block {
+  position: relative;
+  margin-bottom: 4px;
+}
+.block:hover .add-btn { opacity: 1; }
+
+.block-content p {
+  font-size: 1.05rem;
+  padding: 6px 0 6px 32px;
+  min-height: 2em;
+}
+
+/* 追記済みの内容 */
+.annotation {
+  margin: 0 0 4px 32px;
+  padding: 10px 16px;
+  border-left: 3px solid #c9a96e;
+  background: #fffbf4;
+  font-size: .95rem;
+  color: #5a4a2a;
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+.annotation-label {
+  font-size: .7rem;
+  color: #c9a96e;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* + ボタン */
+.add-btn {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #bbb;
+  background: #fff;
+  color: #888;
+  font-size: 16px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s, border-color .15s, color .15s;
+  user-select: none;
+}
+.add-btn:hover { border-color: #555; color: #333; }
+
+/* 入力エリア */
+.input-area {
+  display: none;
+  margin: 4px 0 8px 32px;
+}
+.input-area.open { display: block; }
+.input-area textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 14px;
+  border: 1.5px solid #c9a96e;
+  border-radius: 6px;
+  background: #fffbf4;
+  font-size: .95rem;
+  font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  color: #1a1a1a;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+}
+.input-area textarea::placeholder { color: #bba980; }
+.input-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.btn-confirm {
+  padding: 5px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: .82rem;
+  cursor: pointer;
+  font-family: sans-serif;
+}
+.btn-cancel {
+  padding: 5px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #888;
+  font-size: .82rem;
+  cursor: pointer;
+  font-family: sans-serif;
+}
+
+/* ── 区切り ── */
+.divider {
+  border: none;
+  border-top: 1px solid #e8e6e0;
+  margin: 40px 0;
+}
+
+/* ── アクションバー ── */
+.action-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid #e8e6e0;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.btn-export {
+  padding: 8px 24px;
+  border: none;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: .85rem;
+  cursor: pointer;
+  font-family: sans-serif;
+  letter-spacing: .5px;
+}
+.btn-reset {
+  padding: 8px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #888;
+  font-size: .85rem;
+  cursor: pointer;
+  font-family: sans-serif;
+}
+
+/* コピー完了トースト */
+.toast {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #333;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: .82rem;
+  opacity: 0;
+  transition: opacity .2s, transform .2s;
+  pointer-events: none;
+  font-family: sans-serif;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="page" id="diary">
+
+  <!-- ABOUT -->
+  <div class="about-block">
+    <h1 class="diary-title">僕とClaudeCodeの開発日記</h1>
+    <p class="about-lead">この日記はClaudeCodeのログを基にしてClaudeが書き、僕が編集しています。</p>
+    <p class="about-body">非エンジニア、コードは読めない書けない僕はClaudeCodeを使って２か月で１７プロダクトを開発（？）した。<br><br>僕の目標は９月までに0→1を達成することだ。</p>
+    <div class="about-purpose">
+      <p class="purpose-label">この日記の目的は３つ</p>
+      <ol>
+        <li>自分の振り返り</li>
+        <li>僕と同じような非エンジニアの開発者の参考</li>
+        <li>将来、僕のサービスを購入しようか迷っている顧客に、僕の仕事ぶりを見てもらい判断材料</li>
+      </ol>
+    </div>
+  </div>
+  <hr class="divider">
+
+  <p class="date">2026 . 04 . 13</p>
+  <h2 class="title">悩んだ結果、出た答えがログ日記</h2>
+
+  <div class="block" data-id="1">
+    <div class="block-content">
+      <p>AIを使い始めて２ヶ月が経った。毎日のように何かを作り、失敗して、また作った。</p>
+    </div>
+    <button class="add-btn" title="追記する">+</button>
+    <div class="input-area"></div>
+  </div>
+
+  <div class="block" data-id="2">
+    <div class="block-content">
+      <p>そうやって毎日朝から晩までやり続けて、ふと思った。自分は成長しているのか？これは積み重ねになっているのか？本当にこの先にソロプレナーとしての自立はつながっているのか？正直それすらも分からない。</p>
+    </div>
+    <button class="add-btn" title="追記する">+</button>
+    <div class="input-area"></div>
+  </div>
+
+  <div class="block" data-id="3">
+    <div class="block-content">
+      <p>友人知人に実際に使ってもらえているサービスは５つ。評判が良い。製品として成立していることだと思っている。最初の１つ目のアプリは、送った友人を怒らせてしまった。そのころに比べれば、タダとはいえ人に喜んでもらえるアプリやサービスを作れているのだから、成長はしているだろう。</p>
+    </div>
+    <button class="add-btn" title="追記する">+</button>
+    <div class="input-area"></div>
+  </div>
+
+  <div class="block" data-id="4">
+    <div class="block-content">
+      <p>でも不安は確実にあって、その理由はハッキリしていた。「自分が何をしているのか、はっきりと分かっていない」。とはいえ今からエンジニアとして１から学ぶつもりにはなれない。AI開発の魅力を知ってしまったし、今後コードを書くこと自体の意味は急速に無くなると感じているからだ。現に僕はコードを１行も書かずに５人を喜ばせている。</p>
+    </div>
+    <button class="add-btn" title="追記する">+</button>
+    <div class="input-area"></div>
+  </div>
+
+  <div class="block" data-id="5">
+    <div class="block-content">
+      <p>でも不安は消えないので、数日悩んで気が付いた。ClaudeCodeのログには僕の毎日の記録が詳細に残っている。何を実装したのか、どんな判断ミスで手戻りが起こり、それはどの程度開発の後戻りになったのか、すべてが記録されている。これを日記にしていけば何かが積み上がっていくかもしれない。同じ悩みの人がいたら参考にもなるし、顧客に仕事ぶりを開示することにもなる。そう気づいて、日記をつけることにした。</p>
+    </div>
+    <button class="add-btn" title="追記する">+</button>
+    <div class="input-area"></div>
+  </div>
+
+  <div class="block" data-id="6">
+    <div class="block-content">
+      <p>ログを読むのは当然ClaudeCodeなので、僕は編集という立場で自分の思いを乗せていくスタイルにした。</p>
+    </div>
+    <button class="add-btn" title="追記する">+</button>
+    <div class="input-area"></div>
+  </div>
+
+</div>
+
+<div class="action-bar">
+  <button class="btn-export" onclick="exportText()">ブログ用テキストをコピー</button>
+  <button class="btn-reset" onclick="if(confirm('追記をすべてリセットしますか？'))resetAll()">リセット</button>
+</div>
+<div class="toast" id="toast">コピーしました</div>
+
+<script>
+// ストレージキー
+const STORAGE_KEY = 'diary-2026-04-13';
+
+// 保存・復元
+function save() {
+  const data = {};
+  document.querySelectorAll('.block').forEach(b => {
+    const id = b.dataset.id;
+    const ann = b.querySelector('.annotation');
+    if (ann) data[id] = ann.querySelector('.annotation-body').innerText;
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function load() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    Object.entries(data).forEach(([id, text]) => {
+      const block = document.querySelector(`.block[data-id="${id}"]`);
+      if (block && text) addAnnotation(block, text);
+    });
+  } catch(e) {}
+}
+
+function addAnnotation(block, text) {
+  const existing = block.querySelector('.annotation');
+  if (existing) existing.remove();
+  const ann = document.createElement('div');
+  ann.className = 'annotation';
+  ann.innerHTML = `<div class="annotation-label">MY NOTE</div><div class="annotation-body">${escHtml(text)}</div>`;
+  block.querySelector('.input-area').before(ann);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ブロックの初期化
+document.querySelectorAll('.block').forEach(block => {
+  const btn = block.querySelector('.add-btn');
+  const area = block.querySelector('.input-area');
+
+  function openInput() {
+    area.classList.add('open');
+    area.innerHTML = `
+      <textarea placeholder="ここに追記してください…"></textarea>
+      <div class="input-actions">
+        <button class="btn-confirm">追記する</button>
+        <button class="btn-cancel">キャンセル</button>
+      </div>`;
+    const ta = area.querySelector('textarea');
+    ta.focus();
+
+    // Enter(Shift+Enter で改行) で確定
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); confirm(); }
+      if (e.key === 'Escape') cancel();
+    });
+
+    area.querySelector('.btn-confirm').onclick = confirm;
+    area.querySelector('.btn-cancel').onclick = cancel;
+
+    function confirm() {
+      const text = ta.value.trim();
+      if (!text) { cancel(); return; }
+      addAnnotation(block, text);
+      area.classList.remove('open');
+      area.innerHTML = '';
+      save();
+    }
+    function cancel() {
+      area.classList.remove('open');
+      area.innerHTML = '';
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    if (area.classList.contains('open')) return;
+    openInput();
+  });
+
+  // 既存 annotation クリックで編集
+  block.addEventListener('click', e => {
+    if (e.target.closest('.annotation')) {
+      const body = e.target.closest('.annotation').querySelector('.annotation-body');
+      const currentText = body.innerText;
+      e.target.closest('.annotation').remove();
+      openInput();
+      setTimeout(() => {
+        const ta = area.querySelector('textarea');
+        if (ta) { ta.value = currentText; ta.focus(); }
+      }, 0);
+    }
+  });
+});
+
+// エクスポート
+function exportText() {
+  let out = `2026年4月13日\n記録を、自分の言葉にする日\n\n`;
+  document.querySelectorAll('.block').forEach(block => {
+    const p = block.querySelector('.block-content p');
+    if (p) out += p.innerText + '\n\n';
+    const ann = block.querySelector('.annotation-body');
+    if (ann) out += `【追記】\n${ann.innerText}\n\n`;
+  });
+  navigator.clipboard.writeText(out.trim()).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+function resetAll() {
+  document.querySelectorAll('.annotation').forEach(a => a.remove());
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+load();
+</script>
+</body>
+</html>

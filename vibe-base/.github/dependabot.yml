@@ -1,0 +1,49 @@
+# Dependabot 自動更新設定
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# 2026-07-05 4製品剥離: 本リポは製品を追跡しない（1フォルダ=1リポ・products/ は gitignore blanket）。
+# products/* の14エントリは対象ディレクトリ不在の死に設定となるため削除し、root のみに縮小。
+# 製品側の依存監視は各製品を GitHub 連携した時点でその製品リポに個別配置する。
+#
+# 設計方針:
+# - schedule: 週次（水曜 09:00 JST）— マスター可用時間に合わせて
+# - groups: minor/patch を 1 PR にまとめる（個人開発で運用負荷下げる）
+# - open-pull-requests-limit: 3（暴走防止）
+
+version: 2
+updates:
+  # vibe-base ルート
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "scope:root"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # GitHub Actions 自体のバージョン更新（root workflow・products とは無関係のため剥離後も維持）
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 1
+    labels:
+      - "dependencies"
+      - "scope:ci"
+    commit-message:
+      prefix: "chore(deps,ci)"

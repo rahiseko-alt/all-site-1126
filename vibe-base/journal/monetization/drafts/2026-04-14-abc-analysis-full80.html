@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ABC分析 カテゴリ230 — 80件完全版</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #666;
+    --border: #ddd;
+    --bg: #fafafa;
+    --bg-alt: #f4f4f4;
+    --accent: #2a5d84;
+    --a: #047857;
+    --b: #b45309;
+    --c: #64748b;
+    --lo: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.65;
+    font-size: 13px;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+  }
+  header { border-bottom: 2px solid var(--fg); padding-bottom: 12px; margin-bottom: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 12px; }
+  h2 {
+    font-size: 16px;
+    margin: 28px 0 10px;
+    padding: 6px 12px;
+    border-left: 5px solid var(--accent);
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 14px; margin: 18px 0 6px; color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; background: #fff; margin: 8px 0 16px; font-size: 12px; }
+  th, td { border: 1px solid var(--border); padding: 5px 8px; text-align: left; vertical-align: middle; }
+  th { background: var(--bg-alt); font-weight: 600; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.center { text-align: center; }
+
+  .group-a { background: #ecfdf5; }
+  .group-b { background: #fffbeb; }
+  .group-c { background: #f8fafc; }
+
+  .tag-a { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 10px; font-weight: 700; background: var(--a); color: #fff; }
+  .tag-b { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 10px; font-weight: 700; background: var(--b); color: #fff; }
+  .tag-c { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 10px; font-weight: 700; background: var(--c); color: #fff; }
+
+  .note { background: #fff; border-left: 3px solid var(--accent); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .warn { background: #fef9c3; border-left: 3px solid var(--b); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .critical { background: #fee2e2; border-left: 3px solid var(--lo); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .hi { background: #d1fae5; border-left: 3px solid var(--a); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .kpi {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+  }
+  .kpi .label { color: var(--muted); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .kpi .value { font-size: 18px; font-weight: 700; color: var(--fg); margin-top: 2px; }
+
+  .chart-wrap { background: #fff; border: 1px solid var(--border); padding: 16px; margin: 12px 0; }
+
+  .src { font-size: 11px; color: var(--muted); margin-top: 20px; padding-top: 10px; border-top: 1px dashed var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ABC分析 カテゴリ230「業務自動化・効率化支援」 — 80件完全版</h1>
+  <div class="subtitle">データ取得日: 2026-04-14 / 取得手段: WebFetch × 4ページ (ranking sort) / サンプル: 80件 / 有効: 79件 / 除外: 1件（評価0）</div>
+  <div class="subtitle">方法: ハンドブック §1 準拠（ただし実販売数ではなく評価数ベース）</div>
+</header>
+
+<!-- ========================================= -->
+<h2>§1. 要点（3行）</h2>
+<div class="hi">
+<strong>発見:</strong> A群14件（上位17.5%）が全評価の78.5%を占める強い寡占構造。<strong>A群の57%（14件中8件）が ¥3,000-¥4,999 帯</strong>。中央値 ¥3,500。<strong>「低単価 × 大量受注」が市場の勝ちパターン</strong>、高単価A群は tanaka_s_001 の1件のみ（例外）。
+</div>
+
+<!-- ========================================= -->
+<h2>§2. サマリ KPI</h2>
+<div class="kpi-grid">
+  <div class="kpi"><div class="label">総サンプル</div><div class="value">80 件</div></div>
+  <div class="kpi"><div class="label">有効（評価>0）</div><div class="value">79 件</div></div>
+  <div class="kpi"><div class="label">除外（評価0）</div><div class="value">1 件</div></div>
+  <div class="kpi"><div class="label">総評価数</div><div class="value">7,437</div></div>
+  <div class="kpi"><div class="label">A群 件数</div><div class="value" style="color:var(--a)">14 件</div></div>
+  <div class="kpi"><div class="label">A群 占有率</div><div class="value" style="color:var(--a)">78.5%</div></div>
+  <div class="kpi"><div class="label">B群 件数</div><div class="value" style="color:var(--b)">14 件</div></div>
+  <div class="kpi"><div class="label">C群 件数</div><div class="value" style="color:var(--c)">51 件</div></div>
+</div>
+
+<p class="note"><strong>ABC分類基準:</strong> 累計%≤80% = A群 / 80-95% = B群 / 95-100% = C群。評価数降順、ゼロ除外。</p>
+
+<!-- ========================================= -->
+<h2>§3. A群 詳細 14件</h2>
+
+<p>A群の全14件（累計78.5%まで）。色=緑、順位は評価数降順。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th class="center">順</th>
+      <th>タイトル（要約）</th>
+      <th>出品者</th>
+      <th class="num">価格</th>
+      <th class="num">評価数</th>
+      <th class="num">累計</th>
+      <th class="num">累計%</th>
+      <th class="center">元順位</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="group-a"><td class="center">1</td><td>EXCELマクロ</td><td>ohr</td><td class="num">¥6,000</td><td class="num">992</td><td class="num">992</td><td class="num">13.3%</td><td class="center">71</td></tr>
+    <tr class="group-a"><td class="center">2</td><td>GAS自動化</td><td>n00518</td><td class="num">¥3,000</td><td class="num">892</td><td class="num">1,884</td><td class="num">25.3%</td><td class="center">15</td></tr>
+    <tr class="group-a"><td class="center">3</td><td>自動化・自動購入ツール</td><td>tanaka_s_001</td><td class="num">¥45,000</td><td class="num">651</td><td class="num">2,535</td><td class="num">34.1%</td><td class="center">1</td></tr>
+    <tr class="group-a"><td class="center">4</td><td>Pythonスクレイピング</td><td>エイトさん</td><td class="num">¥10,000</td><td class="num">585</td><td class="num">3,120</td><td class="num">42.0%</td><td class="center">7</td></tr>
+    <tr class="group-a"><td class="center">5</td><td>Excel VBAなんでも承</td><td>いき育児中</td><td class="num">¥29,000</td><td class="num">439</td><td class="num">3,559</td><td class="num">47.9%</td><td class="center">2</td></tr>
+    <tr class="group-a"><td class="center">6</td><td>エクセル効率化全般</td><td>室内森林浴届け隊</td><td class="num">¥3,000</td><td class="num">412</td><td class="num">3,971</td><td class="num">53.4%</td><td class="center">9</td></tr>
+    <tr class="group-a"><td class="center">7</td><td>エクセル占いツール</td><td>占いプログラマDeguchi</td><td class="num">¥3,000</td><td class="num">350</td><td class="num">4,321</td><td class="num">58.1%</td><td class="center">6</td></tr>
+    <tr class="group-a"><td class="center">8</td><td>繰り返しExcel作業自動化</td><td>カスミVBA講師</td><td class="num">¥3,000</td><td class="num">314</td><td class="num">4,635</td><td class="num">62.3%</td><td class="center">11</td></tr>
+    <tr class="group-a"><td class="center">9</td><td>Excelツール作成</td><td>鶴屋一樹</td><td class="num">¥9,000</td><td class="num">226</td><td class="num">4,861</td><td class="num">65.4%</td><td class="center">35</td></tr>
+    <tr class="group-a"><td class="center">10</td><td>コード開示Excel VBA</td><td>キタノネコ</td><td class="num">¥15,000</td><td class="num">225</td><td class="num">5,086</td><td class="num">68.4%</td><td class="center">18</td></tr>
+    <tr class="group-a"><td class="center">11</td><td>エクセル作業代行</td><td>crane_design</td><td class="num">¥3,000</td><td class="num">220</td><td class="num">5,306</td><td class="num">71.3%</td><td class="center">70</td></tr>
+    <tr class="group-a"><td class="center">12</td><td>LINE予約システム</td><td>ayan</td><td class="num">¥3,000</td><td class="num">202</td><td class="num">5,508</td><td class="num">74.1%</td><td class="center">22</td></tr>
+    <tr class="group-a"><td class="center">13</td><td>Octoparse代行</td><td>ココ生活</td><td class="num">¥3,000</td><td class="num">169</td><td class="num">5,677</td><td class="num">76.3%</td><td class="center">27</td></tr>
+    <tr class="group-a"><td class="center">14</td><td>エクセルVBA</td><td>ochuchun</td><td class="num">¥4,000</td><td class="num">161</td><td class="num">5,838</td><td class="num">78.5%</td><td class="center">56</td></tr>
+  </tbody>
+</table>
+
+<!-- ========================================= -->
+<h2>§4. A群 価格統計</h2>
+
+<div class="kpi-grid">
+  <div class="kpi"><div class="label">件数</div><div class="value">14 件</div></div>
+  <div class="kpi"><div class="label">中央値</div><div class="value" style="color:var(--a)">¥3,500</div></div>
+  <div class="kpi"><div class="label">最小 〜 最大</div><div class="value">¥3,000 〜 ¥45,000</div></div>
+  <div class="kpi"><div class="label">最頻帯（5000円刻）</div><div class="value" style="color:var(--a)">¥0-4,999（8件）</div></div>
+</div>
+
+<h3>価格ビン分布（5,000円刻み）</h3>
+<table style="max-width:500px;">
+  <thead><tr><th>価格帯</th><th class="num">件数</th><th class="num">占有率</th></tr></thead>
+  <tbody>
+    <tr style="background:#d1fae5"><td><strong>¥3,000〜¥4,999</strong></td><td class="num"><strong>8</strong></td><td class="num"><strong>57.1%</strong></td></tr>
+    <tr><td>¥5,000〜¥9,999</td><td class="num">2</td><td class="num">14.3%</td></tr>
+    <tr><td>¥10,000〜¥14,999</td><td class="num">1</td><td class="num">7.1%</td></tr>
+    <tr><td>¥15,000〜¥19,999</td><td class="num">1</td><td class="num">7.1%</td></tr>
+    <tr><td>¥25,000〜¥29,999</td><td class="num">1</td><td class="num">7.1%</td></tr>
+    <tr><td>¥45,000〜¥49,999</td><td class="num">1</td><td class="num">7.1%</td></tr>
+  </tbody>
+</table>
+
+<!-- ========================================= -->
+<h2>§5. 可視化（価格×評価数 散布図）</h2>
+
+<div class="chart-wrap">
+  <canvas id="scatter" height="90"></canvas>
+</div>
+
+<!-- ========================================= -->
+<h2>§6. 発見事項と戦略的示唆</h2>
+
+<h3>発見1: 寡占構造は確実に存在</h3>
+<ul>
+  <li>A群14件（全体の17.5%）が評価総数の78.5%を占める</li>
+  <li>上位3件（ohr / n00518 / tanaka_s_001）だけで 34.1%</li>
+  <li>B群14件は16.1%、C群51件は5.4% → <strong>65件が合計21.5%でひしめき合っている</strong></li>
+  <li>マスターの仮説「上位寡占に食い込まないと芽も出ない」は <strong>データで裏付けられた</strong></li>
+</ul>
+
+<h3>発見2: A群は「低単価で大量受注」がメインパターン</h3>
+<ul>
+  <li>A群14件の <strong>中央値 ¥3,500</strong>・8件が ¥3,000-¥4,999 帯</li>
+  <li>¥3,000帯 A群: n00518, 室内森林浴, 占いプログラマDeguchi, カスミ, crane_design, ayan, ココ生活 <strong>の7件</strong></li>
+  <li>¥4,000〜¥9,000帯 A群: ohr(¥6k), 鶴屋(¥9k), ochuchun(¥4k) の3件</li>
+  <li>¥10,000以上のA群は <strong>4件のみ</strong>（エイトさん / いき育児中 / キタノネコ / tanaka_s_001）</li>
+</ul>
+
+<h3>発見3: 高単価A群は「特殊ポジション」</h3>
+<ul>
+  <li>tanaka_s_001 ¥45,000 = 自動購入ツール（競合ほぼ無し・法的グレー領域あり）</li>
+  <li>いき育児中 ¥29,000 = 「何でも承る」ブランド化されたプロ</li>
+  <li>エイトさん ¥10,000 = Pythonスクレイピング特化（カテゴリ内唯一のPython強豪）</li>
+  <li>キタノネコ ¥15,000 = VBAエキスパート認定（資格訴求）</li>
+  <li>→ いずれも <strong>簡単に真似できない要素</strong> を持つ</li>
+</ul>
+
+<h3>戦略的示唆（空白地帯分析）</h3>
+<div class="note">
+<strong>A群の価格帯別にすでに埋まっている軸:</strong>
+<ul>
+  <li><strong>¥3,000帯:</strong> 汎用Excel/GAS/Python自動化、スプレッドシート作業、LINE予約、Octoparse代行 → 飽和</li>
+  <li><strong>¥4,000-¥9,000帯:</strong> わずか3件。<strong>空白地帯の可能性あり</strong></li>
+  <li><strong>¥10,000-¥29,000帯:</strong> 特殊スキル訴求でA群入り（Pythonエキスパート / VBA資格 / ブランド）</li>
+  <li><strong>¥45,000帯:</strong> 自動購入ツール（グレー領域）独占</li>
+</ul>
+</div>
+
+<div class="warn">
+<strong>新規参入の現実:</strong>
+<ul>
+  <li><strong>¥3,000 で A群と真っ向勝負は不可能</strong>（レビュー169-992件の壁）</li>
+  <li><strong>¥4,000-¥9,000 の空白地帯</strong>で差別化軸を持つのが現実的</li>
+  <li>差別化軸候補: 業種特化（医療事務 / 美容室 / 保育園 / 建設業）/ 納期保証 / 返金保証 / 画面共有サポート / ¥4,000代で中身¥9,000相当 の逆張り</li>
+  <li>ABC分析は<strong>「何が埋まっているか」を教えてくれる</strong>が「何が埋まっていないか」は創造力の問題</li>
+</ul>
+</div>
+
+<!-- ========================================= -->
+<h2>§7. 全80件 raw data</h2>
+
+<p>全データ（評価数降順）。A/B/C 色分け。元順位列で元ランキングとの順位差を確認可能。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th class="center">#</th>
+      <th>タイトル（要約）</th>
+      <th>出品者</th>
+      <th class="num">価格</th>
+      <th class="num">評価</th>
+      <th class="num">累計%</th>
+      <th class="center">分類</th>
+      <th class="center">元順位</th>
+    </tr>
+  </thead>
+  <tbody id="rawtable"></tbody>
+</table>
+
+<!-- ========================================= -->
+<h2>§8. 次アクション（マスター判断）</h2>
+
+<p>この ABC分析は「評価数ベース」で80件全数を取得した正式版です。ハンドブック §1 の N=80件規定を満たしています。</p>
+
+<ol>
+  <li><strong>この分析結果を前提に戦略論に進む</strong> — A群特性が見えたので、「A研究→隙を突く」vs「A真似」の最終判定</li>
+  <li><strong>追加調査が必要</strong> — A群の文章構成・タイトル共通パターン・キャッチ訴求軸を深掘り</li>
+  <li><strong>別カテゴリも分析</strong> — カテゴリ231（プログラミング）・カテゴリ22（Web制作）等と比較</li>
+  <li><strong>MF飲食レポートの TOP5 採用判断へ進む</strong> — ABC分析の結論を踏まえて飲食案件を再評価</li>
+</ol>
+
+<p class="src">作成: vibe-base 司令塔 / 2026-04-14 Session 169 / データ: <code>tmp/abc-analysis-data.json</code></p>
+
+<script>
+// 全80件の全体データ（A群だけでなく全件）
+const rows = [
+  {pos:1,title:"EXCELマクロ",seller:"ohr",price:6000,reviews:992,pct:13.3,grp:"A",orig:71},
+  {pos:2,title:"GAS自動化",seller:"n00518",price:3000,reviews:892,pct:25.3,grp:"A",orig:15},
+  {pos:3,title:"自動化・自動購入ツール",seller:"tanaka_s_001",price:45000,reviews:651,pct:34.1,grp:"A",orig:1},
+  {pos:4,title:"Pythonスクレイピング",seller:"エイトさん",price:10000,reviews:585,pct:42.0,grp:"A",orig:7},
+  {pos:5,title:"Excel VBAなんでも承",seller:"いき育児中",price:29000,reviews:439,pct:47.9,grp:"A",orig:2},
+  {pos:6,title:"エクセル効率化全般",seller:"室内森林浴届け隊",price:3000,reviews:412,pct:53.4,grp:"A",orig:9},
+  {pos:7,title:"エクセル占いツール",seller:"占いプログラマDeguchi",price:3000,reviews:350,pct:58.1,grp:"A",orig:6},
+  {pos:8,title:"繰り返しExcel作業自動化",seller:"カスミVBA講師",price:3000,reviews:314,pct:62.3,grp:"A",orig:11},
+  {pos:9,title:"Excelツール作成",seller:"鶴屋一樹",price:9000,reviews:226,pct:65.4,grp:"A",orig:35},
+  {pos:10,title:"コード開示Excel VBA",seller:"キタノネコ",price:15000,reviews:225,pct:68.4,grp:"A",orig:18},
+  {pos:11,title:"エクセル作業代行",seller:"crane_design",price:3000,reviews:220,pct:71.3,grp:"A",orig:70},
+  {pos:12,title:"LINE予約システム",seller:"ayan",price:3000,reviews:202,pct:74.1,grp:"A",orig:22},
+  {pos:13,title:"Octoparse代行",seller:"ココ生活",price:3000,reviews:169,pct:76.3,grp:"A",orig:27},
+  {pos:14,title:"エクセルVBA",seller:"ochuchun",price:4000,reviews:161,pct:78.5,grp:"A",orig:56},
+  {pos:15,title:"ネットショップ自動化",seller:"ECエンジニアneger",price:50000,reviews:148,pct:80.4,grp:"B",orig:16},
+  {pos:16,title:"高品質データ収集",seller:"CHAPPY",price:8000,reviews:153,pct:82.5,grp:"B",orig:32},
+  {pos:17,title:"GAS作成",seller:"n_masao",price:3000,reviews:142,pct:84.4,grp:"B",orig:80},
+  {pos:18,title:"RPA相談",seller:"yousystem",price:75000,reviews:99,pct:85.8,grp:"B",orig:12},
+  {pos:19,title:"ハイエンドExcelツール",seller:"いき育児中",price:100000,reviews:97,pct:87.1,grp:"B",orig:10},
+  {pos:20,title:"API連携自動化",seller:"エイトさん",price:15000,reviews:86,pct:88.2,grp:"B",orig:24},
+  {pos:21,title:"自動予約ツール",seller:"tanaka_s_001",price:45000,reviews:78,pct:89.3,grp:"B",orig:13},
+  {pos:22,title:"Pythonスクレイピング",seller:"かずさん",price:3000,reviews:77,pct:90.3,grp:"B",orig:54},
+  {pos:23,title:"GAS業務自動化システム",seller:"エイトさん",price:5000,reviews:65,pct:91.2,grp:"B",orig:4},
+  {pos:24,title:"EXCELマクロ",seller:"Digital工房オノ",price:3000,reviews:55,pct:91.9,grp:"B",orig:63},
+  {pos:25,title:"フリマコピー出品",seller:"ゆうなぎ",price:30000,reviews:54,pct:92.6,grp:"B",orig:21},
+  {pos:26,title:"フリマサイト自動化",seller:"マクロマン",price:5000,reviews:53,pct:93.3,grp:"B",orig:60},
+  {pos:27,title:"PowerPlatform支援",seller:"mikihisa",price:10000,reviews:46,pct:93.9,grp:"B",orig:43},
+  {pos:28,title:"WEBスクレイピング",seller:"RPA_miyazaki",price:28000,reviews:41,pct:94.5,grp:"B",orig:31},
+  {pos:29,title:"Power Automate",seller:"越後龍之介",price:5500,reviews:36,pct:94.9,grp:"B",orig:67},
+  {pos:30,title:"スプシ作成代行",seller:"パンダPatagonia",price:3000,reviews:32,pct:95.4,grp:"C",orig:53},
+  {pos:31,title:"AutoCAD効率化",seller:"配管設計こう",price:5000,reviews:26,pct:95.8,grp:"C",orig:72},
+  {pos:32,title:"PowerPlatform支援",seller:"PowerDX",price:3000,reviews:24,pct:96.1,grp:"C",orig:30},
+  {pos:33,title:"フリマ新着監視",seller:"フージー",price:7000,reviews:20,pct:96.3,grp:"C",orig:37},
+  {pos:34,title:"ブラウザ操作API自動化",seller:"エイトさん",price:25000,reviews:19,pct:96.6,grp:"C",orig:5},
+  {pos:35,title:"Access台帳作成",seller:"jiseramu",price:8000,reviews:18,pct:96.8,grp:"C",orig:61},
+  {pos:36,title:"業務改善&アクセスアップ",seller:"AlbaniaWork",price:5000,reviews:17,pct:97.0,grp:"C",orig:8},
+  {pos:37,title:"X自動投稿API無料",seller:"夕凪",price:5000,reviews:17,pct:97.3,grp:"C",orig:20},
+  {pos:38,title:"シフト自動作成",seller:"とにとに",price:5000,reviews:17,pct:97.5,grp:"C",orig:38},
+  {pos:39,title:"EXCEL GAS相談",seller:"フィリアちゃんねる",price:3000,reviews:16,pct:97.7,grp:"C",orig:46},
+  {pos:40,title:"SNS定期投稿",seller:"ゆうなぎ",price:15000,reviews:16,pct:97.9,grp:"C",orig:47},
+  {pos:41,title:"Threads予約投稿",seller:"Moon_2424",price:5000,reviews:16,pct:98.1,grp:"C",orig:76},
+  {pos:42,title:"Python画像処理自動化",seller:"gえふ",price:18000,reviews:10,pct:98.2,grp:"C",orig:17},
+  {pos:43,title:"GAS スプレッドシート自動化",seller:"いき育児中",price:25000,reviews:9,pct:98.4,grp:"C",orig:3},
+  {pos:44,title:"GASツール作成",seller:"ひろあき",price:5000,reviews:8,pct:98.5,grp:"C",orig:23},
+  {pos:45,title:"RPA自動化ツール",seller:"SNchan",price:5000,reviews:7,pct:98.6,grp:"C",orig:74},
+  {pos:46,title:"Google AppSheet",seller:"blue202501",price:6000,reviews:6,pct:98.7,grp:"C",orig:19},
+  {pos:47,title:"保育シフト管理",seller:"Clearf Studio",price:5000,reviews:6,pct:98.8,grp:"C",orig:33},
+  {pos:48,title:"エクセルVBA現場仕様",seller:"海野ひろし",price:10000,reviews:6,pct:98.9,grp:"C",orig:41},
+  {pos:49,title:"Twitter自動投稿",seller:"monika",price:10000,reviews:6,pct:99.0,grp:"C",orig:44},
+  {pos:50,title:"Access課題サポート",seller:"kamedassou",price:9000,reviews:5,pct:99.1,grp:"C",orig:45},
+  {pos:51,title:"X Threads自動投稿",seller:"ゆはな",price:7000,reviews:5,pct:99.2,grp:"C",orig:51},
+  {pos:52,title:"GAS業務改善",seller:"鳥獣戯画",price:7000,reviews:5,pct:99.3,grp:"C",orig:55},
+  {pos:53,title:"メルカリ履歴抽出",seller:"Masaki",price:6000,reviews:5,pct:99.4,grp:"C",orig:59},
+  {pos:54,title:"製造販売在庫管理",seller:"SEタケ",price:6000,reviews:5,pct:99.4,grp:"C",orig:66},
+  {pos:55,title:"楽天ROOM自動投稿",seller:"owasoft",price:7000,reviews:4,pct:99.5,grp:"C",orig:42},
+  {pos:56,title:"ノーコード自動化",seller:"かずさん",price:6000,reviews:4,pct:99.6,grp:"C",orig:65},
+  {pos:57,title:"業務システム開発",seller:"ネットショップエンジニア",price:25000,reviews:3,pct:99.6,grp:"C",orig:28},
+  {pos:58,title:"Python GAS自動化",seller:"Tsubasa107",price:3000,reviews:3,pct:99.7,grp:"C",orig:29},
+  {pos:59,title:"チケット予約bot",seller:"SOTIA若林",price:35000,reviews:3,pct:99.7,grp:"C",orig:34},
+  {pos:60,title:"n8n業務効率UP",seller:"かずさん",price:10000,reviews:3,pct:99.8,grp:"C",orig:39},
+  {pos:61,title:"Excelマクロ自動化",seller:"永冨寛治",price:3000,reviews:3,pct:99.8,grp:"C",orig:58},
+  {pos:62,title:"給与計算Excel",seller:"coco_spade",price:5000,reviews:3,pct:99.9,grp:"C",orig:77},
+  {pos:63,title:"Pythonスクレイピング",seller:"いとシステムズ",price:6000,reviews:2,pct:99.9,grp:"C",orig:14},
+  {pos:64,title:"LINE WORKS通知",seller:"Kimihaya",price:15000,reviews:2,pct:99.9,grp:"C",orig:50},
+  {pos:65,title:"Excel GAS Python自動化",seller:"Giftation",price:25000,reviews:2,pct:100.0,grp:"C",orig:64},
+  {pos:66,title:"自動化ポイント相談",seller:"ヨハク",price:6000,reviews:2,pct:100.0,grp:"C",orig:69},
+  {pos:67,title:"HPチャットボット",seller:"星川システム",price:4000,reviews:2,pct:100.0,grp:"C",orig:78},
+  {pos:68,title:"業務効率化専用ツール",seller:"伊那葉",price:10000,reviews:1,pct:100.0,grp:"C",orig:25},
+  {pos:69,title:"Python現役エンジニア",seller:"きたえぞ",price:3000,reviews:1,pct:100.0,grp:"C",orig:36},
+  {pos:70,title:"GASスプレッドシート全般",seller:"キタノネコ",price:15000,reviews:1,pct:100.0,grp:"C",orig:40},
+  {pos:71,title:"Shopee出品自動化",seller:"TommyDev",price:30000,reviews:1,pct:100.0,grp:"C",orig:48},
+  {pos:72,title:"OutlookVBAメール",seller:"らくはた",price:3000,reviews:1,pct:100.0,grp:"C",orig:49},
+  {pos:73,title:"X運用自動化",seller:"さなね",price:10000,reviews:1,pct:100.0,grp:"C",orig:52},
+  {pos:74,title:"PowerPlatform業務フロー",seller:"issei",price:10000,reviews:1,pct:100.0,grp:"C",orig:57},
+  {pos:75,title:"Excel業務フォーマット",seller:"大手メーカーSCM",price:8000,reviews:1,pct:100.0,grp:"C",orig:62},
+  {pos:76,title:"不動産業務自動化",seller:"龍光和尚",price:300,reviews:1,pct:100.0,grp:"C",orig:68},
+  {pos:77,title:"ファイル名一括変更",seller:"カクシカ",price:3000,reviews:1,pct:100.0,grp:"C",orig:73},
+  {pos:78,title:"AppSheetアプリ",seller:"fujii0812",price:6000,reviews:1,pct:100.0,grp:"C",orig:75},
+  {pos:79,title:"VBA GAS自動化",seller:"Toma Works",price:5000,reviews:1,pct:100.0,grp:"C",orig:79},
+];
+
+const tbody = document.getElementById('rawtable');
+rows.forEach(r => {
+  const tr = document.createElement('tr');
+  tr.className = 'group-' + r.grp.toLowerCase();
+  const tagClass = 'tag-' + r.grp.toLowerCase();
+  tr.innerHTML = `<td class="center">${r.pos}</td><td>${r.title}</td><td>${r.seller}</td><td class="num">¥${r.price.toLocaleString()}</td><td class="num">${r.reviews}</td><td class="num">${r.pct.toFixed(1)}%</td><td class="center"><span class="${tagClass}">${r.grp}</span></td><td class="center">${r.orig}</td>`;
+  tbody.appendChild(tr);
+});
+
+// 散布図
+const scatterData = {
+  datasets: [
+    {
+      label: 'A群 (高寡占)',
+      data: rows.filter(r => r.grp === 'A').map(r => ({x: r.price, y: r.reviews, label: r.seller})),
+      backgroundColor: 'rgba(4, 120, 87, 0.7)',
+      borderColor: '#047857',
+      pointRadius: 8,
+    },
+    {
+      label: 'B群',
+      data: rows.filter(r => r.grp === 'B').map(r => ({x: r.price, y: r.reviews, label: r.seller})),
+      backgroundColor: 'rgba(180, 83, 9, 0.6)',
+      borderColor: '#b45309',
+      pointRadius: 6,
+    },
+    {
+      label: 'C群',
+      data: rows.filter(r => r.grp === 'C').map(r => ({x: r.price, y: r.reviews, label: r.seller})),
+      backgroundColor: 'rgba(100, 116, 139, 0.4)',
+      borderColor: '#64748b',
+      pointRadius: 4,
+    },
+  ]
+};
+new Chart(document.getElementById('scatter'), {
+  type: 'scatter',
+  data: scatterData,
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${ctx.raw.label}: ¥${ctx.raw.x.toLocaleString()} / 評価${ctx.raw.y}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: '価格 (円)' },
+        ticks: { callback: v => '¥' + v.toLocaleString() },
+        type: 'logarithmic',
+        min: 100,
+        max: 200000,
+      },
+      y: {
+        title: { display: true, text: '評価数 (件)' },
+        beginAtZero: true,
+      }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

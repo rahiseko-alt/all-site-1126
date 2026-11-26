@@ -1,0 +1,81 @@
+# Hook Integrity CI
+# Phase 3.3: hook ファイルの整合性検査を自動化。
+# fixture-test → production-check の sequential 実行で
+# dangling import / missing-registration / broken-rename を CI gate で block する。
+#
+# 設計方針:
+# - fixture-test: tests/fixtures/hook-integrity/ の4ケースを検証
+# - production-check: root + 全 product の .claude/settings.json を検査
+# - Node 20 (audit.yml と統一)
+# - workflow_dispatch で手動実行可
+
+name: Hook Integrity
+
+on:
+  pull_request:
+    paths:
+      - ".claude/hooks/**"
+      - ".claude/settings.json"
+      - "scripts/check-hook-integrity.mjs"
+      - "scripts/check-secret-patterns.mjs"
+      - "scripts/hook-integrity-manifest.json"
+      - "tests/fixtures/hook-integrity/**"
+      - "products/**/.claude/settings.json"
+  push:
+    branches:
+      - master
+    paths:
+      - ".claude/hooks/**"
+      - ".claude/settings.json"
+      - "scripts/check-hook-integrity.mjs"
+      - "scripts/check-secret-patterns.mjs"
+      - "scripts/hook-integrity-manifest.json"
+      - "tests/fixtures/hook-integrity/**"
+      - "products/**/.claude/settings.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fixture-test:
+    name: Fixture Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run fixture suite
+        run: node scripts/check-hook-integrity.mjs --fixture-suite tests/fixtures/hook-integrity
+
+  production-check:
+    name: Production Check
+    runs-on: ubuntu-latest
+    needs: fixture-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check root .claude
+        run: node scripts/check-hook-integrity.mjs
+
+      - name: Check each product .claude
+        shell: bash
+        run: |
+          # 1 階層 (products/*/) と 2 階層 (products/*/*/) の両方を検査
+          # target-dir は product root (auto-detect で .claude/ を解決)
+          for dir in products/*/ products/*/*/; do
+            if [ -f "$dir.claude/settings.json" ]; then
+              echo "::group::Checking $dir"
+              node scripts/check-hook-integrity.mjs --target-dir "$dir" || exit 1
+              echo "::endgroup::"
+            fi
+          done

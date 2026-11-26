@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3PF出品実態調査（ココナラ・ランサーズ・CW） — Research Bank</title>
+<style>
+:root{--bg:#0f1117;--s1:#1a1d27;--s2:#232733;--bd:#2d3140;--tx:#e4e6ed;--mu:#8b8fa3;--ac:#4f8cff;--gn:#36d399;--or:#f59e42;--rd:#ef4444;--pp:#a78bfa;--yl:#fbbf24}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',-apple-system,'Hiragino Kaku Gothic ProN',sans-serif;background:var(--bg);color:var(--tx);line-height:1.7}
+.hero{background:linear-gradient(135deg,#1a1d27,#0f1117 50%,#1a2744);border-bottom:1px solid var(--bd);padding:48px 40px 36px;text-align:center}
+.hero h1{font-size:1.9rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.hero h1 span{color:var(--ac)}
+.hero .sub{color:var(--mu);font-size:.92rem;margin-bottom:16px}
+.meta-bar{display:inline-flex;gap:20px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 24px;font-size:.82rem;color:var(--mu);flex-wrap:wrap;justify-content:center}
+.meta-bar strong{color:var(--tx)}
+.c{max-width:1200px;margin:0 auto;padding:32px 20px}
+.sec{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:28px;margin-bottom:22px}
+.sec h2{font-size:1.2rem;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--bd);display:flex;align-items:center;gap:8px}
+.sec h2 .n{background:var(--ac);color:#fff;font-size:.75rem;font-weight:700;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec h3{font-size:1rem;font-weight:600;margin:18px 0 8px;color:var(--ac)}
+.sec h4{font-size:.9rem;font-weight:600;margin:14px 0 6px;color:var(--or)}
+table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:.82rem}
+thead th{background:var(--s2);border:1px solid var(--bd);padding:8px 10px;text-align:left;font-weight:600;font-size:.78rem;color:var(--mu);letter-spacing:.03em;white-space:nowrap}
+tbody td{border:1px solid var(--bd);padding:7px 10px;vertical-align:top}
+tbody tr:hover{background:rgba(79,140,255,.04)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600}
+.tg{background:rgba(54,211,153,.15);color:var(--gn)}
+.tb{background:rgba(79,140,255,.15);color:var(--ac)}
+.to{background:rgba(245,158,66,.15);color:var(--or)}
+.tr{background:rgba(239,68,68,.15);color:var(--rd)}
+.tp{background:rgba(167,139,250,.15);color:var(--pp)}
+.ty{background:rgba(251,191,36,.15);color:var(--yl)}
+.al{border-radius:8px;padding:14px 18px;margin:14px 0;font-size:.86rem;border-left:4px solid}
+.al-b{background:rgba(79,140,255,.08);border-color:var(--ac)}
+.al-g{background:rgba(54,211,153,.08);border-color:var(--gn)}
+.al-o{background:rgba(245,158,66,.08);border-color:var(--or)}
+.al-r{background:rgba(239,68,68,.08);border-color:var(--rd)}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+.kp{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:16px;text-align:center}
+.kp .v{font-size:1.6rem;font-weight:800}
+.kp .l{font-size:.75rem;color:var(--mu);margin-top:4px}
+.rank-1{color:var(--yl);font-weight:700}
+.rank-2{color:#c0c0c0;font-weight:600}
+.rank-3{color:#cd7f32;font-weight:600}
+.highlight{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3)}
+@media(max-width:768px){body{font-size:.9rem}.hero{padding:24px 16px}.c{padding:16px 8px}table{font-size:.75rem}thead th,tbody td{padding:5px 6px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>3PF <span>出品実態調査</span></h1>
+  <p class="sub">ココナラ・ランサーズ・クラウドワークス — AIチャットボット/AI連携ツール開発カテゴリ</p>
+  <div class="meta-bar">
+    <span>調査日: <strong>2026-03-28</strong></span>
+    <span>調査軸: <strong>3本</strong>（PF別）</span>
+    <span>データソース: <strong>各PF実ページ+公式ヘルプ+プレスリリース</strong></span>
+    <span>タグ: <strong>platform, pricing, competitor</strong></span>
+    <span>関連: <strong>ai-concierge</strong></span>
+  </div>
+</div>
+
+<div class="c">
+
+<!-- ===== サマリー ===== -->
+<div class="sec">
+  <h2><span class="n">0</span>エグゼクティブサマリー</h2>
+
+  <div class="kr">
+    <div class="kp"><div class="v" style="color:var(--ac)">462件</div><div class="l">ココナラ AIチャットボット出品数</div></div>
+    <div class="kp"><div class="v" style="color:var(--gn)">26件+</div><div class="l">ランサーズ AI搭載Bot出品数</div></div>
+    <div class="kp"><div class="v" style="color:var(--or)">5,832件/年</div><div class="l">CW AI案件数(YoY 8.4倍)</div></div>
+    <div class="kp"><div class="v" style="color:var(--yl)">¥90,000</div><div class="l">買切×AI×LINE最多販売(96件)</div></div>
+  </div>
+
+  <div class="al al-r">
+    <strong>最重要発見:</strong> ランサーズ「みつばスタジオ」が買切×ChatGPT×LINE Bot×Web対応×編集機能付きで¥90,000、96件販売。<strong>AI Conciergeの直接競合が既に存在し、実績を持っている。</strong>出品Bの「該当競合不在」という前提は崩れた。
+  </div>
+
+  <div class="al al-o">
+    <strong>価格帯の実態:</strong> ココナラ=Dify勢¥5,000が最多販売(63件)。生成AI+LINE Botは¥20,000-50,000。ランサーズ=¥25,000-90,000。CW=発注者起点で¥50,000-200,000。<strong>出品B ¥20,000はココナラでは競争力あり、ランサーズでは最安圏。</strong>
+  </div>
+</div>
+
+<!-- ===== 1. ココナラ ===== -->
+<div class="sec">
+  <h2><span class="n">1</span>ココナラ — AIチャットボット制作（カテゴリ772）</h2>
+
+  <h3>カテゴリ概要</h3>
+  <div class="kr">
+    <div class="kp"><div class="v">462件</div><div class="l">総出品数</div></div>
+    <div class="kp"><div class="v">¥4,000〜¥75,000</div><div class="l">価格レンジ</div></div>
+    <div class="kp"><div class="v">¥15,000</div><div class="l">中央値（上位40件）</div></div>
+    <div class="kp"><div class="v">¥5,000</div><div class="l">最頻値（Dify系）</div></div>
+  </div>
+  <p style="font-size:.8rem;color:var(--mu)">出典: <a href="https://coconala.com/categories/772" style="color:var(--ac)">ココナラ AIチャットボット制作カテゴリ</a>（2026-03-28取得、おすすめ順上位40件分析）</p>
+
+  <h3>販売実績TOP10（実売件数順）</h3>
+  <table>
+    <thead><tr><th>#</th><th>タイトル</th><th>出品者</th><th>価格</th><th>実績</th><th>★</th><th>LINE</th><th>生成AI</th><th>技術</th></tr></thead>
+    <tbody>
+      <tr class="highlight"><td class="rank-1">1</td><td>DifyでAIチャットボット作ります</td><td>たま＠SE</td><td>¥5,000</td><td><strong>63件</strong></td><td>5.0</td><td>×</td><td>△</td><td>Dify</td></tr>
+      <tr class="highlight"><td class="rank-2">2</td><td>ChatGPTを用いたLINE Botを作成します</td><td>けうまる</td><td>¥50,000</td><td><strong>53件</strong></td><td>5.0</td><td>○</td><td>○</td><td>ChatGPT</td></tr>
+      <tr class="highlight"><td class="rank-3">3</td><td>最新モデルGPT-5でLINE Botを作成します</td><td>けうまる</td><td>¥75,000</td><td><strong>26件</strong></td><td>5.0</td><td>○</td><td>○</td><td>GPT-5</td></tr>
+      <tr><td>4</td><td>自前のデータを元に回答するChatボットを作ります</td><td>AI活用＠CAMBRITEC</td><td>¥4,000</td><td>22件</td><td>5.0</td><td>○</td><td>○</td><td>ChatGPT</td></tr>
+      <tr><td>5</td><td>DifyとMakeやGASでLINEbot作ります</td><td>たま＠SE</td><td>¥10,000</td><td>21件</td><td>5.0</td><td>○</td><td>△</td><td>Dify+GAS</td></tr>
+      <tr><td>6</td><td>オーダーメイドのAI LINEボットを構築します</td><td>なる◆生成AI</td><td>¥20,000</td><td>21件</td><td>5.0</td><td>○</td><td>○</td><td>AI活用</td></tr>
+      <tr><td>7</td><td>GPT×Chatwork！ボット作成します</td><td>ひろあき＠SSエンジニアリング</td><td>¥5,000</td><td>11件</td><td>4.9</td><td>×</td><td>○</td><td>ChatGPT</td></tr>
+      <tr><td>8</td><td>オーダーメイドのDifyチャットbot開発します</td><td>なる◆生成AI</td><td>¥5,000</td><td>9件</td><td>5.0</td><td>○</td><td>△</td><td>Dify/RAG</td></tr>
+      <tr><td>9</td><td>Dify組み込みします</td><td>DigtaRod</td><td>¥8,000</td><td>9件</td><td>5.0</td><td>×</td><td>△</td><td>Dify</td></tr>
+      <tr><td>10</td><td>AIChatBot開発します</td><td>AidxelSystems</td><td>¥10,000</td><td>7件</td><td>5.0</td><td>○</td><td>○</td><td>Gemini/Dify</td></tr>
+    </tbody>
+  </table>
+
+  <h3>価格帯分布（上位40件）</h3>
+  <table>
+    <thead><tr><th>価格帯</th><th>件数</th><th>割合</th><th>代表的な出品</th></tr></thead>
+    <tbody>
+      <tr><td>¥4,000〜¥5,000</td><td>11件</td><td>27.5%</td><td>Dify系/GPTs/簡易Bot</td></tr>
+      <tr><td>¥8,000〜¥10,000</td><td>5件</td><td>12.5%</td><td>Dify+LINE連携/GAS連携</td></tr>
+      <tr><td>¥15,000〜¥20,000</td><td>10件</td><td>25.0%</td><td>AI LINE Bot/台本作成AI/オーダーメイド</td></tr>
+      <tr><td>¥30,000</td><td>4件</td><td>10.0%</td><td>LINE問い合わせ自動化</td></tr>
+      <tr><td>¥50,000〜¥75,000</td><td>10件</td><td>25.0%</td><td>ChatGPT LINE Bot/企業向け/Dify高機能</td></tr>
+    </tbody>
+  </table>
+
+  <h4>売れているタイトルの共通パターン</h4>
+  <table>
+    <thead><tr><th>パターン</th><th>例</th><th>該当件数</th></tr></thead>
+    <tbody>
+      <tr><td>「〜作ります」「〜構築します」</td><td>DifyでAIチャットボット<strong>作ります</strong></td><td>30件+</td></tr>
+      <tr><td>具体AI名を冒頭に</td><td><strong>ChatGPT</strong>を用いたLINE Botを...</td><td>15件+</td></tr>
+      <tr><td>「LINE」を含む</td><td>LINEの問い合わせをAIに丸投げ...</td><td>20件+</td></tr>
+      <tr><td>ターゲット業種特化</td><td><strong>クリニック向け</strong>チャットボット...</td><td>5件+</td></tr>
+      <tr><td>「Dify」をブランドとして</td><td><strong>Dify</strong>でAIチャットボット作ります</td><td>8件+</td></tr>
+    </tbody>
+  </table>
+
+  <div class="al al-b">
+    <strong>ココナラの特徴:</strong> ①Dify系が最多販売だが単価¥5,000で利益薄い ②「けうまる」が¥50,000-75,000で計79件=このカテゴリのトップ。ChatGPT+LINE Bot特化 ③「たま＠SE」がDify3出品で98件=量産型で多角展開 ④全出品★5.0付近。評価差では勝負できない
+  </div>
+
+  <h3>手数料・ランク制度</h3>
+  <table>
+    <thead><tr><th>項目</th><th>内容</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>出品者手数料</td><td><strong>22%（税込・一律）</strong></td><td><a href="https://coconala-support.zendesk.com/hc/ja/articles/230180287" style="color:var(--ac)">ココナラヘルプ</a></td></tr>
+      <tr><td>ビデオチャット</td><td>27.5%（2025/4/16改定）</td><td><a href="https://coconala.com/news/1137" style="color:var(--ac)">ココナラニュース</a></td></tr>
+      <tr><td>電話相談</td><td>約60%</td><td>同上</td></tr>
+      <tr><td>購入者手数料</td><td>5.5%</td><td>ヘルプ</td></tr>
+      <tr><td>ランク</td><td>レギュラー→ブロンズ→シルバー→ゴールド→プラチナ</td><td><a href="https://coconala-support.zendesk.com/hc/ja/articles/218832757" style="color:var(--ac)">出品者ランクについて</a></td></tr>
+      <tr><td>ランク基準</td><td>販売実績・納品完了率・評価（毎月1日判定）</td><td>同上</td></tr>
+      <tr><td>手取り計算</td><td>¥20,000 → 手取り¥15,600</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 2. ランサーズ ===== -->
+<div class="sec">
+  <h2><span class="n">2</span>ランサーズ — チャットボット開発パッケージ（AI搭載）</h2>
+
+  <h3>カテゴリ概要</h3>
+  <div class="kr">
+    <div class="kp"><div class="v">26件+</div><div class="l">AI搭載Bot出品数</div></div>
+    <div class="kp"><div class="v">¥10,000〜¥700,000</div><div class="l">価格レンジ</div></div>
+    <div class="kp"><div class="v">¥90,000</div><div class="l">中央値</div></div>
+    <div class="kp"><div class="v">¥50,000</div><div class="l">最頻値</div></div>
+  </div>
+  <p style="font-size:.8rem;color:var(--mu)">出典: <a href="https://www.lancers.jp/menu/browse/programming_tech/chatbots/bot_ai" style="color:var(--ac)">ランサーズ AI搭載チャットボット</a>（2026-03-28取得、全件分析）</p>
+
+  <h3>販売実績TOP10（満足件数順）</h3>
+  <table>
+    <thead><tr><th>#</th><th>タイトル</th><th>出品者</th><th>価格</th><th>満足</th><th>残念</th><th>LINE</th><th>Web</th><th>買切</th></tr></thead>
+    <tbody>
+      <tr class="highlight"><td class="rank-1">1</td><td>LINE×AIチャットボット（買い切り・編集機能付き）</td><td><strong>みつばスタジオ</strong></td><td>¥90,000〜</td><td><strong>96</strong></td><td>0</td><td>○</td><td>○</td><td>○</td></tr>
+      <tr class="highlight"><td class="rank-1">1</td><td>ChatGPTチャットボット（買い切り・編集機能付き）</td><td><strong>みつばスタジオ</strong></td><td>¥90,000〜</td><td><strong>96</strong></td><td>0</td><td>○</td><td>○</td><td>○</td></tr>
+      <tr class="highlight"><td class="rank-1">1</td><td>シナリオ型チャットボット（ChatGPT対応・編集機能付き）</td><td><strong>みつばスタジオ</strong></td><td>¥60,000〜</td><td><strong>96</strong></td><td>0</td><td>×</td><td>○</td><td>○</td></tr>
+      <tr><td>4</td><td>【サブスク機能可】公式LINEのBot開発</td><td>山本龍児＠AI開発</td><td>¥25,000〜</td><td>27</td><td>0</td><td>○</td><td>×</td><td>○</td></tr>
+      <tr><td>4</td><td>【Dify】ホームページのAIチャットボット開発</td><td>山本龍児＠AI開発</td><td>¥25,000〜</td><td>27</td><td>0</td><td>○</td><td>○</td><td>○</td></tr>
+      <tr><td>6</td><td>ChatGPTを使ったLINE Botを制作（ココナラ兼業）</td><td>けうまる（ココナラ#7）</td><td>¥10,000〜</td><td>24</td><td>0</td><td>×</td><td>×</td><td>○</td></tr>
+      <tr><td>7</td><td>linebot作成（LINE公式アカウント活用）</td><td>tanaka</td><td>¥10,000〜</td><td>20</td><td>3</td><td>○</td><td>×</td><td>○</td></tr>
+      <tr><td>8</td><td>【サービス業向け】Gemini連携AIチャットボット</td><td>+carna</td><td>¥50,000〜</td><td>19</td><td>0</td><td>×</td><td>○</td><td>○</td></tr>
+      <tr><td>9</td><td>ナレッジ型AIチャットボット導入</td><td>WordPress制作・改修</td><td>¥150,000〜</td><td>13</td><td>0</td><td>×</td><td>○</td><td>○</td></tr>
+      <tr><td>10</td><td>【LINE Bot×AI】店舗予約・顧客対応自動化</td><td>HossainMd Moazzem</td><td>¥90,000〜</td><td>11</td><td>0</td><td>○</td><td>×</td><td>○</td></tr>
+    </tbody>
+  </table>
+
+  <h3>価格帯分布（AI搭載26件）</h3>
+  <table>
+    <thead><tr><th>価格帯</th><th>件数</th><th>割合</th><th>代表出品</th></tr></thead>
+    <tbody>
+      <tr><td>¥10,000〜¥15,000</td><td>4件</td><td>15%</td><td>ChatGPT LINE Bot簡易版/Discord Bot</td></tr>
+      <tr><td>¥20,000〜¥30,000</td><td>5件</td><td>19%</td><td>Dify系/LINE Bot+AI/業種特化</td></tr>
+      <tr><td>¥50,000〜¥60,000</td><td>6件</td><td>23%</td><td>シナリオ型Bot/ナレッジBot/LINE公式連携</td></tr>
+      <tr><td>¥80,000〜¥100,000</td><td>7件</td><td>27%</td><td>みつばスタジオ/中小企業向け/店舗予約</td></tr>
+      <tr><td>¥150,000〜¥700,000</td><td>4件</td><td>15%</td><td>高機能ナレッジBot/フルスタック/資料ベース</td></tr>
+    </tbody>
+  </table>
+
+  <div class="al al-r">
+    <strong>みつばスタジオ = 最大の直接競合:</strong><br>
+    ・3パッケージで96件販売（残念0）= カテゴリ独占<br>
+    ・買い切り×ChatGPT×LINE+Web×編集機能付き = AI Conciergeとほぼ同一コンセプト<br>
+    ・¥90,000（当社計画の4.5倍）で売れている = 価格を¥20,000に下げる根拠が必要<br>
+    ・「編集機能付き」がキーワード = 顧客自身で内容を変更できる点が購買決定因子
+  </div>
+
+  <h3>手数料・ランク制度</h3>
+  <table>
+    <thead><tr><th>項目</th><th>内容</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>ランサー手数料</td><td><strong>一律16.5%（税込）</strong>（2022/10改定。旧: 〜10万20%/〜20万10%/20万超5%）</td><td><a href="https://www.lancers.jp/faq/A1034/936" style="color:var(--ac)">ランサーズヘルプ</a></td></tr>
+      <tr><td>クライアント手数料</td><td>5.5%（税込）</td><td>同上</td></tr>
+      <tr><td>パッケージ最低価格</td><td>¥10,000</td><td><a href="https://www.lancers.jp/faq/S000/854" style="color:var(--ac)">ヘルプ</a></td></tr>
+      <tr><td>パッケージ総出品数</td><td>10万件突破（2024/4）</td><td><a href="https://prtimes.jp/main/html/rd/p/000000214.000010407.html" style="color:var(--ac)">プレスリリース</a></td></tr>
+      <tr><td>認定ランサー</td><td>①報酬上位20% ②満足95%+ ③完了率90%+ ④承認率90%+ ⑤月1ログイン ⑥認証完了</td><td><a href="https://www.lancers.jp/faq/l1005/328" style="color:var(--ac)">認定基準ヘルプ</a></td></tr>
+      <tr><td>手取り計算</td><td>¥90,000 → 手取り¥75,150 / ¥20,000 → 手取り¥16,700</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 3. クラウドワークス ===== -->
+<div class="sec">
+  <h2><span class="n">3</span>クラウドワークス — AI・チャットボット開発</h2>
+
+  <h3>カテゴリ概要</h3>
+  <div class="kr">
+    <div class="kp"><div class="v">5,832件/年</div><div class="l">AI関連案件数(2024)</div></div>
+    <div class="kp"><div class="v">YoY 8.4倍</div><div class="l">前年比成長率</div></div>
+    <div class="kp"><div class="v">40,000件+</div><div class="l">AI活用案件累計(2024/6)</div></div>
+    <div class="kp"><div class="v">¥50,000〜200,000</div><div class="l">チャットBot案件中心帯</div></div>
+  </div>
+  <p style="font-size:.8rem;color:var(--mu)">出典: <a href="https://prtimes.jp/main/html/rd/p/000000198.000050142.html" style="color:var(--ac)">CWプレスリリース 生成AI8.4倍</a> / <a href="https://crowdworks.co.jp/news/ij14qbirt985/" style="color:var(--ac)">AI活用40,000件</a> / <a href="https://crowdworks.jp/public/jobs/category/283" style="color:var(--ac)">AI・チャットボット開発カテゴリ</a></p>
+
+  <h3>予算帯分布（業界相場）</h3>
+  <table>
+    <thead><tr><th>複雑度</th><th>予算帯</th><th>内容</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>最低限の回答</td><td>¥50,000〜¥150,000</td><td>FAQ対応のみ、簡易Bot</td><td rowspan="4"><a href="https://walker-s.co.jp/media/ai-chatbot-development-cost/" style="color:var(--ac)">AI開発費用相場2026</a></td></tr>
+      <tr><td>基本的な回答</td><td>¥150,000〜¥400,000</td><td>生成AI搭載、カスタム応答</td></tr>
+      <tr><td>複雑な回答</td><td>¥400,000〜¥800,000</td><td>RAG+CRM連携+多チャネル</td></tr>
+      <tr><td>非常に複雑</td><td>¥800,000〜</td><td>フルカスタム+ML+音声</td></tr>
+    </tbody>
+  </table>
+
+  <h3>CW上の案件例（ChatGPT特集/プレスリリースより）</h3>
+  <table>
+    <thead><tr><th>案件タイプ</th><th>予算帯</th><th>形態</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>AI関連システム・アプリ開発</td><td>時給¥2,000〜3,000</td><td>時間制</td><td><a href="https://crowdworks.jp/static/lp/chatgpt_special_feature/" style="color:var(--ac)">ChatGPT特集</a></td></tr>
+      <tr><td>ChatGPT活用プロンプト作成</td><td>〜¥50,000</td><td>固定</td><td>同上</td></tr>
+      <tr><td>AIチャットボット開発エンジニア</td><td>月額¥100,000〜200,000</td><td>月額</td><td>同上</td></tr>
+      <tr><td>機械学習エンジニア(生成AI)</td><td>〜¥800,000</td><td>固定</td><td>同上</td></tr>
+      <tr><td>メール/電話問い合わせ対応</td><td>月額¥10,000〜30,000</td><td>月額</td><td>同上</td></tr>
+    </tbody>
+  </table>
+
+  <h3>手数料・ランク制度</h3>
+  <table>
+    <thead><tr><th>項目</th><th>内容</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>ワーカー手数料</td><td><strong>段階制:</strong> 10万以下=20% / 10-20万=10% / 20万超=5%</td><td><a href="https://crowdworks.jp/pages/guides/employee/fee" style="color:var(--ac)">CW手数料ページ</a></td></tr>
+      <tr><td>クライアント手数料</td><td>なし（ワーカー側のみ）</td><td>同上</td></tr>
+      <tr><td>振込手数料</td><td>楽天銀行¥100 / 他行¥500</td><td>同上</td></tr>
+      <tr><td>プロクラウドワーカー</td><td>月収40万円超で認定実績あり。本人確認/NDA/スキル/ポートフォリオ登録必須</td><td><a href="https://crowdworks-commission-keisan.com/top-procrowdworker/" style="color:var(--ac)">プロCW解説</a></td></tr>
+    </tbody>
+  </table>
+
+  <div class="al al-b">
+    <strong>CWの特徴:</strong> ①発注者起点（ワーカーは案件に応募）= パッケージ出品はランサーズ的機能なし ②手数料が10万円以下で20%と最高 ③AI案件はYoY 8.4倍で急成長 ④チャットボット開発に特化した案件ページあり（JS描画で件数不明）⑤案件単価はランサーズ/ココナラより高い傾向
+  </div>
+</div>
+
+<!-- ===== 4. 3PF横断比較 ===== -->
+<div class="sec">
+  <h2><span class="n">4</span>3PF横断比較</h2>
+
+  <table>
+    <thead><tr><th>項目</th><th>ココナラ</th><th>ランサーズ</th><th>クラウドワークス</th></tr></thead>
+    <tbody>
+      <tr><td>形式</td><td>出品型</td><td>出品型(パッケージ) + 提案型</td><td>提案型（案件応募）</td></tr>
+      <tr><td>AIチャットBot出品/案件数</td><td>462件</td><td>26件+(AI搭載)</td><td>5,832件/年(AI全体)</td></tr>
+      <tr><td>手数料(ワーカー)</td><td><span class="tr">22%</span></td><td><span class="to">16.5%</span></td><td><span class="tr">20%(10万以下)</span></td></tr>
+      <tr><td>手数料(クライアント)</td><td>5.5%</td><td>5.5%</td><td>なし</td></tr>
+      <tr><td>¥20,000出品の手取り</td><td><strong>¥15,600</strong></td><td><strong>¥16,700</strong></td><td><strong>¥16,000</strong></td></tr>
+      <tr><td>最多販売者(AI Bot)</td><td>たま＠SE: 63件(¥5K)</td><td>みつばスタジオ: 96件(¥90K)</td><td>—(出品型なし)</td></tr>
+      <tr><td>直接競合(買切×AI×LINE)</td><td>けうまる: 53件(¥50K)</td><td><span class="tr">みつばスタジオ: 96件(¥90K)</span></td><td>—</td></tr>
+      <tr><td>価格中央値</td><td>¥15,000</td><td>¥90,000</td><td>¥50,000-200,000</td></tr>
+      <tr><td>最低価格</td><td>¥4,000</td><td>¥10,000</td><td>—</td></tr>
+      <tr><td>ランク制度</td><td>5段階(〜プラチナ)</td><td>認定ランサー</td><td>プロCW/TOPプロCW</td></tr>
+      <tr><td>振込手数料</td><td>¥160</td><td>楽天¥110/他¥550</td><td>楽天¥100/他¥500</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 5. 直接競合詳細分析 ===== -->
+<div class="sec">
+  <h2><span class="n">5</span>AI Concierge 直接競合分析</h2>
+
+  <h3>直接競合の定義: 買い切り × 生成AI搭載 × LINE Bot OR Web対応</h3>
+
+  <table>
+    <thead><tr><th>PF</th><th>出品者</th><th>価格</th><th>実績</th><th>LINE</th><th>Web</th><th>AI</th><th>編集機能</th><th>脅威度</th></tr></thead>
+    <tbody>
+      <tr class="highlight"><td>ランサーズ</td><td><strong>みつばスタジオ</strong></td><td>¥90,000</td><td>96件</td><td>○</td><td>○</td><td>ChatGPT</td><td>○</td><td><span class="tr">★★★★★</span></td></tr>
+      <tr class="highlight"><td>ココナラ</td><td><strong>けうまる</strong></td><td>¥50,000-75,000</td><td>79件</td><td>○</td><td>×</td><td>ChatGPT/GPT-5</td><td>不明</td><td><span class="to">★★★★</span></td></tr>
+      <tr><td>ランサーズ</td><td>山本龍児</td><td>¥25,000</td><td>27件</td><td>○</td><td>○</td><td>Dify/AI</td><td>不明</td><td><span class="to">★★★</span></td></tr>
+      <tr><td>ランサーズ</td><td>+carna</td><td>¥50,000</td><td>19件</td><td>×</td><td>○</td><td>Gemini</td><td>不明</td><td><span class="ty">★★★</span></td></tr>
+      <tr><td>ココナラ</td><td>たま＠SE</td><td>¥5,000-10,000</td><td>98件</td><td>○</td><td>×</td><td>Dify</td><td>×</td><td><span class="ty">★★</span></td></tr>
+      <tr><td>ランサーズ</td><td>HossainMd</td><td>¥90,000</td><td>11件</td><td>○</td><td>×</td><td>AI</td><td>不明</td><td><span class="ty">★★</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="al al-r">
+    <strong>出品Bの前提修正が必要:</strong><br>
+    既存の coconala-final-report セクション7の出品B原稿は「買い切り×生成AI×月1-3万円帯に競合不在」を前提としている。<br>
+    実態: <strong>みつばスタジオが¥90,000で96件、けうまるが¥50,000-75,000で79件販売。</strong>競合は存在する。<br>
+    ただし「¥20,000帯」には直接競合がいない（ランサーズ山本龍児の¥25,000が最も近い）。<strong>低価格帯は空白だが、それは「安すぎて利益が出ない」からかもしれない。</strong>
+  </div>
+
+  <h4>みつばスタジオの強み（学ぶべき点）</h4>
+  <ul style="padding-left:20px;font-size:.86rem">
+    <li>「買い切り・<strong>編集機能付き</strong>」= 顧客が自分で内容変更できる安心感</li>
+    <li>3パッケージ（LINE×AI / ChatGPT / シナリオ型）で横展開</li>
+    <li>¥90,000で96件 = 残念0 = 品質保証の実績</li>
+    <li>タイトルに「買い切り」「編集機能付き」を明示 = 購買決定因子を前面に</li>
+  </ul>
+
+  <h4>けうまる（ココナラ）の強み</h4>
+  <ul style="padding-left:20px;font-size:.86rem">
+    <li>ココナラとランサーズの両方で出品（クロスプラットフォーム戦略）</li>
+    <li>「ChatGPTを用いた」「最新モデルGPT-5で」= AI名を前面に</li>
+    <li>¥50,000→¥75,000の値上げに成功（26件販売で実績→値上げ）</li>
+    <li>LINE Bot特化 = 明確なターゲティング</li>
+  </ul>
+</div>
+
+<!-- ===== 6. 出品原稿への示唆 ===== -->
+<div class="sec">
+  <h2><span class="n">6</span>出品原稿への示唆（データに基づく修正点）</h2>
+
+  <h3>現行出品B原稿の問題点</h3>
+  <table>
+    <thead><tr><th>項目</th><th>現行原稿</th><th>実データとの乖離</th><th>修正方向</th></tr></thead>
+    <tbody>
+      <tr><td>タイトル</td><td>【ChatGPT/Claude/Gemini対応】AI搭載ツール・Botを開発します</td><td>売れてるタイトルはAI名1つ+具体ターゲット。3AI名並列は散漫</td><td>「【ChatGPT搭載】LINE Bot＋Web埋め込みを買い切りで構築します」等</td></tr>
+      <tr><td>価格</td><td>¥20,000</td><td>みつば¥90K(96件)/けうまる¥50K(53件)。¥20Kは安すぎて信頼性を損なうリスク</td><td>¥30,000-50,000で開始。安さではなく付加価値で勝負</td></tr>
+      <tr><td>説明文冒頭</td><td>「こんな方におすすめ」リスト</td><td>売れてる出品は具体成果を先に出す（「24時間自動応答」「問い合わせ対応を丸投げ」）</td><td>成果ベースの冒頭に変更</td></tr>
+      <tr><td>差別化</td><td>なし（汎用的）</td><td>みつば=「編集機能付き」、けうまる=「GPT-5」、なる=「オーダーメイド」</td><td>「買い切り・管理画面付き・14日保証」を差別化として明示</td></tr>
+      <tr><td>オプション</td><td>LINE +10K / RAG +15K / 管理画面 +15K</td><td>みつばは管理画面込みで¥90K。分離すると安っぽく見える</td><td>LINE+管理画面を基本プランに含む。RAG/外部連携をオプションに</td></tr>
+      <tr><td>技術名</td><td>React/Next.js/Supabase/Vercel/3API名</td><td>購入者は技術名を見ていない。みつばの説明に技術スタック記載なし</td><td>技術名は末尾に簡潔に。本文は顧客メリットに集中</td></tr>
+    </tbody>
+  </table>
+
+  <h3>売れているタイトルのパターン分析</h3>
+  <table>
+    <thead><tr><th>要素</th><th>パターン</th><th>具体例</th><th>効果</th></tr></thead>
+    <tbody>
+      <tr><td>AI名</td><td>1つだけ明示</td><td>「ChatGPTを用いた」「Gemini連携」</td><td>専門性を示す。3つ並列は器用貧乏に見える</td></tr>
+      <tr><td>対象</td><td>「LINE Bot」「ホームページ」等具体的</td><td>「LINE×AIチャットボット」</td><td>検索で引っかかる+ニーズ直結</td></tr>
+      <tr><td>価値提示</td><td>「買い切り」「24時間」「自動化」</td><td>「買い切り・編集機能付き」</td><td>購買決定因子を前面に</td></tr>
+      <tr><td>動詞</td><td>「作ります」「構築します」「設置します」</td><td>「〜を設置します」</td><td>シンプル+行動が明確</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 7. ソース一覧 ===== -->
+<div class="sec">
+  <h2><span class="n">7</span>ソース一覧</h2>
+  <h3>1次ソース（プラットフォーム公式）</h3>
+  <ol style="padding-left:20px;font-size:.84rem">
+    <li><a href="https://coconala.com/categories/772" style="color:var(--ac)">ココナラ AIチャットボット制作カテゴリ</a>（2026-03-28取得）</li>
+    <li><a href="https://coconala-support.zendesk.com/hc/ja/articles/230180287" style="color:var(--ac)">ココナラ 販売時の手数料について</a></li>
+    <li><a href="https://coconala-support.zendesk.com/hc/ja/articles/218832757" style="color:var(--ac)">ココナラ 出品者ランクについて</a></li>
+    <li><a href="https://coconala.com/news/1137" style="color:var(--ac)">ココナラ ビデオチャット手数料改定(2025/4/16)</a></li>
+    <li><a href="https://www.lancers.jp/menu/browse/programming_tech/chatbots/bot_ai" style="color:var(--ac)">ランサーズ AI搭載チャットボット開発パッケージ</a>（2026-03-28取得）</li>
+    <li><a href="https://www.lancers.jp/menu/browse/programming_tech/chatbots" style="color:var(--ac)">ランサーズ チャットボット開発パッケージ</a>（2026-03-28取得）</li>
+    <li><a href="https://www.lancers.jp/faq/A1034/936" style="color:var(--ac)">ランサーズ システム手数料の詳細</a></li>
+    <li><a href="https://www.lancers.jp/faq/l1005/328" style="color:var(--ac)">ランサーズ 認定ランサーの基準</a></li>
+    <li><a href="https://www.lancers.jp/faq/S000/854" style="color:var(--ac)">ランサーズ パッケージ最低価格</a></li>
+    <li><a href="https://prtimes.jp/main/html/rd/p/000000214.000010407.html" style="color:var(--ac)">ランサーズ パッケージ出品10万件突破(2024/4)</a></li>
+    <li><a href="https://crowdworks.jp/public/jobs/category/283" style="color:var(--ac)">CW AI・チャットボット開発カテゴリ</a></li>
+    <li><a href="https://crowdworks.jp/pages/guides/employee/fee" style="color:var(--ac)">CW ワーカーシステム利用料</a></li>
+    <li><a href="https://prtimes.jp/main/html/rd/p/000000198.000050142.html" style="color:var(--ac)">CW 生成AI案件YoY 8.4倍(2023/12)</a></li>
+    <li><a href="https://crowdworks.jp/static/lp/chatgpt_special_feature/" style="color:var(--ac)">CW ChatGPTお仕事特集</a></li>
+  </ol>
+
+  <h3>2次ソース（解説・分析）</h3>
+  <ol start="15" style="padding-left:20px;font-size:.84rem">
+    <li><a href="https://walker-s.co.jp/media/ai-chatbot-development-cost/" style="color:var(--ac)">AIチャットボット開発費用相場2026年版</a> — Walker's</li>
+    <li><a href="https://note.com/gafuuai/n/nf6298bfd567d" style="color:var(--ac)">ココナラの手数料2025年最新版</a> — GafuuAI</li>
+    <li><a href="https://note.com/gafuuai/n/n6ce6c1976013" style="color:var(--ac)">ランサーズの手数料2025年最新</a> — GafuuAI</li>
+    <li><a href="https://crowdworks-commission-keisan.com/top-procrowdworker/" style="color:var(--ac)">プロクラウドワーカー認定条件解説</a></li>
+    <li><a href="https://kotakebi.hateblo.jp/entry/2025/12/10/122410" style="color:var(--ac)">CW手数料2026年版解説</a></li>
+    <li><a href="https://www.nikkei.com/article/DGXZQOUC20DNA0Q3A221C2000000/" style="color:var(--ac)">日経:生成AI個人業務委託1年で8倍</a></li>
+  </ol>
+</div>
+
+</div><!-- /.c -->
+
+<footer style="text-align:center;padding:24px;color:var(--mu);font-size:.78rem;border-top:1px solid var(--bd)">
+  Generated by vibe-base Intelligence | 2026-03-28 | Sources: 20 | Research Bank ID: platform-listing-data-2026
+</footer>
+
+</body>
+</html>

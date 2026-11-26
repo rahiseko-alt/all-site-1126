@@ -1,0 +1,123 @@
+/* Hover Color Buttons — 素CSS。ホバーで項目ごとに別ブランド色に点灯 */
+:root {
+    --bg-dark: #07080a;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border: rgba(255, 255, 255, 0.12);
+    /* nav pill 各色 */
+    --nav-1: #22d3ee; /* cyan   */
+    --nav-2: #8b5cf6; /* violet */
+    --nav-3: #ec4899; /* pink   */
+    --cta: #22d3ee;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stage {
+    width: 100%;
+    max-width: 760px;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--cta);
+    margin-bottom: 18px;
+}
+
+.title {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.05;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+}
+
+.lead {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto 56px;
+    line-height: 1.7;
+}
+
+/* ---- nav pill: nth-child ごとに別色 ---- */
+.pill-nav {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+}
+
+.pill {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    padding: 10px 22px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    transition: color 0.3s, background-color 0.3s, border-color 0.3s;
+}
+
+.pill-nav .pill:nth-child(1):hover { background: var(--nav-1); border-color: var(--nav-1); color: #07080a; }
+.pill-nav .pill:nth-child(2):hover { background: var(--nav-2); border-color: var(--nav-2); color: #fff; }
+.pill-nav .pill:nth-child(3):hover { background: var(--nav-3); border-color: var(--nav-3); color: #fff; }
+
+/* CTA: 既定は白塗り → ホバーでアクセント色 */
+.pill-cta {
+    color: #07080a;
+    background: #fff;
+    border-color: #fff;
+    font-weight: 600;
+}
+.pill-nav .pill-cta:hover { background: var(--cta); border-color: var(--cta); color: #07080a; }
+
+/* ---- 反転ボタン: 既定アウトライン → ホバーで --c 塗り ---- */
+.btn-row {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--c);
+    background: transparent;
+    border: 1.5px solid var(--c);
+    padding: 12px 26px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: color 0.3s, background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+.btn:hover {
+    color: #07080a;
+    background: var(--c);
+    box-shadow: 0 10px 30px -8px var(--c);
+    transform: translateY(-3px);
+}
+
+@media (max-width: 600px) {
+    .title { font-size: 40px; }
+}

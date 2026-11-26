@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>coconala rewrite r1 — 3出品 改稿原稿ビューア</title>
+<style>
+:root {
+  --bg: #fafafa;
+  --fg: #1a1a1a;
+  --muted: #666;
+  --line: #ddd;
+  --accent: #0066cc;
+  --ok: #2e7d32;
+  --warn: #ef6c00;
+  --over: #c62828;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.6;
+}
+header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+header h1 { margin: 0 0 4px; font-size: 18px; }
+header .sub { color: var(--muted); font-size: 12px; }
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.tab-btn {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--muted);
+  font-family: inherit;
+}
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+main {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+.tab-pane h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.meta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+.field {
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border-radius: 4px;
+}
+.field h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.plain {
+  font-size: 15px;
+  padding: 6px 0;
+}
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+  font-size: 13px;
+  background: #f5f5f5;
+  padding: 10px 12px;
+  border-radius: 3px;
+  margin: 0 0 6px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.bar {
+  height: 4px;
+  background: #eee;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.bar .fill {
+  height: 100%;
+}
+.bar .fill.ok { background: var(--ok); }
+.bar .fill.warn { background: var(--warn); }
+.bar .fill.over { background: var(--over); }
+.count {
+  font-size: 11px;
+  margin-top: 3px;
+  text-align: right;
+}
+.count.ok { color: var(--ok); }
+.count.warn { color: var(--warn); }
+.count.over { color: var(--over); font-weight: 600; }
+.faq {
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+.faq:last-child { border-bottom: none; }
+.faq-q { font-weight: 600; font-size: 13px; }
+.faq-a { font-size: 12px; color: #333; margin-top: 4px; }
+.opt {
+  padding: 6px 0;
+  border-bottom: 1px dashed #eee;
+}
+.opt:last-child { border-bottom: none; }
+.opt .plain { font-size: 13px; padding: 2px 0; }
+footer {
+  padding: 16px 24px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>coconala rewrite r1 — 3出品 改稿原稿ビューア</h1>
+  <div class="sub">Plan C 全文書き換え / 2026-04-13 / draft — マスターレビュー待ち</div>
+</header>
+<nav class="tabs">
+  <button class="tab-btn active" data-target="dify25">dify25 (10,000円)</button>
+  <button class="tab-btn" data-target="app50">app50 (50,000円)</button>
+  <button class="tab-btn" data-target="dsl5">dsl5 (4,000円)</button>
+</nav>
+<main>
+<section class="tab-pane" data-tab="dify25">
+<h2>dify25 — 10,000円</h2>
+<div class="meta">予想お届け日数: 5日 / 一度に受注可能: 5件</div>
+<div class="field"><h3>サービスタイトル</h3>
+<div class="plain">DifyでLINE連携AIボットを構築します</div>
+<div class="bar"><div class="fill ok" style="width:88%"></div></div><div class="count ok">22 / 25</div>
+</div>
+<div class="field"><h3>キャッチコピー</h3>
+<div class="plain">DifyでLINE問合せ対応を自動化。月額費用ゼロで運用</div>
+<div class="bar"><div class="fill warn" style="width:93%"></div></div><div class="count warn">28 / 30</div>
+</div>
+<div class="field"><h3>サービス内容</h3>
+<pre>AIチャットボットを入れたい。でも、どの方法を選べばいいのか分からない。そんな方のためのコースです。
+
+
+■ 3つのコースからお選びいただけます
+
+ご予算と運用スタイルに合わせて、3コースをご用意しています。
+
+・DSL納品コース（4,000円）
+　設計図だけお渡し。ご自身でDifyにインポートして運用するコース。
+
+・構築代行コース（10,000円）← 本出品
+　設計から設置まで代行。届いた時点で動く状態でお渡しするコース。
+
+・アプリ開発コース（50,000円）
+　管理画面・履歴確認・メール転送まで付いた専用アプリを構築するコース。
+
+本コースは「動く状態で受け取りたい。でも専用アプリまでは不要」という方向けの中間コースです。
+
+※本コース（構築代行）には、メール転送機能と個人情報ガード機能は含まれません。これらの機能が必要な場合は、アプリ開発コース（50,000円）をご検討ください。
+
+実装の完成イメージはこちらのデモでご覧いただけます：
+https://aianswer-sample-cafe.kouheikosehira.com
+（上記はアプリ開発コースで構築したサンプルです。本コースでは Dify 標準画面で同等の会話体験を実現します）
+
+
+■ 本コースに含まれる作業
+
+1. ヒアリング（業種・よくある質問・設置先の確認）
+2. Difyを使ったチャットボットの設計
+3. Dify上での環境構築
+4. FAQ（よくある質問）のプロンプト設計と登録
+5. LINEまたはホームページへの設置作業
+6. 動作確認
+
+
+■ 納品物
+
+・稼働状態のDify環境（テスト済み）
+・FAQ対応AIボット（プロンプト設計済み）
+・操作マニュアル（管理画面の使い方）
+・APIキー取得・設定の手順書（画面キャプチャ付き）
+・LINE連携手順書（LINE設置をご希望の場合）
+
+
+■ お客様にお願いすること
+
+・AIのAPIキーの取得（OpenAI／Anthropic／Google等）
+　→ 取得方法は画面キャプチャ付きの手順書でご案内します
+・AI利用料（月額数百円〜、使用量で変動）はお客様のアカウントで従量課金
+
+APIキー取得が不安な方は、メッセージでサポートします。
+
+
+■ ご利用の流れ
+
+STEP 1. メッセージで業種・FAQ・設置先をお聞かせください
+STEP 2. こちらで設計・構築（5営業日で納品）
+STEP 3. 管理画面の使い方をご案内
+STEP 4. 設置作業と動作確認後に納品
+
+納品後7日間は、操作方法のご質問にメッセージで対応します。
+
+
+■ こんな方に向いています
+
+・LINEやHPにAIチャットボットを置きたい
+・設定作業に時間をかけたくない
+・届いた時点で動く状態が良い
+・専用管理画面までは必要ない
+
+まずはメッセージでお気軽にご相談ください。業種と用途をお聞きした上で、本コースが合っているかをお答えします。
+
+
+検索キーワード：
+Dify AIチャットボット FAQ 自動応答 LINE連携 ホームページ ChatGPT Claude Gemini 問い合わせ自動化 カスタマーサポート ノーコード 中小企業 個人事業主 業務効率化</pre>
+<div class="bar"><div class="fill ok" style="width:89%"></div></div><div class="count ok">1349 / 1500</div>
+</div>
+<div class="field"><h3>購入にあたってのお願い</h3>
+<pre>スムーズに制作を進めるため、以下の情報をメッセージでお知らせください。
+
+1. 業種（例：美容室、整体院、飲食店、不動産会社、士業事務所）
+2. よくある質問を3〜10件（多いほどAIの回答精度が上がります）
+3. 設置先（LINE／ホームページ／その他）
+4. AIのAPIキーの有無
+
+質問が思いつかない場合は業種だけお知らせください。業種に合わせたFAQのたたき台をこちらから提案します。
+
+APIキーをお持ちでない場合も大丈夫です。取得方法を画面キャプチャ付きの手順書でご案内します。ご不明点はメッセージでサポートします。
+
+AIの利用料（月額数百円〜、使用量で変動）はお客様ご自身のアカウントで従量課金となります。LINE公式アカウントは無料プランで作成できます。
+
+ご不明点は購入前にメッセージでお気軽にご質問ください。業種と用途をお聞きした上で、本コースが合っているか、もしくは他のコース（DSL納品4,000円／アプリ開発50,000円）が合っているかをご案内します。
+
+納品後のキャンセルはお受けできませんので、事前のご相談を歓迎します。</pre>
+<div class="bar"><div class="fill ok" style="width:47%"></div></div><div class="count ok">478 / 1000</div>
+</div>
+<div class="field"><h3>よくある質問（9件 / 最大10件）</h3>
+<div class="faq">
+<div class="faq-q">Q1. Difyとは何ですか？</div>
+<div class="faq-a">オープンソースのAIチャットボット構築ツールです。プログラミング不要で、設計図（DSL）をもとにチャットボットを動かすことができます。ChatGPT・Claude・Gemini等を組み込んで利用できます。</div>
+<div class="bar"><div class="fill ok" style="width:25%"></div></div><div class="count ok">102 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q2. APIキーとは何ですか？取得が難しそうで不安です。</div>
+<div class="faq-a">AIを動かすために必要なアクセス用の鍵です。OpenAIやAnthropic等のサービスから取得できます。取得手順は全画面キャプチャ付きの手順書でご案内しますので、ITに詳しくない方でも手順どおりに進めれば設定できます。ご不明点はメッセージでサポートします。</div>
+<div class="bar"><div class="fill ok" style="width:32%"></div></div><div class="count ok">129 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q3. LINE連携はできますか？追加費用はかかりますか？</div>
+<div class="faq-a">はい、本コースの価格内でLINE連携に対応しています。LINE公式アカウント（無料プランで作成可能）のリッチメニューからチャットボットを開く方式です。設定手順書もお渡しします。</div>
+<div class="bar"><div class="fill ok" style="width:22%"></div></div><div class="count ok">88 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q4. AIの精度はどのくらいですか？</div>
+<div class="faq-a">登録するFAQ（よくある質問）の質と量に応じて変わります。よくある質問を10件以上ご用意いただくと実用的な精度になりやすいです。FAQ内容は納品後に管理画面からご自身で追加・編集ができます。</div>
+<div class="bar"><div class="fill ok" style="width:23%"></div></div><div class="count ok">95 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q5. 月額料金はかかりますか？</div>
+<div class="faq-a">本サービスの制作費は10,000円の一度きりです。AIの利用料（月額数百円〜、使用量で変動）のみ、お客様ご自身のアカウントで従量課金となります。Difyは無料プランで始められますし、LINE公式アカウントも無料プランがあります。</div>
+<div class="bar"><div class="fill ok" style="width:28%"></div></div><div class="count ok">114 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q6. 納品後にFAQを追加・変更できますか？</div>
+<div class="faq-a">はい。Difyの管理画面からお客様ご自身で追加・編集ができます。操作方法はマニュアルに記載していますので、納品後も自由に運用内容を更新できます。</div>
+<div class="bar"><div class="fill ok" style="width:18%"></div></div><div class="count ok">72 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q7. DSL納品コース（4,000円）との違いは何ですか？</div>
+<div class="faq-a">DSL納品コースは「設計図のみ」をお渡しし、Difyへのインポート・APIキー設定・設置作業はお客様ご自身で行っていただくコースです。本コースはそれらの作業をこちらで代行し、届いた時点で動く状態でお渡しします。</div>
+<div class="bar"><div class="fill ok" style="width:26%"></div></div><div class="count ok">105 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q8. アプリ開発コース（50,000円）との違いは何ですか？</div>
+<div class="faq-a">アプリ開発コースは、Difyではなく専用アプリを構築するコースで、管理画面・会話履歴・メール転送・個人情報ガード・CSVダウンロードなどが付きます。本コースはDify標準の管理画面を使い、シンプルに運用したい方向けです。管理画面が必要な方はアプリ開発コースをご検討ください。</div>
+<div class="bar"><div class="fill ok" style="width:34%"></div></div><div class="count ok">137 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q9. 納品後のキャンセルはできますか？</div>
+<div class="faq-a">納品後のキャンセルはお受けできません。ご不明点は購入前にメッセージでお気軽にご質問ください。本コースが合うかどうかも事前にご相談いただけます。</div>
+<div class="bar"><div class="fill ok" style="width:17%"></div></div><div class="count ok">71 / 400</div>
+</div>
+</div>
+<div class="field"><h3>見積りにあたってのお願い</h3>
+<pre>以下をメッセージでお知らせください。
+
+・業種と主な問い合わせ内容
+・設置先（LINE／ホームページ／その他）
+・よくある質問の件数（概算でOK）
+・希望納期（特になければ「お任せ」とお伝えください）</pre>
+<div class="bar"><div class="fill ok" style="width:50%"></div></div><div class="count ok">100 / 200</div>
+</div>
+<div class="field"><h3>有料オプション（4件 / 最大10件）</h3>
+<div class="opt"><div class="plain">FAQ初期登録代行（10件まで） ─ 3,000円（17字）</div>
+<div class="bar"><div class="fill ok" style="width:50%"></div></div><div class="count ok">30 / 60</div>
+</div>
+<div class="opt"><div class="plain">APIキー取得代行サポート（オンラインメッセージ） ─ 2,000円（28字）</div>
+<div class="bar"><div class="fill ok" style="width:65%"></div></div><div class="count ok">39 / 60</div>
+</div>
+<div class="opt"><div class="plain">LINE公式アカウント開設代行 ─ 3,000円（15字）</div>
+<div class="bar"><div class="fill ok" style="width:48%"></div></div><div class="count ok">29 / 60</div>
+</div>
+<div class="opt"><div class="plain">デザインカスタマイズ（色・ロゴ変更） ─ 3,000円（20字）</div>
+<div class="bar"><div class="fill ok" style="width:53%"></div></div><div class="count ok">32 / 60</div>
+</div>
+</div>
+</section>
+<section class="tab-pane" data-tab="app50">
+<h2>app50 — 50,000円</h2>
+<div class="meta">予想お届け日数: 7日 / 一度に受注可能: 3件</div>
+<div class="field"><h3>サービスタイトル</h3>
+<div class="plain">管理画面付LINE AIボットを開発・設置します</div>
+<div class="bar"><div class="fill warn" style="width:96%"></div></div><div class="count warn">24 / 25</div>
+</div>
+<div class="field"><h3>キャッチコピー</h3>
+<div class="plain">面倒な返信を24時間AIに丸投げ。管理画面で会話も把握</div>
+<div class="bar"><div class="fill warn" style="width:90%"></div></div><div class="count warn">27 / 30</div>
+</div>
+<div class="field"><h3>サービス内容</h3>
+<pre>「また同じ質問に答えている」
+「営業時間外の問い合わせが朝まで手付かず」
+「返信が遅れているあいだに、他店に決められてしまう」
+
+AIチャットボット導入で対応できる悩みです。本コースは、dsl5／dify25 の1ランク上。専用アプリを新規開発し、管理画面・会話履歴・メール転送まで含めてお渡しします。
+
+
+■ このコースの立ち位置
+
+AIチャットボット制作の3コース比較：
+
+・DSL納品コース（4,000円）
+　→ 設計図だけお渡し。ご自身で動かしていただくコース。
+
+・構築代行コース（10,000円）
+　→ 設計から設置までを代行。Difyの標準管理画面で運用するコース。
+
+・アプリ開発コース（50,000円）← 本出品
+　→ 専用アプリを新規開発。管理画面・履歴・メール転送・個人情報ガード付き。
+
+本コースは「運用まで見据えて、管理画面で対応状況を把握したい」方向けの最上位コースです。
+
+
+■ 付いてくる機能
+
+1. AIによる自動応答（24時間受付）
+2. 専用管理画面（対応状況・会話履歴をいつでも確認）
+3. スマホ対応（外出先からも管理画面にアクセス可能）
+4. メール転送（AIで答えられない質問はご指定アドレスに通知）
+5. 個人情報ガード（電話番号・メールアドレスの送信を事前ブロック）
+6. CSVダウンロード（会話ログを分析や改善に活用）
+
+
+■ こちらのページで実際のチャットボットを試せます
+
+https://aianswer-sample-cafe.kouheikosehira.com
+
+カフェを想定したサンプル店舗のチャットボットです。本コースで納品するアプリの動作感を、購入前にそのままご体験いただけます。
+
+
+■ 納品物
+
+・稼働状態の専用AIチャットボットアプリ（テスト済み）
+・専用管理ダッシュボード（ログイン情報付き）
+・運用マニュアル（管理画面の使い方）
+・APIキー取得・設定の手順書（画面キャプチャ付き）
+・LINE連携手順書（LINE設置をご希望の場合）
+
+
+■ ご利用の流れ
+
+STEP 1. メッセージで業種・FAQ・設置先をお聞かせください
+STEP 2. 設計・開発・テスト（7営業日で納品）
+STEP 3. 管理画面のログイン情報と使い方をご案内
+STEP 4. 設置作業と動作確認後に納品
+STEP 5. 納品後7日間はメッセージで質問対応
+
+
+■ こんな方に向いています
+
+・一人で問い合わせ対応をしている個人事業主の方
+・電話対応の時間を減らしたい店舗経営者の方
+・営業時間外の問い合わせ対応に困っている方
+・会話履歴を残して改善に活かしたい方
+・電話番号など個人情報の誤送信を防ぎたい方
+
+
+■ 料金について
+
+本サービスの制作費は50,000円の一度きりです。サーバー費用は月額数百円〜（お客様ご自身のアカウント管理）、AI利用料は従量課金（月500〜2,000円程度）となります。
+
+まずはメッセージでお気軽にご相談ください。業種と用途をお聞きした上で、本コースが合っているか、もしくは他コースが合っているかをお答えします。
+
+
+検索キーワード：
+AIチャットボット 問い合わせ自動化 FAQ自動応答 カスタマーサポート 管理画面 会話履歴 メール転送 個人情報ガード LINE連携 ChatGPT 中小企業 個人事業主 業務効率化</pre>
+<div class="bar"><div class="fill warn" style="width:93%"></div></div><div class="count warn">1408 / 1500</div>
+</div>
+<div class="field"><h3>購入にあたってのお願い</h3>
+<pre>スムーズに制作を進めるため、以下の情報をメッセージでお知らせください。
+
+1. 業種（例：美容室、整体院、飲食店、不動産会社、士業事務所）
+2. よくある質問を3〜10件（多いほどAIの回答精度が上がります）
+3. 設置先（LINE／ホームページ／その他）
+4. メール転送先のメールアドレス（AIで答えられない質問の通知先）
+5. 管理画面にログインする方のお名前・メールアドレス
+
+質問が思いつかない場合は業種だけお知らせください。業種に合わせたFAQのたたき台をこちらから提案します。
+
+AIのAPIキーをお持ちでない場合も大丈夫です。取得方法を画面キャプチャ付きの手順書でご案内します。ご不明点はメッセージでサポートします。
+
+AIの利用料（月額500〜2,000円程度、使用量で変動）はお客様ご自身のアカウントで従量課金となります。サーバー費用も月額数百円〜でお客様ご自身のアカウント管理となります。LINE公式アカウントは無料プランで作成できます。
+
+本コースは納品後7日間、メッセージでの質問に無料で対応します。操作方法のご不明点はお気軽にご連絡ください。
+
+ご不明点は購入前にメッセージでお気軽にご質問ください。業種と用途をお聞きした上で、本コースが合っているか、もしくは他のコース（DSL納品4,000円／構築代行10,000円）が合っているかをご案内します。
+
+納品後のキャンセルはお受けできませんので、事前のご相談を歓迎します。</pre>
+<div class="bar"><div class="fill ok" style="width:62%"></div></div><div class="count ok">625 / 1000</div>
+</div>
+<div class="field"><h3>よくある質問（10件 / 最大10件）</h3>
+<div class="faq">
+<div class="faq-q">Q1. 自分でやることはありますか？</div>
+<div class="faq-a">構築・開発・設置・動作確認まで本コースで対応します。ご準備いただくのは業種・FAQ内容・メール転送先のご連絡のみです。納品後のFAQ追加や変更は、管理画面からご自身で操作できます。</div>
+<div class="bar"><div class="fill ok" style="width:22%"></div></div><div class="count ok">90 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q2. AIが答えられない質問が来たらどうなりますか？</div>
+<div class="faq-a">メール転送機能が自動で作動し、ご指定のメールアドレスに内容が通知されます。対応漏れを防ぎつつ、人が対応すべき質問だけを人が対応する運用ができます。</div>
+<div class="bar"><div class="fill ok" style="width:18%"></div></div><div class="count ok">73 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q3. 管理画面では何ができますか？</div>
+<div class="faq-a">会話履歴の閲覧、FAQの追加・変更、メール転送先の設定、CSVダウンロード（会話ログの書き出し）などができます。スマホからもアクセスできるので、外出先でも確認可能です。</div>
+<div class="bar"><div class="fill ok" style="width:21%"></div></div><div class="count ok">84 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q4. 個人情報ガードとは何ですか？</div>
+<div class="faq-a">利用者がチャット欄に電話番号やメールアドレスを入力した際に、送信前にブロックする機能です。意図しない個人情報の送信を防ぎます。</div>
+<div class="bar"><div class="fill ok" style="width:15%"></div></div><div class="count ok">63 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q5. LINE連携はできますか？</div>
+<div class="faq-a">はい、本コースの価格内でLINE連携に対応しています。LINEのリッチメニューからチャットボットを開く方式です。LINE公式アカウント（無料プランで作成可能）をご用意ください。</div>
+<div class="bar"><div class="fill ok" style="width:22%"></div></div><div class="count ok">88 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q6. 月額費用はかかりますか？</div>
+<div class="faq-a">本サービスの制作費は50,000円の一度きりです。サーバー費用は月額数百円〜（お客様ご自身のアカウント管理）、AI利用料は月500〜2,000円程度の従量課金（お客様ご自身のアカウント）となります。</div>
+<div class="bar"><div class="fill ok" style="width:24%"></div></div><div class="count ok">99 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q7. 納品後にFAQを追加・変更できますか？</div>
+<div class="faq-a">はい。専用管理画面からご自身で追加・変更・削除が可能です。操作方法は納品時のマニュアルに記載しています。</div>
+<div class="bar"><div class="fill ok" style="width:13%"></div></div><div class="count ok">52 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q8. DSL納品コース（4,000円）との違いは何ですか？</div>
+<div class="faq-a">DSL納品コースは「設計図のみ」の納品で、インポート・APIキー設定・設置作業はお客様ご自身で行っていただきます。本コースは専用アプリを開発し、管理画面・履歴・メール転送・個人情報ガードなどを提供します。</div>
+<div class="bar"><div class="fill ok" style="width:25%"></div></div><div class="count ok">102 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q9. 構築代行コース（10,000円）との違いは何ですか？</div>
+<div class="faq-a">構築代行コースはDifyで構築・設置まで代行するコースで、Difyの標準管理画面を使います。本コースは専用アプリを新規開発し、会話履歴・メール転送・個人情報ガード・CSVダウンロードなど独自機能を提供します。運用まで見据えた方向けの最上位コースです。</div>
+<div class="bar"><div class="fill ok" style="width:31%"></div></div><div class="count ok">125 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q10. 納品後のサポートはありますか？</div>
+<div class="faq-a">納品後7日間は操作方法のご質問にメッセージで無料対応します。8日目以降も「納品後30日間のメッセージサポート延長」の有料オプションで延長可能です。</div>
+<div class="bar"><div class="fill ok" style="width:18%"></div></div><div class="count ok">73 / 400</div>
+</div>
+</div>
+<div class="field"><h3>見積りにあたってのお願い</h3>
+<pre>以下をメッセージでお知らせください。
+
+・業種と主な問い合わせ内容
+・設置先（LINE／ホームページ／その他）
+・よくある質問の件数（概算でOK）
+・会話履歴・メール転送・個人情報ガードの要否
+・希望納期（特になければ「お任せ」とお伝えください）</pre>
+<div class="bar"><div class="fill ok" style="width:61%"></div></div><div class="count ok">123 / 200</div>
+</div>
+<div class="field"><h3>有料オプション（5件 / 最大10件）</h3>
+<div class="opt"><div class="plain">FAQ初期登録代行（10件まで） ─ 3,000円</div>
+<div class="bar"><div class="fill ok" style="width:41%"></div></div><div class="count ok">25 / 60</div>
+</div>
+<div class="opt"><div class="plain">デザインカスタマイズ（色・ロゴ変更） ─ 3,000円</div>
+<div class="bar"><div class="fill ok" style="width:45%"></div></div><div class="count ok">27 / 60</div>
+</div>
+<div class="opt"><div class="plain">APIキー取得代行サポート（オンラインメッセージ） ─ 2,000円</div>
+<div class="bar"><div class="fill ok" style="width:56%"></div></div><div class="count ok">34 / 60</div>
+</div>
+<div class="opt"><div class="plain">LINE公式アカウント開設代行 ─ 3,000円</div>
+<div class="bar"><div class="fill ok" style="width:40%"></div></div><div class="count ok">24 / 60</div>
+</div>
+<div class="opt"><div class="plain">納品後30日間のメッセージサポート延長 ─ 5,000円</div>
+<div class="bar"><div class="fill ok" style="width:46%"></div></div><div class="count ok">28 / 60</div>
+</div>
+</div>
+</section>
+<section class="tab-pane" data-tab="dsl5">
+<h2>dsl5 — 4,000円</h2>
+<div class="meta">予想お届け日数: 3日 / 一度に受注可能: 3件</div>
+<div class="field"><h3>サービスタイトル</h3>
+<div class="plain">LINE対応Dify DSLボットを納品します</div>
+<div class="bar"><div class="fill warn" style="width:92%"></div></div><div class="count warn">23 / 25</div>
+</div>
+<div class="field"><h3>キャッチコピー</h3>
+<div class="plain">Dify設計図を4千円で納品。LINE対応手順書付きで即稼働</div>
+<div class="bar"><div class="fill warn" style="width:100%"></div></div><div class="count warn">30 / 30</div>
+</div>
+<div class="field"><h3>サービス内容</h3>
+<pre>「営業時間は何時ですか？」
+「駐車場はありますか？」
+「予約はどうすればいいですか？」
+
+この3つの質問に、今月だけで何回答えましたか？
+
+
+LINEやメールが届くたびに手を止めて、同じ文面を打ち直す。その間にお客様は待たされ、夜間・休日は返信すらできず、翌朝には「他店で決めました」。
+
+AIチャットボットを導入すれば、同じ質問への返信作業を24時間・365日AIに任せられます。本コースは、その第一歩を4,000円で始められる入門コースです。
+
+
+■ このコースの立ち位置
+
+AIチャットボット制作の3コース比較：
+
+・DSL納品コース（4,000円）← 本出品
+　→ 設計図だけお渡し。ご自身でDifyにインポートして動かすコース。
+
+・構築代行コース（10,000円）
+　→ 設計から設置まで代行するコース。動く状態で受け取れます。
+
+・アプリ開発コース（50,000円）
+　→ 専用アプリを新規開発するコース。管理画面・履歴・メール転送付き。
+
+本コースは「まずは小さく試したい」「手を動かせる方」向けの入門コースです。
+
+※本コース（DSL納品）には、メール転送機能と個人情報ガード機能は含まれません。これらの機能が必要な場合は、アプリ開発コース（50,000円）をご検討ください。
+
+実装の完成イメージはこちらのデモでご覧いただけます：
+https://aianswer-sample-cafe.kouheikosehira.com
+（上記はアプリ開発コースで構築したサンプルです。本コースの設計図でも同等の会話体験を構築できます）
+
+
+■ 届くもの
+
+1. Dify DSLファイル（AIボットの設計図。インポートするだけで動き始めます）
+2. セットアップ手順書（全ステップ画面キャプチャ付き）
+3. プロンプト設計済みボット（店名・連絡先を入れ替えるだけ）
+
+
+■ 届いてからの作業
+
+STEP 1. Difyに設計図ファイルを読み込む（3分）
+STEP 2. AIのAPIキーを貼り付ける（5分）
+STEP 3. よくある質問を登録して公開
+
+10分程度でチャットボットが動き始めます。全ステップに画面キャプチャ付き手順書が付きますので、迷う箇所はありません。
+
+
+■ このサービスが向いている方
+
+・問い合わせの大半が同じ質問
+・IT担当がいなくても手順書を見ながら進められる方
+・まずは4,000円で小さく試したい方
+・ご自身で設定・運用をしてみたい方
+
+
+■ Difyについて
+
+世界100万人以上が利用しているオープンソースのAIツールです。無料プランで始められます。ChatGPT・Claude・Geminiなどの主要AIを組み込むことができ、日本語に対応しています。納品後、ご自身でFAQを追加・修正することも可能です。
+
+
+■ 納品後のサポート
+
+7日間、メッセージでの質問に無料対応します。「手順書を見てもここが分からない」という箇所があれば遠慮なくメッセージでご連絡ください。
+
+
+2営業日で納品します。下の「購入にあたってのお願い」に書いてある2項目をメッセージでお送りください。
+
+
+検索キーワード：
+AIチャットボット FAQ自動応答 Dify DSL 問い合わせ自動化 LINE連携 ChatGPT Claude Gemini 24時間対応 中小企業 個人事業主 自動返信 カスタマーサポート AI導入 業務効率化 ノーコード</pre>
+<div class="bar"><div class="fill warn" style="width:95%"></div></div><div class="count warn">1437 / 1500</div>
+</div>
+<div class="field"><h3>購入にあたってのお願い</h3>
+<pre>以下の2つだけ教えてください。内容を受け取り次第、制作を開始します。
+
+1. 業種（例：美容室、整体院、飲食店、不動産会社、士業事務所）
+2. お客様からよく聞かれる質問を3〜5件（例：「営業時間は？」「料金は？」「駐車場ある？」）
+
+質問が思いつかない場合は、業種だけお知らせください。業種に合わせたFAQのたたき台をこちらから提案します。
+
+Difyのアカウント作成手順やAPIキーの取得方法は、すべて画面キャプチャ付きの手順書に含まれます。事前に準備していただくものはありません。
+
+AIの利用料（月額数百円〜、使用量で変動）はお客様ご自身のアカウントで従量課金となります。Difyは無料プランで始められます。LINE連携をご希望の場合は、LINE公式アカウント（無料プランで作成可能）を別途ご用意ください。
+
+納品後7日間は、手順書の内容についてメッセージで質問対応します。「手順書を見てもここが分からない」があればご遠慮なくご連絡ください。
+
+ご不明点は購入前にメッセージでお気軽にご質問ください。業種と用途をお聞きした上で、本コースが合っているか、もしくは上位コース（構築代行10,000円／アプリ開発50,000円）が合っているかをご案内します。
+
+納品後のキャンセルはお受けできませんので、事前のご相談を歓迎します。</pre>
+<div class="bar"><div class="fill ok" style="width:56%"></div></div><div class="count ok">566 / 1000</div>
+</div>
+<div class="field"><h3>よくある質問（9件 / 最大10件）</h3>
+<div class="faq">
+<div class="faq-q">Q1. 手順書を見ても自分でセットアップできるか不安です</div>
+<div class="faq-a">全ステップを画面キャプチャ付きでご案内しています。それでも分からない箇所があれば、納品後7日間はメッセージで質問にお答えします。多くの方が納品当日中にセットアップを完了しています。ご不安な場合は、上位の構築代行コース（10,000円）で設置までお任せいただくこともできます。</div>
+<div class="bar"><div class="fill ok" style="width:34%"></div></div><div class="count ok">137 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q2. 毎月お金がかかりますか？</div>
+<div class="faq-a">本サービスの制作費は4,000円の一度きりです。AIの利用料（月数百円〜、使用量で変動）のみ、お客様ご自身のアカウントで従量課金となります。Dify自体は無料プランで利用できます。</div>
+<div class="bar"><div class="fill ok" style="width:22%"></div></div><div class="count ok">90 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q3. LINEから使えますか？</div>
+<div class="faq-a">はい。LINE公式アカウント（無料プランで作成可能）のリッチメニューからチャットボットを開く形で連携できます。設定方法は手順書に含まれています。</div>
+<div class="bar"><div class="fill ok" style="width:18%"></div></div><div class="count ok">72 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q4. 納品後にFAQを自分で追加・変更できますか？</div>
+<div class="faq-a">はい。Difyの管理画面からいつでも追加・編集ができます。操作方法は手順書に記載していますので、運用内容は自由に更新できます。</div>
+<div class="bar"><div class="fill ok" style="width:15%"></div></div><div class="count ok">63 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q5. どのAIが使えますか？</div>
+<div class="faq-a">ChatGPT（OpenAI）・Claude（Anthropic）・Gemini（Google）など主要なAIから選べます。どのAIでも動くように設計図を作成し、おすすめも手順書内でご案内しています。</div>
+<div class="bar"><div class="fill ok" style="width:25%"></div></div><div class="count ok">100 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q6. もっと手厚いコースが欲しい場合は？</div>
+<div class="faq-a">設置までお任せしたい場合は構築代行コース（10,000円）をご検討ください。管理画面・会話履歴・メール転送・個人情報ガードなどが必要な場合はアプリ開発コース（50,000円）もご用意しています。</div>
+<div class="bar"><div class="fill ok" style="width:24%"></div></div><div class="count ok">97 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q7. APIキーの取得方法が分かりません</div>
+<div class="faq-a">全画面キャプチャ付きの手順書でOpenAI・Anthropic・Googleのいずれかから取得する方法をご案内します。ご不明点はメッセージでサポートします。ご自身での取得が不安な場合は、有料オプションの「APIキー取得代行サポート」もご利用いただけます。</div>
+<div class="bar"><div class="fill ok" style="width:31%"></div></div><div class="count ok">127 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q8. 購入後にキャンセルできますか？</div>
+<div class="faq-a">納品後のキャンセルはお受けしていません。ご不明点は購入前にメッセージでお気軽にご質問ください。</div>
+<div class="bar"><div class="fill ok" style="width:11%"></div></div><div class="count ok">47 / 400</div>
+</div>
+<div class="faq">
+<div class="faq-q">Q9. どのくらいの時間でセットアップできますか？</div>
+<div class="faq-a">手順どおりに進めば、ファイル読み込み3分・APIキー設定5分・FAQ登録数分で、10分程度で動き始めます。慣れていない方でも当日中にセットアップを完了されるケースが多いです。</div>
+<div class="bar"><div class="fill ok" style="width:21%"></div></div><div class="count ok">87 / 400</div>
+</div>
+</div>
+<div class="field"><h3>見積りにあたってのお願い</h3>
+<pre>以下をメッセージでお送りください。
+
+・業種（何のお店・会社ですか？）
+・お客様からの問い合わせはおおよそ1日何件くらいですか？
+・希望納期（特になければ「お任せ」とお伝えください）</pre>
+<div class="bar"><div class="fill ok" style="width:45%"></div></div><div class="count ok">91 / 200</div>
+</div>
+<div class="field"><h3>有料オプション（4件 / 最大10件）</h3>
+<div class="opt"><div class="plain">FAQ初期登録代行（10件まで） ─ 3,000円</div>
+<div class="bar"><div class="fill ok" style="width:41%"></div></div><div class="count ok">25 / 60</div>
+</div>
+<div class="opt"><div class="plain">ナレッジベース（FAQ文書）の整形 ─ 2,000円</div>
+<div class="bar"><div class="fill ok" style="width:43%"></div></div><div class="count ok">26 / 60</div>
+</div>
+<div class="opt"><div class="plain">APIキー取得代行サポート（オンラインメッセージ） ─ 2,000円</div>
+<div class="bar"><div class="fill ok" style="width:56%"></div></div><div class="count ok">34 / 60</div>
+</div>
+<div class="opt"><div class="plain">納品後30日間のメッセージサポート延長 ─ 2,000円</div>
+<div class="bar"><div class="fill ok" style="width:46%"></div></div><div class="count ok">28 / 60</div>
+</div>
+</div>
+</section>
+</main>
+<footer>
+  文字数バー: 緑=OK / 橙=90%以上 / 赤=上限超過 (本ビューアでは全項目が上限内であることを確認済み)
+</footer>
+<script>
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var target = btn.dataset.target;
+    document.querySelectorAll('.tab-btn').forEach(function(b){
+      b.classList.toggle('active', b === btn);
+    });
+    document.querySelectorAll('.tab-pane').forEach(function(p){
+      p.classList.toggle('active', p.dataset.tab === target);
+    });
+  });
+});
+document.querySelectorAll('.tab-pane').forEach(function(p, i){
+  if (i === 0) p.classList.add('active');
+});
+</script>
+</body>
+</html>

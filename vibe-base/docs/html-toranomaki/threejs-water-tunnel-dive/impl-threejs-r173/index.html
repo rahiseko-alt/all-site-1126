@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dive into the Dark - Immersive 3D Experience</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <!-- Importmap for CDN dependencies (free & browser CPU ESM runtime) -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.173.0/build/three.module.js",
+          "gsap": "https://esm.sh/gsap@3.12.5",
+          "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger",
+          "lenis": "https://esm.sh/lenis@1.1.18",
+          "simplex-noise": "https://esm.sh/simplex-noise@4.0.3"
+        }
+      }
+    </script>
+</head>
+<body>
+    <!-- WebGL Canvas -->
+    <canvas class="webgl"></canvas>
+
+    <!-- UI Overlay (Fixed positioning) -->
+    <div class="ui-overlay">
+        <!-- Scene 0 UI: Start -->
+        <section class="scene-ui active" id="scene-0">
+            <div class="content">
+                <h1 class="glow-text">DIVE INTO THE DARK</h1>
+                <p class="sub-text">[Scroll] to begin the descent</p>
+            </div>
+        </section>
+
+        <!-- Scene 1 UI: Descent -->
+        <section class="scene-ui" id="scene-1">
+            <div class="content left-align">
+                <h2 class="glow-text-sub">THE DESCENT</h2>
+                <p class="sub-text">Sinking deeper into the abyss, leaving the surface light behind.</p>
+            </div>
+        </section>
+
+        <!-- Scene 2 UI: Crystals -->
+        <section class="scene-ui" id="scene-2">
+            <div class="content right-align">
+                <h2 class="glow-text-sub">FLOATING ESSENCE</h2>
+                <p class="sub-text">Crystals of pure energy, drifting in the endless dark.</p>
+            </div>
+        </section>
+
+        <!-- Scene 3 UI: Depth -->
+        <section class="scene-ui" id="scene-3">
+            <div class="content">
+                <h2 class="glow-text-sub">THE CORE</h2>
+                <p class="sub-text">At the absolute bottom, where time stands still.</p>
+                <div class="footer">
+                    <span class="copyright">© 2026 Immersive Lab.</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scroll Container (Defines the scrolling height) -->
+    <div class="scroll-container">
+        <div class="scroll-section"></div>
+        <div class="scroll-section"></div>
+        <div class="scroll-section"></div>
+        <div class="scroll-section"></div>
+    </div>
+
+    <script type="module" src="./js/app.js"></script>
+</body>
+</html>

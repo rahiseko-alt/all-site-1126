@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>散財資産棚卸し結果</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', 'Hiragino Sans', sans-serif; background: #fff; color: #333; padding: 40px; max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; border-bottom: 2px solid #333; padding-bottom: 8px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+  h2 { font-size: 16px; margin-top: 36px; margin-bottom: 12px; border-left: 4px solid #333; padding-left: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 24px; }
+  th { background: #fafafa; text-align: left; padding: 8px 10px; border: 1px solid #ddd; font-weight: 600; white-space: nowrap; }
+  td { padding: 8px 10px; border: 1px solid #ddd; vertical-align: top; }
+  tr:hover td { background: #f8f9ff; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+  .badge-a { background: #e8f5e9; color: #2e7d32; }
+  .badge-b { background: #e3f2fd; color: #1565c0; }
+  .badge-c { background: #f5f5f5; color: #757575; }
+  .badge-d { background: #fce4ec; color: #c62828; }
+  .badge-done { background: #c8e6c9; color: #1b5e20; }
+  .summary { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 20px; margin-bottom: 32px; font-size: 13px; line-height: 1.8; }
+  .note { font-size: 12px; color: #888; margin-top: 8px; }
+  .ex { color: #666; font-size: 12px; }
+  .footer { margin-top: 40px; font-size: 11px; color: #bbb; border-top: 1px solid #eee; padding-top: 12px; }
+  .ha { border-left-color: #2e7d32; }
+  .hb { border-left-color: #1565c0; }
+  .hc { border-left-color: #757575; }
+  .hd { border-left-color: #c62828; }
+</style>
+</head>
+<body>
+
+<h1>散財資産棚卸し結果</h1>
+<p class="subtitle">全プロダクトのドキュメント資料を「工程の再現性」視点で判定 | 2026-03-24 Session 69</p>
+
+<div class="summary">
+  <strong>判定基準:</strong> 中身（製品固有データ）ではなく、<strong>工程・書式として他プロダクトで再現できるか</strong>を基準に判定。<br>
+  <strong>対象:</strong> CLAUDE.md・pc-progress.html・READMEボイラープレートを除く実質的な資料27個。<br>
+  <strong>結果:</strong> 22個（81%）が他プロダクトで活用可能。全てプロダクト内に閉じている。
+  <table style="margin-top: 12px; width: auto;">
+    <tr><th>判定</th><th>件数</th><th>意味</th><th>状態</th></tr>
+    <tr><td><span class="badge badge-a">A: 横展開</span></td><td>6</td><td>他プロダクトが同じ工程で確実に使う。共有化しないと車輪の再発明</td><td><span class="badge badge-done">✅ 完了</span></td></tr>
+    <tr><td><span class="badge badge-b">B: 参考</span></td><td>16</td><td>工程・書式のテンプレートとして流用可能</td><td><span class="badge badge-done">✅ 完了</span></td></tr>
+    <tr><td><span class="badge badge-c">C: 製品固有</span></td><td>2</td><td>工程としても再現性が薄い</td><td>—</td></tr>
+    <tr><td><span class="badge badge-d">D: 陳腐化</span></td><td>3</td><td>古い・使われていない。整理対象</td><td>未着手</td></tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<h2 class="ha">A群: 横展開すべき（6件）<span class="badge badge-done" style="margin-left:8px">✅ Session 71で共有化済み</span></h2>
+<!-- ============================================================ -->
+
+<table>
+  <tr><th style="width:30px">#</th><th style="width:90px">現在地</th><th style="width:200px">ファイル</th><th>再現可能な工程</th><th style="width:220px">どの工程で使えるか</th></tr>
+  <tr>
+    <td>1</td>
+    <td>foodee</td>
+    <td>design-patterns.md</td>
+    <td>模写→パターン抽出→体系化の工程。画像×テキスト6配置型、色4段階、余白、区切り4種を体系化</td>
+    <td class="ex">全プロダクトのUI実装。ui-clone-sopの実践成果物</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>hearing-bot</td>
+    <td>pricing-guide.md</td>
+    <td>見積提示・予算逆算の工程。人月単価、工程別相場10項目、機能別相場</td>
+    <td class="ex">受注営業・新規案件全般</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>review-analysis</td>
+    <td>bot/review-app/docs/<br>external-service-check.md</td>
+    <td>外部サービス最新仕様の調査・記録工程。Google API群+NextAuth+Prisma+Neon+Vercelの制限・リスク一覧</td>
+    <td class="ex">P1#7（外部サービス確認）で全プロダクト使用</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>review-analysis</td>
+    <td>bot/review-app/docs/<br>vercel-env-checklist.md</td>
+    <td>デプロイ前の環境変数確認工程。必須11項目+GCP設定手順</td>
+    <td class="ex">Vercelデプロイする全プロダクト</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>review-analysis</td>
+    <td>bot/review-app/docs/<br>delivery-template.md</td>
+    <td>メール自動送信の設計・テンプレート化工程。4種テンプレート+送信タイミング定義</td>
+    <td class="ex">P2#20-21（受注導線・自動返信）で全SaaS使用</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>review-analysis</td>
+    <td>bot/review-app/docs/<br>cl3-failure-scenarios.md</td>
+    <td>障害シナリオの洗い出し・対応策定義工程。認証/DB/Google API/Gemini/Vercelの7カテゴリ</td>
+    <td class="ex">P1#12（CL-3: 壊れたらどうなるか）で全プロダクト使用</td>
+  </tr>
+</table>
+
+<p class="note">シミュレーション例: foodeeエージェントがGemini APIのレート制限を調べたい → review-analysisのexternal-service-check.mdに最新情報がある。しかし今はfoodee側からは見えない。新プロダクトでVercelデプロイ時に環境変数を漏らす → vercel-env-checklist.mdがあれば防げるが、review-analysis内に閉じている。</p>
+
+<!-- ============================================================ -->
+<h2 class="hb">B群: 参考になる（16件）<span class="badge badge-done" style="margin-left:8px">✅ Session 71でテンプレート化済み</span></h2>
+<!-- ============================================================ -->
+
+<table>
+  <tr><th style="width:30px">#</th><th style="width:90px">現在地</th><th style="width:200px">ファイル</th><th>再現可能な工程</th><th style="width:220px">どの工程で使えるか</th></tr>
+  <tr>
+    <td>7</td>
+    <td>aiueo/app</td>
+    <td>docs/user-acceptance-test.md</td>
+    <td>UATチェックリスト作成工程（セクション分割×項目列挙×期待結果）。7セクション×38項目</td>
+    <td class="ex">P1#10-11（手動テスト）のフォーマット</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>aiueo/video</td>
+    <td>docs/video-strategy.md</td>
+    <td>動画ファネル設計工程（入口/出口/分岐の定義→配信テーブル作成）</td>
+    <td class="ex">P2#3（動画配信戦略策定）の実施例</td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td>aiueo/video</td>
+    <td>docs/lp-demo-storyboard.md</td>
+    <td>動画進行表の作成工程（シーン×秒数×構成×素材×テロップ）</td>
+    <td class="ex">P2#4（出口動画制作）の進行表テンプレート</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>review-analysis</td>
+    <td>bot/review-app/docs/<br>test-plan.md</td>
+    <td>手動テストケース作成工程（TC番号×手順×期待結果×レスポンシブ検証）</td>
+    <td class="ex">P1#10（機能テスト）のテンプレート</td>
+  </tr>
+  <tr>
+    <td>11</td>
+    <td>review-analysis</td>
+    <td>docs/provisioning-guide.md</td>
+    <td>プロビジョニングフロー設計工程（自動/セルフ/手動の分離→所要時間算出）</td>
+    <td class="ex">P2#23（手順書作成）のモデル</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>review-analysis</td>
+    <td>bot/review-app/docs/<br>external-services.md</td>
+    <td>外部サービス統合ドキュメント作成工程（接続先×認証×リトライ×コスト）</td>
+    <td class="ex">P1#7-8（外部API調査・接続）のドキュメント形式</td>
+  </tr>
+  <tr>
+    <td>13</td>
+    <td>kobaraku</td>
+    <td>design-spec.md</td>
+    <td>デザインシステム定義工程（色→Typography→Animation→質感→コンポーネント規則）</td>
+    <td class="ex">P1#6（UI実装）時のデザインシステム構築</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>microscope/app</td>
+    <td>docs/search-feature-design.md</td>
+    <td>多軸検索の設計工程（軸定義→スキーマ設計→API設計→UIコンポーネント分割）</td>
+    <td class="ex">検索・フィルタ機能を持つ製品の設計時</td>
+  </tr>
+  <tr>
+    <td>15</td>
+    <td>microscope/lp</td>
+    <td>ph-launch.md</td>
+    <td>ProductHuntローンチ準備工程（タグライン→概要→Maker Comment→アセットチェックリスト）</td>
+    <td class="ex">英語圏ローンチするプロダクト</td>
+  </tr>
+  <tr>
+    <td>16</td>
+    <td>aiueo/app</td>
+    <td>docs/prd.md</td>
+    <td>PRD作成工程（課題→競合→ユーザー分類→機能一覧→制約→KPI）</td>
+    <td class="ex">P0（企画）でPRDを整理する際のフォーマット</td>
+  </tr>
+  <tr>
+    <td>17</td>
+    <td>aiueo/app</td>
+    <td>docs/operation-manual.md</td>
+    <td>運用マニュアル作成工程（起動→ロール別操作→初期設定→トラブル対応）</td>
+    <td class="ex">本体アプリの運用マニュアル作成時</td>
+  </tr>
+  <tr>
+    <td>18</td>
+    <td>aiueo/app</td>
+    <td>docs/screen-flow-and-api-spec.md</td>
+    <td>画面遷移図+API仕様書の作成工程（ユーザーフロー図→エンドポイント定義）</td>
+    <td class="ex">P1#4-6（実装）時の仕様書フォーマット</td>
+  </tr>
+  <tr>
+    <td>19</td>
+    <td>foodee</td>
+    <td>legal-and-ux-reference.md</td>
+    <td>法的根拠の調査→条文整理→判定→UXへの落とし込み工程</td>
+    <td class="ex">コンテンツ配信・外部データ利用するプロダクトの法務調査時</td>
+  </tr>
+  <tr>
+    <td>20</td>
+    <td>foodee</td>
+    <td>rss-feed-registry.md</td>
+    <td>外部データソースの選定→確認→登録→除外判定の工程</td>
+    <td class="ex">外部データを収集する製品のソース管理</td>
+  </tr>
+  <tr>
+    <td>21</td>
+    <td>kobaraku</td>
+    <td>risk-diagnosis.md</td>
+    <td>リスク診断SOP実施工程（12項目スキャン→タグ付け→軽減策→最終判定）</td>
+    <td class="ex">P0#13（リスク予備フィルター）の実施例</td>
+  </tr>
+  <tr>
+    <td>22</td>
+    <td>review-analysis</td>
+    <td>docs/ux-persona-journey.md</td>
+    <td>ジャーニーマップ生成工程（ペルソナ定義→画面別 目線・指・つまずき記録→コード矛盾検出）</td>
+    <td class="ex">全プロダクトのUI作成時（P1#6、P2#2）</td>
+  </tr>
+</table>
+
+<p class="note">シミュレーション例: foodeeエージェントがP2#3で動画配信戦略を策定する → aiueo/videoのvideo-strategy.mdのファネル設計形式が参考になる。しかしfoodee側は存在を知らない。hearing-botエージェントがUATを作る → aiueoのuser-acceptance-test.mdの38項目チェックリスト形式が雛型になるが、発見できない。</p>
+
+<!-- ============================================================ -->
+<h2 class="hc">C群: 製品固有（2件）</h2>
+<!-- ============================================================ -->
+
+<table>
+  <tr><th style="width:30px">#</th><th style="width:90px">現在地</th><th style="width:200px">ファイル</th><th>理由</th></tr>
+  <tr>
+    <td>23</td>
+    <td>review-analysis</td>
+    <td>bot/demo-manual.md</td>
+    <td>GAS版デモの操作説明。GASデモという形態自体が他で再現されない</td>
+  </tr>
+  <tr>
+    <td>24</td>
+    <td>aiueo/lp</td>
+    <td>docs/cta-before.md</td>
+    <td>CTA変更前のベースライン記録。差分追跡の発想は参考だが記録方法がただのメモ</td>
+  </tr>
+</table>
+
+<!-- ============================================================ -->
+<h2 class="hd">D群: 陳腐化（3件）</h2>
+<!-- ============================================================ -->
+
+<table>
+  <tr><th style="width:30px">#</th><th style="width:90px">現在地</th><th style="width:200px">ファイル</th><th>状態</th></tr>
+  <tr>
+    <td>25</td>
+    <td>aiueo/app</td>
+    <td>PLAN.md</td>
+    <td>Sprint2完了（2/25）で停止。MISSION_LOGと乖離の可能性大</td>
+  </tr>
+  <tr>
+    <td>26</td>
+    <td>aiueo/lp</td>
+    <td>docs/session27-handoff.md</td>
+    <td>Session27の引き継ぎ資料。4タスク未着手のまま放置</td>
+  </tr>
+  <tr>
+    <td>27</td>
+    <td>aiueo/app</td>
+    <td>docs/sheets-schema.md</td>
+    <td>PocketBase移行済みで旧設計。削除推奨</td>
+  </tr>
+</table>
+
+<!-- ============================================================ -->
+<h2 style="border-left-color: #333;">構造的な問題</h2>
+<!-- ============================================================ -->
+
+<table>
+  <tr><th style="width:30px">#</th><th style="width:200px">問題</th><th>詳細</th></tr>
+  <tr>
+    <td>1</td>
+    <td>知見がプロダクト内に閉じている</td>
+    <td>A群6件が全てプロダクトディレクトリ内に閉じており、他エージェントからアクセスされない。特にexternal-service-check.mdとvercel-env-checklist.mdは複数プロダクトが同じ外部サービスを使っているのにreview-analysis内に閉じている</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>同じ工程を個別に発明するリスク</td>
+    <td>foodeeのdesign-patterns.md（模写→パターン抽出）はui-clone-sopの実践成果物だが、次に模写するプロダクトのエージェントがこの成果を知らないまま一からやる。review-analysisの障害シナリオ集はP1#12（CL-3）の貴重な先行事例だが見えない</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>テンプレート化されていない</td>
+    <td>B群16件は形式として優秀だが「テンプレート」として抽出されておらず、製品固有データと混在している。他エージェントがコピーして使うには加工が必要</td>
+  </tr>
+</table>
+
+<!-- ============================================================ -->
+<h2 style="border-left-color: #333;">既に共有SOP化済みのもの（参考）</h2>
+<!-- ============================================================ -->
+
+<table>
+  <tr><th style="width:250px">SOP</th><th>発生元</th></tr>
+  <tr><td>docs/ops/ui-clone-sop.md</td><td>foodee等の模写知見</td></tr>
+  <tr><td>docs/ops/video-production-sop.md</td><td>aiueo/video + video-studio</td></tr>
+  <tr><td>docs/ops/lp-design-sop.md</td><td>複数プロダクトのLP制作知見</td></tr>
+</table>
+
+<p class="footer">v1.1 | 2026-03-24 Session 71 A群6件共有化+B群16件テンプレート化 完了<br>v1.0 | 2026-03-24 Session 69 作成 | 共有資産化SOP（docs/ops/shared-asset-ops.md）の初回適用結果</p>
+
+</body>
+</html>

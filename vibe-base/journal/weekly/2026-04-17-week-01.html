@@ -1,0 +1,313 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>Week 01 週次振り返り</title><style>body { font-family: -apple-system, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic UI', sans-serif; max-width: 1100px; margin: 2em auto; padding: 0 2em; line-height: 1.7; color: #1f2328; }
+h1 { border-bottom: 2px solid #d0d7de; padding-bottom: .3em; font-size: 2em; }
+h2 { border-bottom: 1px solid #d0d7de; padding-bottom: .3em; margin-top: 2em; font-size: 1.5em; }
+h3 { margin-top: 1.5em; font-size: 1.25em; color: #0550ae; }
+h4 { margin-top: 1.2em; font-size: 1.05em; background: #f6f8fa; padding: 8px 12px; border-left: 4px solid #0550ae; border-radius: 4px; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.93em; }
+th, td { border: 1px solid #d0d7de; padding: 8px 12px; text-align: left; vertical-align: top; }
+th { background: #f6f8fa; font-weight: 600; }
+tr:nth-child(even) td { background: #fafbfc; }
+blockquote { border-left: 4px solid #d0d7de; padding: 0 1em; color: #57606a; }
+strong { color: #0550ae; }
+hr { border: none; border-top: 2px solid #d0d7de; margin: 2em 0; }</style></head><body><h1>Week 01 週次振り返り (2026-04-11 〜 2026-04-17)</h1>
+<blockquote>
+<p>対象セッション: Session 165〜183（15セッション）
+対象プロダクト: vibe-base / biz-efficiency / ai-concierge / portfolio / dify-service / journal-book
+本レポートは Phase 1 集約レイヤー設計の初回試運転（第3稿=強み弱み統合版）</p>
+</blockquote>
+<hr />
+<h2>Part A: 今週習得した事</h2>
+<h3>A-1. やったこと一覧（プロダクト別）</h3>
+<table>
+<thead>
+<tr>
+<th>プロダクト</th>
+<th>主な成果物</th>
+<th>参照セッション</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>biz-efficiency</strong></td>
+<td>eff-vba01 ココナラ初出品 / 4シート統合VBAマクロ / .exe化3ツール / 景品表示法ルール整備</td>
+<td>168, 169, 170, 172, 175, 179-2</td>
+</tr>
+<tr>
+<td><strong>ai-concierge (AI Answer)</strong></td>
+<td>多言語化4言語完全対応（日英中韓）/ ヨコ展開計画策定 / OGPメタタグ+SVG画像</td>
+<td>165, 180</td>
+</tr>
+<tr>
+<td><strong>portfolio</strong></td>
+<td>独自ドメイン公開 / 画像OGPビルド時キャッシュ（32秒→数百ms）/ SAMPLE_PROJECTS 20→10件実在化</td>
+<td>165</td>
+</tr>
+<tr>
+<td><strong>dify-service</strong></td>
+<td>Dify OSS 660MB を外部移動（トークン消費削減）/ DSLサムネv2.0 vest1昇格</td>
+<td>146, 149</td>
+</tr>
+<tr>
+<td><strong>journal-book（新規）</strong></td>
+<td>Claude Code日記書籍化プロジェクト着手 / Chapter 1-3 ドラフト / mulmoclaude母艦構築</td>
+<td>165, 166, 167</td>
+</tr>
+<tr>
+<td><strong>vibe-base 基盤</strong></td>
+<td>CLAUDE.md v5.0→v5.3 段階改訂 / Plan Mode SOP整備 / NotebookLM MCP運用SOP / エージェント用語統一作戦完遂</td>
+<td>150, 151, 170, 173, 178, 179, 181, 182</td>
+</tr>
+</tbody>
+</table>
+<h3>A-2. 顧客の困りごと × 提供できる解決（+ 理解の解像度をあげる為の、用語解説）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>顧客の困りごと</th>
+<th>技術手段</th>
+<th>理解の解像度をあげる為の、用語解説</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>ポートフォリオサイトを自分のドメインで公開したい</td>
+<td>Cloudflare DNS + Vercel certs issue + OGPビルド時キャッシュ</td>
+<td><strong>Cloudflare DNS</strong> = ドメイン名（例: kouheikosehira.com）とサーバーの住所（IPアドレス）を結ぶ電話帳。<strong>Vercel certs issue</strong> = ブラウザに「このサイトは本物」と証明する鍵（SSL証明書）を発行する手続き。<strong>OGPキャッシュ</strong> = SNSにリンクを貼った時のプレビュー画像を事前に作って保存する仕組み（毎回取りに行かないので表示が速い：32秒→数百ms）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AIチャットボットを複数言語に対応させたい</td>
+<td>navigator.language起点 → 入力言語動的検出 → 完全言語一貫性</td>
+<td><strong>navigator.language</strong> = ブラウザが持つ「ユーザーの言語設定」。日本語ブラウザなら <code>ja-JP</code> を返す。<strong>入力言語動的検出</strong> = ブラウザ設定だけに頼らず、実際にユーザーが打った日本語/英語/中国語/韓国語を判定する仕組み。<strong>言語一貫性</strong> = 途中で英語混じりにならず、全回答がユーザー言語で統一される仕組み</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Excel業務で雑多なデータを自動整理したい</td>
+<td>4シート統合マクロ + 再提出疑惑検出 + 冪等性設計</td>
+<td><strong>4シート統合</strong> = 「受信→整形→確定→月次集計」の段階を別シートに分けて「途中経過」を人間が検証できる構造。<strong>再提出疑惑検出</strong> = 同じ人が同じ申請を複数回出した時に自動で警告を出す仕組み。<strong>冪等性</strong> = 同じボタンを何回押しても結果が壊れない設計（誰が押しても安心）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>参考画像に似せた画像を量産したい</td>
+<td>flux-kontext-pro の input_image 活用</td>
+<td><strong>flux-kontext-pro</strong> = Replicate の画像生成AIのひとつ。<strong>input_image</strong> = テキストだけでなく「参考画像そのもの」を編集素材として受け取れるパラメータ。「テキストで全部説明する」のではなく「この絵をこう変えて」と命令できる</td>
+</tr>
+<tr>
+<td>5</td>
+<td>複数のAIツールを横断で使いたい（用途別に使い分け）</td>
+<td>NotebookLM MCP運用SOP（調査3分岐）</td>
+<td><strong>MCP (Model Context Protocol)</strong> = Claude Code から外部ツール（NotebookLM, Gmail等）を直接呼べる仕組み。<strong>調査3分岐</strong> = 「単発事実 → web_search」「複数ソース横断 → NotebookLM」「コード読解・実装方針 → deep-research」の使い分けルール</td>
+</tr>
+<tr>
+<td>6</td>
+<td>ココナラでサービスを出品したい（未経験）</td>
+<td>13段階出品サイクル + 景品表示法チェック + ヒアリング型カスタム開発モデル</td>
+<td><strong>13段階出品サイクル</strong> = 市場調査→ひな形→分析→MVP→仮想やり取り→試用→文章→素材→出品→記録→販売分析の手順化。<strong>景品表示法チェック</strong> = 「必ず元が取れます」「黒字が出ます」等のNGワード一覧の自動照合（グレーもアウト）。<strong>ヒアリング型モデル</strong> = 購入→ヒアリング→カスタム開発→納品の流れ（ココナラ cat 230 の競合主流）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>動画を自動生成したい（どのツールを選ぶか不明）</td>
+<td>Remotion + mulmocast-cli + Antigravity Nano Banana の使い分け</td>
+<td><strong>Remotion</strong> = React で動画を作るツール（コード管理可能・再現性高）。<strong>mulmocast-cli</strong> = 音声+画像を組み合わせて動画を自動生成するCLI。<strong>Nano Banana</strong> = Antigravity ネイティブの画像生成</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Excelファイルを Web経由で配布したい（社外)</td>
+<td>MOTW 回避設計 + ブロック解除ガイド</td>
+<td><strong>MOTW (Mark of the Web)</strong> = Windows が「Webからダウンロードしたファイル」に貼る警告タグ。xlsm は MOTW が付くとマクロが実行できない。回避策はコード署名証明書（年¥20k）または手動ブロック解除（右クリック→プロパティ→ブロック解除）</td>
+</tr>
+</tbody>
+</table>
+<h3>A-3. 実績データ（monetization.xlsx 連動）</h3>
+<table>
+<thead>
+<tr>
+<th>指標</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>出品件数</td>
+<td>7件（cat 772 AIチャットボット6件 + cat 230 業務効率化1件）</td>
+</tr>
+<tr>
+<td>累計売上</td>
+<td>¥0（video-edit 1件=集計対象外を除く）</td>
+</tr>
+<tr>
+<td>累計閲覧（14日間）</td>
+<td>AI系合計 ~120閲覧。dify-dsl 35、dify-build 37、ai-answer-full 33</td>
+</tr>
+<tr>
+<td>価格改定</td>
+<td>dify-build ¥25,000→¥10,000 / dify-dsl ¥5,000→¥4,000（販売数は0を維持）</td>
+</tr>
+<tr>
+<td>有料広告オプション</td>
+<td>AI系6商品で5-9日連続実施（閲覧は増えるが販売直結せず）</td>
+</tr>
+<tr>
+<td>新規出品</td>
+<td>eff-vba01 ¥3,000（2026-04-16、業務効率化部門初号機）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Part B: 今週のログから見える、あなたのAIスキル（自覚する事が大切）</h2>
+<blockquote>
+<p><strong>厳選方針</strong>: 再現性ある判断のみ採用（「こじつけ」は削除）。強みと弱みを両面記載。</p>
+</blockquote>
+<h3>B-1. 強み（再現性あり・繰り返し活用すべき）</h3>
+<h4>①【検証怠慢を見抜く指摘力】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 181 で私が Opus 4.7 opusplan 提案書を「未検証機能だらけ」と 80%却下しようとした</li>
+<li><strong>あなたの指示</strong>: 「批判する前に自分で調査すべき。怠慢姿勢は4.7の進化方向と真逆」</li>
+<li><strong>結果</strong>: 私が公式調査→提案の前提ほぼ全て事実と判明→評価撤回→CLAUDE.md v5.3 昇格</li>
+</ul>
+<p>→ <strong>AIスキルとしては</strong>: AIの一次回答の未検証断定を見抜く指摘力
+→ <strong>ビジネス応用</strong>: AI導入支援で「AIが無理と言った」を鵜呑みにせず前提検証を要求する能力</p>
+<hr />
+<h4>②【数値化前に直感で違和感を言語化する力】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 170 で通常作業中、具体的な問題が露呈する前</li>
+<li><strong>あなたの指示</strong>: 「ムダを感じる、減らしたい」</li>
+<li><strong>結果</strong>: 調査で memory.md が全体の87%（50k tokens）占有と判明→-46k tokens 削減</li>
+</ul>
+<p>→ <strong>AIスキルとしては</strong>: 計測前に違和感を言語化して探索方向を指示する直感力
+→ <strong>ビジネス応用</strong>: 業務改善で「なんか重い」を出発点にして本丸を特定する能力。経営者の勘所の言語化</p>
+<hr />
+<h4>③【y/n 二択質問で土俵違いを顕在化させる判別力】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 168 ロールプレイ中、私が納品物（.exe即納型）を「完成」と提示した</li>
+<li><strong>あなたの指示</strong>: 「これを納品するの？競合も同じなの？y/n」</li>
+<li><strong>結果</strong>: 業界標準（ヒアリング型カスタム）との土俵違いが即露呈→Session 169 で納品モデル全面転換</li>
+</ul>
+<p>→ <strong>AIスキルとしては</strong>: 抽象議論を二択で詰めて構造ギャップを顕在化させる質問力
+→ <strong>ビジネス応用</strong>: 戦略判断・意思決定の場で「逃げ道をふさいで決める」ための質問技法</p>
+<hr />
+<h4>④【素人直感で専門結論を一刀両断する検証力】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 174 で私が Canva 納品形式調査→「Canva Pro 必須」と結論</li>
+<li><strong>あなたの指示</strong>: 「PNGにテキスト入れるだけやろ？」</li>
+<li><strong>結果</strong>: 即軌道修正→PNG土台納品で応募可能な状態に完了</li>
+</ul>
+<p>→ <strong>AIスキルとしては</strong>: 専門調査の結果を素人直感で検証する能力
+→ <strong>ビジネス応用</strong>: コンサル・IT提案で「専門家が難しく言っていること」の本質を言い当てる力</p>
+<hr />
+<h4>⑤【AIの提案モードを遮断して思考ツールとして使い直す制御力】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 182 opusplan 議論→ハーネス論→PC表管理と議論が発散した</li>
+<li><strong>あなたの指示</strong>: 「マテ、俺の頭の整理が主目的だ」</li>
+<li><strong>結果</strong>: 私が整理支援モードに切替→自己発見連鎖（塩漬けも経験/9月起業/点→線→面の装置不在）→vibe-base 構造的欠陥発見</li>
+</ul>
+<p>→ <strong>AIスキルとしては</strong>: AIに使われる側にならず、AIを思考ツールとして使い直す制御力
+→ <strong>ビジネス応用</strong>: AI導入支援で顧客側に最も欠けがちなスキル。研修コンテンツ化可能</p>
+<hr />
+<h4>⑥【現実前提の破綻を瞬時に見抜く現場感覚】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 183 私が「実ヒアリング1件」を顧客像作成に提案した</li>
+<li><strong>あなたの指示</strong>: 「顧客0で聞く人もいないのに、どうやるのさ」</li>
+<li><strong>結果</strong>: 撤回→「競合レビュー観察+公開情報」で代替フローに設計変更</li>
+</ul>
+<p>→ <strong>AIスキルとしては</strong>: 提案の前提条件が現実的に満たせるか瞬時に判別する力
+→ <strong>ビジネス応用</strong>: ゼロから始める個人事業主の支援で「理想の手順」と「実用手順」のギャップを埋める力</p>
+<hr />
+<h3>B-2. 弱み（見落とし・判断ミス・運用不足）</h3>
+<blockquote>
+<p>悪いところも記載。強みの裏側にある見落とし傾向を直視する欄。</p>
+</blockquote>
+<h4>①【事前検証を飛ばして進行を許した】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 175 で .exe 配布の MOTW 問題が発覚→サンプルURL配布路線が崩壊</li>
+<li><strong>事象</strong>: P0 フェーズで「xlsm 直渡し+サンプルURL試用」という差別化を技術検証なしに ○判定し通過させた</li>
+<li><strong>結果</strong>: P1 実機検証で MOTW 問題露呈→サンプルURL配布全面廃止→出品文章4稿の手戻り</li>
+</ul>
+<p>→ <strong>見えた弱み</strong>: 「差別化アイデアの技術的実現性を P0 で検証する」手順が運用に組み込まれていない
+→ <strong>改善方針</strong>: P0 の技術検証フェーズに「配布技術のドン詰まり検証」を組み込む（Session 175 Check-out で既に指摘済み、SOP化未実施）</p>
+<hr />
+<h4>②【出品モデル確定を長期間先送りした】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 168 で私が納品物を作って提示するまで、納品モデル（汎用.exe即納 vs ヒアリング型）の方針が決まっていなかった</li>
+<li><strong>事象</strong>: 作ってから「競合と違う土俵」と気づく構造。ヒアリング型は Session 169 で初めて確定</li>
+<li><strong>結果</strong>: 汎用.exe路線で作ってきた成果物が方針転換で全て見直し対象に</li>
+</ul>
+<p>→ <strong>見えた弱み</strong>: 戦略判断（誰にどう売るか）を技術実装より先に確定する順序が弱い
+→ <strong>改善方針</strong>: 新プロダクト P0 に「納品モデル仮置き→競合と比較→確定」を必須ステップ化</p>
+<hr />
+<h4>③【AI系6商品が14日間売上0でも打ち手が出なかった】</h4>
+<ul>
+<li><strong>シーン</strong>: cat 772 AIチャットボット6商品（業種特化3件含む）が出品後14日で販売0</li>
+<li><strong>事象</strong>: 値下げ（dify-build ¥25k→¥10k、dify-dsl ¥5k→¥4k）と有料広告を試したが効果なし。記事内容の薄さが本丸という認識は Session 167 で持っていたが、次の具体手が Week 01 内に打てていない</li>
+<li><strong>結果</strong>: eff-vba01 も出品しただけで、同じ失敗を繰り返すリスクが残存</li>
+</ul>
+<p>→ <strong>見えた弱み</strong>: 「何が売れない原因か」を認識してから「具体的に何を変えるか」に落とすサイクルが遅い
+→ <strong>改善方針</strong>: Session 183 で biz-efficiency エージェントに cat 230 競合レビュー分析タスクを指示済み。次週実行確認</p>
+<hr />
+<h4>④【振り返り周期の誤設計】</h4>
+<ul>
+<li><strong>シーン</strong>: Session 183 私が「月次振り返りSOP」を提案した</li>
+<li><strong>事象</strong>: 実際の運用速度（週1新規+毎日1本ヨコ展開=週8本）を踏まえない月次提案</li>
+<li><strong>結果</strong>: あなたの指摘「週次じゃダメなの？」で即修正</li>
+</ul>
+<p>→ <strong>見えた弱み</strong>: 運用設計の際、実測速度を逆算する前に慣習値（月次）で提案する癖
+→ <strong>改善方針</strong>: 運用提案前に「実運用の頻度・スループット」を必ず先確認する</p>
+<hr />
+<h2>Part C: 来週の宣言 + 毎日のタスク</h2>
+<h3>来週の宣言（Week 02 レポートで実行度スコア評価）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>宣言（来週やること）</th>
+<th>成否判定基準</th>
+<th>達成度（Week 02 で記入）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>ポートフォリオの完成</strong></td>
+<td>全機能完成・デプロイ済み・独自ドメインで閲覧可能</td>
+<td><em>（◯/△/✗）</em></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>新規APP 1個完成</strong></td>
+<td>新規プロダクト1つ MVP 完成・公開URL到達</td>
+<td><em>（◯/△/✗）</em></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>ココナラレビュー分析→良い出品文→数字実績 1件獲得</strong></td>
+<td>いいね・ブックマーク・販売のいずれか1件以上（何でもいいから数字実績を作る）</td>
+<td><em>（◯/△/✗）</em></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>アウトプット強化（Discord）</strong></td>
+<td>Discord に 3件投稿</td>
+<td><em>（◯/△/✗）</em></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>note掲載再開</strong></td>
+<td>記事3件公開</td>
+<td><em>（◯/△/✗）</em></td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>X投稿再開</strong></td>
+<td>毎日1件以上投稿（7日間連続）</td>
+<td><em>（◯/△/✗）</em></td>
+</tr>
+</tbody>
+</table>
+<h3>毎日のタスク（終えるまで日次継続）</h3>
+<ul>
+<li><strong>今週のテスト回答</strong>: <code>2026-04-17-week-01-vocab-test.md</code> の 17問を毎日少しずつ埋める。全問 ◯ を目指す（直ぐには無理なので毎日継続）</li>
+</ul>
+<hr />
+<p><em>Phase 1 初回試運転版（第3稿=強み弱み統合版）。用語解説テストは別紙 <code>2026-04-17-week-01-vocab-test.md</code> 参照。構造レビュー後 SOP 正式化予定。</em></p></body></html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Variable Font Drum</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 上部ガラス風コントロール: 入力した文字列が全行に反映される -->
+  <div class="controls">
+    <input type="text" id="text-input" value="Drum Rolling" placeholder="Enter text..." autocomplete="off" />
+  </div>
+
+  <!-- 3D ドラム本体。.line は app.js が numLines 個まで clone する -->
+  <div class="stage">
+    <div class="tube">
+      <div class="tube__inner">
+        <h1 class="line">Drum Rolling</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- GSAP 本体 + ScrollTrigger（classic script: window.gsap をグローバル参照） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

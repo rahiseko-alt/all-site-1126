@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ルール構造改革 1+2 — セカンドオピニオン審査資料</title>
+<style>
+:root{--bg:#f8f9fa;--card:#fff;--text:#1a1a2e;--sub:#64748b;--border:#e2e8f0;--blue:#1e40af;--blue-bg:#dbeafe;--green:#166534;--green-bg:#dcfce7;--red:#991b1b;--red-bg:#fee2e2;--orange:#9a3412;--orange-bg:#fff7ed;--purple:#7c3aed;--purple-bg:#f3e8ff;--teal:#0f766e;--teal-bg:#ccfbf1}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:40px 24px}
+.container{max-width:960px;margin:0 auto}
+h1{font-size:1.5rem;font-weight:800;margin-bottom:4px;border-bottom:3px solid var(--text);padding-bottom:8px}
+h2{font-size:1.15rem;font-weight:700;margin:32px 0 12px;padding:8px 16px;background:var(--blue-bg);color:var(--blue);border-left:4px solid var(--blue);border-radius:4px}
+h3{font-size:1rem;font-weight:700;margin:20px 0 8px;color:#334155}
+.meta{font-size:.82rem;color:var(--sub);margin-bottom:24px}
+.toc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-bottom:32px}
+.toc h3{margin-top:0}
+.toc ol{padding-left:20px;font-size:.88rem}
+.toc li{margin-bottom:4px}
+.toc a{color:var(--blue);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-bottom:20px}
+.card p,.card li{font-size:.88rem}
+.card ul,.card ol{padding-left:20px;margin:8px 0}
+.card li{margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin:12px 0}
+thead th{background:#f1f5f9;padding:10px 12px;text-align:left;font-weight:700;color:#475569;border-bottom:2px solid var(--border);white-space:nowrap}
+tbody td{padding:8px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+tbody tr:hover{background:#f8fafc}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.73rem;font-weight:700;white-space:nowrap}
+.b-before{background:var(--red-bg);color:var(--red)}
+.b-after{background:var(--green-bg);color:var(--green)}
+.b-risk{background:var(--orange-bg);color:var(--orange)}
+.b-info{background:var(--blue-bg);color:var(--blue)}
+.b-ok{background:var(--green-bg);color:var(--green)}
+.b-warn{background:var(--orange-bg);color:var(--orange)}
+.highlight{background:#fffbeb;border:1px solid #fbbf24;border-radius:8px;padding:16px 20px;margin:16px 0;font-size:.88rem}
+.code-block{background:#1e293b;color:#e2e8f0;padding:16px 20px;border-radius:8px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.78rem;overflow-x:auto;margin:12px 0;line-height:1.6;white-space:pre-wrap}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.comp-card{padding:16px;border-radius:8px}
+.comp-before{background:var(--red-bg);border-left:4px solid var(--red)}
+.comp-after{background:var(--green-bg);border-left:4px solid var(--green)}
+.comp-card h4{font-size:.9rem;margin-bottom:8px}
+.comp-card p,.comp-card li{font-size:.82rem;color:#475569}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.stat{text-align:center;padding:16px;border-radius:8px;background:#f1f5f9}
+.stat-val{font-size:1.6rem;font-weight:800}
+.stat-label{font-size:.72rem;color:var(--sub);margin-top:4px}
+.stat-green .stat-val{color:var(--green)}
+.stat-blue .stat-val{color:var(--blue)}
+.stat-orange .stat-val{color:var(--orange)}
+.stat-red .stat-val{color:var(--red)}
+.file-tree{font-family:'Cascadia Code','Fira Code',monospace;font-size:.78rem;background:#f8fafc;padding:16px 20px;border-radius:8px;border:1px solid var(--border);line-height:1.8}
+.section-divider{border:none;border-top:2px solid var(--border);margin:40px 0}
+.verdict{background:#1e293b;color:#fff;border-radius:8px;padding:20px 24px;margin:20px 0}
+.verdict h3{color:#fbbf24;margin-bottom:8px}
+.verdict p{font-size:.88rem;color:#cbd5e1}
+.appendix{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:12px 0}
+.appendix summary{font-weight:700;font-size:.9rem;cursor:pointer}
+.appendix pre{font-size:.75rem;margin-top:12px;white-space:pre-wrap;line-height:1.6}
+@media(max-width:768px){body{padding:16px 8px}.comparison{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}table{font-size:.75rem}}
+</style>
+</head>
+<body>
+<div style="background:#7f1d1d;color:#fff;padding:12px 16px;font-size:14px;line-height:1.6;border-radius:6px;margin:12px;">⚠️ <strong>歴史資料</strong>: 本資料は Session 295 以前の旧運用（MISSION_LOG / SESSION_JOURNAL 体制）を記述しています。現行の正はセッションライフサイクル（<code style="background:rgba(255,255,255,.18);color:#fff;padding:1px 5px;border-radius:3px;">.claude/rules/session-lifecycle.md</code> → <code style="background:rgba(255,255,255,.18);color:#fff;padding:1px 5px;border-radius:3px;">docs/rules/session-lifecycle-canonical.md</code>）と memory.md 分散運用 v2.0 です。本資料の手順には従わないこと。</div>
+<div class="container">
+
+<h1>ルール構造改革 1+2 — セカンドオピニオン審査資料</h1>
+<p class="meta">提出日: 2026-04-02 | 対象: vibe-base AIマルチエージェント開発基盤 | 実施者: Claude Opus | 審査依頼先: 外部専門家</p>
+
+<!-- ===== 目次 ===== -->
+<div class="toc">
+<h3>目次</h3>
+<ol>
+<li><a href="#s1">エグゼクティブサマリー</a></li>
+<li><a href="#s2">改革の背景と課題定義</a></li>
+<li><a href="#s3">設計思想: 3層アーキテクチャ</a></li>
+<li><a href="#s4">実装物一覧と変更差分</a></li>
+<li><a href="#s5">第1層: ルートCLAUDE.md v5.0（全文）</a></li>
+<li><a href="#s6">第2層: .claude/rules/ 13ファイル（全文）</a></li>
+<li><a href="#s7">第3層: プロダクトCLAUDE.md @インポート</a></li>
+<li><a href="#s8">持続性ガード（フック+検証スクリプト）</a></li>
+<li><a href="#s9">検証結果: 発火テスト 13/13</a></li>
+<li><a href="#s10">カバレッジマトリクス: SOP 28/32本</a></li>
+<li><a href="#s11">意図的除外 4本の根拠</a></li>
+<li><a href="#s12">残存リスクと未解決事項</a></li>
+<li><a href="#s13">審査観点の提案</a></li>
+</ol>
+</div>
+
+<!-- ===== 1. エグゼクティブサマリー ===== -->
+<h2 id="s1">1. エグゼクティブサマリー</h2>
+<div class="card">
+<p><strong>何をしたか:</strong> AIエージェントが開発作業時に従うべきSOP（標準作業手順書）32本の運用方式を、「エージェントが自分で判断して読みに行くPull型」から「作業対象ファイルに応じて自動注入されるPush型」に転換した。</p>
+
+<div class="stats">
+<div class="stat stat-green"><div class="stat-val">87.5%</div><div class="stat-label">SOP自動注入率<br>(28/32本)</div></div>
+<div class="stat stat-blue"><div class="stat-val">13</div><div class="stat-label">rulesファイル数<br>(要約層)</div></div>
+<div class="stat stat-orange"><div class="stat-val">55→4</div><div class="stat-label">CLAUDE.md §3行数<br>(92.7%削減)</div></div>
+<div class="stat stat-green"><div class="stat-val">13/13</div><div class="stat-label">発火テスト<br>(100%通過)</div></div>
+</div>
+
+<p><strong>改革の範囲:</strong></p>
+<ul>
+<li>Session 107（2026-04-01）: 構造改革1 — rulesファイル13本配置、旧SOP 30本に注記、8プロダクトに@インポート</li>
+<li>Session 108（2026-04-02）: 構造改革2 — kobarakuローリングテスト（発火検証13/13）、CLAUDE.md v5.0（§3縮小）、持続性ガードフック3種、検証スクリプト</li>
+</ul>
+</div>
+
+<!-- ===== 2. 背景と課題 ===== -->
+<h2 id="s2">2. 改革の背景と課題定義</h2>
+<div class="card">
+<h3>システム概要</h3>
+<p>vibe-baseは複数のAIエージェント（Claude Opus/Sonnet等）が協調して10+プロダクトを開発するモノレポ基盤。各エージェントはセッション単位で起動し、MISSION_LOG.mdで引き継ぎながら作業を進める。</p>
+
+<h3>課題: 参照断絶</h3>
+<p>32本のSOPを<code>CLAUDE.md §3</code>に列挙し、エージェントに「作業開始前に該当SOPを自分で判断して読め」と指示していた。しかし:</p>
+<ul>
+<li><strong>判断誤り:</strong> 自分の作業に該当するSOPを正しく選べない（32本から選ぶ認知負荷）</li>
+<li><strong>読み飛ばし:</strong> 面倒で開かない。特にコンテキスト枯渇時に顕著</li>
+<li><strong>結果:</strong> ルール違反→手戻り→マスターからの是正→同じ指摘の繰り返し</li>
+</ul>
+
+<div class="comparison">
+<div class="comp-card comp-before">
+<h4><span class="badge b-before">Before: Pull型</span></h4>
+<p>CLAUDE.md §3（32行のSOP索引表）</p>
+<ul>
+<li>エージェントが32行の表を読む</li>
+<li>自分の作業に該当するSOPを<strong>判断</strong></li>
+<li>該当SOPファイルを<strong>手動で開く</strong></li>
+<li>全文を読んで要点を<strong>理解</strong></li>
+</ul>
+<p><strong>4ステップの判断が必要。各ステップで失敗の可能性がある。</strong></p>
+</div>
+<div class="comp-card comp-after">
+<h4><span class="badge b-after">After: Push型</span></h4>
+<p>.claude/rules/（13ファイル、paths指定）</p>
+<ul>
+<li>エージェントがファイルにアクセス</li>
+<li>pathsパターンに一致→<strong>自動注入</strong></li>
+<li>要点がsystem-reminderとして表示</li>
+<li>詳細が必要なら参照リンクから全文へ</li>
+</ul>
+<p><strong>判断ステップ0。読み忘れが構造的に発生しない。</strong></p>
+</div>
+</div>
+</div>
+
+<!-- ===== 3. 設計思想 ===== -->
+<h2 id="s3">3. 設計思想: 3層アーキテクチャ</h2>
+<div class="card">
+<div class="file-tree">
+vibe-base/
+├── CLAUDE.md                          ← 第1層: 憲法（55行、全エージェント常時読込）
+├── .claude/
+│   ├── rules/                         ← 第2層: 要約ルール（13ファイル、paths発火で自動注入）
+│   │   ├── session-lifecycle.md       　 常時発火（pathsなし）
+│   │   ├── product-development.md     　 products/** で発火
+│   │   ├── legal.md                   　 **/terms.html 等で発火
+│   │   ├── risk-assessment.md         　 **/risk-*.md 等で発火
+│   │   ├── deployment.md             　 **/vercel.json 等で発火
+│   │   ├── lp-design.md              　 products/*/lp/** で発火
+│   │   ├── ui-clone.md               　 products/*/tmp/clone/** で発火
+│   │   ├── video-production.md        　 products/*/video/** で発火
+│   │   ├── research-bank.md           　 docs/research-bank/** で発火
+│   │   ├── quality-templates.md       　 products/*/docs/cl3-* 等で発火
+│   │   ├── structural-ops.md          　 products/*/ 等で発火
+│   │   ├── delivery-onboarding.md     　 products/*/docs/delivery* で発火
+│   │   └── ag-task.md                 　 products/*/handoff* で発火
+│   └── settings.local.json           ← フック登録
+├── docs/ops/                          ← 第3層（詳細版）: SOP全文（32本、参照リンクから到達）
+├── scripts/
+│   ├── check-rules-coverage.sh        ← 持続性ガードフック（PostToolUse発火）
+│   └── verify-rules-coverage.sh       ← 定期検証スクリプト（手動実行）
+└── products/
+    └── {product}/
+        └── CLAUDE.md                  ← 第3層（プロダクト）: @docs/ops/agent-rules.md インポート
+</div>
+
+<h3>設計判断</h3>
+<table>
+<thead><tr><th>判断</th><th>選択</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td>rulesの粒度</td><td>SOP 32本→rules 13ファイルに集約</td><td>1:1対応だとファイル爆発。関連SOPをテーマ別にグループ化</td></tr>
+<tr><td>rulesの内容</td><td>SOP全文ではなく要約</td><td>コンテキスト消費を抑制。詳細が必要なときだけ全文へ</td></tr>
+<tr><td>旧SOPの扱い</td><td>削除せず残置。先頭に注記追加</td><td>要約→全文の参照関係を明示。二重管理ではなく要約+全文の階層構造</td></tr>
+<tr><td>CLAUDE.md v5.0</td><td>§3を55行→4行に縮小</td><td>自動注入されるSOPを列挙する意味がない。除外4本のみ記載</td></tr>
+<tr><td>session-lifecycle</td><td>pathsなし（常時注入）</td><td>セッション開始/終了/引き継ぎは全作業に共通</td></tr>
+<tr><td>product-development</td><td>products/** で発火</td><td>PC表ルールは全プロダクト作業で必要</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 4. 実装物一覧 ===== -->
+<h2 id="s4">4. 実装物一覧と変更差分</h2>
+<div class="card">
+<h3>改革1（Session 107）で変更したファイル</h3>
+<table>
+<thead><tr><th>種別</th><th>ファイル</th><th>変更内容</th></tr></thead>
+<tbody>
+<tr><td><span class="badge b-ok">新規</span></td><td>.claude/rules/ 13ファイル</td><td>要約ルール配置（frontmatter + paths + 要点 + 詳細リンク）</td></tr>
+<tr><td><span class="badge b-info">修正</span></td><td>docs/ops/ 30ファイル</td><td>先頭に「要点は .claude/rules/ で自動注入。ここは詳細版」注記追加</td></tr>
+<tr><td><span class="badge b-info">修正</span></td><td>products/*/CLAUDE.md 8ファイル</td><td>@docs/ops/agent-rules.md インポート行追加</td></tr>
+<tr><td><span class="badge b-info">修正</span></td><td>.claude/rules/agent-task.md</td><td>MISSION_LOG重複発火条件を削除</td></tr>
+</tbody>
+</table>
+
+<h3>改革2（Session 108）で変更したファイル</h3>
+<table>
+<thead><tr><th>種別</th><th>ファイル</th><th>変更内容</th></tr></thead>
+<tbody>
+<tr><td><span class="badge b-info">修正</span></td><td>CLAUDE.md</td><td>v4.9→v5.0。§3を55行→4行に縮小</td></tr>
+<tr><td><span class="badge b-info">修正</span></td><td>.claude/rules/structural-ops.md</td><td>司令塔SOP（project-promotion/shared-asset-ops）セクション除去</td></tr>
+<tr><td><span class="badge b-ok">新規</span></td><td>docs/ops/rules-verification-matrix.html</td><td>発火検証マトリクス+検証結果</td></tr>
+<tr><td><span class="badge b-ok">新規</span></td><td>scripts/check-rules-coverage.sh</td><td>持続性ガードフック（3種）</td></tr>
+<tr><td><span class="badge b-ok">新規</span></td><td>scripts/verify-rules-coverage.sh</td><td>定期検証スクリプト</td></tr>
+<tr><td><span class="badge b-info">修正</span></td><td>.claude/settings.local.json</td><td>PostToolUse Write|Edit でフック登録</td></tr>
+<tr><td><span class="badge b-info">修正</span></td><td>docs/ops/revision-history.md</td><td>v5.0エントリ追加</td></tr>
+<tr><td><span class="badge b-ok">新規</span></td><td>memory/project_rule-structure-reform.md</td><td>改革メモリ（進捗・残存課題）</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 5. 第1層: CLAUDE.md v5.0 全文 ===== -->
+<h2 id="s5">5. 第1層: ルートCLAUDE.md v5.0（全文）</h2>
+<div class="card">
+<div class="code-block"># CLAUDE.md -- AI共創基盤 共通憲法 v5.0
+
+> **本ファイルを読むすべてのAIエージェントは、以下のルールに従わなければならない。**
+
+## &sect;0. 概要
+- **Vibe-Base:** 複数のAIエージェントが協調して開発を行うための共通インフラ
+- **作業ディレクトリ:** エージェントごとに専用ディレクトリを使用する
+- **運用:** 各プロダクトが企画→保守を自律完結
+
+## &sect;1. メタルール
+1. **Refactor-on-Write:** ルール追加時、既存との統合・置換を先に検討。純増は最終手段
+2. **Reference-over-Redundancy:** 1箇所に定義、他からは参照パスを記せ
+3. **Self-Correction Loop:** SOPを読まずに作業開始禁止
+
+## &sect;2. プロダクトサイクル
+各プロダクトは P0→P4 を順に通過する。**定義・タスク・種別・ゲート条件 → `docs/ops/product-cycle.md`**
+
+## &sect;3. SOP運用
+> SOPの要点は `.claude/rules/` から作業対象ファイルに応じて自動注入される（28/32本）。
+> 以下4本のみ自動注入対象外。必要時に直接参照せよ。
+
+| ファイル | 用途 |
+|---------|------|
+| `docs/ops/project-promotion.md` | 外部リポ→vibe-base昇格 |
+| `docs/ops/shared-asset-ops.md` | 散財→共有資産化 |
+| `memory/patrol.md` | パトロール指示 |
+| `docs/md-inventory.md` | 全mdファイル棚卸し |
+
+### 参照資料（判断基準・知識体系）
+| ファイル | 用途 |
+|---------|------|
+| `docs/pricing-guide.md` | アプリ開発の見積設定・相場確認 |
+| `docs/web-page-classification.html` | WEBページ設計・分類体系 |
+| `docs/scattered-asset-audit.html` | 散財資産の一覧確認 |
+
+## &sect;4. 開発ルール
+- **命名:** kebab-case必須。日本語・スペース・大文字（拡張子除く）禁止
+- **三打席ルール:** 同一箇所3回失敗→コミット→MISSION_LOG記録→引き継ぎ要請
+- **横断チェック:** バグ修正時、同パターンを全ファイル検索し一括修正
+
+## &sect;5. AIセルフガバナンス
+- **フェーズゲート:** ゲート種別タスクではマスター判定なく次フェーズに進まない
+- **先行バリデーション:** 変更前に本憲法（スコープ・禁止事項）を照合
+- **能力限界の事前申告:** 未検証を「確認済み」と報告禁止
+- **混乱検知:** 否定的FB 1回で全停止→整理→報告
+- **Check-in義務:** セッション開始時に `MISSION_LOG.md` を読み、前回の未解決事項を把握
+- **会話復帰:** マスターが過去の会話に言及→SESSION_JOURNAL.md検索→確認→再開
+- **製品参照義務:** 製品作業時は自治憲法+PC表を読め
+
+## &sect;6. 禁止事項
+- `main`への `--force` push / シークレットのコミット / `archive/`無断削除
+
+v5.0 | 改訂履歴 → `docs/ops/revision-history.md`</div>
+</div>
+
+<!-- ===== 6. 第2層: rulesファイル全文 ===== -->
+<h2 id="s6">6. 第2層: .claude/rules/ 13ファイル（全文）</h2>
+
+<div class="card">
+<h3>6-1. session-lifecycle.md <span class="badge b-info">常時発火</span></h3>
+<div class="code-block">---
+description: セッション開始・終了・引き継ぎ時の必須手順。全作業に適用
+---
+
+## セッション開始（Check-in）
+- MISSION_LOG.md を読み、前回の未解決事項を把握せよ
+- PC表バージョンを確認し、pc-template.html の CURRENT_SOP_VERSION と照合せよ
+- 不一致の場合は agent-rules.md の手順に従え
+
+## コミット前チェック（必須）
+- unstaged ファイルがゼロであること
+- 意図しない変更が含まれていないこと
+- PC表と実装が一致していること
+- MISSION_LOG が git diff-stat と一致していること
+- 次のAIが MISSION_LOG だけで作業開始できること
+- チェックなしの EXIT は禁止
+
+## セッション終了（Check-out）
+- MISSION_LOG に Check-out を書け（実施内容・未解決事項・変更ファイル・PC表バージョン・エラー回数）
+- SESSION_JOURNAL.md にエントリを追記せよ（経緯・保留判断・温度感）
+- コミットしてから EXIT せよ
+
+## AI間引き継ぎ
+- 引き継ぎは MISSION_LOG 経由のみ。チャットコピー・マスター経由の口頭伝達は禁止
+- 判断根拠（なぜそう決めたか）を必ず3行以内で書け。省略するとデザイン意図が消失する
+
+詳細: docs/ops/mission-log-ops.md / docs/ops/handoff-protocol.md（git-workflow.md は 2026-05-11 廃止・archive 移動）</div>
+</div>
+
+<div class="card">
+<h3>6-2. product-development.md <span class="badge b-info">products/** で発火</span></h3>
+<div class="code-block">---
+description: プロダクト開発時のPC表・ゲート・フェーズルール
+paths:
+  - "products/**"
+---
+
+## PC表（pc-progress.html）
+- PC表は唯一の進捗記録。照合なしに進捗を語るな
+- ○は第三者検証に耐える完了のみ。ファイル作っただけ・確認しただけは×
+- タスク名・番号・種別は pc-template.html と完全一致させよ。独自変更禁止
+- rationale には「判断内容」+「evidence列に定義された証跡」の両方を書け
+- PC表に載っていない作業を勝手に着手するな。追加提案→承認→着手
+
+## ゲート通過
+- ゲート（P0#18 / P1#14 / P2#26 / P4#5）はマスター承認 + vibe-base確認の両方が必要
+- 担当AIがマスター承認だけで○にすることは禁止
+- ゲート前にリスクタグを再評価せよ
+
+## フェーズ作業開始時
+- product-cycle.md の該当フェーズ「このフェーズで使うテンプレート」表を読め
+- PC表バージョン不一致の場合は最新テンプレートに合わせて書き換え→マスター報告→承認待ち
+
+詳細: docs/ops/product-cycle.md / docs/ops/agent-rules.md</div>
+</div>
+
+<div class="card">
+<h3>6-3. legal.md <span class="badge b-info">**/terms.html 等で発火</span></h3>
+<div class="code-block">---
+description: 法令表記・プライバシー・利用規約のページ作成・修正時のルール
+paths:
+  - "**/legal.html"
+  - "**/privacy.html"
+  - "**/terms.html"
+  - "**/terms-of-service*"
+  - "**/privacy-policy*"
+---
+
+## 事業者情報（正本）
+- 氏名: 小齊平 恒平（英語: KOHEI KOSEHIRA）
+- ブランド名: Aiueo（Aのみ大文字。AIUEO / aiueo / Aiueo System は全て誤り）
+- メール: rahiseko@gmail.com（全プロダクト共通）
+- フッター: &copy; 2026 Aiueo. All rights reserved.
+
+## 法令ページ作成時
+- 各プロダクト固有の情報のみ変える（価格・サービス内容・扱うデータ種別・利用する外部API）
+- 共通部分は legal-reference.md の正本をそのまま使え
+
+## RSS・API・スクレイピングを使うプロダクト
+- 利用規約の法的調査テンプレート（legal-reference.md Appendix A）を使え
+- 1次ソース（公式規約）を優先。AI生成の法律解釈は使うな
+
+詳細: docs/ops/legal-reference.md</div>
+</div>
+
+<div class="card">
+<h3>6-4. risk-assessment.md <span class="badge b-info">**/risk-*.md 等で発火</span></h3>
+<div class="code-block">---
+description: リスク診断・リスク台帳・ドン詰まり台帳に関するルール
+paths:
+  - "**/risk-diagnosis.md"
+  - "**/risk-registry.md"
+  - "**/dead-end-registry.md"
+  - "**/pc-progress.html"
+---
+
+## リスクタグ
+- 4種: Aout（規約違反）/ Gray（曖昧）/ Judge-Able（データ不足）/ Clear（安全）
+- 出力先（誰が被害を受けるか）で分類: A1-A4（事業者）、B1-B4（顧客）、C1-C4（第三者）
+- 入力（どの技術を使うか）ではなく出力で判定
+
+## 運用
+- P0で全件フィルター+タグ付け実施（共有リスク台帳を先に読むこと）
+- 各ゲート通過時にタグを再評価し risk-diagnosis.md を更新
+- Gray タグが減らないまま次ゲートに進む場合は vibe-base に報告
+- 共有リスク台帳（risk-registry.md）への記入は vibe-base のみ。担当AIは閲覧のみ
+
+## ドン詰まり台帳
+- 外部サービスの既知制約を事前確認せよ（P0#10で必ず照合）
+- Google API承認=数日〜数週間、Google OAuth=最大6週間、Stripe Live=7日、Vercel Hobby=非商用限定
+
+詳細: docs/ops/risk-diagnosis-sop.md / docs/ops/risk-registry.md / docs/ops/dead-end-registry.md</div>
+</div>
+
+<div class="card">
+<h3>6-5. deployment.md <span class="badge b-info">**/vercel.json 等で発火</span></h3>
+<div class="code-block">---
+description: Vercelデプロイ前後のチェックリスト
+paths:
+  - "**/vercel.json"
+  - "**/vercel"
+  - "**/.vercel/**"
+---
+
+## デプロイ前
+- npm run build が成功すること
+- DB マイグレーションが適用済みであること
+- OAuth のリダイレクト URI が本番用に設定されていること
+- 全APIが有効化されていること
+- 環境変数: DATABASE_URL / AUTH_SECRET / 各API_KEY / OAuth CLIENT_ID+SECRET
+
+## デプロイ後
+- トップページが表示されること / 認証が動作すること
+- 主要APIが応答すること / DB の読み書きが正常なこと / OGP が正しいこと
+
+## ドメイン
+- カスタムドメイン {product}.kouheikosehira.com を使え。*.vercel.app のまま放置禁止
+- Vercel Hobby = 非商用限定。収益化する場合は Pro に移行が必要
+
+詳細: docs/ops/vercel-deploy-checklist.md</div>
+</div>
+
+<div class="card">
+<h3>6-6. lp-design.md <span class="badge b-info">products/*/lp/** で発火</span></h3>
+<div class="code-block">---
+description: LP設計・参考サイト選定のルール
+paths:
+  - "products/*/lp/**"
+---
+
+## LP設計の必須入力（7項目）
+1. ターゲットの痛み  2. プロダクト  3. ベネフィット（数値付き）
+4. 証拠  5. オファー・価格  6. 緊急性・希少性  7. CTA
+
+## 競合LP分析（必須）
+- 3〜5つの実在LPを分析（コピー: トーン・PASONA・証拠・CTA / デザイン: 色・タイポ・余白・モバイル）
+
+## 構成
+- PASONA 7セクション固定順序: ヒーロー→問題→解決→証拠→オファー→不安解消→クロージング
+- ヒーローが成否の80%を決める。見出しA/Bテスト3案を作れ
+- 証拠は具体的データのみ（「多くの」「高い」禁止。数値+期間+名前）
+
+## 参考サイト選定
+- 感情定義が先（ターゲットに与えたい感情 + 与えたくない感情）→ マスターGO必須
+- 実在する稼働中のサイトのみ（記憶からの選定禁止）
+- コンポーネント単位のコピーは禁止（全体の印象から分解）
+
+詳細: docs/ops/lp-design-sop.md / docs/ops/reference-site-selection-sop.md</div>
+</div>
+
+<div class="card">
+<h3>6-7. ui-clone.md <span class="badge b-info">products/*/tmp/clone/** で発火</span></h3>
+<div class="code-block">---
+description: UI模写（クローン）作業時のルール
+paths:
+  - "products/*/tmp/clone/**"
+  - "products/*/tmp/*clone*"
+  - "products/*/tmp/*smartnews*"
+  - "products/*/tmp/*aesop*"
+---
+
+## 原則
+- まず100%コピー、その後に部分変更。最初からオリジナルを作るな
+- AIにデザインの目はない。推測するな、計測せよ
+
+## CSS計測表（17項目）
+base font-size / font-family / font-size / font-weight / line-height / letter-spacing /
+color(text) / color(bg) / color(border) / padding / margin / gap / max-width / height /
+border-radius / box-shadow / opacity+transition
+- 計測値をマスターに表で提出。未実施は「未実施」と書け。嘘をつくな
+- 計測はDevToolsまたは計測スクリプト（Puppeteer等）で取得
+
+## 照合
+- スクリーンショットは撮るだけでなく比較まで必須
+- 実サイト撮影→クローン撮影→比較→修正→再比較の5ステップ
+
+詳細: docs/ops/ui-clone-sop.md</div>
+</div>
+
+<div class="card">
+<h3>6-8. video-production.md <span class="badge b-info">products/*/video/** で発火</span></h3>
+<div class="code-block">---
+description: 動画制作・Remotionセットアップ・AI画像ツールのルール
+paths:
+  - "products/*/video/**"
+---
+
+## 動画戦略
+- 戦略テーブルを先に作れ（エントリ動画/エグジット動画/分岐動画。ファネル: 認知→興味→行動）
+- 最低限: エントリ1本（7〜30秒）+ エグジット1本（30〜90秒）
+
+## テロップの情報源
+- 現在のLP + 検証済み仮説テーブル（&check;のもの）のみ使用可
+- 旧設定・過去動画・CLAUDE.mdのデータからテロップを作るな
+
+## ツール
+- 承認済み: Remotion（無料）+ Nano Banana 2（無料）
+- 未承認（マスターGO必要）: Luma / ElevenLabs / Sora / DALL-E 3 / OpenAI TTS
+- 禁止: Midjourney（非公式API=規約違反）
+
+## Remotionセットアップ
+- 各プロダクトに独立した video/ ディレクトリを作れ（共有禁止）
+
+詳細: docs/ops/video-production-sop.md / docs/ops/antigravity-remotion-setup.md / docs/ops/antigravity-tools-reference.md</div>
+</div>
+
+<div class="card">
+<h3>6-9. research-bank.md <span class="badge b-info">docs/research-bank/** で発火</span></h3>
+<div class="code-block">---
+description: ディープリサーチ・データバンクのルール
+paths:
+  - "docs/research-bank/**"
+---
+
+## 保存先
+- 全ての調査成果物は docs/research-bank/ に保存
+- ファイル名: {トピック}-{西暦}.{拡張子}
+- 原本はResearch Bankに保存、要約だけMISSION_LOGに書くこと
+
+## 必須項目
+- タグ（market / competitor / pricing / tech / ux / platform / legal / design / script）
+- reusableFor（どの場面で再利用できるか）を明記
+
+## 品質基準
+- 全ての数値にソースURL付き / 1次ソース優先 / 3データポイント以上 / 「〜と言われている」禁止
+
+## EXIT前チェック
+- 「このセッションの調査成果物をResearch Bankに保存したか？」を自問せよ
+
+詳細: docs/ops/research-bank-sop.md</div>
+</div>
+
+<div class="card">
+<h3>6-10. quality-templates.md <span class="badge b-info">products/*/docs/cl3-* 等で発火</span></h3>
+<div class="code-block">---
+description: P1/P2フェーズで使う品質テンプレート
+paths:
+  - "products/*/docs/cl3-*"
+  - "products/*/docs/test-plan*"
+  - "products/*/docs/external-service*"
+  - "products/*/docs/*-comparison*"
+  - "products/*/docs/*-feature-comparison*"
+  - "products/*/tmp/feature-list*"
+---
+
+## 障害シナリオ（P1#12 CL-3）
+- 7カテゴリ必須: 認証/DB/外部API/AI・LLM/ホスティング/ネットワーク/データ整合性
+- 重大度: HIGH→P1必須、MEDIUM→P1推奨、LOW→P2以降
+
+## 外部サービス確認（P1#7）
+- 全外部サービスについて: SDK・エンドポイント・認証方式・無料枠・既知リスク・修正状況・確認日
+- 全数値にタイムスタンプとソースを付けよ
+
+## テスト計画（P1#10-11）
+- TC-1〜TC-7グループ: 認証/ユーザー管理/コアフロー/データ操作/外部連携/エラー/レスポンシブ
+- レスポンシブ: 375px / 768px / 1280px
+
+## 比較表（P0#5-12）
+- 単一HTML形式。3〜5社。推測禁止。不明は「non-public」
+
+## 機能棚卸し表
+- 1機能=1行。8列: #・名前・説明（専門用語禁止）・実装済み・実行可能・API種別・コスト・発火タイミング
+
+詳細: docs/ops/failure-scenario-template.md / docs/ops/external-service-check-template.md /
+      docs/ops/test-template-guide.md / docs/ops/comparison-sop.md / docs/ops/feature-inventory-sop.md</div>
+</div>
+
+<div class="card">
+<h3>6-11. delivery-onboarding.md <span class="badge b-info">products/*/docs/delivery* で発火</span></h3>
+<div class="code-block">---
+description: 納品・オンボーディング・メール設計のテンプレート
+paths:
+  - "products/*/docs/delivery*"
+  - "products/*/docs/provisioning*"
+  - "products/*/docs/operation-manual*"
+---
+
+## プロビジョニング
+- 登録方式・初期設定・マスター手動作業の内容と所要時間を明記
+- 環境変数チェックリスト必須
+
+## 運用マニュアル
+- 開発用語禁止。画面ごとに手順 / 役割別分離 / トラブルシューティング: 症状→原因→対処法
+
+## メール設計（P2#20-21）
+- 4種類: ウェルカム/フォローアップ/管理者通知/自動返信
+- APIキーは環境変数に。エラー時: 1回リトライ+管理者通知。ユーザー操作をブロックするな
+
+詳細: docs/ops/onboarding-ops-templates.md / docs/ops/email-template-guide.md / docs/ops/design-doc-templates.md</div>
+</div>
+
+<div class="card">
+<h3>6-12. ag-task.md <span class="badge b-info">products/*/handoff* で発火</span></h3>
+<div class="code-block">---
+description: エージェント間タスク委任・モデル割り当てのルール
+paths:
+  - "products/*/handoff*"
+---
+
+## モデル割り当て
+- Opus: 設計判断・レビュー・ゲート判定
+- 中級（Sonnet等）: 標準作業・実装
+- 低コスト（Haiku/Flash等）: 検索・単純リサーチ
+
+## 委任ルール
+- 1タスク=1チェックアウト / クロスディレクトリ参照は絶対パスを使え
+
+## 調査委任（低コストモデル向け）
+- 委任可能: P0市場調査・競合分析、P1外部サービス確認、P2競合LP分析・CSS計測
+- 委任不可: ゲート判定・設計判断・リスク診断・コードレビュー
+- 受入検証: 委任元が出力を必ず検証してから採用
+
+詳細: docs/ops/agent-task-protocol.md</div>
+</div>
+
+<div class="card">
+<h3>6-13. structural-ops.md <span class="badge b-info">products/*/ 等で発火</span></h3>
+<div class="code-block">---
+description: フォルダ構造変更・構造診断のルール
+paths:
+  - "products/*/"
+  - "archive/**"
+---
+
+## フォルダ構造
+- 1プロダクト=1ディレクトリ。CLAUDE.mdはプロダクトルートに1つだけ
+- 移動はgit mvで履歴保持。旧パスをgrepで全ファイル検索し参照更新
+- 凍結プロダクトは再起動時に再検証が必要
+
+## 構造診断（トリガー: マスター指示・新プロダクト・チーム変更・ルール違反発覚時）
+- 診断順序は厳守: &lt;1&gt;フォルダ構造 → &lt;2&gt;ルール到達範囲 → &lt;3&gt;重複整理
+- サブディレクトリに独立した .git があるとルート CLAUDE.md が届かない
+
+詳細: docs/ops/folder-lifecycle.md / docs/ops/structural-diagnosis.md</div>
+</div>
+
+<!-- ===== 7. 第3層: @インポート ===== -->
+<h2 id="s7">7. 第3層: プロダクトCLAUDE.md @インポート</h2>
+<div class="card">
+<p>8プロダクトのCLAUDE.mdに以下の行を追加:</p>
+<div class="code-block">@docs/ops/agent-rules.md</div>
+<table>
+<thead><tr><th>プロダクト</th><th>状態</th><th>備考</th></tr></thead>
+<tbody>
+<tr><td>ai-concierge</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>foodee</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>design-seed</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>review-analysis</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>aiueo</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>kobaraku</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>hearing-bot</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>omotenashi-trainer</td><td><span class="badge b-ok">追加済み</span></td><td></td></tr>
+<tr><td>microscope</td><td><span class="badge b-warn">スキップ</span></td><td>非アクティブ。再起動時に追加</td></tr>
+<tr><td>profile</td><td><span class="badge b-warn">スキップ</span></td><td>非アクティブ</td></tr>
+<tr><td>affiliate-lp</td><td><span class="badge b-warn">スキップ</span></td><td>非アクティブ</td></tr>
+<tr><td>video-studio</td><td><span class="badge b-warn">スキップ</span></td><td>非アクティブ</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 8. 持続性ガード ===== -->
+<h2 id="s8">8. 持続性ガード（フック+検証スクリプト）</h2>
+<div class="card">
+<p>改革の効果が時間経過で劣化しないよう、3つの自動検知フック+1つの手動検証スクリプトを設置。</p>
+
+<h3>フック: check-rules-coverage.sh</h3>
+<p>トリガー: <code>PostToolUse</code>（Write または Edit 実行後に自動発火）</p>
+
+<table>
+<thead><tr><th>#</th><th>検知対象</th><th>発火条件</th><th>動作</th></tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>SOP未カバー検知</strong></td>
+<td>docs/ops/*.md への書き込み時</td>
+<td>そのSOPファイル名が .claude/rules/ 内のどのファイルからも参照されていなければ <span class="badge b-before">block</span></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>@import漏れ検知</strong></td>
+<td>products/*/CLAUDE.md への書き込み時</td>
+<td>@docs/ops/agent-rules.md が含まれていなければ <span class="badge b-before">block</span></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>&sect;3肥大化防止</strong></td>
+<td>ルートCLAUDE.md への書き込み時</td>
+<td>60行を超えたら <span class="badge b-before">block</span></td>
+</tr>
+</tbody>
+</table>
+
+<h3>手動検証: verify-rules-coverage.sh</h3>
+<p>コマンド: <code>bash scripts/verify-rules-coverage.sh</code></p>
+<ul>
+<li>docs/ops/ の全SOP → .claude/rules/ からの参照有無を全件チェック</li>
+<li>全プロダクトCLAUDE.md → @import有無を全件チェック</li>
+<li>ルートCLAUDE.md → 行数チェック</li>
+<li>意図的除外リスト・非アクティブプロダクトリストを考慮</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>フックソースコード（全文）</h3>
+<details>
+<summary>check-rules-coverage.sh を展開</summary>
+<div class="code-block">#!/bin/bash
+# PostToolUse:Write|Edit -- 持続性ガード（#1 SOP未カバー / #2 @import漏れ / #3 &sect;3肥大化）
+
+INPUT=$(cat)
+FILE=$(echo "$INPUT" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=&gt;{try{console.log(JSON.parse(d).tool_input.file_path)}catch(e){console.log('')}})")
+
+if [ -z "$FILE" ]; then exit 0; fi
+
+FILE=$(echo "$FILE" | sed 's|\\|/|g')
+BASE_DIR="/c/Users/user/Desktop/ClaudeCode/vibe-base"
+RELPATH=$(echo "$FILE" | sed 's|.*/vibe-base/||')
+
+# #1: SOP未カバー検知
+if echo "$RELPATH" | grep -qE '^docs/ops/[^/]+\.md$'; then
+  SOPNAME=$(basename "$RELPATH")
+  case "$SOPNAME" in
+    project-promotion.md|shared-asset-ops.md|beginner-dns-nav.md|revision-history.md) exit 0 ;;
+  esac
+  COVERED=0
+  if grep -rl "$SOPNAME" "$BASE_DIR/.claude/rules/" &gt;/dev/null 2&gt;&amp;1; then COVERED=1; fi
+  if [ "$COVERED" -eq 0 ]; then
+    echo "{\"decision\":\"block\",\"reason\":\"SOP未カバー: $SOPNAME が .claude/rules/ から参照されていません\"}"
+    exit 0
+  fi
+fi
+
+# #2: @import漏れ検知
+if echo "$RELPATH" | grep -qE '^products/[^/]+/CLAUDE\.md$'; then
+  UNIX_FILE=$(echo "$FILE" | sed 's|^C:|/c|')
+  if [ -f "$UNIX_FILE" ]; then
+    if ! grep -q '@docs/ops/agent-rules.md' "$UNIX_FILE" 2&gt;/dev/null; then
+      echo "{\"decision\":\"block\",\"reason\":\"@import漏れ: $RELPATH に @docs/ops/agent-rules.md がありません\"}"
+      exit 0
+    fi
+  fi
+fi
+
+# #3: &sect;3肥大化防止
+if echo "$RELPATH" | grep -qE '^CLAUDE\.md$'; then
+  UNIX_FILE="$BASE_DIR/CLAUDE.md"
+  if [ -f "$UNIX_FILE" ]; then
+    LINES=$(wc -l &lt; "$UNIX_FILE")
+    if [ "$LINES" -gt 60 ]; then
+      echo "{\"decision\":\"block\",\"reason\":\"CLAUDE.md が ${LINES}行（上限60行超過）\"}"
+      exit 0
+    fi
+  fi
+fi
+
+exit 0</div>
+</details>
+</div>
+
+<!-- ===== 9. 検証結果 ===== -->
+<h2 id="s9">9. 検証結果: 発火テスト 13/13</h2>
+<div class="card">
+<p><strong>テストベッド:</strong> kobaraku（products/kobaraku/）</p>
+<p><strong>方法:</strong> 各ルールのpaths条件に該当するファイルを作成→読み込み→system-reminderへの自動注入を確認→テストファイル削除</p>
+
+<table>
+<thead><tr><th>#</th><th>ルール</th><th>トリガーしたファイル</th><th>結果</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>session-lifecycle</td><td>（常時。pathsなし）</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>2</td><td>product-development</td><td>products/kobaraku/**</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>3</td><td>structural-ops</td><td>products/kobaraku/</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>4</td><td>research-bank</td><td>docs/research-bank/kobaraku-market-test.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>5</td><td>quality-templates</td><td>products/kobaraku/docs/kobaraku-comparison-test.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>6</td><td>risk-assessment</td><td>products/kobaraku/risk-diagnosis.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>7</td><td>quality-templates</td><td>products/kobaraku/docs/external-service-check.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>8</td><td>quality-templates</td><td>products/kobaraku/docs/cl3-failure-scenario.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>9</td><td>lp-design</td><td>products/kobaraku/lp/index.html</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>10</td><td>video-production</td><td>products/kobaraku/video/strategy.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>11</td><td>legal</td><td>products/kobaraku/terms.html</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>12</td><td>deployment</td><td>products/kobaraku/.vercel/project.json</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>13</td><td>delivery-onboarding</td><td>products/kobaraku/docs/delivery-checklist.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>14</td><td>ui-clone</td><td>products/kobaraku/tmp/clone/reference.html</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+<tr><td>15</td><td>ag-task</td><td>products/kobaraku/handoff.md</td><td style="color:#166534;font-weight:700">PASS</td></tr>
+</tbody>
+</table>
+<p><strong>結論: 全13ルール（15テストケース）が発火を確認。自動注入率100%。</strong></p>
+</div>
+
+<!-- ===== 10. カバレッジマトリクス ===== -->
+<h2 id="s10">10. カバレッジマトリクス: SOP 28/32本</h2>
+<div class="card">
+<table>
+<thead><tr><th>rulesファイル</th><th>カバーするSOP</th><th>本数</th></tr></thead>
+<tbody>
+<tr><td>session-lifecycle</td><td>git-workflow / mission-log-ops / handoff-protocol</td><td>3</td></tr>
+<tr><td>product-development</td><td>product-cycle / agent-rules</td><td>2</td></tr>
+<tr><td>risk-assessment</td><td>risk-diagnosis-sop / risk-registry / dead-end-registry</td><td>3</td></tr>
+<tr><td>quality-templates</td><td>external-service-check-template / comparison-sop / failure-scenario-template / test-template-guide / design-doc-templates / feature-inventory-sop</td><td>6</td></tr>
+<tr><td>legal</td><td>legal-reference</td><td>1</td></tr>
+<tr><td>deployment</td><td>vercel-deploy-checklist</td><td>1</td></tr>
+<tr><td>lp-design</td><td>lp-design-sop / reference-site-selection-sop</td><td>2</td></tr>
+<tr><td>video-production</td><td>video-production-sop / antigravity-tools-reference / antigravity-remotion-setup</td><td>3</td></tr>
+<tr><td>ui-clone</td><td>ui-clone-sop</td><td>1</td></tr>
+<tr><td>research-bank</td><td>research-bank-sop</td><td>1</td></tr>
+<tr><td>structural-ops</td><td>folder-lifecycle / structural-diagnosis</td><td>2</td></tr>
+<tr><td>delivery-onboarding</td><td>onboarding-ops-templates / email-template-guide</td><td>2</td></tr>
+<tr><td>ag-task</td><td>agent-task-protocol</td><td>1</td></tr>
+<tr style="background:#f1f5f9"><td colspan="2" style="text-align:right;font-weight:700">合計</td><td style="font-weight:700">28</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 11. 意図的除外 ===== -->
+<h2 id="s11">11. 意図的除外 4本の根拠</h2>
+<div class="card">
+<table>
+<thead><tr><th>SOP</th><th>除外理由</th><th>代替アクセス手段</th></tr></thead>
+<tbody>
+<tr><td>project-promotion.md</td><td>司令塔のみが使用。年に数回の稀な操作</td><td>マスター指示で直接読む</td></tr>
+<tr><td>shared-asset-ops.md</td><td>同上</td><td>同上</td></tr>
+<tr><td>memory/patrol.md</td><td>memoryシステムの管轄。SOPではなくパトロール指示書</td><td>memoryから自動読み込み</td></tr>
+<tr><td>docs/md-inventory.md</td><td>棚卸し作業用の台帳。SOPではない</td><td>棚卸し時に直接参照</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 12. 残存リスク ===== -->
+<h2 id="s12">12. 残存リスクと未解決事項</h2>
+<div class="card">
+<table>
+<thead><tr><th>項目</th><th>リスク度</th><th>内容</th><th>対応方針</th></tr></thead>
+<tbody>
+<tr>
+<td>非アクティブ5プロダクト</td>
+<td><span class="badge b-warn">LOW</span></td>
+<td>microscope/profile/affiliate-lp/video-studioの@importがスキップ中</td>
+<td>再起動時に都度追加。verify-rules-coverage.shの除外リストで管理</td>
+</tr>
+<tr>
+<td>pathsパターンの過不足</td>
+<td><span class="badge b-warn">MEDIUM</span></td>
+<td>将来のファイル名がpathsに合致しない可能性（例: legal.mdではなくcompliance.mdを使う等）</td>
+<td>フック#1（SOP未カバー検知）が新SOPの無カバーを検知。pathsは新しいファイル名出現時に手動追加が必要</td>
+</tr>
+<tr>
+<td>要約の鮮度</td>
+<td><span class="badge b-warn">MEDIUM</span></td>
+<td>SOPの全文を改訂しても、rulesの要約が自動更新されない（手動同期が必要）</td>
+<td>SOP改訂時にrulesも同時改訂する運用ルールを設ける必要あり。現状のフックではこの乖離を検知できない</td>
+</tr>
+<tr>
+<td>フックのWindows依存</td>
+<td><span class="badge b-warn">LOW</span></td>
+<td>check-rules-coverage.shはbash + nodeを前提。Windows Git Bash環境でのみ動作確認済み</td>
+<td>現行環境（Windows 11 + Git Bash）では問題なし。環境移行時は再検証</td></tr>
+<tr>
+<td>CLAUDE.md 60行上限</td>
+<td><span class="badge b-warn">LOW</span></td>
+<td>現在55行。残り5行の余裕。§5に項目追加すると超過の可能性</td>
+<td>超過時はフック#3がblockするため無断肥大化は防止される。必要時は上限値の見直し</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===== 13. 審査観点の提案 ===== -->
+<h2 id="s13">13. 審査観点の提案</h2>
+<div class="card">
+<p>外部専門家による審査にあたり、以下の観点での評価を依頼します。</p>
+
+<table>
+<thead><tr><th>#</th><th>審査観点</th><th>具体的な問い</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>設計の妥当性</strong></td><td>3層構造（憲法→要約ルール→詳細SOP）は参照断絶の解決策として適切か。過剰設計ではないか。</td></tr>
+<tr><td>2</td><td><strong>pathsの網羅性</strong></td><td>13ファイルのpathsパターンに「発火すべきなのに発火しない」盲点はあるか。</td></tr>
+<tr><td>3</td><td><strong>要約の品質</strong></td><td>各rulesファイルの要約は、SOP全文を読まなくても正しい行動を取れる十分な情報を含んでいるか。</td></tr>
+<tr><td>4</td><td><strong>持続性ガードの有効性</strong></td><td>3つのフックは改革の劣化を防ぐのに十分か。検知できない劣化パターンはあるか。</td></tr>
+<tr><td>5</td><td><strong>除外の妥当性</strong></td><td>4本の除外判断は適切か。自動注入すべきSOPが除外されていないか。</td></tr>
+<tr><td>6</td><td><strong>CLAUDE.md v5.0の完成度</strong></td><td>55行の憲法として、必要十分な情報を含んでいるか。欠落/冗長はあるか。</td></tr>
+<tr><td>7</td><td><strong>旧SOPとの整合性</strong></td><td>rulesの要約と旧SOP全文の間に矛盾・乖離はないか。</td></tr>
+<tr><td>8</td><td><strong>スケーラビリティ</strong></td><td>プロダクト数やSOP数が増えた場合、この構造は破綻しないか。</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="section-divider">
+<p style="text-align:center;font-size:.78rem;color:var(--sub);margin-top:24px">
+ルール構造改革 1+2 セカンドオピニオン審査資料 | 2026-04-02 | vibe-base Session 108-109
+</p>
+
+</div>
+</body>
+</html>

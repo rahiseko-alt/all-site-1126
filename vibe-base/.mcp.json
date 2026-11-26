@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "notebooklm-mcp": {
+      "type": "stdio",
+      "command": "notebooklm-mcp",
+      "args": [
+        "--transport",
+        "stdio"
+      ],
+      "env": {
+        "NOTEBOOKLM_HL": "ja",
+        "NOTEBOOKLM_QUERY_TIMEOUT": "120"
+      }
+    }
+  }
+}

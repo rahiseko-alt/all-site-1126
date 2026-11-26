@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-05-31 Session 3 — Canva スライド探索</title>
+<style>
+body{font-family:sans-serif;max-width:860px;margin:40px auto;padding:0 20px;color:#222}
+h1{font-size:1.4rem;border-bottom:3px solid #333;padding-bottom:8px}
+h2{font-size:1.1rem;margin-top:2rem;border-left:4px solid #555;padding-left:10px}
+.alert-red{background:#fff0f0;border:2px solid #c00;border-radius:6px;padding:14px 18px;margin:16px 0}
+.alert-yellow{background:#fffbe6;border:2px solid #e6a817;border-radius:6px;padding:12px 16px;margin:12px 0}
+table{border-collapse:collapse;width:100%;margin:10px 0}
+th,td{border:1px solid #ccc;padding:6px 10px;font-size:.9rem;vertical-align:top}
+th{background:#f5f5f5}
+code{background:#f0f0f0;padding:2px 5px;border-radius:3px;font-size:.85rem}
+ul{margin:6px 0;padding-left:1.4rem}
+li{margin:3px 0}
+.pass{color:#080}
+.note{font-size:.85rem;color:#555}
+</style>
+</head>
+<body>
+
+<h1>Check-out レポート — 2026-05-31 Session 3<br>
+<span style="font-size:.9rem;font-weight:normal">Canva スライド探索（未完了）</span></h1>
+<p class="note">次セッションは <code>memory.md</code> 冒頭の <code>@</code> 参照から本ファイルを <strong>必ず先に Read</strong> してから着手すること。</p>
+
+<div class="alert-red">
+<strong>⚠️ 要確認: learning-suite-kanji-foreign に未コミット差分あり（97ファイル）</strong><br>
+<code>products/learning-suite-kanji-foreign/src/lib/data/kanji/</code> 配下 JS 95件 + Svelte 2件が unstaged（211挿入/210削除）。<br>
+本セッションでは一切触っていない。前セッション持越しと思われる。<br>
+次セッション冒頭で <code>git diff HEAD -- products/learning-suite-kanji-foreign/</code> を確認 → コミットまたは revert。
+</div>
+
+<div class="alert-yellow">
+<strong>⚠️ Canva スライド: 未完了（テンプレート URL が必要）</strong><br>
+「White Beige and Brown Simple Minimalist Clean Final Project Presentation」は Canva 公開テンプレート。<br>
+MCP 経由では直接アクセス不可。次回対応: ①マスターにテンプレート URL を共有してもらう、または ②AI 生成で類似スタイルを作成。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+  <li>Canva MCP 接続確認済（アカウント連携済み）</li>
+  <li>スライド 5 枚の内容確認（Claude Code CLI/IDE/Desktop/Web 版解説）</li>
+  <li>Canva 公開テンプレートは MCP 経由では直接使用不可と判明</li>
+  <li>コードコミットなし</li>
+</ul>
+
+<h2>B. 完了 commit 一覧</h2>
+<p class="note">本セッションのコミットなし。</p>
+
+<h2>C. Canva MCP 能力メモ（次回参照用）</h2>
+<ul>
+  <li>アカウント内の既存デザイン → 検索・編集・エクスポート可</li>
+  <li>公開テンプレートライブラリ → <b>MCP 非対応</b>（ブラウザ操作が必要）</li>
+  <li>AI 生成（generate-design-structured）→ 可能（request-outline-review フローを使う）</li>
+  <li>テンプレ使用フロー: マスターが Canva でテンプレートを「使用」→ URL を共有 → MCP で編集</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table>
+<tr><th>優先度</th><th>内容</th></tr>
+<tr><td><b>H</b></td><td>learning-suite-kanji-foreign 未コミット差分の処理（前セッション持越し）</td></tr>
+<tr><td>M</td><td>Canva スライド作成: テンプレート URL 共有待ち or AI 生成で代替</td></tr>
+<tr><td>L</td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否の決定</td></tr>
+</table>
+
+<h2>E. Wave A 機械検証</h2>
+<table>
+<tr><th>項目</th><th>結果</th></tr>
+<tr><td>unstaged ファイル</td><td>⚠️ learning-suite-kanji-foreign 97件（本セッション外・要確認）</td></tr>
+<tr><td>secret-grep</td><td class="pass">PASS（0件）</td></tr>
+<tr><td>code-reviewer</td><td class="pass">no issues（本セッションのコード変更なし）</td></tr>
+</table>
+
+<h2>F. 次セッション初手</h2>
+<ol>
+  <li>pc-checkin 実行</li>
+  <li><b>kanji-foreign 差分確認・処理</b>（最優先）</li>
+  <li>Canva スライド作業再開（テンプレート URL or AI 生成選択）</li>
+</ol>
+<p>残作業: H=1 / M=1 / L=1</p>
+<p class="note">生成: 2026-05-31 Session 3 | branch: master | コミットなし</p>
+</body>
+</html>

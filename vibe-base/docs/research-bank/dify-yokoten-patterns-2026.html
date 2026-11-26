@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Difyヨコ展開パターン — ココナラ出品調査レポート（2026年4月）</title>
+<style>
+  :root { --bg: #f8f9fa; --card: #fff; --border: #dee2e6; --primary: #2563eb; --danger: #dc2626; --success: #16a34a; --warn: #d97706; --text: #1e293b; --muted: #64748b; --purple: #7c3aed; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; border-bottom: 3px solid var(--primary); padding-bottom: 8px; margin-bottom: 6px; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+  h2 { font-size: 1.25rem; margin: 32px 0 12px; padding: 6px 12px; background: var(--primary); color: #fff; border-radius: 4px; }
+  h3 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--primary); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; white-space: nowrap; }
+  .highlight { background: #fef3c7; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; }
+  .tag-fact { background: #dbeafe; color: #1d4ed8; }
+  .tag-estimate { background: #fef3c7; color: #92400e; }
+  .tag-blue { background: #dbeafe; color: #1e40af; }
+  .tag-green { background: #dcfce7; color: #166534; }
+  .tag-red { background: #fecaca; color: #991b1b; }
+  .tag-purple { background: #ede9fe; color: #5b21b6; }
+  .callout { padding: 12px 16px; border-left: 4px solid; border-radius: 0 4px 4px 0; margin: 12px 0; font-size: 0.9rem; }
+  .callout-warn { border-color: var(--warn); background: #fffbeb; }
+  .callout-success { border-color: var(--success); background: #f0fdf4; }
+  .callout-info { border-color: var(--primary); background: #eff6ff; }
+  .callout-danger { border-color: var(--danger); background: #fef2f2; }
+  .callout-purple { border-color: var(--purple); background: #f5f3ff; }
+  ul, ol { padding-left: 20px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  p { font-size: 0.9rem; margin-bottom: 8px; }
+  .executive { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 20px 24px; margin: 16px 0; }
+  .executive h2 { background: none; color: #93c5fd; margin: 0 0 12px; padding: 0; font-size: 1.15rem; }
+  .executive p { color: #cbd5e1; }
+  .executive strong { color: #fbbf24; }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 12px 0; }
+  .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+  .kpi .val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+  .kpi .label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .sources { font-size: 0.8rem; color: var(--muted); margin-top: 32px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .sources a { color: var(--primary); }
+  .opp-card { background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 1px solid #86efac; border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  .opp-card h3 { color: #166534; margin-top: 0; }
+  .risk-card { background: linear-gradient(135deg, #fef2f2, #fff1f2); border: 1px solid #fca5a5; border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  .insight-num { display: inline-block; background: var(--primary); color: #fff; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; font-size: 0.8rem; font-weight: 700; margin-right: 6px; }
+  @media (max-width: 768px) { body { padding: 12px; } .kpi-row { grid-template-columns: 1fr 1fr; } table { font-size: 0.78rem; } }
+</style>
+</head>
+<body>
+
+<h1>Difyヨコ展開パターン — ココナラ出品調査レポート</h1>
+<p class="meta">
+  調査日: 2026-04-06 | タグ: <span class="tag tag-blue">market</span><span class="tag tag-green">competitor</span><span class="tag tag-purple">pricing</span> | reusableFor: ココナラ新商品企画・価格設定・差別化戦略
+</p>
+
+<div class="executive">
+  <h2>エグゼクティブサマリー</h2>
+  <p>ココナラ上のDify関連出品を網羅調査した結果、<strong>確認できた出品数は約20件超</strong>、うち「チャットボット構築」が約6割を占め、残りが「教育・レッスン」「SNS自動投稿」「環境構築代行」「業務自動化エージェント」「テキスト教材販売」の切り口。価格帯の中央値は<strong>8,000円〜10,000円</strong>。最も売れている出品者は<strong>たま@システムエンジニア</strong>（チャットボット構築63件+LINEbot21件+環境構築5件=計89件）と<strong>タナ@生成AI活用サポーター</strong>（60分レッスン32件）。「チャットボット以外」で実売があるのは<strong>SNS自動投稿</strong>（9件）、<strong>LINEbot構築</strong>（21件）、<strong>60分レッスン</strong>（32件）の3パターンのみで、議事録自動化・経費処理・営業提案書生成などは<strong>Difyで技術的に可能だがココナラ出品は皆無</strong>という空白地帯。</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="val">20+</div><div class="label">Dify関連 出品総数</div></div>
+  <div class="kpi"><div class="val">~60%</div><div class="label">チャットボット構築の割合</div></div>
+  <div class="kpi"><div class="val">89件</div><div class="label">最多販売者の累計実績</div></div>
+  <div class="kpi"><div class="val">5種</div><div class="label">チャットbot以外の切り口数</div></div>
+</div>
+
+<h2>1. 主要データ: ココナラ上のDify関連出品一覧</h2>
+
+<h3>A. チャットボット構築（メインストリーム）</h3>
+<table>
+<tr><th>#</th><th>タイトル</th><th>価格</th><th>販売実績</th><th>評価</th><th>出品者</th></tr>
+<tr><td>1</td><td>DifyでAIチャットボット作ります（相談からOK）</td><td>5,000円〜</td><td>63件</td><td>5.0 (51)</td><td>たま@システムエンジニア</td></tr>
+<tr><td>2</td><td>社内資料をナレッジ学習させたDifyを構築します</td><td>55,000円</td><td>5件</td><td>5.0 (5)</td><td>けうまる@ラジオパーソナリティ</td></tr>
+<tr><td>3</td><td>Dify×Azureで生成AIボットを作成します</td><td>100,000円</td><td>1件</td><td>5.0 (1)</td><td>マルチンゲール</td></tr>
+<tr><td>4</td><td>Dify構築します（最短でAIサービスを実現）</td><td>30,000円</td><td>1件</td><td>5.0 (1)</td><td>ルミナス_design</td></tr>
+<tr><td>5</td><td>任意の情報を学習させたAIチャットボット作ります</td><td>30,000円</td><td>0件</td><td>-</td><td>K・A Studio</td></tr>
+<tr><td>6</td><td>Difyでチャットボットを開発します（24時間365日AI社員）</td><td>50,000円</td><td>0件</td><td>-</td><td>花咲凛</td></tr>
+<tr><td>7</td><td>DIfyのチャットボット・ワークフローを作成します</td><td>4,000円</td><td>0件</td><td>-</td><td>ロヒス</td></tr>
+<tr><td>8</td><td>AI導入！"あなた専用チャットボット"を構築します</td><td>50,000円</td><td>0件</td><td>-</td><td>まきりんAI</td></tr>
+<tr><td>9</td><td>店舗/企業向けFAQチャットボットを構築します</td><td>50,000円</td><td>0件</td><td>-</td><td>obaratoshiharu</td></tr>
+</table>
+
+<h3>B. チャットボット以外の切り口</h3>
+<table>
+<tr><th>#</th><th>切り口</th><th>タイトル</th><th>価格</th><th>販売実績</th><th>評価</th><th>出品者</th></tr>
+<tr class="highlight"><td>10</td><td>LINEbot構築</td><td>DifyとMakeやGASでLINEbot作ります</td><td>10,000円</td><td>21件</td><td>5.0 (13)</td><td>たま@システムエンジニア</td></tr>
+<tr class="highlight"><td>11</td><td>SNS自動投稿</td><td>Dify組み込みします RAGを使って1ランク上の自動投稿</td><td>8,000円</td><td>9件</td><td>5.0 (8)</td><td>DigtaRod</td></tr>
+<tr class="highlight"><td>12</td><td>60分レッスン</td><td>Difyの超基礎を60分で徹底的に教えます</td><td>9,500円</td><td>32件</td><td>5.0 (25)</td><td>タナ@生成AI活用サポーター</td></tr>
+<tr><td>13</td><td>60分レッスン</td><td>未経験OK！DifyでAIツール作成方法が学べます</td><td>7,000円</td><td>9件</td><td>5.0 (9)</td><td>森本洋平</td></tr>
+<tr><td>14</td><td>環境構築代行</td><td>Difyのローカル環境構築手伝います</td><td>5,000円</td><td>5件</td><td>5.0 (4)</td><td>たま@システムエンジニア</td></tr>
+<tr><td>15</td><td>レッスン</td><td>Difyの環境構築・開発教えます（AIワークフロー）</td><td>7,500円</td><td>3件</td><td>-</td><td>生成AIファースト</td></tr>
+<tr><td>16</td><td>AIアプリ汎用開発</td><td>生成AI歴3年がDifyでAIアプリ開発します</td><td>7,500円</td><td>1件</td><td>5.0 (1)</td><td>プラチナ認定者</td></tr>
+<tr><td>17</td><td>業務自動化エージェント</td><td>AIエージェント・MCPサーバーを構築します（Dify・n8n・Replit）</td><td>6,500円</td><td>0件</td><td>-</td><td>soh_ccnl</td></tr>
+<tr><td>18</td><td>X自動投稿ツール</td><td>X自動投稿ツール販売します（Dify使用）</td><td>8,000円</td><td>0件</td><td>-</td><td>シャイニング レボ</td></tr>
+<tr><td>19</td><td>使い方教え+開発</td><td>Difyの使い方教え/Difyで商品を開発します</td><td>5,000円</td><td>0件</td><td>-</td><td>（法人向け）</td></tr>
+<tr><td>20</td><td>業務自動化コンサル</td><td>AI×業務自動化｜めんどい作業をAIで効率化します</td><td>10,000円</td><td>0件</td><td>-</td><td>れい（プラチナ）</td></tr>
+</table>
+
+<div class="callout callout-info">
+  <strong>注記:</strong> 販売実績はページ表示時点の数値。ココナラは販売実績とレビュー件数が異なる（全購入者がレビューを書くわけではない）。上記は2026年4月6日時点の調査結果。
+</div>
+
+<h2>2. 切り口別の市場構造</h2>
+
+<div class="card">
+<table>
+<tr><th>切り口カテゴリ</th><th>出品数</th><th>販売実績合計</th><th>価格帯</th><th>中央値</th><th>競争度</th></tr>
+<tr><td>チャットボット構築</td><td>9件</td><td>70件</td><td>4,000〜100,000円</td><td>30,000円</td><td>レッドオーシャン</td></tr>
+<tr class="highlight"><td>LINEbot構築</td><td>1件</td><td>21件</td><td>10,000円</td><td>10,000円</td><td>独占状態</td></tr>
+<tr class="highlight"><td>SNS自動投稿（RAG付き）</td><td>2件</td><td>9件</td><td>8,000円</td><td>8,000円</td><td>低競争</td></tr>
+<tr class="highlight"><td>60分レッスン・教育</td><td>4件</td><td>44件</td><td>5,000〜9,500円</td><td>7,250円</td><td>やや競争</td></tr>
+<tr><td>環境構築代行（VPS/Docker）</td><td>1件</td><td>5件</td><td>5,000円</td><td>5,000円</td><td>独占状態</td></tr>
+<tr><td>業務自動化エージェント</td><td>2件</td><td>0件</td><td>6,500〜10,000円</td><td>8,250円</td><td>出品あるが未売</td></tr>
+<tr><td>AIアプリ汎用開発</td><td>1件</td><td>1件</td><td>7,500円</td><td>7,500円</td><td>低競争</td></tr>
+</table>
+</div>
+
+<h2>3. ブルーオーシャン候補: Difyで提供可能だが出品がない/極少の領域</h2>
+
+<div class="opp-card">
+  <h3>A. 議事録自動作成ワークフロー</h3>
+  <p><strong>需要根拠:</strong> Dify+音声テキスト化+Notion連携で議事録自動化の技術記事が多数（note、Qiita、日経リスキリング等）。ココナラの「AIエージェント構築」出品(#17)が対応可能と記載しているが、販売実績0。専門特化した出品は存在しない。</p>
+  <p><strong>想定価格:</strong> 15,000〜30,000円（ワークフロー構築+Notion連携+操作マニュアル）</p>
+  <p><strong>差別化ポイント:</strong> 「録音ファイルをアップロードするだけ→発言者別要約+タスク抽出→Notionに自動保存」という具体ユースケースで訴求</p>
+</div>
+
+<div class="opp-card">
+  <h3>B. WordPress/SEO記事自動生成ワークフロー</h3>
+  <p><strong>需要根拠:</strong> ココナラ公開依頼に「DifyでWordPress自動投稿作成」（予算1〜3万円、応募0件で終了）あり。技術記事も多数（DifyハッカソンでSEO記事→WP自動投稿が受賞）。現在ココナラに専門出品なし。</p>
+  <p><strong>想定価格:</strong> 20,000〜40,000円（キーワード入力→構成生成→本文生成→WP下書き投稿の一気通貫）</p>
+  <p><strong>差別化ポイント:</strong> SEO構成テンプレート付き。GAS連携でスプレッドシートからバッチ実行も対応</p>
+</div>
+
+<div class="opp-card">
+  <h3>C. 経費精算・請求書OCR自動処理</h3>
+  <p><strong>需要根拠:</strong> Difyワークフロー+Gemini OCRで領収書→仕訳の事例多数。「経理の月次処理9割時短」の記事あり。ココナラに出品なし。</p>
+  <p><strong>想定価格:</strong> 30,000〜50,000円（OCR→項目抽出→仕訳分類→スプレッドシート出力）</p>
+  <p><strong>差別化ポイント:</strong> 中小企業の経理担当者向け。freee/マネーフォワード連携の入口として設計</p>
+</div>
+
+<div class="opp-card">
+  <h3>D. 営業提案書・メール自動生成</h3>
+  <p><strong>需要根拠:</strong> Dify×n8nで見積もり・提案メール自動生成の技術記事あり。ココナラでは「AI×業務自動化」として出品(#20)あるが販売0件で、Dify特化ではない。</p>
+  <p><strong>想定価格:</strong> 15,000〜25,000円（ヒアリングシート入力→提案書テンプレート生成→PDF出力）</p>
+  <p><strong>差別化ポイント:</strong> 業種別テンプレート（不動産・人材・IT等）を用意し、即戦力感を訴求</p>
+</div>
+
+<div class="opp-card">
+  <h3>E. Webスクレイピング+情報整理ボット（Firecrawl連携）</h3>
+  <p><strong>需要根拠:</strong> Dify公式Firecrawlプラグインで競合調査・リード収集・価格監視が可能。技術記事多数。ココナラに専門出品なし。</p>
+  <p><strong>想定価格:</strong> 15,000〜30,000円（URL指定→データ抽出→整形→スプレッドシート出力）</p>
+  <p><strong>差別化ポイント:</strong> 「毎日の競合価格チェックを自動化」「採用候補者リスト自動作成」等の具体シナリオ</p>
+</div>
+
+<div class="opp-card">
+  <h3>F. Dify完全攻略テキスト教材（DSLテンプレート付き）</h3>
+  <p><strong>需要根拠:</strong> レッスン系が32件+9件+3件と高実績。書籍は技術評論社・SBクリエイティブから出版済み。ココナラでの教材販売は「完全攻略セット」(AI寺子屋)が1件あるがレビュー確認不可。DSLテンプレート集としての出品はなし。</p>
+  <p><strong>想定価格:</strong> 3,000〜8,000円（テキスト+DSLテンプレート5〜10本セット）</p>
+  <p><strong>差別化ポイント:</strong> 「インポートするだけで即使える」DSLファイル集。レッスンではなく買い切りで単価低・数量勝負</p>
+</div>
+
+<div class="opp-card">
+  <h3>G. 顧客アンケート/レビュー分析ワークフロー</h3>
+  <p><strong>需要根拠:</strong> Dify×GASでアンケート分析アプリの技術記事あり（たま@ITエンジニアのnote）。CSVアップロード→ポジネガ判定→レポート生成が可能。ココナラに専門出品なし。</p>
+  <p><strong>想定価格:</strong> 15,000〜25,000円</p>
+  <p><strong>差別化ポイント:</strong> 店舗経営者向け。Googleレビュー・アンケートのCSVを入れるだけで改善提案レポートが出る</p>
+</div>
+
+<h2>4. 分析・示唆</h2>
+
+<div class="card">
+  <p><span class="insight-num">1</span><strong>チャットボット一極集中。</strong> Dify出品の約6割がチャットボット構築。しかし上位2名（たま: 63件、けうまる: 5件）が市場を寡占。新規参入でチャットボットを出しても、63件の実績壁を突破するのは困難。同じ土俵で戦うのは非効率。</p>
+</div>
+
+<div class="card">
+  <p><span class="insight-num">2</span><strong>「教える」切り口は実証済みの高単価市場。</strong> タナ@生成AI活用サポーターの60分レッスン（9,500円、32件=30万円超の売上）が市場を証明済み。レッスン系は原価ゼロ・在庫なし・スケーラブル。ただし60分拘束されるため時間単価に上限あり。テキスト教材（買い切り）にすれば労働集約を脱却できる。</p>
+</div>
+
+<div class="card">
+  <p><span class="insight-num">3</span><strong>SNS自動投稿は「チャットボット以外」で唯一の成功事例。</strong> DigtaRodの「RAGを使って1ランク上の自動投稿」（8,000円、9件）。X/BlueSky/Threads連携。GAS+Dify APIの組み合わせ。ワークフロー型商品の需要が存在する証拠。</p>
+</div>
+
+<div class="card">
+  <p><span class="insight-num">4</span><strong>業務特化型ワークフローは技術記事豊富だが出品ゼロ。</strong> 議事録・経費処理・営業提案・Webスクレイピング・アンケート分析は、note/Qiita/Zennに実装記事が多数あり技術的に成熟している。にもかかわらずココナラに専門出品がない。これは「Difyエンジニアがココナラで売る」という行動パターン自体がまだ少ないことを意味する。先行者利益を取れる窓口がある。</p>
+</div>
+
+<div class="card">
+  <p><span class="insight-num">5</span><strong>価格のスイートスポットは5,000〜10,000円。</strong> 販売実績がある商品の価格帯は5,000〜10,000円に集中。50,000円以上（けうまる55,000円、マルチンゲール100,000円）は実績が少ない。ヨコ展開の新商品は8,000〜15,000円帯で出品し、実績を積んでから値上げするのが合理的。</p>
+</div>
+
+<h2>5. 推奨ヨコ展開ロードマップ</h2>
+
+<div class="callout callout-success">
+  <strong>即時展開（既存スキルで対応可能・需要実証済み）</strong>
+  <ol>
+    <li><strong>DSLテンプレート集販売</strong>（3,000〜5,000円）: 既存DSL納品商品の延長。5〜10本のユースケース別DSLをパッケージ化。低単価・高回転狙い</li>
+    <li><strong>SNS自動投稿ワークフロー構築</strong>（10,000〜15,000円）: DigtaRodの成功モデルを参考に、WordPress連携まで含めた上位版</li>
+  </ol>
+</div>
+
+<div class="callout callout-warn">
+  <strong>短期展開（1〜2週間の準備で出品可能）</strong>
+  <ol start="3">
+    <li><strong>議事録自動作成ワークフロー</strong>（15,000〜25,000円）: 音声ファイル→テキスト化→要約→Notion保存。ブルーオーシャン</li>
+    <li><strong>Webスクレイピング+情報整理ボット</strong>（15,000〜25,000円）: Firecrawl連携。競合価格調査・リード収集の自動化</li>
+  </ol>
+</div>
+
+<div class="callout callout-purple">
+  <strong>中期展開（業種特化で高単価を狙う）</strong>
+  <ol start="5">
+    <li><strong>経費精算・請求書OCR処理</strong>（30,000〜50,000円）: 中小企業経理向け。freee/MF連携で付加価値</li>
+    <li><strong>顧客レビュー分析レポート</strong>（15,000〜25,000円）: 店舗経営者向け。Googleレビュー→改善提案を自動化</li>
+  </ol>
+</div>
+
+<h2>6. トップ出品者の商品構成（参考）</h2>
+
+<div class="card">
+  <h3>たま@システムエンジニア（プラチナ認定・累計89件+）</h3>
+  <table>
+  <tr><th>商品</th><th>切り口</th><th>価格</th><th>実績</th></tr>
+  <tr><td>DifyでAIチャットボット作ります</td><td>チャットボット構築</td><td>5,000円〜</td><td>63件</td></tr>
+  <tr><td>DifyとMakeやGASでLINEbot作ります</td><td>LINEbot構築</td><td>10,000円</td><td>21件</td></tr>
+  <tr><td>Difyのローカル環境構築手伝います</td><td>環境構築代行</td><td>5,000円</td><td>5件</td></tr>
+  </table>
+  <p style="font-size:0.85rem; color:var(--muted); margin-top:8px;">注目点: 同一スキルセット（Dify）を3つの切り口に展開。チャットボット→LINEbot→環境構築と、関連サービスで顧客を囲い込んでいる。noteでの技術発信（アンケート分析・ナレッジAPI等）も集客導線として機能。</p>
+</div>
+
+<h2>ソース一覧</h2>
+<div class="sources">
+<ol>
+  <li><a href="https://coconala.com/services/3294998" target="_blank">ココナラ: DifyでAIチャットボット作ります（たま）</a> — 販売実績63件（2026年4月確認）</li>
+  <li><a href="https://coconala.com/services/3295033" target="_blank">ココナラ: DifyとMakeやGASでLINEbot作ります（たま）</a> — 販売実績21件</li>
+  <li><a href="https://coconala.com/services/3294210" target="_blank">ココナラ: Difyのローカル環境構築手伝います（たま）</a> — 販売実績5件</li>
+  <li><a href="https://coconala.com/services/3437450" target="_blank">ココナラ: Difyの超基礎を60分で教えます（タナ@生成AI活用サポーター）</a> — 販売実績32件</li>
+  <li><a href="https://coconala.com/services/3399941" target="_blank">ココナラ: Dify組み込み RAG自動投稿（DigtaRod）</a> — 販売実績9件</li>
+  <li><a href="https://coconala.com/services/3398714" target="_blank">ココナラ: Dify×Azure生成AIボット（マルチンゲール）</a> — 販売実績1件、100,000円</li>
+  <li><a href="https://coconala.com/services/3855990" target="_blank">ココナラ: Dify構築します（ルミナス_design）</a> — 販売実績1件、30,000円</li>
+  <li><a href="https://coconala.com/services/3726204" target="_blank">ココナラ: 生成AI歴3年がDifyでAIアプリ開発します</a> — 販売実績1件</li>
+  <li><a href="https://coconala.com/services/3713179" target="_blank">ココナラ: AIエージェント・MCPサーバー構築（soh_ccnl）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/3493811" target="_blank">ココナラ: X自動投稿ツール販売（シャイニング レボ）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/3389427" target="_blank">ココナラ: DIfyのチャットボット・ワークフロー作成（ロヒス）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/3922786" target="_blank">ココナラ: AI導入あなた専用チャットボット（まきりんAI）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/4126049" target="_blank">ココナラ: AI×業務自動化めんどい作業をAIで効率化（れい）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/3414599" target="_blank">ココナラ: Difyの環境構築・開発教えます（生成AIファースト）</a> — 販売実績3件</li>
+  <li><a href="https://coconala.com/services/3311495" target="_blank">ココナラ: Difyの使い方教え/商品開発します</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/3985036" target="_blank">ココナラ: 店舗/企業向けFAQチャットボット（obaratoshiharu）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/3291505" target="_blank">ココナラ: 任意の情報を学習させたAIチャットボット（K・A Studio）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/services/3956251" target="_blank">ココナラ: Difyでチャットボットを開発します（花咲凛）</a> — 販売実績0件</li>
+  <li><a href="https://coconala.com/categories/774" target="_blank">ココナラ: AIアプリケーション制作カテゴリ</a> — カテゴリ一覧（2026年4月確認）</li>
+  <li><a href="https://coconala.com/categories/28?keyword=Dify" target="_blank">ココナラ: AI導入カテゴリ Dify検索結果</a></li>
+  <li><a href="https://coconala.com/requests/3474737" target="_blank">ココナラ公開依頼: DifyでWordPress自動投稿作成</a> — 予算1〜3万円、応募0件（終了）</li>
+  <li><a href="https://note.com/tama_engineer/n/nb0d348119c56" target="_blank">note: Dify×GASでアンケート分析アプリ（たま@ITエンジニア）</a></li>
+  <li><a href="https://note.com/conaxam/n/n178a1a0d596f" target="_blank">note: Difyで領収書OCR→仕訳（岸田崇史@Omluc）</a></li>
+  <li><a href="https://hatenabase.jp/blog/%E7%B5%8C%E7%90%86%E3%81%AE%E6%9C%88%E6%AC%A1%E5%87%A6%E7%90%86%E3%82%929%E5%89%B2%E6%99%82%E7%9F%AD%EF%BC%81-ai%E3%81%8C%E8%AB%8B%E6%B1%82%E6%9B%B8%E3%81%AE%E4%B8%8D%E5%82%99/" target="_blank">はてなベース: 経理の月次処理9割時短 Dify×OCR</a></li>
+  <li><a href="https://note.com/samuraijuku_biz/n/nb1cf39588137" target="_blank">note: Difyハッカソン受賞作 SEO記事→WP自動投稿</a></li>
+  <li><a href="https://note.com/jun_ichikawa/n/ne751213731a0" target="_blank">note: Dify×n8nで営業提案メール自動生成</a></li>
+  <li><a href="https://docs.firecrawl.dev/ja/developer-guides/workflow-automation/dify" target="_blank">Firecrawl公式: Dify連携ガイド</a></li>
+  <li><a href="https://coconala.com/categories/772" target="_blank">ココナラ: AIチャットボット作成カテゴリ</a></li>
+  <li><a href="https://reskill.nikkei.com/article/DGXZQOLM290NX0Z20C25A9000000/" target="_blank">日経リスキリング: Difyなら音声入力も扱える 議事録アプリ</a></li>
+</ol>
+</div>
+
+</body>
+</html>

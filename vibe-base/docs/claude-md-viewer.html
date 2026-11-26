@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>CLAUDE.md v4.5 全文ビューア</title>
+<style>
+  :root { --bg:#fafaf9; --card:#fff; --border:#d6d3d1; --text:#1c1917; --muted:#78716c; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans JP','Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.7; padding:2rem; max-width:960px; margin:0 auto; }
+  h1 { font-size:1.5rem; font-weight:800; margin-bottom:0.3rem; }
+  h2 { font-size:1.1rem; font-weight:800; margin:1.5rem 0 0.5rem; color:#7c3aed; border-bottom:2px solid #e9d5ff; padding-bottom:0.3rem; }
+  .meta { color:var(--muted); font-size:0.8rem; margin-bottom:1rem; }
+  .section { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem 1.2rem; margin:0.8rem 0; }
+  .section-head { font-weight:700; font-size:0.9rem; margin-bottom:0.4rem; }
+  .lines { font-size:0.72rem; color:var(--muted); float:right; }
+  ul, ol { padding-left:1.4rem; font-size:0.85rem; }
+  li { margin:0.2rem 0; }
+  table { width:100%; border-collapse:collapse; font-size:0.8rem; margin:0.5rem 0; }
+  th { background:#f5f5f4; text-align:left; padding:0.4rem 0.6rem; font-weight:700; border-bottom:2px solid var(--border); }
+  td { padding:0.4rem 0.6rem; border-bottom:1px solid #e7e5e4; }
+  code { background:#f5f5f4; padding:1px 5px; border-radius:3px; font-size:0.8rem; }
+  strong { color:#1c1917; }
+  .highlight { background:#fef3c7; border:1px solid #fde68a; border-radius:6px; padding:0.15rem 0.5rem; font-size:0.75rem; font-weight:700; color:#92400e; }
+  .new { background:#dcfce7; border:1px solid #bbf7d0; border-radius:6px; padding:0.15rem 0.5rem; font-size:0.75rem; font-weight:700; color:#166534; }
+  .ver { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.8rem 1.2rem; margin:1rem 0; font-size:0.78rem; }
+  .ver-title { font-weight:700; margin-bottom:0.3rem; }
+  .stats { display:flex; gap:1rem; flex-wrap:wrap; margin:1rem 0; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.6rem 1rem; text-align:center; min-width:100px; }
+  .stat-num { font-size:1.4rem; font-weight:800; color:#7c3aed; }
+  .stat-label { font-size:0.7rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>CLAUDE.md — AI共創基盤 共通憲法</h1>
+<p class="meta">v4.5 | 全50行 | 最終更新: 2026-03-18 | 全エージェントが読む最高規範</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">7</div><div class="stat-label">セクション</div></div>
+  <div class="stat"><div class="stat-num">50</div><div class="stat-label">行</div></div>
+  <div class="stat"><div class="stat-num">8</div><div class="stat-label">SOP参照</div></div>
+  <div class="stat"><div class="stat-num">7</div><div class="stat-label">ガバナンスルール</div></div>
+  <div class="stat"><div class="stat-num">3</div><div class="stat-label">禁止事項</div></div>
+</div>
+
+<!-- §0 -->
+<div class="section">
+  <div class="section-head">§0. 概要 <span class="lines">L6-8 (3行)</span></div>
+  <ul>
+    <li><strong>Vibe-Base:</strong> 複数のAIエージェントが協調して開発を行うための共通インフラ</li>
+    <li><strong>作業ディレクトリ:</strong> エージェントごとに専用ディレクトリを使用する</li>
+    <li><strong>運用:</strong> 各プロダクトが企画→保守を自律完結</li>
+  </ul>
+</div>
+
+<!-- §1 -->
+<div class="section">
+  <div class="section-head">§1. メタルール <span class="lines">L10-13 (4行)</span></div>
+  <ol>
+    <li><strong>Refactor-on-Write:</strong> ルール追加時、既存との統合・置換を先に検討。純増は最終手段</li>
+    <li><strong>Reference-over-Redundancy:</strong> 1箇所に定義、他からは参照パスを記せ</li>
+    <li><strong>Self-Correction Loop:</strong> SOPを読まずに作業開始禁止</li>
+  </ol>
+</div>
+
+<!-- §2 -->
+<div class="section">
+  <div class="section-head">§2. プロダクトサイクル <span class="lines">L15-16 (2行)</span></div>
+  <p style="font-size:0.82rem;">各プロダクトは P0→P4 を順に通過する。<strong>定義・タスク・種別・ゲート条件 → <code>docs/ops/product-cycle.md</code></strong></p>
+</div>
+
+<!-- §3 -->
+<div class="section">
+  <div class="section-head">§3. SOP運用 <span class="lines">L18-34 (17行)</span></div>
+  <p style="font-size:0.78rem; color:var(--muted); margin-bottom:0.3rem;">28/32本は <code>.claude/rules/</code> から自動注入。以下4本のみ手動参照</p>
+  <table>
+    <thead><tr><th>ファイル</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>docs/ops/project-promotion.md</code></td><td>外部リポ→vibe-base昇格</td></tr>
+      <tr><td><code>docs/ops/shared-asset-ops.md</code></td><td>散財→共有資産化</td></tr>
+      <tr><td><code>memory/patrol.md</code></td><td>パトロール指示</td></tr>
+      <tr><td><code>docs/md-inventory.md</code></td><td>全mdファイル棚卸し</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- §4 -->
+<div class="section">
+  <div class="section-head">§4. 開発ルール <span class="lines">L29-32 (4行)</span></div>
+  <ul>
+    <li><strong>命名:</strong> kebab-case必須。日本語・スペース・大文字（拡張子除く）禁止</li>
+    <li><strong>三打席ルール:</strong> 同一箇所3回失敗→コミット→memory.md記録→引き継ぎ要請</li>
+    <li><strong>横断チェック:</strong> バグ修正時、同パターンを全ファイル検索し一括修正</li>
+  </ul>
+</div>
+
+<!-- §5 -->
+<div class="section">
+  <div class="section-head">§5. AIセルフガバナンス <span class="lines">L34-41 (8行)</span></div>
+  <ul>
+    <li><strong>フェーズゲート:</strong> ゲート種別タスクではマスター判定なく次フェーズに進まない</li>
+    <li><strong>先行バリデーション:</strong> 変更前に本憲法（スコープ・禁止事項）を照合</li>
+    <li><strong>能力限界の事前申告:</strong> 未検証を「確認済み」と報告禁止</li>
+    <li><strong>混乱検知:</strong> 否定的FB 1回で全停止→整理→報告</li>
+    <li><strong>Check-in義務:</strong> セッション開始時に <code>memory.md</code> を読み、前回の未解決事項を把握せよ</li>
+    <li><strong>製品参照義務:</strong> 製品作業時は自治憲法 + PC表を読め</li>
+    <li><strong>PC表連動:</strong> タスクの状態を変更したら、対応するPC表を同一コミット内で更新せよ</li>
+    <li><em style="font-size:0.8rem;color:var(--muted);">HTML提示義務は MEMORY.md に移動（v4.5）</em></li>
+  </ul>
+</div>
+
+<!-- §6 -->
+<div class="section">
+  <div class="section-head">§6. 禁止事項 <span class="lines">L43-46 (4行)</span></div>
+  <ul>
+    <li><code>main</code>への <code>--force</code> push / シークレットのコミット / <code>archive/</code>無断削除</li>
+    <li>自分が開かれたディレクトリ範囲外のファイルを無断で変更すること</li>
+    <li>未検証を「動作OK」と報告</li>
+  </ul>
+</div>
+
+<!-- 改訂履歴 -->
+<div class="ver">
+  <div class="ver-title">改訂履歴</div>
+  <table>
+    <tbody>
+      <tr><td style="white-space:nowrap">v4.0</td><td>2026-03-10</td><td>0ベース再構築。プロダクトサイクル(P0-P4)新設。product-cycle.md分離</td></tr>
+      <tr><td>v4.1</td><td>2026-03-16</td><td>P2.5「販売準備」フェーズ新設</td></tr>
+      <tr><td>v4.2</td><td>2026-03-16</td><td>P2に★表示内容検証追加。フォルダライフサイクルSOP新設</td></tr>
+      <tr><td>v4.3</td><td>2026-03-17</td><td>§5にCheck-in義務・製品参照義務・PC表連動を追加。ガバナンス改革</td></tr>
+      <tr><td>v4.4</td><td>2026-03-18</td><td>§5にHTML提示義務を追加（PC表・競合比較表はHTMLで提示がデフォルト）</td></tr>
+      <tr><td style="font-weight:700;">v4.5</td><td>2026-03-18</td><td><span class="new">New</span> HTML提示義務→MEMORY.md移動。§2を参照パスのみに圧縮（50行）</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

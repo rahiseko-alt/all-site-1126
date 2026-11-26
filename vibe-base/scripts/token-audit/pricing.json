@@ -1,0 +1,14 @@
+{
+  "_source": "/claude-api skill cached model table (cached: 2026-06-24) + shared/prompt-caching.md multiplier rule",
+  "_note": "1M context (>200k) premium tier does NOT exist — Opus 4.7/4.8 explicitly documented as 'standard API pricing with no long-context premium'; other models show a single flat price regardless of context length. Cache write/read are NOT separate flat rates — they are multipliers of the model's own input price (5m TTL write = 1.25x, 1h TTL write = 2x, cache read = 0.1x). sonnet-5 intro pricing ($2/$10 per Mtok) applies through 2026-08-31; use intro rates for messages dated before that, standard rates after.",
+  "unit": "USD per 1,000,000 tokens",
+  "models": {
+    "claude-opus-4-8": { "input": 5.00, "output": 25.00, "cache_write_5m": 6.25, "cache_write_1h": 10.00, "cache_read": 0.50 },
+    "claude-sonnet-5": { "input": 3.00, "output": 15.00, "cache_write_5m": 3.75, "cache_write_1h": 6.00, "cache_read": 0.30,
+      "intro_until": "2026-08-31", "intro": { "input": 2.00, "output": 10.00, "cache_write_5m": 2.50, "cache_write_1h": 4.00, "cache_read": 0.20 } },
+    "claude-sonnet-4-6": { "input": 3.00, "output": 15.00, "cache_write_5m": 3.75, "cache_write_1h": 6.00, "cache_read": 0.30 },
+    "claude-fable-5": { "input": 10.00, "output": 50.00, "cache_write_5m": 12.50, "cache_write_1h": 20.00, "cache_read": 1.00 },
+    "claude-haiku-4-5": { "input": 1.00, "output": 5.00, "cache_write_5m": 1.25, "cache_write_1h": 2.00, "cache_read": 0.10 },
+    "<synthetic>": { "_note": "internal/non-billed synthetic messages observed in logs (e.g. compaction markers) — exclude from cost totals, report token count separately", "input": 0, "output": 0, "cache_write_5m": 0, "cache_write_1h": 0, "cache_read": 0 }
+  }
+}

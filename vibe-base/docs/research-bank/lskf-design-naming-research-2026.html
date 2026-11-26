@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>外国人向け日本語学習アプリ デザイン + 命名 リサーチ — LSKF</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2d3140;
+    --text: #e4e6ed;
+    --text-muted: #8b8fa3;
+    --accent: #ec4899;
+    --accent2: #6366f1;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #a78bfa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', 'Noto Sans JP', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #1a1d27 0%, #0f1117 50%, #2d1b3d 100%); border-bottom: 1px solid var(--border); padding: 60px 40px 50px; text-align: center; }
+  .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .hero h1 span { color: var(--accent); }
+  .hero .subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 24px; }
+  .hero .meta { display: inline-flex; gap: 20px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 24px; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; }
+  .hero .meta strong { color: var(--text); }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+  section { margin-bottom: 48px; }
+  h2 { font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+  h3 { font-size: 1.15rem; font-weight: 600; color: var(--accent2); margin: 24px 0 12px; }
+  h4 { font-size: 1rem; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+  p { margin-bottom: 12px; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 16px; }
+  li { margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--surface); border-radius: 6px; overflow: hidden; font-size: 0.9rem; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface2); color: var(--accent2); font-weight: 600; font-size: 0.85rem; }
+  tr:last-child td { border-bottom: none; }
+  code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; color: var(--accent3); }
+  .callout { background: var(--surface); border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 4px; margin: 16px 0; }
+  .callout strong { color: var(--accent); }
+  .callout-success { border-left-color: var(--accent3); }
+  .callout-success strong { color: var(--accent3); }
+  .callout-warn { border-left-color: var(--accent4); }
+  .callout-warn strong { color: var(--accent4); }
+  .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: middle; margin-right: 4px; border: 1px solid var(--border); }
+  .src-list a { color: var(--accent2); text-decoration: none; word-break: break-all; }
+  .src-list a:hover { text-decoration: underline; color: var(--accent); }
+  .src-list li { margin-bottom: 4px; font-size: 0.85rem; }
+  .tag { display: inline-block; padding: 2px 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; font-size: 0.7rem; color: var(--text-muted); margin-right: 4px; }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px 24px; margin-bottom: 32px; }
+  .toc h3 { color: var(--accent4); margin-top: 0; }
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>外国人向け日本語学習アプリ <span>デザイン + 命名 リサーチ</span></h1>
+  <div class="subtitle">LSKF (learning-suite-kanji-foreign) Phase C 以降のデザイン方針決定資料</div>
+  <div class="meta">
+    <span>調査日 <strong>2026-05-18</strong></span>
+    <span>調査軸 <strong>3 本</strong></span>
+    <span>ソース数 <strong>40+</strong></span>
+    <span>関連プロダクト <strong>learning-suite-kanji-foreign</strong></span>
+    <span>再利用先 <strong>learning-suite-kanji (sibling refresh)</strong></span>
+  </div>
+</div>
+
+<main>
+
+<div class="toc">
+  <h3>目次</h3>
+  <ol>
+    <li><a href="#summary">エグゼクティブサマリー（先に読め）</a></li>
+    <li><a href="#axis1">軸 1: UI/UX デザイン preferences</a></li>
+    <li><a href="#axis2">軸 2: アプリ命名 preferences</a></li>
+    <li><a href="#axis3">軸 3: 競合 13 アプリ実例</a></li>
+    <li><a href="#synthesis">統合分析・LSKF 推奨</a></li>
+    <li><a href="#sources">ソース一覧</a></li>
+  </ol>
+</div>
+
+<section id="summary">
+<h2>エグゼクティブサマリー（So What）</h2>
+
+<div class="callout callout-success">
+  <strong>LSKF MVP 推奨デザイン方針（横断統合の結論）</strong>
+  <ul>
+    <li><strong>カラー</strong>: 和色基調（藍 #223a70 主・朱 #c93a40 アクセント・白 #fafaf7 ベース）。既存 13 アプリ全てが欧米トーン（緑/青/ビビッド）で和色は完全な空白市場</li>
+    <li><strong>マスコット</strong>: 日本固有種採用（柴犬 or 招き猫 or 鯉）。既存マスコットは鰐蟹・フクロウ・鹿・狸で日本固有はゼロ</li>
+    <li><strong>タイポ</strong>: 漢字表示=UD デジタル教科書体 N-R / 本文=Noto Sans JP / 英文 UI=Inter</li>
+    <li><strong>ゲーミフィケーション</strong>: ストリーク + XP + 進捗リング 3 点のみ。ハート（ライフ）は大人学習者忌避で不採用</li>
+    <li><strong>UI パターン</strong>: カード型 SRS 1 画面 1 漢字 + タップ判定（業界収束）</li>
+    <li><strong>多言語 UI</strong>: 英語 + 中国語簡体 + ベトナム語 3 言語 MVP から（既存アプリ 9/13 が英語のみで空白）</li>
+    <li><strong>ダークモード</strong>: MVP 必須（業界デファクト）</li>
+  </ul>
+</div>
+
+<div class="callout callout-success">
+  <strong>LSKF 推奨名称候補（5 案・最有力 ★）</strong>
+  <ol>
+    <li>★ <strong>Inko</strong>（鸚哥）— ローマ字日本語 3 音・「真似て覚える」インコ比喩・マスコット展開容易・WaniKani 黄金パターン踏襲</li>
+    <li>★ <strong>Kotoba</strong>（言葉）— 4 音節・漢字単体ではなく日本語との接点として拡張可能</li>
+    <li><strong>Fude</strong>（筆）— 3 音節・漢字＝筆の直感的連想・書き取り機能と相性</li>
+    <li><strong>Hanji</strong>（造語: Hanzi + Kanji）— 中華圏外国人も含意・4 音節</li>
+    <li><strong>KanjiKame</strong>（漢字亀）— ASO で漢字キーワード獲得 + 亀=長期継続のメタファー</li>
+  </ol>
+</div>
+
+<div class="callout callout-warn">
+  <strong>避けるべきパターン</strong>
+  <ul>
+    <li>緑系メインカラー → Duolingo / MaruMori と正面衝突</li>
+    <li>フクロウ / 鹿 / 鰐系マスコット → 既存被り</li>
+    <li>「Kanji ○○」直球命名 → 同名乱立で ASO 差別化不能</li>
+    <li>ハート（ライフ）ゲーミフィケーション → 大人学習者の解約原因</li>
+    <li>SRS のみで機能勝負 → WaniKani / Bunpro / MaruMori と機能正面衝突</li>
+  </ul>
+</div>
+</section>
+
+<section id="axis1">
+<h2>軸 1: UI/UX デザイン preferences</h2>
+
+<h3>主要観点別データ</h3>
+<table>
+<tr><th>観点</th><th>主流パターン</th><th>採用例</th></tr>
+<tr><td>カラー（大人向け）</td><td>淡色 + 1〜2 色アクセント</td><td>WaniKani・Bunpro</td></tr>
+<tr><td>カラー（万人向け）</td><td>高彩度ポップ + マスコット</td><td>Duolingo 緑 #58CC02 ・LingoDeer</td></tr>
+<tr><td>ダークモード</td><td>対応がデファクト</td><td>WaniKani・Renshuu・Bunpo</td></tr>
+<tr><td>日本語学習用フォント</td><td>UD デジタル教科書体（筆順学習用）</td><td>複数学習サイト推奨</td></tr>
+<tr><td>本文フォント</td><td>Noto Sans JP / 游ゴシック</td><td>業界標準</td></tr>
+<tr><td>英文 UI フォント</td><td>Inter / SF / Roboto</td><td>業界標準</td></tr>
+<tr><td>UI パターン</td><td>カード型 SRS 1 画面 1 漢字 + タップ</td><td>WaniKani・Renshuu・Anki 系</td></tr>
+<tr><td>ゲーミフィケーション</td><td>ストリーク + XP は効果実証 / ハートは賛否両論</td><td>Duolingo: streak 14日 retention +14%、freeze で churn -21%</td></tr>
+<tr><td>進捗可視化</td><td>リング・レベルバー・ヒートマップカレンダー</td><td>Duolingo / WaniKani / Renshuu</td></tr>
+</table>
+
+<h3>セグメント別差</h3>
+<table>
+<tr><th>セグメント</th><th>特徴</th><th>例</th></tr>
+<tr><td>子供向け (≦12)</td><td>高彩度・マスコット・3-5 分セッション</td><td>Duolingo ABC・Todai Kids</td></tr>
+<tr><td>大人向け (13+)</td><td>単色基調・密度高・SRS 中心・10-30 分セッション</td><td>WaniKani・Renshuu・Bunpro</td></tr>
+<tr><td>西洋人</td><td>ミニマル・余白多・1 画面 1 タスク・ローマ字併記必須</td><td>Duolingo・WaniKani</td></tr>
+<tr><td>中華圏</td><td>高密度グリッド・赤金アクセント許容・繁簡漢字差説明</td><td>HelloChinese 系</td></tr>
+<tr><td>韓国人</td><td>西洋寄りミニマル + ハングル併記・丸ゴ好まれる</td><td>LingoDeer（韓国発）</td></tr>
+<tr><td>N5 初学者</td><td>ふりがな常時 ON・英訳併記・1 課 5 語・教科書体</td><td>Bunpo・LingoDeer</td></tr>
+<tr><td>N1 上級</td><td>ふりがな OFF 可・例文長文・ゴシック / 明朝・辞書連携</td><td>Renshuu・Migaku</td></tr>
+</table>
+
+<h3>極端例の対比</h3>
+<table>
+<tr><th>派手成功例: Duolingo</th><th>質実成功例: WaniKani</th></tr>
+<tr><td>緑マスコット・ハート・リーグ・XP・宝石・ストリーク炎・フクロウ通知。MAU 128M / 評価 $14B。<strong>ただし大人 N3+ 学習者には「子供っぽい」と忌避される</strong></td><td>ピンク(部首)/紫(漢字)/青(語彙)の SRS タイプ別単色・最小ゲーミフィケーション（レベル進捗のみ）・ニッチだが高 LTV。<strong>ただし新規 UI 変更で community 炎上の実例あり</strong></td></tr>
+</table>
+</section>
+
+<section id="axis2">
+<h2>軸 2: アプリ命名 preferences</h2>
+
+<h3>命名パターン分析（漢字/日本語アプリ Top20 内）</h3>
+<table>
+<tr><th>パターン</th><th>採用率</th><th>成功例</th><th>失敗傾向</th></tr>
+<tr><td>機能直球英語（"Kanji ○○"）</td><td>約 40%</td><td>Kanji Study・Kanji Tree</td><td>量産・差別化不能・TM 不可</td></tr>
+<tr><td>ローマ字日本語短語</td><td>約 30%</td><td>WaniKani・Bunpo・Mochi・Renshuu</td><td>西洋人発音不安あるが粘着力高</td></tr>
+<tr><td>抽象英語造語</td><td>約 20%</td><td>Drops・Memrise・Skritter</td><td>意味伝達ゼロでマーケ投資必須</td></tr>
+<tr><td>ハイブリッド</td><td>約 10%</td><td>Kanji Quest・JA Sensei</td><td>中庸・印象薄</td></tr>
+</table>
+
+<h3>主流アプリ名（命名タイプ別）</h3>
+<table>
+<tr><th>アプリ名</th><th>タイプ</th><th>文字数</th><th>由来</th><th>DL 推定</th></tr>
+<tr><td>Duolingo</td><td>英語造語</td><td>8</td><td>duo + lingo</td><td>5 億+</td></tr>
+<tr><td>WaniKani</td><td>ローマ字</td><td>8</td><td>鰐 + 蟹（動物名連結）</td><td>200 万+</td></tr>
+<tr><td>Drops</td><td>英語</td><td>5</td><td>「一滴ずつ」5 分学習比喩</td><td>5,000 万+</td></tr>
+<tr><td>Memrise</td><td>英語造語</td><td>7</td><td>memory + rise</td><td>6,000 万+</td></tr>
+<tr><td>Bunpo</td><td>ローマ字</td><td>5</td><td>文法</td><td>100 万+</td></tr>
+<tr><td>Renshuu</td><td>ローマ字</td><td>7</td><td>練習</td><td>10 万+</td></tr>
+<tr><td>Mochi</td><td>ローマ字</td><td>5</td><td>餅</td><td>50 万+</td></tr>
+<tr><td>Kanji Study</td><td>英語直球</td><td>11</td><td>そのまま</td><td>100 万+</td></tr>
+<tr><td>LingoDeer</td><td>英語造語</td><td>9</td><td>lingo + deer</td><td>1,000 万+</td></tr>
+</table>
+
+<div class="callout">
+<strong>黄金パターン</strong>: ローマ字日本語 2 モーラ+2 モーラ（4 音節）= WaniKani / Mochi / Bunpo / Tofugu に共通。発音容易・SNS で会話に乗りやすい・マスコット展開と相性
+</div>
+
+<h3>ASO 観点</h3>
+<ul>
+<li>Top アプリは <strong>意図的に「Kanji」を冠しない</strong>（WaniKani / Drops / Bunpo）。代わりにサブタイトルで「Learn Japanese Kanji」を取りに行く</li>
+<li>ローカライズアプリ名対応（マルチ言語）は LingoDeer / Drops / Duolingo のみ</li>
+</ul>
+</section>
+
+<section id="axis3">
+<h2>軸 3: 競合 13 アプリ実例</h2>
+
+<table>
+<tr><th>アプリ</th><th>カラー</th><th>マスコット</th><th>主機能</th><th>課金</th><th>評価</th></tr>
+<tr><td><strong>WaniKani</strong></td><td><span class="swatch" style="background:#00aaff"></span>青系 (SRS タイプ別色分け)</td><td>Crabigator (鰐+蟹)</td><td>SRS + 部首→漢字→語彙 + ニーモニック</td><td>$9/月 or $299 永続</td><td>4.7</td></tr>
+<tr><td><strong>Renshuu</strong></td><td><span class="swatch" style="background:#ffc8a8"></span>パステル暖色</td><td>Kao-chan (顔)</td><td>SRS + 多肢選択 + マスコット進化</td><td>無料 + Pro</td><td>4.8 / 100万 DL+</td></tr>
+<tr><td><strong>MaruMori.io</strong></td><td><span class="swatch" style="background:#3d8b3d"></span>緑系 (森)</td><td>狸系</td><td>かな→文法→漢字 2000→語彙 8000 統合</td><td>$9/月 / $79/年</td><td>—</td></tr>
+<tr><td><strong>Kanji Study</strong></td><td>マテリアル青/赤</td><td>なし</td><td>FC + なぞり書き + 辞書</td><td>N5 無料 / N4+ ¥1,000 買切</td><td>—</td></tr>
+<tr><td><strong>Skritter</strong></td><td><span class="swatch" style="background:#ff8c42"></span>オレンジ + 白</td><td>なし</td><td>実書き + SRS + 筆順 (中日両対応)</td><td>$14.99/月</td><td>—</td></tr>
+<tr><td><strong>Duolingo</strong></td><td><span class="swatch" style="background:#58cc02"></span>緑 #58cc02 + 青</td><td>Duo (緑フクロウ)</td><td>多肢選択 + 翻訳 + 音声 (漢字浅め)</td><td>無料 / Super $6.99/月+</td><td>—</td></tr>
+<tr><td><strong>Bunpro</strong></td><td><span class="swatch" style="background:#3d3870"></span>紺/紫 + 白</td><td>なし</td><td>SRS + 例文 + JLPT 模試 25 本</td><td>$5/月 / Lifetime</td><td>—</td></tr>
+<tr><td><strong>Drops</strong></td><td>ビビッド (桃/紫/黄)</td><td>なし (イラスト 2000+)</td><td>スワイプ + 視覚マッチング (語彙特化)</td><td>無料 5 分制限 / $13/月</td><td>—</td></tr>
+<tr><td><strong>LingoDeer</strong></td><td><span class="swatch" style="background:#5dade2"></span>明るい青 + 白</td><td>Deer-kun (鹿)</td><td>SRS + 文法解説 + ストリーク</td><td>$14.99/月 / Lifetime $159.99</td><td>—</td></tr>
+<tr><td><strong>Kanji Garden</strong></td><td><span class="swatch" style="background:#5d9b3d"></span>緑系 (植物)</td><td>なし (植物)</td><td>部品分解 + 多肢/入力 + SRS</td><td>無料 (寄付)</td><td>—</td></tr>
+<tr><td><strong>Kanji Tree</strong></td><td>機能本位</td><td>なし</td><td>漢検 6355 字 + 3 ゲーム分離</td><td>寄付</td><td>Android</td></tr>
+<tr><td><strong>Anki + Jo-Mako</strong></td><td>OSS</td><td>なし</td><td>SRS + Jo-Mako デッキ</td><td>iOS $24.99 買切</td><td>上級者最終形</td></tr>
+<tr><td><strong>JPod101</strong></td><td>緑系</td><td>なし</td><td>音声主軸 9000 レッスン</td><td>$4-$47/月 3 段階</td><td>—</td></tr>
+</table>
+
+<h3>パターン抽出</h3>
+<table>
+<tr><th>観点</th><th>多数派</th><th>少数派 / 空白</th></tr>
+<tr><td>メインカラー</td><td>緑系 4 件・青系 4 件</td><td><strong>赤系・黒基調・和色（藍/朱/紅梅）は皆無</strong></td></tr>
+<tr><td>マスコット</td><td>あり 6/13</td><td>なし 7/13 (硬派系)</td></tr>
+<tr><td>動物モチーフ</td><td>鰐・蟹・鹿・狸・フクロウ</td><td><strong>日本固有種（柴犬・招き猫・狐・鯉・鶴）皆無</strong></td></tr>
+<tr><td>学習方式</td><td>SRS 11/13</td><td>なぞり書き 3/13 (少数派)</td></tr>
+<tr><td>UI トーン</td><td>カジュアル明色 8 件</td><td><strong>和風（墨/和紙/縦書き/筆文字）皆無</strong></td></tr>
+<tr><td>多言語 UI</td><td>英語のみ 9/13</td><td>中・西・葡対応 3 件のみ（<strong>非英語圏ターゲット手薄</strong>）</td></tr>
+</table>
+</section>
+
+<section id="synthesis">
+<h2>統合分析・LSKF 推奨</h2>
+
+<h3>差別化 3 ポジショニング（被り回避）</h3>
+
+<h4>① 和色 + 筆文字トーンで視覚独占ゾーンを取る</h4>
+<p>13 アプリ全てが欧米トーン（緑/青/ビビッド/マテリアル）。日本固有の和色（藍 <code>#223a70</code> / 朱 <code>#c93a40</code> / 鶸 <code>#d6c537</code> / 墨 <code>#1c1c1c</code>）+ 縦書き要素 + 筆文字ロゴで「日本そのもの」を視覚化。サムネ一覧で即判別。外国人が求める「本物の日本」体験と漢字学習の題材と整合。Duolingo 緑・WaniKani 青の正面衝突を回避。</p>
+
+<h4>② マスコットは日本固有種（柴犬・招き猫・鯉）</h4>
+<p>既存マスコットは鰐蟹・フクロウ・鹿・狸でどれも欧米/中華圏的またはキメラ。<strong>日本人なら誰でも知っている縁起物動物</strong>を起用すれば、アプリ名想起と日本文化学習を同時に満たせる。例: 「Shiba-sensei」（柴犬+巻物）。マスコット不在の硬派 7 アプリにも勝ち、可愛い系 6 アプリとも被らない。</p>
+
+<h4>③ 非英語圏ターゲット（中国語・ベトナム語）に振る</h4>
+<p>LingoDeer/Drops/Duolingo 除く 10 アプリは英語 UI のみ。一方、在日外国人実数の上位はベトナム・中国・韓国・フィリピン・ブラジル（法務省統計）で<strong>英語ネイティブは少数派</strong>。MVP 段階で英語 + 中国語簡体 + ベトナム語 3 言語 UI を最初から備えれば、巨大空白市場に直接打てる。漢字は中国語話者には部分既知という強みあり。コンテンツ翻訳負荷も「UI 文言+解説」に限定可能。</p>
+
+<h3>MVP 単一デザイン推奨（最終）</h3>
+<div class="callout callout-success">
+  <strong>1 sentence: WaniKani 寄り（落ち着き）+ Duolingo の進捗リング + ストリーク 1 要素 + 和色 + 日本固有種マスコット 1 体 + 教科書体大型表示</strong>
+</div>
+
+<table>
+<tr><th>要素</th><th>採用</th><th>根拠</th></tr>
+<tr><td>ベース色</td><td>off-white <code>#FAFAF7</code></td><td>外光下でも読みやすい・西洋/中華/韓国 最大公約数</td></tr>
+<tr><td>主アクセント</td><td>藍 <code>#223a70</code></td><td>和色独占ゾーン + 落ち着き</td></tr>
+<tr><td>副アクセント</td><td>朱 <code>#c93a40</code></td><td>正解フィードバック・CTA</td></tr>
+<tr><td>ダークモード</td><td>必須・CSS variable 切替</td><td>業界デファクト</td></tr>
+<tr><td>漢字フォント</td><td>UD デジタル教科書体 N-R</td><td>筆順学習に最適 (複数推奨)</td></tr>
+<tr><td>本文 JP</td><td>Noto Sans JP</td><td>業界標準</td></tr>
+<tr><td>UI EN</td><td>Inter</td><td>業界標準</td></tr>
+<tr><td>UI 動線</td><td>カード型 SRS 1 画面 1 漢字 + タップ判定</td><td>業界収束</td></tr>
+<tr><td>ゲーム要素</td><td>ストリーク + XP + 進捗リング 3 点</td><td>retention 実証・ハートは大人忌避</td></tr>
+<tr><td>マスコット</td><td>日本固有種 1 体（柴犬 / 招き猫 / 鯉のいずれか・要確定）</td><td>競合空白市場</td></tr>
+<tr><td>多言語 UI</td><td>EN / ZH-CN / VI（MVP）</td><td>非英語圏空白市場 + 在日実数上位</td></tr>
+<tr><td>マルチターゲット</td><td>JLPT 級別表記 (N5-N1)</td><td>業界標準</td></tr>
+</table>
+
+<h3>命名 推奨候補（5 案）</h3>
+<table>
+<tr><th>#</th><th>候補</th><th>タイプ</th><th>音節</th><th>向く理由</th></tr>
+<tr><td>★1</td><td><strong>Inko</strong>（鸚哥）</td><td>ローマ字</td><td>3</td><td>「真似て覚える」インコ比喩 + マスコット展開容易 + 短語覚えやすさ最強</td></tr>
+<tr><td>★2</td><td><strong>Kotoba</strong>（言葉）</td><td>ローマ字</td><td>4</td><td>WaniKani 黄金パターン踏襲 + 漢字単体ではなく日本語接点として拡張可能</td></tr>
+<tr><td>3</td><td><strong>Fude</strong>（筆）</td><td>ローマ字</td><td>3</td><td>漢字=筆の直感的連想 + 書き取り機能の象徴性</td></tr>
+<tr><td>4</td><td><strong>Hanji</strong>（造語）</td><td>ハイブリッド</td><td>4</td><td>Hanzi（中国語）+ Kanji の中間で中華圏含む外国人すべて暗示</td></tr>
+<tr><td>5</td><td><strong>KanjiKame</strong>（漢字亀）</td><td>ハイブリッド</td><td>—</td><td>ASO で漢字キーワード初動取得 + 亀=長期継続メタファー</td></tr>
+</table>
+
+<div class="callout callout-warn">
+<strong>マスター判断要点</strong>:
+<ol>
+<li>命名 5 案から 1 つ確定（または Other で新案提示）</li>
+<li>マスコット 3 候補（柴犬/招き猫/鯉）から 1 つ確定</li>
+<li>MVP 多言語 UI 3 言語 (EN/ZH-CN/VI) で着手するか、最初は EN のみで段階追加するか</li>
+</ol>
+</div>
+</section>
+
+<section id="sources">
+<h2>ソース一覧（重複排除済 40 件）</h2>
+
+<h3>UI/UX デザイン (16 件)</h3>
+<ol class="src-list">
+<li><a href="https://migaku.com/blog/japanese/best-japanese-learning-apps-comparison">Migaku - Best Japanese Learning Apps Comparison 2025</a></li>
+<li><a href="https://jlptsamurai.com/2025/12/25/the-ultimate-guide-to-the-best-japanese-learning-apps-in-2026-ranked-and-reviewed/">JLPT Samurai - Ultimate Guide 2026</a></li>
+<li><a href="https://elements.envato.com/learn/color-scheme-trends-in-mobile-app-design">Envato - Mobile App Color Scheme Trends 2026</a></li>
+<li><a href="https://coloruxlab.com/guides/mobile-app-color-design">ColorUXLab - Mobile App Color Design 2026</a></li>
+<li><a href="https://linguasteps.com/reviews/wanikani-review-2025-master-kanji-fast-with-this-fun-effective-tool">Linguasteps - WaniKani Review 2026</a></li>
+<li><a href="https://community.wanikani.com/t/does-anyone-else-hate-the-new-ui-as-much-as-i-do/72266">WaniKani Community - New UI feedback (2025)</a></li>
+<li><a href="https://www.orizon.co/blog/duolingos-gamification-secrets">Orizon - Duolingo Gamification Secrets 2025</a></li>
+<li><a href="https://www.strivecloud.io/blog/gamification-examples-boost-user-retention-duolingo">StriveCloud - Duolingo Gamification 2025</a></li>
+<li><a href="https://www.diva-portal.org/smash/get/diva2:1866808/FULLTEXT01.pdf">DiVA Portal - Duolingo Gamified Design (academic) 2024</a></li>
+<li><a href="https://www.jlptlord.com/blog/best-jlpt-apps">JLPTLord - Best JLPT Apps 2026</a></li>
+<li><a href="https://talkpal.ai/culture/what-are-the-best-japanese-fonts-for-reading/">Talkpal - Best Japanese Fonts 2025</a></li>
+<li><a href="https://www.sljfaq.org/afaq/shotai-printed.html">sci.lang.japan - Printed styles (Kyokashotai)</a></li>
+<li><a href="https://www.humblebunny.com/understanding-japanese-typography/">Humble Bunny - Japanese Typography 2025</a></li>
+<li><a href="https://raw.studio/blog/how-cultural-differences-influence-ux-design/">Raw.Studio - Cultural Differences UX 2025</a></li>
+<li><a href="https://blog.btrax.com/japanese-type-classifications/">btrax - Japanese Type Classifications 2025</a></li>
+<li><a href="https://belitsoft.com/design-for-different-regions">Belitsoft - UI/UX across regions 2025</a></li>
+</ol>
+
+<h3>命名・ASO (12 件)</h3>
+<ol class="src-list">
+<li><a href="https://www.gtn.co.jp/magazine/en_us/article48/">GTN Magazine - Best JP Apps for Foreigners 2026</a></li>
+<li><a href="https://languavibe.com/japanese-kanji-apps/">Languavibe - Best Language Apps for Kanji 2025</a></li>
+<li><a href="https://www.fluentu.com/blog/japanese/best-kanji-apps/">FluentU - 7 Best Kanji Apps</a></li>
+<li><a href="https://community.wanikani.com/t/what-does-the-name-wanikani-stand-for/39536">WaniKani Community - Name Origin</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Wani_(dragon)">Wikipedia - Wani (dragon)</a></li>
+<li><a href="https://www.alllanguageresources.com/skritter-review/">All Language Resources - Skritter Review</a></li>
+<li><a href="https://blog.boon.so/language-learning-industry-app-name-ideas/">Boon - Language App Name Ideas</a></li>
+<li><a href="https://www.fluentu.com/blog/reviews/memrise-vs-duolingo/">FluentU - Memrise vs Duolingo</a></li>
+<li><a href="https://www.apptweak.com/en/aso-blog/how-to-localize-your-app-in-japanese">Apptweak - How to Localize for Japan</a></li>
+<li><a href="https://medium.com/@jamie_aix/advanced-aso-techniques-for-japanese-language-apps-beyond-basic-translation-000ae7f6fd10">Medium - Advanced ASO for JP Apps</a></li>
+<li><a href="https://radaso.com/blog/metadata-localization-in-the-app-store-cultural-and-national-differences">Radaso - Metadata Localization Cultural Differences</a></li>
+<li><a href="https://www.tofugu.com/japanese-learning-resources-database/wanikani/">Tofugu - WaniKani Review</a></li>
+</ol>
+
+<h3>競合実例 (12 件)</h3>
+<ol class="src-list">
+<li><a href="https://www.wanikani.com/">WaniKani 公式</a></li>
+<li><a href="https://apps.apple.com/us/app/renshuu-japanese-learning/id1542730063">Renshuu App Store</a></li>
+<li><a href="https://cotoacademy.com/learning-japanese-with-renshuu-app-review/">Coto Academy - Renshuu Review</a></li>
+<li><a href="https://marumori.io/">MaruMori 公式</a></li>
+<li><a href="https://mindtwisted.com/">Kanji Study 公式</a></li>
+<li><a href="https://www.joyokanjikai.com/learning-japanese/skritter-review/">Joyokanjikai - Skritter Review 2025</a></li>
+<li><a href="https://medium.com/@lindiebotes/creating-a-design-system-for-a-language-app-skritter-case-study-3702eae094e0">Medium - Skritter Design System Case Study</a></li>
+<li><a href="https://design.duolingo.com/identity/color">Duolingo Brand Color Guidelines</a></li>
+<li><a href="https://design.duolingo.com/illustration/duo">Duolingo Duo Mascot 公式</a></li>
+<li><a href="https://bunpro.jp/">Bunpro 公式</a></li>
+<li><a href="https://www.lingodeer.com/purchase/lingodeer/plan">LingoDeer Pricing</a></li>
+<li><a href="https://kanji.garden/">Kanji Garden 公式</a></li>
+</ol>
+</section>
+
+</main>
+</body>
+</html>

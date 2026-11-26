@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 導入サポート資料 — 版別統合ガイド</title>
+<style>
+body{font-family:-apple-system,"Segoe UI",sans-serif;max-width:980px;margin:2em auto;padding:0 1em;line-height:1.8;color:#222}
+h1{border-bottom:3px solid #2563eb;padding-bottom:.3em}
+h2{border-left:5px solid #2563eb;padding-left:.5em;margin-top:2.2em;color:#1e3a8a}
+h3{color:#1e40af;margin-top:1.6em}
+.alert-red{background:#fee;border-left:5px solid #c00;padding:1em;margin:1em 0;border-radius:4px}
+.alert-yellow{background:#fffae6;border-left:5px solid #d97706;padding:1em;margin:1em 0;border-radius:4px}
+.box{background:#f3f4f6;border-left:5px solid #6b7280;padding:1em;margin:1em 0;border-radius:4px}
+.box-blue{background:#eff6ff;border-left:5px solid #2563eb;padding:1em;margin:1em 0;border-radius:4px}
+table{border-collapse:collapse;width:100%;margin:1em 0}
+th,td{border:1px solid #d1d5db;padding:.5em .7em;text-align:left;vertical-align:top}
+th{background:#e5e7eb}
+code{background:#f1f5f9;padding:.1em .35em;border-radius:3px;font-size:.92em}
+pre{background:#1e293b;color:#e2e8f0;padding:.9em 1.1em;border-radius:6px;overflow-x:auto;font-size:.88em}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{margin:.4em 0}
+.time{color:#2563eb;font-weight:bold;font-size:.92em}
+.warn{color:#b91c1c;font-weight:bold}
+.note{color:#6b7280;font-size:.9em}
+a{color:#2563eb}
+.toc{background:#f8fafc;border:1px solid #e2e8f0;padding:1em 1.4em;border-radius:6px}
+@media(max-width:640px){body{margin:1em auto}table{font-size:.85em}th,td{padding:.35em .4em}}
+</style>
+</head>
+<body>
+
+<h1>Claude Code 導入サポート資料 — 版別統合ガイド</h1>
+<p class="note">所要：約55〜65分 ／ 対象：プログラミング初心者 ／ 一次情報：<a href="https://code.claude.com/docs/ja/">https://code.claude.com/docs/ja/</a></p>
+
+<div class="alert-red">
+<strong>サポート開始前に必ず確認する2点</strong>
+<ol>
+<li><strong>どの「版」で使うか</strong> ＝「ローカルで編集する版（CLI／デスクトップ／VS Code）」か「Web版」か。これで手順2〜5の中身が変わります。</li>
+<li><strong>有料プランを契約済みか</strong> ＝ 無料プランでは使えません。Claude Pro（月20ドル）以上、または Anthropic Console の API キー（従量課金）が必要です。</li>
+</ol>
+</div>
+
+<div class="toc">
+<strong>この資料の使い方</strong>
+<ul>
+<li>ローカル系3版（A/B/D）を選んだ場合 → <strong>手順1の該当版＋共通の手順2〜5</strong> を使う</li>
+<li>Web版（C）を選んだ場合 → <strong>手順1の版C＋Web版の手順2〜5</strong> に差し替えて使う</li>
+</ul>
+</div>
+
+<h2>0. 共通の大前提（全版・先方へ要事前告知）</h2>
+<ul>
+<li><span class="warn">無料プランでは使えません。</span> Claude Pro（月20ドル）以上のサブスク契約が必要です（または Anthropic Console の API キーで従量課金）。</li>
+<li>機密情報（APIキー・パスワード）はチャットやコミットに貼らない。</li>
+<li>Claude の提案（特に削除・公開・課金が絡む操作）は必ず人間がレビューしてから採用する。</li>
+<li>一次情報は公式ドキュメント <a href="https://code.claude.com/docs/ja/">https://code.claude.com/docs/ja/</a>。</li>
+</ul>
+
+<h2>利用形態（版）の選び方</h2>
+<table>
+<tr><th>版</th><th>ローカルPCのファイル編集</th><th>手順2〜5</th><th>向き</th></tr>
+<tr><td>A. ターミナル/CLI版</td><td>する</td><td>現行のまま共通</td><td>コマンド操作が得意</td></tr>
+<tr><td>B. デスクトップアプリ版</td><td>する</td><td>現行のまま共通</td><td>初心者に最も簡単</td></tr>
+<tr><td>C. Web版</td><td><span class="warn">しない（クラウドVM）</span></td><td>Web版2〜5に差し替え</td><td>ローカル環境構築が苦手・プレビュー段階</td></tr>
+<tr><td>D. IDE拡張版（VS Code）</td><td>する</td><td>現行のまま共通</td><td>既にVS Code利用中</td></tr>
+</table>
+<div class="box-blue">
+先方に確認すべきは「<strong>ローカルで編集する版か / Web版か</strong>」の2択だけ。ローカル系3版は手順1のみ差し替え、Web版のみ手順2〜5ごと差し替えます。
+</div>
+
+<h2>手順1：Claude Code を使える状態にする（版別）</h2>
+
+<h3>版A：ターミナル/CLI版 <span class="time">所要15〜20分</span> — 現行プランの想定</h3>
+<p class="note">出典: <a href="https://code.claude.com/docs/ja/setup">https://code.claude.com/docs/ja/setup</a></p>
+<ul>
+<li>インストール（Windows PowerShell）：<pre><code>irm https://claude.ai/install.ps1 | iex</code></pre>（Node.js不要・自動更新あり）</li>
+<li>起動：ターミナルで <code>claude</code></li>
+<li>認証：自動で開くブラウザで Claude Pro/Max ログイン（または Console API キー）</li>
+<li>Git for Windows をオプション導入推奨（Bashツール有効化のため）</li>
+<li>→ 手順2〜5そのまま適用</li>
+</ul>
+
+<h3>版B：デスクトップアプリ版 <span class="time">所要10〜15分</span> — 初心者に最も簡単</h3>
+<p class="note">出典: <a href="https://code.claude.com/docs/ja/desktop-quickstart">https://code.claude.com/docs/ja/desktop-quickstart</a></p>
+<ul>
+<li>公式サイトから Windows 用インストーラーをDL → 起動</li>
+<li>claude.ai アカウントでサインイン（有料プラン必須）</li>
+<li>上部「Code」タブ → Environment を「Local」に → プロジェクトフォルダを選択</li>
+<li>Windows は Git のインストールが必須</li>
+<li>→ 手順2〜5そのまま適用</li>
+</ul>
+
+<h3>版C：Web版 <span class="time">所要10分</span> — ローカル環境構築が不要・※プレビュー段階</h3>
+<p class="note">出典: <a href="https://code.claude.com/docs/ja/claude-code-on-the-web">https://code.claude.com/docs/ja/claude-code-on-the-web</a></p>
+<ul>
+<li>ブラウザで <a href="https://claude.ai/code">https://claude.ai/code</a> → 有料プランでサインイン</li>
+<li>左サイドバー「Code」→ GitHubリポジトリ連携（GitHub App 認可が必須）</li>
+<li>実行環境は Anthropic のクラウドVM上に自動構築</li>
+<li><span class="warn">⚠️ ローカルPCのファイルは編集しない／GAではなくリサーチプレビュー段階</span></li>
+<li>→ 手順2〜5は「Web版 手順2〜5」に差し替え</li>
+</ul>
+
+<h3>版D：IDE拡張版（VS Code） <span class="time">所要10〜15分</span> — 既にVS Code利用中なら</h3>
+<p class="note">出典: <a href="https://code.claude.com/docs/ja/vs-code">https://code.claude.com/docs/ja/vs-code</a></p>
+<ul>
+<li>VS Code（1.98以上）で拡張機能「Claude Code」を検索 → Install</li>
+<li>右上の Spark アイコン → Sign in → ブラウザで認可</li>
+<li>→ 手順2〜5そのまま適用</li>
+</ul>
+
+<h2>手順2〜5（ローカル系3版＝A/B/D 共通）</h2>
+<p class="note">元の手順を踏襲。版A／B／D を選んだ場合はこちらを使います。</p>
+<table>
+<tr><th>手順</th><th>所要</th><th>内容</th></tr>
+<tr><td>手順2 開発環境を整える</td><td>10〜15分</td><td>Python・VS Code・ターミナルの基本確認</td></tr>
+<tr><td>手順3 Git を初期設定する</td><td>10分</td><td>git の初期化／<code>.gitignore</code>で公開不可ファイル除外／最初のコミット</td></tr>
+<tr><td>手順4 プロジェクト管理の枠組みを作る</td><td>10分</td><td>フォルダ構成・メモ書きの雛形・設定ファイルの分離</td></tr>
+<tr><td>手順5 重要な情報の管理方法を整える</td><td>10分</td><td><code>.env</code> ファイルの使い方ルール（ローカル保存・<code>.gitignore</code>で除外）</td></tr>
+</table>
+
+<h2>Web版 手順2〜5（版C 専用差し替え）</h2>
+<div class="alert-yellow">
+版C（Web版）を選んだ場合は、上の共通手順2〜5の<strong>代わりに</strong>こちらを使います。ローカルにPython・VS Code・git を入れる必要はありません。
+</div>
+
+<h3>Web版 手順2：利用環境とリポジトリを用意する <span class="time">10分</span></h3>
+<p>目的：ローカルのPython/VS Code/ターミナルの代わりに、クラウド側で動かす準備を整える</p>
+<ul>
+<li>GitHubアカウントを用意（必須）</li>
+<li>新規プロジェクトの場合：先に <a href="https://github.com/new">https://github.com/new</a> で<strong>空のリポジトリを作成</strong>してから Web版を開く</li>
+<li>ブラウザで <a href="https://claude.ai/code">https://claude.ai/code</a> →「Code」→ 対象リポジトリを選択</li>
+<li><span class="warn">⚠️ ローカルPCへの Python・VS Code・ターミナル導入は不要</span>（クラウドVM上で動く）</li>
+</ul>
+
+<h3>Web版 手順3：環境（Environment）を作成する <span class="time">10分</span></h3>
+<p>目的：クラウドVMの動作条件を設定する（ローカルの git init に相当）</p>
+<p>環境作成画面で4項目を設定：</p>
+<table>
+<tr><th>項目</th><th>設定内容</th></tr>
+<tr><td>Name</td><td>任意の環境名</td></tr>
+<tr><td>Network access</td><td><strong>Trusted 推奨</strong>（npm・PyPI 等の取得を許可。遮断なら None）</td></tr>
+<tr><td>Environment variables</td><td>APIキー等（→ 手順5）</td></tr>
+<tr><td>Setup script</td><td>依存パッケージのインストールコマンド等（任意・初回のみ実行されキャッシュ）</td></tr>
+</table>
+<p><span class="warn">⚠️ git の初期化・コミットは Claude が自動で行う</span>（→ 手順4）</p>
+
+<h3>Web版 手順4：作業とコミットの流れを理解する <span class="time">10分</span></h3>
+<p>目的：中断・再開しても続きから進められる仕組みを理解する</p>
+<ul>
+<li>タスク送信 → リポジトリがVM上にクローン → 新しいブランチ自動作成 → Claudeが編集 → GitHubへ自動push</li>
+<li><span class="warn">⚠️ ユーザーが手動で commit / push する操作はない（全自動）。</span>ユーザーは diff ビューでレビュー → インラインコメント → PR作成</li>
+<li>セッション履歴はサイドバーに残り、中断・再開できる</li>
+<li><span class="warn">⚠️ pushされていないVM上のファイルはセッション終了で消える</span>＝GitHubに入ったものだけが残る（リソース上限：4vCPU / 16GB / ディスク30GB）</li>
+</ul>
+
+<h3>Web版 手順5：重要な情報（APIキー等）の管理 <span class="time">10分</span></h3>
+<p>目的：APIキーやパスワードを安全に渡し、誤公開を防ぐ</p>
+<ul>
+<li>環境作成時の Environment variables に <code>.env</code> 形式で入力：
+<pre><code>OPENAI_API_KEY=sk-xxxxxxxx
+DATABASE_URL=postgres://user:pass@host:5432/db</code></pre>
+<span class="warn">⚠️ 値はクォートで囲まない</span>（囲むとクォート文字も値に含まれる）</li>
+</ul>
+<div class="alert-yellow">
+<strong>⚠️ 公式記載の制約2点（要告知）</strong>
+<ol>
+<li>環境変数は<strong>平文で保存</strong>され、その環境を編集できる人は全員閲覧できる → 機密を入れる環境は<strong>信頼できるメンバーのみ</strong>に限定</li>
+<li>専用の Secrets 機能は<strong>まだ提供されていない</strong>（環境変数フィールドが現状の唯一の手段）</li>
+</ol>
+</div>
+<ul>
+<li>コードに直書きせず <code>process.env.OPENAI_API_KEY</code> / <code>os.environ[...]</code> 経由で読む</li>
+<li><code>.env</code> をリポジトリ内に作る運用も可だが、必ず <code>.gitignore</code> に <code>.env</code> を入れて誤コミットを防ぐ</li>
+</ul>
+
+<h2>追記：導入後の運用について</h2>
+
+<h3>共通（全版）</h3>
+<div class="box">
+<strong>注意事項</strong>
+<ul>
+<li>無料プランでは使えない。Pro（月20ドル）以上の契約を継続する。</li>
+<li>APIキー・パスワード等の機密はチャット／コミットに貼らない。漏洩経路の最大は「貼付」。</li>
+<li>削除・公開・課金が絡む操作は必ず人間が最終確認してから実行する。</li>
+</ul>
+<strong>日々の使い方の区切り</strong>
+<ul>
+<li>ローカル系：作業の区切りで git commit（戻せる状態を残す）。</li>
+<li>Web版：レビュー → PR で GitHub に反映（push前のVM内変更は消える）。</li>
+</ul>
+<strong>今後の質問について</strong>
+<ul>
+<li>一次情報は公式ドキュメント <a href="https://code.claude.com/docs/ja/">https://code.claude.com/docs/ja/</a>。</li>
+<li>操作で困った場合の連絡先：（担当者連絡先）</li>
+</ul>
+</div>
+
+<h3>ローカル系版（A/B/D）固有</h3>
+<ul>
+<li>ネイティブインストーラー版は自動更新。npm版は <code>claude update</code> 等で手動更新。</li>
+<li>CLI版はターミナルで <code>claude</code> 起動 → 作業 → 区切りで commit。デスクトップ/VS Code拡張はGUIで完結。</li>
+<li>ローカルに置いた <code>.env</code> は必ず <code>.gitignore</code> で除外（公開リポジトリへの誤push防止）。</li>
+</ul>
+
+<h3>Web版（C）固有</h3>
+<ul>
+<li>セッション終了でpush前のファイルは消える → 重要な変更は必ずPRでGitHubに反映。</li>
+<li>環境変数は平文保存・閲覧注意。機密は信頼メンバー限定の環境に。</li>
+<li>大規模ビルド／メモリ集約タスクはリソース上限（4vCPU/16GB/30GB）で失敗しうる。</li>
+<li>リサーチプレビュー段階のため、仕様が変わる可能性がある（公式docを随時確認）。</li>
+</ul>
+
+<h3>サポート提供者（社内）向けメモ</h3>
+<div class="box-blue">
+バージョン差で手順が変わるため、サポート開始時に必ず先方の「版（ローカル系 or Web版）」と「有料プラン契約状況」を確認してから進める。
+</div>
+
+<hr>
+<p class="note">本資料は公式ドキュメント（code.claude.com/docs/ja/）に基づき作成。Web版はリサーチプレビュー段階のため、最新情報は公式を確認してください。</p>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>2026-05-29 Check-out — learning-suite-kanji-foreign</title>
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.7; margin: 32px; color: #222; background: #f8f5ed; }
+    h1, h2 { color: #b64032; }
+    code { background: #fff; padding: 2px 5px; border-radius: 4px; }
+    .alert { border-left: 5px solid #b64032; background: #fff7f3; padding: 12px 16px; }
+    .box { background: rgba(255,255,255,.72); border: 1px solid #e3d3ad; padding: 14px 18px; border-radius: 8px; margin: 16px 0; }
+    li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <h1>Check-out: learning-suite-kanji-foreign</h1>
+  <p><strong>日付:</strong> 2026-05-29 / <strong>branch:</strong> master</p>
+  <div class="alert">
+    <strong>次セッションは本ファイルを先頭から必読。</strong>
+    記憶機能は SQLite/WASM から切り離し、<code>localStorage</code> 正本に変更済み。
+  </div>
+
+  <h2>A. 本セッション TL;DR</h2>
+  <div class="box">
+    <ul>
+      <li><code>/admin</code> を景色メイン + 習得漢字一覧パネル構成へ変更。</li>
+      <li>習得漢字一覧パネルの閉じるボタンを見出し右横へ配置。</li>
+      <li>1文字クリア=1ポイントの記憶機能を <code>src/lib/utils/clearedKanji.ts</code> に集約。</li>
+      <li>SQLite/WASM 初期化を <code>+layout.svelte</code> から外し、記憶機能の正本から除外。</li>
+      <li>デプロイ完了: <code>https://80c4080e.senbon.pages.dev</code></li>
+    </ul>
+  </div>
+
+  <h2>B. 完了 Commit</h2>
+  <div class="box">
+    <ul>
+      <li><code>26efa9b</code> — Use local progress store for learned kanji</li>
+    </ul>
+  </div>
+
+  <h2>C. 影響波及</h2>
+  <div class="box">
+    <p>記憶機能は DB ではなく localStorage 正本。今後ネイティブ配布でより堅牢にする場合は Capacitor Preferences への差し替えを検討する。</p>
+    <p>既存の <code>src/lib/db/*</code>、SQLite依存、<code>static/assets/sql-wasm.wasm</code> は現在の記憶機能では未使用化。削除するか、将来ログ分析機能としてADR化する必要あり。</p>
+  </div>
+
+  <h2>D. 残作業</h2>
+  <div class="box">
+    <ul>
+      <li><strong>H:</strong> SQLite/WASM撤退後の掃除。<code>src/lib/db/*</code>、SQLite依存、<code>sql-wasm.wasm</code>、DBテストの削除/ADR化判断。</li>
+      <li><strong>H:</strong> 実機で <code>できた</code> → admin反映 → 再起動保持 → 同一漢字重複なしを確認。</li>
+      <li><strong>M:</strong> 未使用CSS警告（play/select）と古い <code>study_log</code> コメントの掃除。</li>
+    </ul>
+  </div>
+
+  <h2>E. 配備済み</h2>
+  <div class="box">
+    <p>Cloudflare Pages deploy 済み。URL: <code>https://80c4080e.senbon.pages.dev</code></p>
+  </div>
+
+  <h2>F. 注意</h2>
+  <div class="box">
+    <p>vibe-base ルートに Research Bank 系の未コミット差分あり。本プロダクト改修とは別件として残置。</p>
+  </div>
+
+  <h2>G. 次セッション初手</h2>
+  <div class="box">
+    <ol>
+      <li><code>memory.md</code> と本レポートを読む。</li>
+      <li>ユーザーが許可すれば SQLite/WASM撤退後の掃除を実施。</li>
+      <li>掃除前に <code>npm run check</code> / <code>npm run build</code> の現状基準を確認。</li>
+    </ol>
+  </div>
+</body>
+</html>

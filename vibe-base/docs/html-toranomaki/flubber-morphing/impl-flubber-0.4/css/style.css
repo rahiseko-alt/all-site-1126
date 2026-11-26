@@ -1,0 +1,91 @@
+:root {
+  --bg-dark: #0a0a0a;
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --accent: #06D6A0;
+  --text-main: #f0f0f0;
+  --text-muted: #a0a0a0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+}
+
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 5%;
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1200px;
+  gap: 50px;
+  align-items: center;
+}
+
+.text-panel {
+  flex: 1;
+  min-width: 300px;
+}
+
+.text-panel h2 {
+  font-size: 3rem;
+  margin: 0 0 20px 0;
+  font-weight: 800;
+}
+
+.text-panel p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.demo-panel {
+  flex: 1.5;
+  min-width: 400px;
+  min-height: 400px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.morph-svg-container {
+  width: 200px;
+  height: 200px;
+}
+.morph-path {
+  fill: var(--accent);
+}
+
+.replay-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+.replay-btn:hover {
+  background: rgba(255,255,255,0.2);
+}

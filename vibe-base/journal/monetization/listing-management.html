@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ococonala 出品管理基盤 — マネタイズ大作戦</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --fg: #222;
+    --muted: #6b6b6b;
+    --line: #e0e0e0;
+    --soft: #f4f4f4;
+    --accent: #111;
+    --hot: #047857;
+    --low: #b91c1c;
+    --warn: #b45309;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    font-size: 14px;
+    padding: 32px 48px 60px;
+  }
+  header {
+    border-bottom: 2px solid var(--fg);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: 22px;
+    margin: 0 0 4px;
+    letter-spacing: 0.02em;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  h2 {
+    font-size: 16px;
+    margin: 32px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  p { margin: 6px 0; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+    margin: 8px 0 16px;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  th {
+    background: var(--soft);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover { background: #f9f9f9; }
+
+  /* Status badges */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  .badge-live    { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .badge-prep    { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+  .badge-plan    { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+  .badge-stop    { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .badge-on      { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .badge-off     { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+  .badge-test    { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .badge-unset   { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; }
+
+  /* Milestone bar */
+  .milestone-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    margin: 0 0 28px;
+    border: 1px solid var(--fg);
+  }
+  .ms-item {
+    padding: 12px 14px;
+    border-right: 1px solid var(--line);
+    text-align: center;
+  }
+  .ms-item:last-child { border-right: none; }
+  .ms-item.current {
+    background: #111;
+    color: #fff;
+  }
+  .ms-month {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .ms-target {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 3px;
+  }
+  .ms-current .ms-target { color: #fff; }
+  .ms-milestone {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+  .ms-item.current .ms-milestone { color: #aaa; }
+
+  /* Roadmap table */
+  .roadmap-table th { text-align: center; }
+  .roadmap-table td { text-align: center; font-size: 12px; }
+  .roadmap-table td.label-col { text-align: left; font-weight: 600; min-width: 100px; }
+  .roadmap-table th.month-header {
+    text-align: center;
+    vertical-align: top;
+    padding: 8px 6px;
+    min-width: 140px;
+  }
+  .month-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .month-target {
+    font-size: 12px;
+    font-weight: 800;
+    color: #111;
+    margin-top: 2px;
+    display: block;
+  }
+  .month-header.col-current { background: #111; color: #fff; }
+  .month-header.col-current .month-target { color: #fff; }
+
+  .cell-now    { background: #ecfdf5; color: #065f46; font-weight: 600; font-size: 11px; }
+  .cell-soon   { background: #fffbeb; color: #854d0e; font-size: 11px; }
+  .cell-mid    { background: #f5f3ff; color: #5b21b6; font-size: 11px; }
+  .cell-grow   { background: #fdf2f8; color: #86198f; font-size: 11px; }
+  .cell-later  { background: #f8fafc; color: #64748b; font-size: 11px; }
+  .cell-na     { background: #f8fafc; color: #cbd5e1; font-size: 11px; }
+  .cell-action { line-height: 1.5; padding: 7px 8px; }
+
+  /* Pipeline cards */
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 8px 0 16px;
+  }
+  .pipeline-card {
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 14px 16px;
+  }
+  .pipeline-card.urgent {
+    border: 2px solid #b91c1c;
+    background: #fff8f8;
+  }
+  .pipeline-card-code {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .pipeline-card.urgent .pipeline-card-code { color: #b91c1c; }
+  .urgent-label {
+    display: inline-block;
+    background: #b91c1c;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 2px;
+    margin-left: 6px;
+    letter-spacing: 0.04em;
+  }
+  .pipeline-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .pipeline-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .pipeline-meta span {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid var(--line);
+    margin-right: 4px;
+    color: var(--muted);
+  }
+  .stage-bar {
+    display: flex;
+    gap: 2px;
+    margin-top: 10px;
+  }
+  .stage-step {
+    flex: 1;
+    height: 4px;
+    background: var(--line);
+    border-radius: 1px;
+  }
+  .stage-step.done { background: #111; }
+  .stage-step.current { background: #6b6b6b; }
+  .stage-labels {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+    font-size: 9px;
+    color: #bbb;
+  }
+  .stage-labels span { flex: 1; text-align: center; }
+  .stage-labels span.active { color: #111; font-weight: 700; }
+
+  /* Verdict box */
+  .strategy-box {
+    border: 1px solid var(--fg);
+    background: #fff;
+    padding: 16px 20px;
+    margin: 12px 0 24px;
+  }
+  .strategy-main {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .strategy-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Footer */
+  .ops-footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .ops-footer code {
+    background: var(--soft);
+    padding: 1px 5px;
+    font-size: 10px;
+    border: 1px solid var(--line);
+  }
+
+  /* Nav */
+  .nav-anchors {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .nav-anchors a {
+    font-size: 12px;
+    padding: 4px 14px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    text-decoration: none;
+    background: #fff;
+  }
+  .nav-anchors a:hover { color: var(--fg); border-color: var(--fg); }
+
+  .zero { color: var(--muted); }
+  .tbd  { color: #94a3b8; font-style: italic; font-size: 12px; }
+  td.memo { font-size: 12px; color: var(--muted); }
+
+  /* Highlight row */
+  tr.row-urgent td { background: #fff8f8 !important; }
+
+  /* ROI table */
+  .roi-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .roi-high { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .roi-mid  { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+  .roi-low  { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+  .roi-x    { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; }
+  .usecase-list { margin: 0; padding-left: 14px; font-size: 11px; color: var(--muted); line-height: 1.7; }
+  td.benefit { font-size: 12px; }
+  .benefit-title { font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+  .exe-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    background: #1e293b; color: #f8fafc; padding: 1px 6px; border-radius: 2px;
+    letter-spacing: 0.03em; vertical-align: middle;
+  }
+  .dev-status-done {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+    padding: 2px 7px; border-radius: 2px; letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ococonala 出品管理基盤 — マネタイズ大作戦</h1>
+  <div class="subtitle">全8出品ダッシュボード / 月次ロードマップ / 広告トラッカー / 開発パイプライン — 最終更新 2026-04-13</div>
+</header>
+
+<!-- MILESTONE BAR -->
+<div class="milestone-bar">
+  <div class="ms-item current">
+    <div class="ms-month">4月 ← 今ここ</div>
+    <div class="ms-target">初売上</div>
+    <div class="ms-milestone">既存3出品改善<br>業務効率化2本出品<br>広告テスト開始</div>
+  </div>
+  <div class="ms-item">
+    <div class="ms-month">5月</div>
+    <div class="ms-target" style="color:#047857;">¥50,000</div>
+    <div class="ms-milestone">業務効率化3〜4本稼働<br>勝ち筋の広告増額</div>
+  </div>
+  <div class="ms-item">
+    <div class="ms-month">6月</div>
+    <div class="ms-target" style="color:#047857;">¥100,000</div>
+    <div class="ms-milestone">全8本体制<br>月10万ペース確立</div>
+  </div>
+  <div class="ms-item">
+    <div class="ms-month">7月</div>
+    <div class="ms-target" style="color:#b45309;">¥200,000</div>
+    <div class="ms-milestone">勝ち筋集中<br>撤退判断<br>単価引き上げ開始</div>
+  </div>
+  <div class="ms-item">
+    <div class="ms-month">8月</div>
+    <div class="ms-target" style="color:#b45309;">¥400,000</div>
+    <div class="ms-milestone">高単価帯強化<br>レビュー武器化</div>
+  </div>
+  <div class="ms-item">
+    <div class="ms-month">9月</div>
+    <div class="ms-target" style="color:#7c3aed;">開業届</div>
+    <div class="ms-milestone">月収安定<br>法人化準備</div>
+  </div>
+</div>
+
+<nav class="nav-anchors">
+  <a href="#s1">§1 出品一覧</a>
+  <a href="#s2">§2 月次ロードマップ</a>
+  <a href="#s3">§3 広告予算トラッカー</a>
+  <a href="#s4">§4 新規開発パイプライン</a>
+  <a href="#s5">§5 開発済みツール一覧（ROI・効能）</a>
+</nav>
+
+<div class="strategy-box">
+  <div class="strategy-main">方針: 4月中に業務効率化2本出品 → 広告テストで露出 → 成約実績でレビュー獲得 → 勝ち筋に集中して単価引き上げ</div>
+  <div class="strategy-sub">既存3出品（AIチャットボット / カテゴリ772）＋ 業務効率化5系統（カテゴリ230）の計8出品体制を4月〜6月で構築。4月末までに <strong>eff-gas01 / eff-py01</strong> の出品完了が最重要タスク。</div>
+</div>
+
+<!-- ===================== SECTION 1 ===================== -->
+<section id="s1">
+  <div class="section-label">SECTION 01</div>
+  <h2>出品一覧ダッシュボード</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>コード</th>
+        <th>サービスタイトル</th>
+        <th>カテゴリ</th>
+        <th class="num">価格</th>
+        <th>ステータス</th>
+        <th>広告</th>
+        <th class="num">PV</th>
+        <th class="num">クリック</th>
+        <th class="num">成約</th>
+        <th class="num">レビュー</th>
+        <th>メモ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 既存3出品 -->
+      <tr>
+        <td><strong>app50</strong></td>
+        <td>管理画面付LINE AIボットを開発・設置します</td>
+        <td>772 / AIチャットボット</td>
+        <td class="num">¥50,000</td>
+        <td><span class="badge badge-live">🟢 公開中</span></td>
+        <td><span class="badge badge-off">OFF</span></td>
+        <td class="num">1,047</td>
+        <td class="num">96</td>
+        <td class="num zero">0</td>
+        <td class="num zero">0</td>
+        <td class="memo">改稿済。記事内容改善が最優先。顧客ストーリー・納品物の見える化・CTA強化</td>
+      </tr>
+      <tr>
+        <td><strong>dify25</strong></td>
+        <td>DifyでLINE連携AIボットを構築します</td>
+        <td>772 / AIチャットボット</td>
+        <td class="num">¥10,000</td>
+        <td><span class="badge badge-live">🟢 公開中</span></td>
+        <td><span class="badge badge-off">OFF</span></td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num zero">0</td>
+        <td class="num zero">0</td>
+        <td class="memo">改稿済。広告テスト第1候補。詳細ページ改善後に広告ON予定</td>
+      </tr>
+      <tr>
+        <td><strong>dsl5</strong></td>
+        <td>LINE対応Dify DSLボットを納品します</td>
+        <td>772 / AIチャットボット</td>
+        <td class="num">¥4,000</td>
+        <td><span class="badge badge-live">🟢 公開中</span></td>
+        <td><span class="badge badge-off">OFF</span></td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num zero">0</td>
+        <td class="num zero">0</td>
+        <td class="memo">改稿済・画像2枚（最少構成）。低単価エントリー商品。レビュー獲得用先兵</td>
+      </tr>
+      <!-- 業務効率化5系統 -->
+      <tr class="row-urgent">
+        <td><strong style="color:#b91c1c;">eff-gas01</strong></td>
+        <td>GASでGmail・スプレッドシート業務を自動化</td>
+        <td>230 / 業務自動化・効率化支援</td>
+        <td class="num">¥5,000〜</td>
+        <td><span class="badge badge-prep">🟡 開発中</span></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo"><strong style="color:#b91c1c;">4月中出品必達</strong> / 難易度3 / 優先度:高</td>
+      </tr>
+      <tr class="row-urgent">
+        <td><strong style="color:#b91c1c;">eff-py01</strong></td>
+        <td>Pythonで欲しいデータを自動収集します</td>
+        <td>230 / 業務自動化・効率化支援</td>
+        <td class="num">¥3,000〜</td>
+        <td><span class="badge badge-prep">🟡 開発中</span></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo"><strong style="color:#b91c1c;">4月中出品必達</strong> / 難易度3 / 優先度:高</td>
+      </tr>
+      <tr>
+        <td><strong>eff-ai01</strong></td>
+        <td>業務フローをAI＋自動化で丸ごと効率化</td>
+        <td>230 / 業務自動化・効率化支援</td>
+        <td class="num">¥10,000〜</td>
+        <td><span class="badge badge-plan">⚪️ 計画</span></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">5月出品目標 / 難易度5 / AIチャット既存資産と親和性高</td>
+      </tr>
+      <tr>
+        <td><strong>eff-rpa01</strong></td>
+        <td>面倒なPC作業をPython・RPAで自動化します</td>
+        <td>230 / 業務自動化・効率化支援</td>
+        <td class="num">¥5,000〜</td>
+        <td><span class="badge badge-plan">⚪️ 計画</span></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">5月出品目標 / 難易度4</td>
+      </tr>
+      <tr>
+        <td><strong>eff-ec01</strong></td>
+        <td>ECショップの在庫・出品・価格更新を自動化</td>
+        <td>230 / 業務自動化・効率化支援</td>
+        <td class="num">¥15,000〜</td>
+        <td><span class="badge badge-plan">⚪️ 計画</span></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">6月以降 / 難易度6 / 高単価帯狙い</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section id="s2">
+  <div class="section-label">SECTION 02</div>
+  <h2>月次展開ロードマップ（マネタイズ目標連結）</h2>
+
+  <table class="roadmap-table">
+    <thead>
+      <tr>
+        <th class="label-col" style="min-width:100px; background:var(--soft);">出品</th>
+        <th class="month-header col-current">
+          <div class="month-name">4月 ← 今ここ</div>
+          <span class="month-target">初売上 1円以上</span>
+        </th>
+        <th class="month-header">
+          <div class="month-name">5月</div>
+          <span class="month-target" style="color:#047857;font-size:13px;font-weight:800;">¥50,000</span>
+        </th>
+        <th class="month-header">
+          <div class="month-name">6月</div>
+          <span class="month-target" style="color:#047857;font-size:13px;font-weight:800;">¥100,000</span>
+        </th>
+        <th class="month-header">
+          <div class="month-name">7月</div>
+          <span class="month-target" style="color:#b45309;font-size:13px;font-weight:800;">¥200,000</span>
+        </th>
+        <th class="month-header">
+          <div class="month-name">8月</div>
+          <span class="month-target" style="color:#b45309;font-size:13px;font-weight:800;">¥400,000</span>
+        </th>
+        <th class="month-header">
+          <div class="month-name">9月</div>
+          <span class="month-target" style="color:#7c3aed;font-size:13px;font-weight:800;">開業届</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label-col"><strong>app50</strong></td>
+        <td class="cell-now cell-action">記事内容改善<br>顧客ストーリー追加<br>納品物の見える化<br>広告テスト開始</td>
+        <td class="cell-soon cell-action">広告ON（記事改善後）<br>FAQ強化<br>CTA見直し</td>
+        <td class="cell-mid cell-action">レビュー獲得後<br>単価維持 or UP検討</td>
+        <td class="cell-grow cell-action">勝ち筋確認<br>単価引き上げ開始</td>
+        <td class="cell-grow cell-action">高単価帯強化<br>レビュー武器化</td>
+        <td class="cell-later cell-action">月収安定運用</td>
+      </tr>
+      <tr>
+        <td class="label-col"><strong>dify25</strong></td>
+        <td class="cell-now cell-action">記事内容改善<br>差別化前面化<br>広告テスト（優先度高）</td>
+        <td class="cell-soon cell-action">成約実績でレビュー獲得<br>勝ち筋なら広告増額</td>
+        <td class="cell-mid cell-action">レビュー数を武器化<br>評価育成</td>
+        <td class="cell-grow cell-action">単価引き上げ検討</td>
+        <td class="cell-grow cell-action">高評価継続</td>
+        <td class="cell-later cell-action">安定運用</td>
+      </tr>
+      <tr>
+        <td class="label-col"><strong>dsl5</strong></td>
+        <td class="cell-now cell-action">記事内容改善<br>CTA強化<br>初回購入ハードル引き下げ</td>
+        <td class="cell-soon cell-action">初レビュー獲得<br>信頼構築</td>
+        <td class="cell-mid cell-action">レビュー蓄積<br>価格見直し検討</td>
+        <td class="cell-grow cell-action">他出品へのクロスセル</td>
+        <td class="cell-grow cell-action">エントリー商品として安定</td>
+        <td class="cell-later cell-action">安定運用</td>
+      </tr>
+      <tr>
+        <td class="label-col" style="color:#b91c1c;font-weight:700;">eff-gas01<br><span style="font-size:10px;background:#b91c1c;color:#fff;padding:1px 4px;border-radius:2px;">4月必達</span></td>
+        <td class="cell-now cell-action"><strong>出品完了（4月中）</strong><br>広告テスト開始<br>最低チャージ1,000円</td>
+        <td class="cell-soon cell-action">成約実績確認<br>芽が出れば広告増額</td>
+        <td class="cell-mid cell-action">全8本体制の一角<br>月10万ペース貢献</td>
+        <td class="cell-grow cell-action">勝ち筋なら集中<br>撤退判断も検討</td>
+        <td class="cell-grow cell-action">月40万貢献</td>
+        <td class="cell-later cell-action">安定運用</td>
+      </tr>
+      <tr>
+        <td class="label-col" style="color:#b91c1c;font-weight:700;">eff-py01<br><span style="font-size:10px;background:#b91c1c;color:#fff;padding:1px 4px;border-radius:2px;">4月必達</span></td>
+        <td class="cell-now cell-action"><strong>出品完了（4月中）</strong><br>広告テスト開始<br>最低チャージ1,000円</td>
+        <td class="cell-soon cell-action">成約実績確認<br>芽が出れば広告増額</td>
+        <td class="cell-mid cell-action">全8本体制の一角<br>月10万ペース貢献</td>
+        <td class="cell-grow cell-action">勝ち筋なら集中<br>撤退判断も検討</td>
+        <td class="cell-grow cell-action">月40万貢献</td>
+        <td class="cell-later cell-action">安定運用</td>
+      </tr>
+      <tr>
+        <td class="label-col"><strong>eff-ai01</strong></td>
+        <td class="cell-na cell-action">—</td>
+        <td class="cell-soon cell-action"><strong>出品（5月）</strong><br>AIチャット資産横展開<br>広告テスト</td>
+        <td class="cell-mid cell-action">全8本体制の一角<br>高単価帯候補</td>
+        <td class="cell-grow cell-action">勝ち筋なら集中</td>
+        <td class="cell-grow cell-action">高単価帯強化</td>
+        <td class="cell-later cell-action">安定運用</td>
+      </tr>
+      <tr>
+        <td class="label-col"><strong>eff-rpa01</strong></td>
+        <td class="cell-na cell-action">—</td>
+        <td class="cell-soon cell-action"><strong>出品（5月）</strong><br>RPA系需要確認</td>
+        <td class="cell-mid cell-action">全8本体制完成</td>
+        <td class="cell-grow cell-action">勝ち筋 or 撤退判断</td>
+        <td class="cell-grow cell-action">育てる or 絞る</td>
+        <td class="cell-later cell-action">安定運用</td>
+      </tr>
+      <tr>
+        <td class="label-col"><strong>eff-ec01</strong></td>
+        <td class="cell-na cell-action">—</td>
+        <td class="cell-na cell-action">—</td>
+        <td class="cell-mid cell-action"><strong>出品（6月）</strong><br>EC特化・高単価狙い</td>
+        <td class="cell-grow cell-action">勝ち筋確認<br>単価引き上げ</td>
+        <td class="cell-grow cell-action">高単価帯の主力に</td>
+        <td class="cell-later cell-action">安定運用</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:12px;color:var(--muted);margin-top:4px;">10倍速計画: 4月中に業務効率化2本（gas01/py01）出品完了 → 5月に残り2本追加稼働（ai01/rpa01）→ 6月に全8本体制 + eff-ec01出品 → 7月以降は勝ち筋に集中して撤退・単価引き上げ判断。</p>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section id="s3">
+  <div class="section-label">SECTION 03</div>
+  <h2>広告予算トラッカー</h2>
+
+  <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">参考: CPC相場 30〜60円 / 最低チャージ 1,000円 / 新規出品者でも出稿可。ROI = (成約数 × 価格 − 広告費) ÷ 広告費 × 100</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>コード</th>
+        <th>広告ステータス</th>
+        <th class="num">月予算</th>
+        <th class="num">消化額</th>
+        <th class="num">クリック数</th>
+        <th class="num">CPC（実績）</th>
+        <th class="num">成約数</th>
+        <th class="num">ROI</th>
+        <th>備考</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>app50</strong></td>
+        <td><span class="badge badge-off">OFF</span></td>
+        <td class="num tbd">未設定</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">記事改善後に広告設定。4月中に広告テスト開始目標</td>
+      </tr>
+      <tr>
+        <td><strong>dify25</strong></td>
+        <td><span class="badge badge-off">OFF</span></td>
+        <td class="num tbd">未設定</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">広告テスト第1候補。詳細ページ改善後に即ON予定</td>
+      </tr>
+      <tr>
+        <td><strong>dsl5</strong></td>
+        <td><span class="badge badge-off">OFF</span></td>
+        <td class="num tbd">未設定</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">低単価(¥4,000)のためROI要注意。成約率で判断</td>
+      </tr>
+      <tr class="row-urgent">
+        <td><strong style="color:#b91c1c;">eff-gas01</strong></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">1,000円〜</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">CPC想定40円</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo"><strong style="color:#b91c1c;">4月出品後すぐに広告テスト開始</strong></td>
+      </tr>
+      <tr class="row-urgent">
+        <td><strong style="color:#b91c1c;">eff-py01</strong></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">1,000円〜</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">CPC想定40円</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo"><strong style="color:#b91c1c;">4月出品後すぐに広告テスト開始</strong></td>
+      </tr>
+      <tr>
+        <td><strong>eff-ai01</strong></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">未設定</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">5月出品後に設定</td>
+      </tr>
+      <tr>
+        <td><strong>eff-rpa01</strong></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">未設定</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">5月出品後に設定</td>
+      </tr>
+      <tr>
+        <td><strong>eff-ec01</strong></td>
+        <td><span class="badge badge-unset">未設定</span></td>
+        <td class="num tbd">未設定</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="num tbd">—</td>
+        <td class="memo">6月出品後に設定</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== SECTION 4 ===================== -->
+<section id="s4">
+  <div class="section-label">SECTION 04</div>
+  <h2>新規開発パイプライン（業務効率化部門）</h2>
+
+  <div class="pipeline-grid">
+
+    <!-- eff-gas01: 4月必達 -->
+    <div class="pipeline-card urgent">
+      <div class="pipeline-card-code">eff-gas01 <span class="urgent-label">4月中出品必達</span></div>
+      <div class="pipeline-card-title">GASでGmail・スプレッドシート業務を自動化</div>
+      <div class="pipeline-meta">
+        <span>GAS系</span>
+        <span>難易度: 3/10</span>
+        <span>優先度: 高</span>
+      </div>
+      <div class="pipeline-meta">想定価格: <strong>¥5,000〜</strong> / カテゴリ230 中央値18,000円</div>
+      <div class="pipeline-meta" style="margin-top:6px;">Googleアカウントがあれば誰でも使えるため購入ハードル低。開発コスト最小で先行出品に最適。</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">進捗</div>
+      <div class="stage-bar">
+        <div class="stage-step done"></div>
+        <div class="stage-step current"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+      </div>
+      <div class="stage-labels">
+        <span class="active">アイデア</span>
+        <span class="active">設計</span>
+        <span>開発中</span>
+        <span>完成</span>
+        <span>出品済</span>
+      </div>
+    </div>
+
+    <!-- eff-py01: 4月必達 -->
+    <div class="pipeline-card urgent">
+      <div class="pipeline-card-code">eff-py01 <span class="urgent-label">4月中出品必達</span></div>
+      <div class="pipeline-card-title">Pythonで欲しいデータを自動収集します</div>
+      <div class="pipeline-meta">
+        <span>Python系</span>
+        <span>難易度: 3/10</span>
+        <span>優先度: 高</span>
+      </div>
+      <div class="pipeline-meta">想定価格: <strong>¥3,000〜</strong></div>
+      <div class="pipeline-meta" style="margin-top:6px;">スクレイピング・データ収集はカテゴリ231で人気。カテゴリ230でも需要あり。要件が明確でスコープを絞りやすい。</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">進捗</div>
+      <div class="stage-bar">
+        <div class="stage-step done"></div>
+        <div class="stage-step current"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+      </div>
+      <div class="stage-labels">
+        <span class="active">アイデア</span>
+        <span class="active">設計</span>
+        <span>開発中</span>
+        <span>完成</span>
+        <span>出品済</span>
+      </div>
+    </div>
+
+    <!-- eff-ai01: 5月 -->
+    <div class="pipeline-card">
+      <div class="pipeline-card-code">eff-ai01 — 5月出品目標</div>
+      <div class="pipeline-card-title">業務フローをAI＋自動化で丸ごと効率化</div>
+      <div class="pipeline-meta">
+        <span>AI自動化系</span>
+        <span>難易度: 5/10</span>
+        <span>優先度: 中</span>
+      </div>
+      <div class="pipeline-meta">想定価格: <strong>¥10,000〜</strong></div>
+      <div class="pipeline-meta" style="margin-top:6px;">既存AIチャット（AI Answer/Dify）の資産を横展開できる。業務フロー全体を扱う高単価帯狙い。</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">進捗</div>
+      <div class="stage-bar">
+        <div class="stage-step done"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+      </div>
+      <div class="stage-labels">
+        <span class="active">アイデア</span>
+        <span>設計</span>
+        <span>開発中</span>
+        <span>完成</span>
+        <span>出品済</span>
+      </div>
+    </div>
+
+    <!-- eff-rpa01: 5月 -->
+    <div class="pipeline-card">
+      <div class="pipeline-card-code">eff-rpa01 — 5月出品目標</div>
+      <div class="pipeline-card-title">面倒なPC作業をPython・RPAで自動化します</div>
+      <div class="pipeline-meta">
+        <span>RPA系</span>
+        <span>難易度: 4/10</span>
+        <span>優先度: 中</span>
+      </div>
+      <div class="pipeline-meta">想定価格: <strong>¥5,000〜</strong></div>
+      <div class="pipeline-meta" style="margin-top:6px;">PC操作自動化の需要は継続的。Windows環境依存が多く納品形式の定義が重要。</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">進捗</div>
+      <div class="stage-bar">
+        <div class="stage-step done"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+      </div>
+      <div class="stage-labels">
+        <span class="active">アイデア</span>
+        <span>設計</span>
+        <span>開発中</span>
+        <span>完成</span>
+        <span>出品済</span>
+      </div>
+    </div>
+
+    <!-- eff-ec01: 6月以降 -->
+    <div class="pipeline-card">
+      <div class="pipeline-card-code">eff-ec01 — 6月以降</div>
+      <div class="pipeline-card-title">ECショップの在庫・出品・価格更新を自動化</div>
+      <div class="pipeline-meta">
+        <span>EC特化</span>
+        <span>難易度: 6/10</span>
+        <span>優先度: 低</span>
+      </div>
+      <div class="pipeline-meta">想定価格: <strong>¥15,000〜</strong></div>
+      <div class="pipeline-meta" style="margin-top:6px;">業種特化系。単価帯高め狙い可。EC運営者は費用対効果を理解している購買層。</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">進捗</div>
+      <div class="stage-bar">
+        <div class="stage-step done"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+        <div class="stage-step"></div>
+      </div>
+      <div class="stage-labels">
+        <span class="active">アイデア</span>
+        <span>設計</span>
+        <span>開発中</span>
+        <span>完成</span>
+        <span>出品済</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== SECTION 5 ===================== -->
+<section id="s5">
+  <div class="section-label">SECTION 05</div>
+  <h2>開発済みツール一覧（ROI・効能）</h2>
+
+  <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+    基準賃金: <strong>¥1,160/時間</strong>（2026年度最低賃金）｜ ROI = 年間コスト削減額 ÷ ツール購入費 ｜
+    想定: バイトを雇って手作業でやらせた場合の代替コスト
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="min-width:90px;">コード</th>
+        <th style="min-width:140px;">ツール名</th>
+        <th>納品形式</th>
+        <th class="num">価格</th>
+        <th class="num" style="min-width:80px;">削減時間/月</th>
+        <th class="num" style="min-width:100px;">月間コスト削減</th>
+        <th class="num" style="min-width:110px;">年間コスト削減</th>
+        <th class="num" style="min-width:100px;">初月損益<br><span style="font-weight:400;font-size:10px;">月削減 − 価格</span></th>
+        <th class="num" style="min-width:60px;">判定</th>
+        <th class="num" style="min-width:70px;">ROI倍率</th>
+        <th style="min-width:260px;">効能（ユースケース）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <strong>eff-vba01</strong><br>
+          <span class="dev-status-done">✅ 開発済</span>
+        </td>
+        <td>
+          <strong>ExcelMacroツール</strong><br>
+          <span style="font-size:11px;color:var(--muted);">Excelマクロ自動化セット</span>
+        </td>
+        <td>
+          <span class="exe-badge">.bat</span>&nbsp;
+          <span style="font-size:11px;color:var(--muted);">自動インストーラー<br>Excelを開けば即使用可</span>
+        </td>
+        <td class="num"><strong>¥3,000</strong></td>
+        <td class="num"><strong>10時間</strong><br><span style="font-size:10px;color:var(--muted);">集計・整形・<br>フォーマット統一</span></td>
+        <td class="num">
+          <strong style="color:#047857;">¥11,600</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥1,160×10h</span>
+        </td>
+        <td class="num">
+          <strong style="color:#047857;">¥139,200</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥1,160×10h×12ヶ月</span>
+        </td>
+        <td class="num">
+          <strong style="color:#047857;">+¥8,600</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥11,600 − ¥3,000</span>
+        </td>
+        <td class="num">
+          <span class="roi-label roi-high">✅ 通過</span><br>
+          <span style="font-size:10px;color:var(--muted);">価格余地あり<br>〜¥11,600まで可</span>
+        </td>
+        <td class="num">
+          <span class="roi-label roi-high"><span class="roi-x">46x</span></span>
+        </td>
+        <td class="benefit">
+          <div class="benefit-title">定型Excelを1クリック完了に</div>
+          <ul class="usecase-list">
+            <li>月次売上集計・グラフ自動生成</li>
+            <li>名簿・在庫リストのフォーマット統一</li>
+            <li>シート間データ転記・重複削除</li>
+            <li>日付自動入力・改行セル整形</li>
+            <li>セル色付け・条件付き書式の一括適用</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>eff-py01</strong><br>
+          <span class="dev-status-done">✅ 開発済</span>
+        </td>
+        <td>
+          <strong>WebScraperツール</strong><br>
+          <span style="font-size:11px;color:var(--muted);">Web自動データ収集ツール</span>
+        </td>
+        <td>
+          <span class="exe-badge">.exe</span>&nbsp;
+          <span style="font-size:11px;color:var(--muted);">Python不要<br>ダブルクリックで起動</span>
+        </td>
+        <td class="num"><strong>¥10,000</strong></td>
+        <td class="num"><strong>9時間</strong><br><span style="font-size:10px;color:var(--muted);">競合調査・リスト<br>作成・データ収集</span></td>
+        <td class="num">
+          <strong style="color:#047857;">¥10,440</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥1,160×9h</span>
+        </td>
+        <td class="num">
+          <strong style="color:#047857;">¥125,280</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥1,160×9h×12ヶ月</span>
+        </td>
+        <td class="num">
+          <strong style="color:#b45309;">+¥440</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥10,440 − ¥10,000</span>
+        </td>
+        <td class="num">
+          <span class="roi-label roi-mid">⚠️ ギリギリ</span><br>
+          <span style="font-size:10px;color:var(--muted);">上限が価格と接近<br>¥8,000推奨</span>
+        </td>
+        <td class="num">
+          <span class="roi-label roi-high"><span class="roi-x">12.5x</span></span>
+        </td>
+        <td class="benefit">
+          <div class="benefit-title">手動コピペをゼロに</div>
+          <ul class="usecase-list">
+            <li>競合サイトの価格・在庫を毎日自動収集</li>
+            <li>求人情報・物件情報の一覧CSV出力</li>
+            <li>ECサイト商品リストの定期取得</li>
+            <li>URLリストを一括処理→CSV保存</li>
+            <li>営業リスト・公開情報の自動収集</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>eff-rpa01</strong><br>
+          <span class="dev-status-done">✅ 開発済</span>
+        </td>
+        <td>
+          <strong>PC AutoTool</strong><br>
+          <span style="font-size:11px;color:var(--muted);">PC操作自動化ツール</span>
+        </td>
+        <td>
+          <span class="exe-badge">.exe</span>&nbsp;
+          <span style="font-size:11px;color:var(--muted);">Python不要<br>ダブルクリックで起動</span>
+        </td>
+        <td class="num"><strong>¥5,000</strong></td>
+        <td class="num"><strong>3時間</strong><br><span style="font-size:10px;color:var(--muted);">ファイル整理・<br>バックアップ等</span></td>
+        <td class="num">
+          <strong style="color:#b45309;">¥3,480</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥1,160×3h</span>
+        </td>
+        <td class="num">
+          <strong style="color:#b45309;">¥41,760</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥1,160×3h×12ヶ月</span>
+        </td>
+        <td class="num">
+          <strong style="color:#b91c1c;">−¥1,520</strong><br>
+          <span style="font-size:10px;color:var(--muted);">¥3,480 − ¥5,000</span>
+        </td>
+        <td class="num">
+          <span class="roi-label roi-low" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;">❌ 要改定</span><br>
+          <span style="font-size:10px;color:#b91c1c;font-weight:600;">¥3,000以下に修正</span>
+        </td>
+        <td class="num">
+          <span class="roi-label roi-mid"><span class="roi-x">8.4x</span></span>
+        </td>
+        <td class="benefit">
+          <div class="benefit-title">毎日のルーティン作業を自動実行</div>
+          <ul class="usecase-list">
+            <li>フォルダ内ファイルの自動整理・分類</li>
+            <li>日付フォルダへの自動移動・バックアップ</li>
+            <li>大量ファイルの一括リネーム</li>
+            <li>特定フォルダの自動クリーンアップ</li>
+            <li>PC起動時の定時タスク自動実行</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3" style="font-weight:700;font-size:12px;background:var(--soft);">合計（3ツール）</td>
+        <td class="num" style="font-weight:700;background:var(--soft);">¥18,000</td>
+        <td class="num" style="font-weight:700;background:var(--soft);">22時間/月</td>
+        <td class="num" style="font-weight:700;color:#047857;background:var(--soft);">¥25,520/月</td>
+        <td class="num" style="font-weight:700;color:#047857;background:var(--soft);">¥306,240/年</td>
+        <td class="num" style="background:var(--soft);font-size:11px;">2通過 / 1要改定</td>
+        <td class="num" style="background:var(--soft);"></td>
+        <td class="num" style="font-weight:700;background:var(--soft);">平均 <span style="font-size:15px;">22x</span></td>
+        <td style="background:var(--soft);font-size:11px;color:var(--muted);">全ツール .exe/.bat 納品 → インストール作業ゼロ</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div style="margin-top:8px;font-size:11px;color:var(--muted);">
+    ※ 削減時間は「この作業を週2回、1回30〜60分やっている」想定の最小値。実際の効果はユーザー環境に依存。<br>
+    ※ 競合No.1（エイト: 585件）は .exe ツール販売モデル。同形式で勝負。
+  </div>
+</section>
+
+<footer class="ops-footer">
+  <strong>更新ルール:</strong> 成約・PV更新は週次で記入 / 広告ON/OFF変更時は即反映 / ロードマップの月次達成判定はマネタイズ大作戦 dashboard.html と照合<br>
+  参照元: <code>journal/monetization/dashboard.html</code> / <code>memory/project_monetization-battleplan.md</code><br>
+  最終更新: 2026-04-14
+</footer>
+
+</body>
+</html>

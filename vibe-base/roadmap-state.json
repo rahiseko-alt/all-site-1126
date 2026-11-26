@@ -1,0 +1,10 @@
+{
+  "_note": "現在地の単一正本。AI が編集してよいのは status フィールドのみ。マイルストーン名・順序・依存は roadmap.md が正本（ここに書くな）。履歴は git log が持つ（ここに書くな）。",
+  "_status_values": ["todo", "in_progress", "done"],
+  "updated_at": "2026-07-19",
+  "milestones": [
+    { "id": 1, "status": "todo" },
+    { "id": 2, "status": "todo" },
+    { "id": 3, "status": "todo" }
+  ]
+}

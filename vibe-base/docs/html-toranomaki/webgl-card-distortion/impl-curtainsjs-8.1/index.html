@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL Premium Card Distortion - HTML Toranomaki</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Link to external CSS style -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="glow"></div>
+    
+    <!-- WebGL Canvas -->
+    <div id="canvas"></div>
+
+    <header>
+        <h1>Utsubo / Lusion Flow</h1>
+        <p>WebGL Jelly Cards & Click Ripple</p>
+    </header>
+
+    <!-- Cards Layout Container -->
+    <div class="cards-container">
+        
+        <!-- Card 1: Vertical (縦カード) - Zero Spikes (Boundary Fixed, Image Distorted Only) -->
+        <div class="card-wrapper card-vertical" 
+             data-hover-intensity="0.5" 
+             data-ripple-vertex-intensity="0.020" 
+             data-ripple-fragment-intensity="0.12" 
+             data-ripple-edge-limit="0.0" 
+             data-ripple-edge-width="0.25"
+             data-ripple-speed="0.022"
+             data-ripple-max-time="180.0"
+             data-ripple-frequency="9.0">
+            <div class="card-inner">
+                <div class="plane">
+                    <!-- Textures (using Unsplash placeholder URLs) -->
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=640&auto=format&fit=crop" data-sampler="cardTexture" alt="Premium Artwork 1" />
+                    <img class="displacement-img" src="" data-sampler="displacementTexture" alt="WebGL Noise Map" />
+                </div>
+                <div class="card-content">
+                    <span class="category">Interactive Art</span>
+                    <h2 class="title">Cosmic Wave</h2>
+                    <p class="description">Preset: Border Fixed. The outer gold border remains static to guarantee zero spikes, while the inner image fluidly ripples.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Horizontal (横カード) - Mild Warp (Smooth Border Wave, 10% Edge limit) -->
+        <div class="card-wrapper card-horizontal" 
+             data-hover-intensity="1.0" 
+             data-ripple-vertex-intensity="0.06" 
+             data-ripple-fragment-intensity="0.16" 
+             data-ripple-edge-limit="0.1" 
+             data-ripple-edge-width="0.2"
+             data-ripple-speed="0.018"
+             data-ripple-max-time="180.0"
+             data-ripple-frequency="19.0">
+            <div class="card-inner">
+                <div class="plane">
+                    <!-- Textures (using Unsplash placeholder URLs) -->
+                    <img src="https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=640&auto=format&fit=crop" data-sampler="cardTexture" alt="Premium Artwork 2" />
+                    <img class="displacement-img" src="" data-sampler="displacementTexture" alt="WebGL Noise Map" />
+                </div>
+                <div class="card-content">
+                    <span class="category">Fluid Motion</span>
+                    <h2 class="title">Golden Ripple</h2>
+                    <p class="description">Preset: Mild Warp. The border waves gently (max 10% intensity near edges) with strong decay to prevent spikes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Large (大カード) - Dynamic Warp (Bolder Border Wave, 25% Edge limit) -->
+        <div class="card-wrapper card-large" 
+             data-hover-intensity="1.8" 
+             data-ripple-vertex-intensity="0.07" 
+             data-ripple-fragment-intensity="0.22" 
+             data-ripple-edge-limit="0.25" 
+             data-ripple-edge-width="0.12"
+             data-ripple-speed="0.0116"
+             data-ripple-max-time="120.0"
+             data-ripple-frequency="15.0">
+            <div class="card-inner">
+                <div class="plane">
+                    <!-- Textures (using Unsplash placeholder URLs) -->
+                    <img src="https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=640&auto=format&fit=crop" data-sampler="cardTexture" alt="Premium Artwork 3" />
+                    <img class="displacement-img" src="" data-sampler="displacementTexture" alt="WebGL Noise Map" />
+                </div>
+                <div class="card-content">
+                    <span class="category">Generative Shape</span>
+                    <h2 class="title">Jelly Monolith</h2>
+                    <p class="description">Preset: Dynamic Warp. The gold border warps bolder with a 25% edge limit. Good for testing extreme limits.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2026 Jelly Demo | Built for Premium WebGL Experiences.
+    </footer>
+
+    <!-- 頂点シェーダー (Vertex Shader): 頂点座標の変形（ホバー時の1回限りのうねり ＋ クリック時の放射状波紋） -->
+    <script id="vs" type="x-shader/x-vertex">
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+
+        attribute vec3 aVertexPosition;
+        attribute vec2 aTextureCoord;
+
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+
+        // 親から渡されるパラメータ
+        uniform float uHoverStrength;
+        uniform vec2 uMousePosition;
+        
+        // 追加: ホバー制御パラメータ (1回だけぐにゃーん用)
+        uniform float uHoverTime;      // マウスホバーしてからの経過フレーム数
+        uniform float uHoverIntensity; // カードごとのホバー強度
+
+        // クリックイベント用パラメータ
+        uniform vec2 uClickPosition;
+        uniform float uClickTime;      // クリックされてからの経過フレーム数
+        uniform float uRippleVertexIntensity; // 追加: カード固有の頂点変位強度
+        uniform float uRippleEdgeLimit;       // 追加: カード固有の端部変位制限 (0.0=完全固定, 1.0=無制限)
+        uniform float uRippleEdgeWidth;       // 追加: カード固有の端部減衰幅
+        uniform float uRippleSpeed;           // 追加: カード固有の波紋伝播速度
+        uniform float uRippleMaxTime;         // 追加: カード固有の最大減衰時間
+        uniform float uAspect;                // 追加: カード固有のアスペクト比
+        uniform float uRippleFrequency;       // 追加: カード固有の波の周波数（細かさ）
+
+        varying vec2 vTextureCoord;
+
+        void main() {
+            vTextureCoord = aTextureCoord;
+            
+            vec3 position = aVertexPosition;
+
+            // 1. マウスホバーによるゼリー状のうねり（Jelly Distortion - 最初の一回だけ）
+            if (uHoverTime >= 0.0) {
+                float distMouse = distance(aTextureCoord, uMousePosition);
+                
+                // 80フレームで完全に減衰するイージングマスク
+                float hoverDecay = smoothstep(80.0, 0.0, uHoverTime);
+                
+                // ホバーの影響力（マウスが乗っている強度 × 時間による減衰 × カード固有の強度）
+                float hoverInfluence = uHoverStrength * hoverDecay * uHoverIntensity;
+
+                // 時間軸に uHoverTime を使用し、最初の1回だけ波が動くようにする
+                float waveX = sin(aTextureCoord.y * 8.0 + uHoverTime * 0.05) * cos(aTextureCoord.x * 4.0 + uHoverTime * 0.03);
+                float waveY = cos(aTextureCoord.x * 8.0 + uHoverTime * 0.05) * sin(aTextureCoord.y * 4.0 + uHoverTime * 0.03);
+
+                position.x += waveX * 0.12 * hoverInfluence;
+                position.y += waveY * 0.12 * hoverInfluence;
+            }
+
+            // 2. マウスクリックによる中心からの同心円状の波紋
+            // uClickTime が 0 以上の場合にのみ計算を実行
+            if (uClickTime >= 0.0) {
+                // アスペクト比でX座標を補正し、正円の距離を計算
+                vec2 correctedUV = aTextureCoord;
+                correctedUV.x *= uAspect;
+                vec2 correctedClick = uClickPosition;
+                correctedClick.x *= uAspect;
+                
+                float distClick = distance(correctedUV, correctedClick);
+
+                // 波紋の最前線（カード固有のスピードを使用）
+                float waveFront = uClickTime * uRippleSpeed;
+
+                // 頂点が波紋の最前線からどれだけ離れているか
+                float distFromWave = abs(distClick - waveFront);
+
+                // 全体の70%までは強度を100%維持し、後半30%で急激にフェードアウトする減衰カーブ
+                float lifeRatio = uClickTime / uRippleMaxTime;
+                float timeDecay = smoothstep(1.0, 0.7, lifeRatio);
+                float rippleStrength = smoothstep(0.18, 0.0, distFromWave) * timeDecay;
+
+                // カードの境界線（エッジ）部分で頂点が飛び出すのを防ぐためのマスク
+                // 端から uRippleEdgeWidth の範囲で変形量を減衰させ、エッジ付近の変形を最大 uRippleEdgeLimit に抑える
+                float edgeMask = smoothstep(0.0, uRippleEdgeWidth, aTextureCoord.x) * 
+                                 smoothstep(1.0, 1.0 - uRippleEdgeWidth, aTextureCoord.x) * 
+                                 smoothstep(0.0, uRippleEdgeWidth, aTextureCoord.y) * 
+                                 smoothstep(1.0, 1.0 - uRippleEdgeWidth, aTextureCoord.y);
+                edgeMask = uRippleEdgeLimit + (1.0 - uRippleEdgeLimit) * edgeMask;
+
+                // 周波数を uRippleFrequency にして波を大きくゆったりさせつつ、変位の基本値を uRippleVertexIntensity にする
+                float rippleWave = sin((distClick - waveFront) * uRippleFrequency) * rippleStrength * uRippleVertexIntensity * edgeMask;
+
+                // クリック位置から頂点に向かう放射状のベクトル（アスペクト比補正された方向空間で計算）
+                vec2 dir = aTextureCoord - uClickPosition;
+                vec2 correctedDir = dir;
+                correctedDir.x *= uAspect;
+                float len = length(correctedDir);
+                if (len > 0.0) {
+                    vec2 normDir = correctedDir / len;
+                    // 頂点をクリック位置から押し出すようにX, Y座標を歪ませる
+                    // X方向の変形は、アスペクト比の引き延ばしを相殺するために uAspect で割る
+                    position.x += (normDir.x * rippleWave) / uAspect;
+                    position.y += normDir.y * rippleWave;
+                }
+            }
+
+            gl_Position = uPMatrix * uMVMatrix * vec4(position, 1.0);
+        }
+    </script>
+
+    <!-- フラグメントシェーダー (Fragment Shader): ピクセル色の歪み（ホバー歪み ＋ クリック波紋歪み）と、ゴールド境界線の描画 -->
+    <script id="fs" type="x-shader/x-fragment">
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D cardTexture;
+        uniform sampler2D displacementTexture;
+
+        uniform float uHoverStrength;
+        uniform vec2 uMousePosition;
+        
+        // 追加: ホバー制御用パラメータ
+        uniform float uHoverTime;
+        uniform float uHoverIntensity;
+
+        // クリックイベント用パラメータ
+        uniform vec2 uClickPosition;
+        uniform float uClickTime;
+        uniform float uRippleFragmentIntensity; // 追加: カード固有のテクスチャ歪み強度
+        uniform float uRippleSpeed;             // 追加: カード固有の波紋伝播速度
+        uniform float uRippleMaxTime;           // 追加: カード固有の最大減衰時間
+        uniform float uAspect;                  // 追加: カード固有のアスペクト比
+        uniform float uRippleFrequency;         // 追加: カード固有の波の周波数（細かさ）
+
+        void main() {
+            vec2 uv = vTextureCoord;
+
+            // ノイズマップ of サンプリング
+            vec4 displacement = texture2D(displacementTexture, uv);
+
+            // 1. マウスホバーによるサンプリング座標の歪み (最初の一回だけ)
+            vec2 distortedCoord = uv;
+            if (uHoverTime >= 0.0) {
+                float hoverDecay = smoothstep(80.0, 0.0, uHoverTime);
+                float hoverInfluence = uHoverStrength * hoverDecay * uHoverIntensity;
+
+                distortedCoord.x += (displacement.r - 0.5) * 0.05 * hoverInfluence;
+                distortedCoord.y += (displacement.g - 0.5) * 0.05 * hoverInfluence;
+            }
+
+            // ゴールド境界線の描画座標（クリック波紋が適用される前のホバー歪みのみの座標）
+            vec2 borderCoord = distortedCoord;
+
+            // 2. クリック波紋によるサンプリング座標の歪み
+            if (uClickTime >= 0.0) {
+                // アスペクト比でX座標を補正し、正円の距離を計算
+                vec2 correctedUV = uv;
+                correctedUV.x *= uAspect;
+                vec2 correctedClick = uClickPosition;
+                correctedClick.x *= uAspect;
+
+                float distClick = distance(correctedUV, correctedClick);
+                
+                // 進行スピード（カード固有のスピードを使用）
+                float waveFront = uClickTime * uRippleSpeed;
+                float distFromWave = abs(distClick - waveFront);
+                
+                // 全体の70%までは強度を100%維持し、後半30%で急激にフェードアウトする減衰カーブ
+                float lifeRatio = uClickTime / uRippleMaxTime;
+                float timeDecay = smoothstep(1.0, 0.7, lifeRatio);
+                float rippleStrength = smoothstep(0.18, 0.0, distFromWave) * timeDecay;
+                
+                // 画像のサンプリング座標歪み強度を uRippleFragmentIntensity に設定
+                float rippleDisplacement = sin((distClick - waveFront) * uRippleFrequency) * rippleStrength * uRippleFragmentIntensity;
+
+                vec2 dir = uv - uClickPosition;
+                vec2 correctedDir = dir;
+                correctedDir.x *= uAspect;
+                float len = length(correctedDir);
+                if (len > 0.0) {
+                    vec2 normDir = correctedDir / len;
+                    // 画像のテクスチャサンプリング座標を放射状にずらす
+                    // X方向のズレは、アスペクト比の引き延ばしを相殺するために uAspect で割る
+                    distortedCoord.x += (normDir.x * rippleDisplacement) / uAspect;
+                    distortedCoord.y += normDir.y * rippleDisplacement;
+                }
+            }
+
+            // 画像のカラー取得 (はみ出し防止のため 0.0〜1.0 の範囲にクランプ)
+            vec4 imgColor = texture2D(cardTexture, clamp(distortedCoord, vec2(0.0), vec2(1.0)));
+
+            // カードの背景に暗いグラデーションをかける（立体感）
+            float shadow = smoothstep(0.9, 0.1, uv.y) * 0.4 + 0.6;
+            vec4 cardColor = vec4(imgColor.rgb * shadow, 1.0);
+
+            // ゴールドの輪郭線を描画（変形した座標系に載せるため、輪郭線自体が完全にぐにゃーんと変形する）
+            vec4 borderColor = vec4(0.83, 0.69, 0.22, 1.0); // ゴールド (#d4af37)
+            
+            // borderCoord から境界線（エッジ）部分を滑らかに抽出
+            // 境界の幅（0.015 = 1.5%幅）に近づくにつれてゴールドの色合いを強くする
+            float borderMask = smoothstep(0.0, 0.015, borderCoord.x) * 
+                               smoothstep(1.0, 0.985, borderCoord.x) * 
+                               smoothstep(0.0, 0.015, borderCoord.y) * 
+                               smoothstep(1.0, 0.985, borderCoord.y);
+
+            gl_FragColor = mix(borderColor, cardColor, borderMask);
+        }
+    </script>
+
+    <!-- curtains.js v8: type="module" + CDN ESM (src/index.mjs) が正規ルート -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

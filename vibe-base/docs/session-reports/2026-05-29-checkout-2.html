@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check-out 2026-05-29 (2) — research-bank bypass + hook整合性4エラー解決</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.7; max-width: 920px; margin: 0 auto; padding: 24px; background: #0f1115; color: #e3e6ea; }
+  h1 { font-size: 1.4rem; border-bottom: 2px solid #3a7bd5; padding-bottom: 8px; }
+  h2 { font-size: 1.1rem; margin-top: 28px; color: #7fb0ff; border-left: 4px solid #3a7bd5; padding-left: 10px; }
+  code { background: #1c2027; padding: 2px 6px; border-radius: 4px; color: #ffd479; font-size: 0.9em; }
+  .alert-red { background: #2a1416; border: 1px solid #c0392b; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+  .alert-red b { color: #ff7a6b; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.9rem; }
+  th, td { border: 1px solid #2c3138; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #1c2027; color: #7fb0ff; }
+  .h { color: #ff7a6b; font-weight: bold; } .m { color: #ffd479; } .l { color: #8fcf8f; }
+  .ok { color: #8fcf8f; font-weight: bold; }
+  .meta { color: #8b949e; font-size: 0.85rem; }
+  ul { padding-left: 22px; }
+</style>
+</head>
+<body>
+<h1>Check-out 2026-05-29 (2) — research-bank bypass + hook整合性4エラー根本解決</h1>
+<p class="meta">branch: master / vibe-base 司令塔セッション / <b>次セッションは本ファイルを先頭から Read 必須</b></p>
+
+<div class="alert-red">
+<b>⚠️ 最重要</b>
+<ul>
+<li>本セッションの作業は <b>governance のみ</b>。<code>products/trimmer-system</code> の Konva.js 描画ツール再設計（commit <code>57b240d</code>）は<b>別セッション/別エージェントの作業</b>で、司令塔は不干渉。working tree に残る <code>products/ai-concierge/*</code> と <code>products/learning-suite-kanji-foreign/*</code> の未コミット変更も<b>他エージェント領域</b>。司令塔は触っていない・コミットしていない。</li>
+<li><code>.codex/hooks/area-gate.mjs</code> は root <code>.claude/hooks/area-gate.mjs</code> と<b>乖離した別実装</b>（bypass なし・block メッセージ独自）。Codex CLI 用の別経路として温存。同期要否は未決（下記 D 参照）。</li>
+</ul>
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+<li>① research-bank <code>index.html</code> の <code>BANK.entries</code> 二重 <code>{</code>（344行）を除去 → <code>Unexpected token</code> で全エントリ描画不能だった実害を解消（entries 24件復旧）。</li>
+<li>② <code>area-gate.mjs</code> に <code>/deep-research</code> bypass を実装。TTL マーカー <code>docs/research-bank/.allow-research-write</code>（600秒・<code>.allow-destructive</code> と同形）が新鮮な時のみ書込許可。手動書込は依然 block。全 18 product へ伝播。</li>
+<li>③ <code>/deep-research</code> SKILL.md（別 repo）STEP 4-1 に Write 直前の <code>touch</code> 手順を追記。SOP §5-1 / .gitignore も整備。</li>
+<li>④ memory P1 [2026-05-29] の <code>check-hook-integrity</code> 既存4エラーを根本解決（真の故障 vs 偽陽性を切り分け）。checker → <span class="ok">PASSED</span>。</li>
+</ul>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+<tr><th>hash</th><th>repo</th><th>内容</th></tr>
+<tr><td><code>35235d1</code></td><td>vibe-base</td><td>fix(research-bank): index.html 構文修正 + area-gate に deep-research bypass（21ファイル）</td></tr>
+<tr><td><code>597f154</code></td><td>vibe-base</td><td>fix(hooks): check-hook-integrity 既存4エラー根本解決（40ファイル・v2孤児36削除）</td></tr>
+<tr><td><code>59c8ed9</code></td><td>claude-skills-base</td><td>feat(deep-research): STEP 4-1 に bypass マーカー生成手順追記</td></tr>
+</table>
+
+<h2>C. 影響波及（必読）</h2>
+<ul>
+<li><b>area-gate.mjs 全 product 伝播済</b>: <code>node scripts/propagate-hooks.mjs</code> で 18 product に配布。research-bank パスは vibe-base root のみ存在のため product 側挙動は不変。</li>
+<li><b>v2 hook 削除</b>: <code>pc-version-gate-v2.mjs</code> / <code>rules-coverage-gate-v2.mjs</code> を root + 全 product から削除（v1 が現役・v2 は旧世代孤児）。propagate は削除を伝播しないため手動削除済。今後 propagate で復活しない（root に不在）。</li>
+<li><b>check-notebook-query.mjs は温存・未登録のまま</b>: create-image STEP 2 強制 hook。モノレポ統合(<code>c0a456f</code>)で登録脱落 → 再登録は見送り（マスター判断）。generator の <code>SKIP_HOOKS</code> で manifest 除外。<b>現在 create-image の NotebookLM 参照強制は無効状態</b>。</li>
+</ul>
+
+<h2>D. 残作業（次セッション）</h2>
+<table>
+<tr><th>優先</th><th>項目</th></tr>
+<tr><td><span class="l">L</span></td><td><code>.codex/hooks/area-gate.mjs</code> の扱い決定 — root と乖離した別実装（bypass なし）。Codex CLI 経由でも research-bank 保存を許可したいか、別実装を維持するか。マスター判断待ち。</td></tr>
+<tr><td><span class="l">L</span></td><td>既存 hook-integrity の <code>ac-keyword-gate</code> matcher が manifest 上 <code>(unknown)</code>（登録はされており checker は PASS・実害なし）。棚卸し時に matcher 明示化を検討。</td></tr>
+<tr><td><span class="l">L</span></td><td><code>tmp/</code> に 5/26-27 の <code>area-gate-*</code> 残骸 + 多数の旧中間ファイル。クリーンアップ未実施（削除は classifier 判断で要明示）。</td></tr>
+</table>
+<p class="meta">司令塔管轄の H/M 残作業は 0 件。products/* は各 product agent 領域。</p>
+
+<h2>E. 配備済 subagent / skill / hook（本セッション）</h2>
+<ul>
+<li>hook 改修: <code>area-gate.mjs</code>（deep-research bypass）/ <code>check-hook-integrity.mjs</code>（(b) を実 module エラー時のみ flag）/ <code>generate-hook-manifest.mjs</code>（<code>SKIP_HOOKS</code> 追加）</li>
+<li>新規配備: なし（subagent/skill 追加なし）</li>
+</ul>
+
+<h2>F. 本セッション生成物</h2>
+<ul>
+<li><code>~/.claude/plans/foamy-sauteeing-panda.md</code> — research-bank governance 2件修正 plan（承認・完遂済）</li>
+<li><code>tmp/rb-extract.js</code> — 構文検証用の使い捨て（削除可）</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本ファイルを Read。</li>
+<li><code>bash scripts/check-in-verify.sh</code> + <code>node scripts/check-hook-integrity.mjs</code>（後者は PASSED 維持を確認）。</li>
+<li>D 残作業（すべて L）に着手不要なら通常 Check-in フロー。</li>
+</ol>
+<p class="meta">機械検証（本 Check-out）: hook整合性 <span class="ok">PASSED</span> / secret-scan 0件 / code-reviewer <span class="ok">no issues</span>。</p>
+</body>
+</html>

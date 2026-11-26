@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Bank — vibe-base データバンク</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #242836;
+  --border: #2e3348;
+  --text: #e4e4e7;
+  --text2: #9ca3af;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --tag-market: #10b981;
+  --tag-competitor: #f59e0b;
+  --tag-tech: #3b82f6;
+  --tag-ux: #ec4899;
+  --tag-legal: #ef4444;
+  --tag-pricing: #8b5cf6;
+  --tag-platform: #14b8a6;
+  --tag-design: #f472b6;
+  --tag-script: #a78bfa;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', 'Noto Sans JP', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+.header { padding: 2rem 2rem 1rem; border-bottom: 1px solid var(--border); }
+.header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+.header h1 span { color: var(--accent2); }
+.header p { color: var(--text2); font-size: 0.85rem; margin-top: 0.25rem; }
+
+.stats { display: flex; gap: 1.5rem; padding: 1rem 2rem; border-bottom: 1px solid var(--border); }
+.stat { display: flex; flex-direction: column; }
+.stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent2); }
+.stat-label { font-size: 0.7rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.controls { display: flex; gap: 0.75rem; padding: 1rem 2rem; flex-wrap: wrap; align-items: center; }
+.search { flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.85rem; outline: none; }
+.search:focus { border-color: var(--accent); }
+.filter-btn { padding: 0.35rem 0.7rem; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text2); font-size: 0.75rem; cursor: pointer; transition: all 0.15s; }
+.filter-btn:hover, .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1rem; padding: 1.5rem 2rem; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; transition: border-color 0.15s, transform 0.15s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+.card-title { font-size: 0.95rem; font-weight: 600; line-height: 1.4; flex: 1; }
+.card-date { font-size: 0.7rem; color: var(--text2); white-space: nowrap; margin-left: 0.75rem; }
+.card-desc { font-size: 0.8rem; color: var(--text2); line-height: 1.5; margin-bottom: 0.75rem; }
+.card-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.tag { padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.tag-market { background: rgba(16,185,129,0.15); color: var(--tag-market); }
+.tag-competitor { background: rgba(245,158,11,0.15); color: var(--tag-competitor); }
+.tag-tech { background: rgba(59,130,246,0.15); color: var(--tag-tech); }
+.tag-ux { background: rgba(236,72,153,0.15); color: var(--tag-ux); }
+.tag-legal { background: rgba(239,68,68,0.15); color: var(--tag-legal); }
+.tag-pricing { background: rgba(139,92,246,0.15); color: var(--tag-pricing); }
+.tag-platform { background: rgba(20,184,166,0.15); color: var(--tag-platform); }
+.tag-design { background: rgba(244,114,182,0.15); color: var(--tag-design); }
+.tag-script { background: rgba(167,139,250,0.15); color: var(--tag-script); }
+.card-product { font-size: 0.65rem; color: var(--text2); background: var(--surface2); padding: 0.15rem 0.45rem; border-radius: 3px; }
+.card-sources { font-size: 0.65rem; color: var(--text2); margin-left: auto; }
+
+.empty { text-align: center; padding: 3rem; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Research <span>Bank</span></h1>
+  <p>全プロダクト横断リサーチ資産データバンク — ディープリサーチの成果物を蓄積・検索・再利用</p>
+</div>
+
+<div class="stats" id="stats"></div>
+<div class="controls">
+  <input class="search" id="search" type="text" placeholder="キーワード検索（タイトル・説明・タグ）">
+  <button class="filter-btn active" data-filter="all">ALL</button>
+  <button class="filter-btn" data-filter="market">市場</button>
+  <button class="filter-btn" data-filter="competitor">競合</button>
+  <button class="filter-btn" data-filter="tech">技術</button>
+  <button class="filter-btn" data-filter="ux">UX</button>
+  <button class="filter-btn" data-filter="pricing">価格</button>
+  <button class="filter-btn" data-filter="platform">販路</button>
+  <button class="filter-btn" data-filter="legal">法務</button>
+  <button class="filter-btn" data-filter="design">デザイン</button>
+  <button class="filter-btn" data-filter="script">スクリプト</button>
+</div>
+<div class="grid" id="grid"></div>
+
+<script>
+// ============================================================
+// RESEARCH BANK DATA
+// 新しいリサーチを追加するときは entries 配列に1オブジェクト追加
+// ============================================================
+const BANK = {
+  version: "1.0",
+  lastUpdated: "2026-06-16",
+  entries: [
+    {
+      id: "software-maintenance-scope-acceptance-2026",
+      title: "受託開発の保守範囲・検収・UX改善課金・漏洩責任（出典付き4論点）",
+      description: "問い=トリマー向けカルテアプリ受託で『バグか改善か』『使い心地調整の扱い』『DB漏洩の責任』をどう線引きするのが正しいか。【①保守範囲】バグが契約不適合(瑕疵)になるのは『仕様不一致＋稼働に重大支障＋迅速補修不可』のみ(東京地判平9.2.18)。実務はIPAモデル契約に倣い開発段階の契約不適合責任と検収後の保守契約を分離し、保守は『バグ修正=限定列挙／改善・追加=除外列挙』。民法改正で『知った時から1年通知』に延長＝長期リスク。【②検収】非技術顧客が判定できる鍵=プロトタイプ先行合意→顧客の言葉のAC(Given-When-Then)→UAT→検収。技術仕様/数字で書くな・『感じが悪い』を不合格にしない定量シナリオ基準を着手前合意。みなし検収は受入基準とセット。【③UX改善課金】バグでも新機能でもない第3類型。標準は都度見積(タイムチャージ/個別見積)=着手前に金額提示→顧客承認。月額リテイナー(伴走)はsonicgarden等の少数派で大多数はやらない。実勢 時給3000〜10000・伴走なら月5〜30万。際限ない要望は『タダでやらない=都度見積』＋回数/時間/予算の境界で締める。【④漏洩責任】『DB漏れたらベンダー責任』はほぼ不成立=責任共有モデルで設定/アクセス制御/暗号化は利用者責任、SLAは損害ほぼ全額免責(上限=直近12ヶ月利用料)。個人情報保護法は委託しても委託元の安全管理・監督義務(25条)残る。Capital One/WelcomeHRもアプリ側設定ミスでベンダー免責。",
+      date: "2026-06-28",
+      tags: ["legal", "pricing", "ux"],
+      products: ["横断", "trimmer-system"],
+      reusableFor: ["受託/保守契約の線引き条文設計", "検収・受け入れ基準(AC)の合意フロー", "UX改善の課金モデル設計(リテイナー+工数上限)", "個人情報/DB漏洩の責任分界説明", "顧客向け見積の透明性向上", "プロトタイプ→MVP→本番の段階説明"],
+      sources: 50,
+      file: "software-maintenance-scope-acceptance-2026.html",
+      originalPath: null
+    },
+    {
+      id: "long-to-short-video-automation-2026",
+      title: "長編→ショート動画 編集自動化（FFmpeg×Claude Code・3業界＋auto-editor）",
+      description: "問い=FFmpeg単体では『どこを切るか』を判断できない、Claude Code連携でその判断層を埋めて長編→縦型ショート編集を自動化できるか。映像/編集/開発者の3業界＋OSS auto-editor を原文verbatim調査。【結論】できる・OSSで既に成立（SamurAIGPT★3.9k=download→Whisper転写→LLMハイライト選定→自動クロップの8段）。価値の在処=判断層（LLM区間選定+オーケストレーション）でFFmpegとauto-editorはそれを担えない。【映像】切出の肝は完結性判断・3秒で離脱50-60%・カット2-4秒に1回・字幕焼きで維持率+15-25%・AIは思考完結前に切る/テンプレ疲労で4ヶ月CPQV22%劣化。【編集】テロップが工数の半分=自動化ROI最大・AI生成歩留まり30-50%・単価二極化(CW1000円〜/制作1-10万)。【開発】典型6段アーキ・FFmpegレシピ(crop9:16/subtitles焼き/silencedetect/scene検出)原文・落とし穴『LLMs are bad at timestamps』→残すテキスト返却→word-level逆マッチング。【auto-editor】★4.4k=音量/動き閾値の無音カット(first pass)専用でハイライト選定/縦化は不可・ショート切出にはClipsAIが本命・両者は補完。kosespark拡張型ツール候補ユースケース。",
+      date: "2026-06-16",
+      tags: ["tech", "platform"],
+      products: ["横断", "kosespark"],
+      reusableFor: ["ショート自動編集ツール設計", "FFmpegコマンドレシピ", "Whisper/LLMパイプライン構築", "OSS選定(auto-editor/ClipsAI/SamurAIGPT)", "kosespark Claude Code拡張型案件", "動画編集代行の自動化提案"],
+      sources: 60,
+      file: "long-to-short-video-automation-2026.html",
+      originalPath: null
+    },
+    {
+      id: "business-card-copy-anti-cliche-2026",
+      title: "名刺コピー「ダサい/カッコいい」の構造差・逆張り検証（107ソース）",
+      description: "①ダサ語60+件分類（AI-powered/伴走/最適化/寄り添う/お気軽に等が信頼を下げる5メカニズム=M1クリシェ/M2 zombie nouns/M3 weasel/M4 Trust Equation分母自己中心/M5代弁押しつけ）。②著名デザイナー名刺=「肩書一行のみ・コピーなし」「白紙余白勝負」「個性的肩書のみ」の3系統が支配。Sagmeister 30年同一・Pentagram非公開・Behance Featured 16件全タグライン不在・原研哉=グラフィックデザイナーのみ・Jerry Yang=Chief Yahoo・Steve Jobs=iCEO。③逆張り成立条件と10原則（One Idea/5秒テスト/Specificity/POV/Signature Phrase/Negation/Question Hook/詩的省略/沈黙/Anti-Sales）。「短く誠実で力強い」数値基準=10文字以内/動詞1個/修飾語ゼロ/8音節以下/1.5秒で読了。マスター文脈での逆張りコピー案10件提示。",
+      date: "2026-05-29",
+      tags: ["design"],
+      products: ["横断"],
+      reusableFor: ["名刺コピー作成", "LP/SNS自己紹介文", "肩書設計", "PRコピーレビュー基準", "AI業界の差別化ポジショニング"],
+      sources: 107,
+      file: "business-card-copy-anti-cliche-2026.html",
+      originalPath: null
+    },
+    {
+      id: "business-card-pro-design-thinking-2026",
+      title: "プロの名刺デザイン思考回路（カード×余白×黄金比の統合判断・道具vs規則）",
+      description: "①余白決定の6ステップ（基準余白→比例システム→グリッド→密度測定→proximity→nudge）。「呼吸/窮屈/間が抜ける」言語化。3階層原則 1.5x/2x/4x/8x。微調整7段階心理ループ。②黄金比は「ルールではなく道具」仮説を強く支持。Markowsky実験「人は1.6〜1.7比を区別不能」=厳密適用は名刺で無意味。φ実用は①先行スキャフォールド②事後診断③クライアント説明の三重道具。代替=Rule of Thirds/1:√2/×1.618タイポスケール/Optical Center(中央+5%上)。③チャンク4±1、Common Region余白優先、internal:external=1:1.5〜1:2、Visual Weight 5要素、Squint Test、N字視線。プロの自問14リスト。85ソース。",
+      date: "2026-05-29",
+      tags: ["design"],
+      products: ["横断"],
+      reusableFor: ["名刺・LP・印刷物のレイアウト意思決定", "デザインレビュー基準（自問14リスト）", "余白決定のmm単位判断", "黄金比/グリッド適用判断", "クライアント説明資料"],
+      sources: 85,
+      file: "business-card-pro-design-thinking-2026.html",
+      originalPath: null
+    },
+    {
+      id: "business-card-designer-workflow-2026",
+      title: "プロの名刺デザイン作業フロー — 国内/海外/縦型 + 「カード分解」業界位置判定",
+      description: "国内主流フロー9ステップ（ヒアリング9項目→サムネ→ラフ3案→初稿→修正2回→入稿前13項目）/ 海外標準 Modular Grid（Müller-Brockmann 1961, Vignelli, Pentagram）+ Atomic Design は UI 主・印刷物適用は限定。国内では「カード分解」用語登場せず、代わりに4原則（近接・整列・反復・コントラスト）+ 3列グリッド。縦型では「ブロック分解」より「段分解+中央軸+対角3点」に読替え必要。横型71%/縦型29%。ツールは Illustrator がほぼ標準・Figma 増加中。86ソース。",
+      date: "2026-05-29",
+      tags: ["design"],
+      products: ["横断"],
+      reusableFor: ["名刺・LP・印刷物の制作フロー設計", "クライアントヒアリング項目設計", "デザイン方法論の意思決定", "縦型レイアウト判断", "Illustrator vs Figma 選定根拠"],
+      sources: 86,
+      file: "business-card-designer-workflow-2026.html",
+      originalPath: null
+    },
+    {
+      id: "business-card-margin-golden-ratio-2026",
+      title: "タテ型名刺の余白・黄金比 デザイン定石（55×91mm 実数ガイド）",
+      description: "日本標準名刺55×91mm（縦使い）の塗り足し・安全領域・要素配置を実数で確定。入稿97×61mm / 仕上がり91×55mm / 安全枠85×49mm（四辺3mm）。黄金分割点（上から34.8mm/56.2mm）・三分割線・余白率27%・QR本体15mm角+QZ2mm・連絡先最小6pt（印刷下限）。国内印刷6社一致値+デンソーウェーブ公式+デザイン定石を統合。",
+      date: "2026-05-29",
+      tags: ["design"],
+      products: ["横断"],
+      reusableFor: ["名刺デザイン制作・編集", "縦型印刷物レイアウト", "Canva/Illustrator 入稿データ作成", "QRコード配置設計", "DTP 余白・塗り足し基準"],
+      sources: 34,
+      file: "business-card-margin-golden-ratio-2026.html",
+      originalPath: null
+    },
+    {
+      id: "canva-editor-ui-2026",
+      title: "Canva エディタ UI/操作モデル（スマホPWA名刺メーカー設計用）",
+      description: "Canva の核心=全要素オブジェクト化（選択→ドラッグ移動→隅ハンドルでリサイズ→スマートガイドでスナップ）＋文脈依存ツールバー（選択対象で中身が変わる）。Position（重ね順/整列/等間隔）・グループ・ロック・レイヤー。テンプレ起点。モバイルは下部ツールバー＋ピンチ。Adobe Express/ラクスル比較。名刺は要素少なので限定オブジェクト編集で十分。",
+      date: "2026-06-21",
+      tags: ["ui"],
+      products: ["meishi-maker"],
+      reusableFor: ["キャンバス系エディタUI設計", "オブジェクト選択・ドラッグ・スナップ実装", "文脈ツールバー設計", "タッチ編集UX", "名刺メーカーUI"],
+      sources: 10,
+      file: "canva-editor-ui-2026.html",
+      originalPath: null
+    },
+    {
+      id: "code-review-philosophy-2026",
+      title: "コードレビューの思想・致命的見落とし・AI レビューの限界 v2（2026）",
+      description: "7 軸統合 (v1 公式・学術 4 軸 + v2 追加: Claude 固有癖 / 現場ノウハウ / トップエンジニア個人ブログ)。Anthropic Code Review 公式 (FP <1% 目標) + GitHub Issues 実体験 (#14759 sycophancy / #46727 hallucination / #1638 refactor violation / #45502 completion bias) + Simon Willison / Atwood / Spolsky / Abramov / Brooker / Hashimoto / Beck / Fowler / Hillel Wayne / Charity Majors / Will Larson / patio11 / Kent C. Dodds 個人ブログ + Qiita/Zenn/dev.to/HN/Reddit 現場ノウハウ。Brooker 「コードは何をしているかしか語らない」+ Beck 「可逆性×bug 確率」+ Fowler「perpetual refinement」+ Willison「動作証明義務」+ Anthropic 公式「Important 定義厳格化」を統合した /code-review v2 改修要件 17 項目。Session 296 Must 5 件の再判定根拠付き (M3/M4/M5 降格・M1/M2 保持)。",
+      date: "2026-05-18",
+      tags: ["tech"],
+      products: ["横断"],
+      reusableFor: ["/code-review スキル v2 改修", "/security-review スキル改修", "本番デプロイ前レビュー基準", "Claude 固有プロンプト設計 (Sycophancy/Hallucination/Nit cap 対策)", "1 PR / 300 LOC / 60 分スコープ運用", "dev-checklist 機械/人間分担表", "memory.md 共通規律"],
+      sources: 101,
+      file: "code-review-philosophy-2026.html",
+      originalPath: null
+    },
+    {
+      id: "lskf-japan-affinity-naming-2026",
+      title: "外国人の「日本好感」象徴 + LSKF 命名／デザイン再起案（補完リサーチ）",
+      description: "JNTO 22 市場調査・観光庁消費動向 2025・JFL 動機研究を統合。日本好き外国人の憧れ 8 系統（桜/鳥居/アニメ聖地/富士/食/侍/温泉/禅）と出身国差を整理。Sakura・Torii・Yume 3 命名案を配色 hex + マスコット + SNS ストーリーまでパッケージ化。前提リサーチ（lskf-design-naming-research-2026）の和色空白路線を補強。",
+      date: "2026-05-18",
+      tags: ["ux", "market", "design"],
+      products: ["learning-suite-kanji-foreign"],
+      reusableFor: ["learning-suite-kanji (sibling refresh)", "インバウンド系 product 全般", "日本コンセプト brand 設計"],
+      sources: 15,
+      file: "lskf-japan-affinity-naming-2026.html",
+      originalPath: null
+    },
+    {
+      id: "lskf-design-naming-research-2026",
+      title: "外国人向け日本語学習アプリ デザイン + 命名 リサーチ（LSKF Phase C 方針決定資料）",
+      description: "競合 13 アプリ実例 + UI/UX preferences + 命名パターン分析。和色 + 日本固有種マスコット + 非英語圏 UI（EN/ZH/VI）で空白市場差別化 3 軸提案。命名候補 5 案（Inko/Kotoba/Fude/Hanji/KanjiKame）+ デザイン仕様表。",
+      date: "2026-05-18",
+      tags: ["ux", "competitor", "market", "design"],
+      products: ["learning-suite-kanji-foreign"],
+      reusableFor: ["learning-suite-kanji (sibling refresh)", "外国人向け教育プロダクト全般", "Japanese app branding", "JP UI design system"],
+      sources: 40,
+      file: "lskf-design-naming-research-2026.html",
+      originalPath: null
+    },
+    {
+      id: "obsidian-claudecode-japan-2026",
+      title: "Obsidian × Claude Code 国内事業活用 数値根拠（中小DX需要・単価・補助金・飲食店DX + 海外連携手段）",
+      description: "国内中小DX市場（IT投資中央値1.0%・最頻値100-500万）、1人IT顧問単価（月1-2万〜3-10万）、持続化補助金採択率51%、飲食店DX普及67.5%、Obsidian×Claude Code連携手段（kepano/obsidian-skills等）の合成根拠データ。個人事業の意思決定用。",
+      date: "2026-04-30",
+      tags: ["market", "tech", "platform", "pricing"],
+      products: ["横断"],
+      reusableFor: ["事業戦略全般", "個人事業価格設定", "補助金活用判断", "飲食店ターゲット判断", "Obsidian×AI連携設計"],
+      sources: 42,
+      file: "obsidian-claudecode-japan-2026.html",
+      originalPath: null
+    },
+    {
+      id: "chatbot-market-2026",
+      title: "AIチャットボット市場調査（プラットフォーム実データ）",
+      description: "ココナラ/CW/ランサーズのAIチャットボット出品・案件を網羅調査。価格帯・販売件数・購入者像・依頼内容の実データ集",
+      date: "2026-03-28",
+      tags: ["market", "platform", "pricing"],
+      products: ["ai-concierge"],
+      reusableFor: ["全プロダクト販路戦略", "価格設定", "競合分析"],
+      sources: 15,
+      file: "chatbot-market-2026.html",
+      originalPath: "docs/chatbot-market-research.html"
+    },
+    {
+      id: "ai-concierge-p0-2026",
+      title: "AI Concierge P0統合リサーチ（市場・障壁・ターゲット定義）",
+      description: "AIチャットボット市場145億円、SMB導入率1.3%、導入障壁Top3、買い切りモデル優位性、Dify台頭分析。30+ソースからターゲット定義を導出",
+      date: "2026-03-28",
+      tags: ["market", "competitor", "pricing", "platform"],
+      products: ["ai-concierge"],
+      reusableFor: ["SaaS価格戦略", "中小企業向けAI製品企画", "プラットフォーム販売戦略"],
+      sources: 30,
+      file: "ai-concierge-p0-2026.html",
+      originalPath: "products/ai-concierge/p0-research.html"
+    },
+    {
+      id: "review-ai-competitor-2026",
+      title: "クチコミ分析AI 競合調査",
+      description: "Googleクチコミ分析ツールの競合マップ。機能比較・価格帯・差別化ポイント",
+      date: "2026-03-20",
+      tags: ["competitor"],
+      products: ["review-analysis"],
+      reusableFor: ["SaaS競合分析テンプレート"],
+      sources: 8,
+      file: "review-ai-competitor-2026.md",
+      originalPath: "docs/review-ai-competitor-research.md"
+    },
+    {
+      id: "aiueo-ui-competitive-2026",
+      title: "Aiueo UI競合調査（ビジュアル比較）",
+      description: "飲食業界向けアプリのUI/UX比較。Square/Airレジ/スマレジ等のレイアウト・操作フロー分析",
+      date: "2026-03-15",
+      tags: ["ux", "competitor"],
+      products: ["aiueo"],
+      reusableFor: ["POS/飲食アプリUI設計", "モバイルファーストUI設計"],
+      sources: 12,
+      file: "aiueo-ui-competitive-2026.md",
+      originalPath: "docs/aiueo-ui-competitive-research.md"
+    },
+    {
+      id: "kds-dashboard-ui-2026",
+      title: "KDS/ダッシュボードUI調査",
+      description: "キッチンディスプレイシステム・管理ダッシュボードのUI調査。色設計・レイアウト・情報密度の分析",
+      date: "2026-03-14",
+      tags: ["ux"],
+      products: ["aiueo"],
+      reusableFor: ["ダッシュボードUI設計", "リアルタイム表示UI"],
+      sources: 6,
+      file: "kds-dashboard-ui-2026.md",
+      originalPath: "docs/kds-dashboard-ui-research.md"
+    },
+    {
+      id: "pos-checkout-ui-2026",
+      title: "POS/チェックアウトUI調査",
+      description: "レジ画面のUI調査。決済フロー・商品選択・金額表示のパターン分析",
+      date: "2026-03-14",
+      tags: ["ux"],
+      products: ["aiueo"],
+      reusableFor: ["決済画面UI設計"],
+      sources: 5,
+      file: "pos-checkout-ui-2026.md",
+      originalPath: "docs/pos-checkout-ui-research.md"
+    },
+    {
+      id: "coconala-deep-research-2026",
+      title: "ココナラ販売戦略ディープリサーチ",
+      description: "ココナラでのAI開発サービス出品戦略。価格帯・カテゴリ・購入者行動・レビュー傾向の実データ分析",
+      date: "2026-03-28",
+      tags: ["platform", "pricing", "market"],
+      products: ["ai-concierge"],
+      reusableFor: ["ココナラ出品戦略", "フリーランス価格設定"],
+      sources: 20,
+      file: "coconala-deep-research-2026.html"
+    },
+    {
+      id: "coconala-monetize-report-2026",
+      title: "フリーランス開発マネタイズ最終レポート（統合版）",
+      description: "3PF比較+カテゴリ別実売データ+競合密度マップ+実力診断+信頼構築戦略+出品原稿(修正版)+CW/ランサーズ攻略+収益シミュレーション+実行ロードマップ。40+ソース統合。出品原稿の正本はproducts/ai-concierge/listing-draft-b.md",
+      date: "2026-03-28",
+      tags: ["platform", "pricing", "market", "competitor"],
+      products: ["ai-concierge"],
+      reusableFor: ["マネタイズ戦略全体設計", "3PF出品判断", "フリーランス収益計画", "信頼構築手法"],
+      sources: 40,
+      file: "coconala-monetize-report-2026.html"
+    },
+    {
+      id: "platform-listing-data-2026",
+      title: "3PF出品実態調査（ココナラ・ランサーズ・CW）",
+      description: "AIチャットボット出品の実データ一覧。ココナラTOP40+ランサーズ全26件の価格・実績・タイトル・直接競合分析。手数料/ランク制度の現行仕様",
+      date: "2026-03-28",
+      tags: ["platform", "pricing", "competitor"],
+      products: ["ai-concierge"],
+      reusableFor: ["出品原稿作成", "価格設定", "競合ベンチマーク", "全プロダクト販路戦略"],
+      sources: 20,
+      file: "platform-listing-data-2026.html"
+    },
+    {
+      id: "concierge-lme-css-2026",
+      title: "L Message (lme.jp) CSS計測データ",
+      description: "L Message管理画面LPのCSS 17項目計測。游ゴシック体、pill型ボタン(160px radius)、緑アクセント#08BF5A、box-shadow 0 2px 8px",
+      date: "2026-03-28",
+      tags: ["design"],
+      products: ["ai-concierge"],
+      reusableFor: ["LINE系SaaS管理画面デザイン参考", "日本語LPのCSS値ベンチマーク"],
+      sources: 1,
+      file: "concierge-lme-css-2026.json"
+    },
+    {
+      id: "concierge-tayori-css-2026",
+      title: "Tayori (tayori.com) CSS計測データ",
+      description: "Tayori問い合わせ管理のCSS 17項目計測。Noto Sans JP、8px radius、ティール系#1AAD90、container 1176px",
+      date: "2026-03-28",
+      tags: ["design"],
+      products: ["ai-concierge"],
+      reusableFor: ["日本語SaaS管理画面デザイン参考", "SMB向けUI設計ベンチマーク"],
+      sources: 1,
+      file: "concierge-tayori-css-2026.json"
+    },
+    {
+      id: "concierge-tidio-css-2026",
+      title: "Tidio (tidio.com) CSS計測データ",
+      description: "Tidioチャットボット管理画面のCSS 17項目計測。euclidcircularb、18px base、shadow-free設計、container 1216px",
+      date: "2026-03-28",
+      tags: ["design"],
+      products: ["ai-concierge"],
+      reusableFor: ["チャットボットSaaS UIベンチマーク", "フラットデザイン参考値"],
+      sources: 1,
+      file: "concierge-tidio-css-2026.json"
+    },
+    {
+      id: "concierge-ui-reference-css-2026",
+      title: "AI Concierge 参考3サイトCSS比較表+デザインシステム照合",
+      description: "L Message/Tayori/Tidio 3サイトのCSS 17項目比較表。既存design-system.mdとの差異分析付き。結論: letter-spacing追加のみ推奨",
+      date: "2026-03-28",
+      tags: ["design", "competitor"],
+      products: ["ai-concierge"],
+      reusableFor: ["管理画面CSSベンチマーク手法", "デザインシステム策定時の根拠データ"],
+      sources: 3,
+      file: "concierge-ui-reference-css-2026.md"
+    },
+    {
+      id: "wix-wizard-css-measure-2026",
+      title: "Wix ウィザードUI CSS計測データ（動画フレーム分析）",
+      description: "Wixオンボーディングウィザードの全画面分析。カラー(#f5f3f1/ウォームグレー)、カード86%vw/95%vh、カラースウィープ(#4040ff→#181818)、プログレスバー、浮遊カードアニメーション。動画フレーム分析手法",
+      date: "2026-03-29",
+      tags: ["design", "ux"],
+      products: ["design-seed"],
+      reusableFor: ["ウィザードUI設計", "オンボーディングフロー設計", "ステップ型フォームのアニメーション参考"],
+      sources: 1,
+      file: "wix-wizard-css-measure-2026.md"
+    },
+    {
+      id: "puppeteer-css-measure-2026",
+      title: "汎用Puppeteer CSS 17項目計測スクリプト",
+      description: "任意URLのCSS 17項目(font/color/spacing/radius/shadow等)を自動計測+3VPスクリーンショット+リンク検証。CLI引数でURL複数指定可",
+      date: "2026-03-28",
+      tags: ["script", "design"],
+      products: ["all"],
+      reusableFor: ["全プロダクトの参考サイトCSS計測", "LP模写前のベンチマーク取得", "デザインシステム策定の実測根拠"],
+      sources: 0,
+      file: "puppeteer-css-measure-2026.mjs"
+    },
+    {
+      id: "coconala-dify-competitor-2026",
+      title: "ココナラ Dify関連 上位出品者 競合調査",
+      description: "Difyサービス上位5出品者の出品ページ実データ。価格構造(5,000~55,000円)・納品形態(DSL/VPS/直接構築/教育)・API費用説明・保守設計・レビュー傾向・差別化ポイント・アップセルファネル分析",
+      date: "2026-04-03",
+      tags: ["competitor", "pricing", "platform"],
+      products: ["ai-concierge"],
+      reusableFor: ["Dify出品原稿作成", "ココナラ価格設定", "サービス類型設計", "競合差別化戦略"],
+      sources: 10,
+      file: "coconala-dify-competitor-2026.html"
+    },
+    {
+      id: "dify-cost-structure-2026",
+      title: "Dify.ai コスト構造 詳細調査レポート",
+      description: "Dify Cloud全4プラン比較(Sandbox/Professional/Team/Enterprise)・セルフホストインフラ要件(2vCPU/4GB~)・VPS月額目安(600~3,600円)・DSLエクスポート制限(ナレッジベース未対応)・LLM API単価・納品方法別コスト試算・無料枠枯渇リスク評価",
+      date: "2026-04-03",
+      tags: ["pricing", "tech", "platform"],
+      products: ["ai-concierge"],
+      reusableFor: ["Dify構築代行サービス設計", "ココナラ出品価格設定", "顧客向けランニングコスト説明", "セルフホストvs Cloud判断"],
+      sources: 10,
+      file: "dify-cost-structure-2026.html"
+    },
+    {
+      id: "coconala-yokoten-strategy-2026",
+      title: "ヨコ展開戦略レポート（Dify/チャットアプリ × ococonala）",
+      description: "既存3商品（DSL/構築代行/アプリ）の切り口変え戦略。4軸並列調査統合。業種特化(宿泊/不動産/士業)×用途特化(議事録/EC自動化/AI診断)の実行計画。価格の死の谷分析・優先順位まとめ付き",
+      date: "2026-04-06",
+      tags: ["market", "pricing", "competitor", "platform"],
+      products: ["dify-service"],
+      reusableFor: ["ococonala出品戦略全般", "ヨコ展開商品企画", "価格設定根拠", "業種特化出品"],
+      sources: 32,
+      file: "coconala-yokoten-strategy-2026.html"
+    },
+    {
+      id: "coconala-price-cross-analysis-2026",
+      title: "ococonala 価格x実績クロス分析（AIチャットボット480件）",
+      description: "AIチャットボット作成カテゴリ480件超を3ページ直接調査。価格帯別売れ行き実データ（最多レビュー63件=5,000円Dify/53件=50,000円LINE Bot）・高単価が売れる6条件・空白地帯6候補・価格x切り口マトリクス。ヨコ展開価格設計の根拠データ",
+      date: "2026-04-06",
+      tags: ["market", "pricing", "platform", "competitor"],
+      products: ["ai-concierge"],
+      reusableFor: ["ococonala出品戦略", "ヨコ展開の切り口設計", "価格帯別競合分析", "AI Answerマネタイズ計画"],
+      sources: 18,
+      file: "coconala-price-cross-analysis-2026.html"
+    },
+    {
+      id: "alphatheta-cdj3000x-animation-2026",
+      title: "AlphaTheta CDJ-3000X アニメーション技法調査",
+      description: "GSAP 3.13.0+Lenis+独自RAFループ構成の完全解析。テキストスライドアップhover・clip-path insetリビール・scale ズームアウト・staggerフェード・パララックス 6技法の純CSS再現コード付き。Homepage流用優先度付き",
+      date: "2026-04-25",
+      tags: ["animation", "css", "ux", "tech"],
+      products: ["homepage"],
+      reusableFor: ["高品質製品LP模写", "スクロールアニメーション実装参考", "CSS hover技法"],
+      sources: 1,
+      file: "alphatheta-cdj3000x-animation-2026.html",
+      note: "HTMLファイル未保存（area-gate.mjs のdeep-research bypass未実装のため）。MISSIONLOGに全データ記録済み"
+    }
+  ]
+};
+
+// ============================================================
+// RENDER
+// ============================================================
+const TAG_LABELS = {
+  market: "市場", competitor: "競合", tech: "技術",
+  ux: "UX", pricing: "価格", platform: "販路", legal: "法務",
+  design: "デザイン", script: "スクリプト"
+};
+
+function renderStats() {
+  const el = document.getElementById("stats");
+  const total = BANK.entries.length;
+  const totalSources = BANK.entries.reduce((s, e) => s + (e.sources || 0), 0);
+  const products = [...new Set(BANK.entries.flatMap(e => e.products))].length;
+  const tags = [...new Set(BANK.entries.flatMap(e => e.tags))].length;
+  el.innerHTML = `
+    <div class="stat"><span class="stat-value">${total}</span><span class="stat-label">リサーチ</span></div>
+    <div class="stat"><span class="stat-value">${totalSources}</span><span class="stat-label">ソース</span></div>
+    <div class="stat"><span class="stat-value">${products}</span><span class="stat-label">プロダクト</span></div>
+    <div class="stat"><span class="stat-value">${tags}</span><span class="stat-label">カテゴリ</span></div>
+  `;
+}
+
+function renderGrid(filter, query) {
+  const grid = document.getElementById("grid");
+  let entries = BANK.entries;
+  if (filter && filter !== "all") entries = entries.filter(e => e.tags.includes(filter));
+  if (query) {
+    const q = query.toLowerCase();
+    entries = entries.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      e.description.toLowerCase().includes(q) ||
+      e.tags.some(t => TAG_LABELS[t]?.includes(q)) ||
+      e.products.some(p => p.includes(q)) ||
+      (e.reusableFor || []).some(r => r.toLowerCase().includes(q))
+    );
+  }
+  if (!entries.length) { grid.innerHTML = '<div class="empty">該当するリサーチがありません</div>'; return; }
+
+  grid.innerHTML = entries.map(e => `
+    <a class="card" href="${e.file || e.originalPath}" title="${e.file ? 'データバンク内ファイル' : '元ファイル参照'}">
+      <div class="card-header">
+        <div class="card-title">${e.title}</div>
+        <div class="card-date">${e.date}</div>
+      </div>
+      <div class="card-desc">${e.description}</div>
+      <div class="card-meta">
+        ${e.tags.map(t => `<span class="tag tag-${t}">${TAG_LABELS[t] || t}</span>`).join("")}
+        ${e.products.map(p => `<span class="card-product">${p}</span>`).join("")}
+        <span class="card-sources">${e.sources || "?"}sources</span>
+      </div>
+    </a>
+  `).join("");
+}
+
+// Filters
+let currentFilter = "all";
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    renderGrid(currentFilter, document.getElementById("search").value);
+  });
+});
+
+// Search
+document.getElementById("search").addEventListener("input", e => {
+  renderGrid(currentFilter, e.target.value);
+});
+
+renderStats();
+renderGrid("all", "");
+</script>
+</body>
+</html>

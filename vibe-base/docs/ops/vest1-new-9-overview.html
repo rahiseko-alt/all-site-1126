@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vest1 新規9件テンプレート一覧</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Hiragino Sans',sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.7;padding:24px}
+.container{max-width:1100px;margin:0 auto}
+h1{font-size:1.4rem;color:#f8fafc;margin-bottom:4px}
+.subtitle{font-size:.8rem;color:#64748b;margin-bottom:24px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.summary-card{background:#1e293b;border-radius:10px;padding:16px;text-align:center;border:1px solid #334155}
+.summary-card .num{font-size:2rem;font-weight:800;color:#38bdf8}
+.summary-card .label{font-size:.75rem;color:#94a3b8}
+.card{background:#1e293b;border-radius:12px;padding:20px 24px;margin-bottom:16px;border-left:4px solid #2563eb}
+.card.boilerplate{border-left-color:#f59e0b}
+.card.checklist{border-left-color:#10b981}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.card-num{background:#2563eb;color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.card.boilerplate .card-num{background:#f59e0b;color:#0f172a}
+.card.checklist .card-num{background:#10b981;color:#0f172a}
+.card-title{font-size:1rem;font-weight:700;color:#f1f5f9}
+.card-phase{font-size:.7rem;color:#94a3b8;background:#334155;padding:2px 8px;border-radius:4px}
+.card-desc{font-size:.82rem;color:#cbd5e1;margin-bottom:12px}
+.card-path{font-size:.72rem;color:#64748b;font-family:'Consolas',monospace;background:#0f172a;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:10px}
+.card-sections{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.card-sections li{font-size:.7rem;background:#334155;color:#94a3b8;padding:2px 10px;border-radius:4px}
+.w5h2{margin-top:10px;border-collapse:collapse;width:100%;font-size:.78rem}
+.w5h2 th{text-align:left;color:#64748b;padding:4px 8px;width:80px;vertical-align:top}
+.w5h2 td{color:#cbd5e1;padding:4px 8px}
+details{margin-top:8px}
+summary{font-size:.78rem;color:#38bdf8;cursor:pointer}
+summary:hover{color:#7dd3fc}
+.gap-ref{font-size:.7rem;color:#f97316;margin-left:8px}
+.footer{margin-top:32px;padding-top:16px;border-top:1px solid #1e293b;font-size:.72rem;color:#475569;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>vest1 新規9件テンプレート一覧</h1>
+<p class="subtitle">PC表ギャップ分析v2で特定された計測記録/品質検証テンプレートの不足9件 | 2026-04-02</p>
+
+<div class="summary">
+  <div class="summary-card"><div class="num">9</div><div class="label">新規vest1</div></div>
+  <div class="summary-card"><div class="num">22</div><div class="label">vest1 総数（13→22）</div></div>
+  <div class="summary-card"><div class="num">T7 / B1 / C1</div><div class="label">カテゴリ内訳</div></div>
+</div>
+
+<!-- Gap 1: 収益モデル -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#14 T</span>
+    <span class="card-title">収益モデル設計テンプレート</span>
+    <span class="card-phase">P0#14-15</span>
+    <span class="gap-ref">Gap 1</span>
+  </div>
+  <div class="card-path">docs/standards/templates/revenue-model.md</div>
+  <div class="card-desc">「いくらで売って、いくらかかって、何人で黒字か」を設計する表。収益モデル定義→価格設計→コスト構造→損益分岐点→Go/No-Go判定まで1ファイルで完結。</div>
+  <div class="card-sections">
+    <li>モデル定義</li><li>価格設計+競合比較</li><li>コスト構造マップ</li><li>損益分岐点</li><li>Go/No-Go判定</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>収益モデル+価格設計+コスト構造+損益分岐+Go/No-Goを記録するテンプレート</td></tr>
+      <tr><th>Why</th><td>P0で収益設計が数字なしだと、P2以降で「儲かるのか」が不明のまま実装が進む</td></tr>
+      <tr><th>素材</th><td>design-seed p0-results.md から共有資産化</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 2: CSS計測表 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#15 T</span>
+    <span class="card-title">CSS計測表テンプレート</span>
+    <span class="card-phase">P1#6a</span>
+    <span class="gap-ref">Gap 2</span>
+  </div>
+  <div class="card-path">docs/standards/templates/css-measurement.md</div>
+  <div class="card-desc">模写の「参考値」と「実測値」を17項目で記録する表。ui-clone-sopの17項目を空欄テーブルにしたもの。参考サイト計測→実装後計測→pixelmatch検証まで1ファイルで管理。</div>
+  <div class="card-sections">
+    <li>17項目空欄テーブル</li><li>フォントサイズ</li><li>フォントウェイト</li><li>行間</li><li>カラー</li><li>余白</li><li>角丸</li><li>pixelmatch検証結果</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>UI模写時のCSS17項目計測値+pixelmatch検証結果を記録するテンプレート</td></tr>
+      <tr><th>Why</th><td>模写が「感覚」で終わると品質がエージェント依存。数値基準+検証結果で再現性を担保する</td></tr>
+      <tr><th>素材</th><td>foodee css-values.md + design-seed css-measurement-strategy.md から共有資産化</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 3: 即死仮説検証 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#16 T</span>
+    <span class="card-title">即死仮説検証記録テンプレート</span>
+    <span class="card-phase">P1#9a</span>
+    <span class="gap-ref">Gap 3</span>
+  </div>
+  <div class="card-path">docs/standards/templates/hypothesis-verification.md</div>
+  <div class="card-desc">「これがダメならプロダクトが死ぬ」という仮説を1つずつ検証し、結果を記録する表。仮説ID×計測項目×基準値×実測値×合否判定。</div>
+  <div class="card-sections">
+    <li>仮説サマリー表</li><li>個別検証ブロック</li><li>テストデータ表</li><li>合否判定+証跡</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>即死仮説（技術/コスト/法令）ごとの検証データ+判定を記録するテンプレート</td></tr>
+      <tr><th>Why</th><td>PC表CLの○×だけでは「何を計測してどう判定したか」の証跡が残らない</td></tr>
+      <tr><th>素材</th><td>risk-diagnosis-sop.md のフレームワークを計測記録用に再構成</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 4: ログ・監視設計 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#17 T</span>
+    <span class="card-title">ログ・監視設計テンプレート</span>
+    <span class="card-phase">P1#9b</span>
+    <span class="gap-ref">Gap 4</span>
+  </div>
+  <div class="card-path">docs/standards/templates/monitoring-design.md</div>
+  <div class="card-desc">「壊れたとき、どうやって気づくか」の設計書。エラーログ保存先・アラート発火条件・死活監視方法・障害時対応フローを設計する。</div>
+  <div class="card-sections">
+    <li>エラーログ設計</li><li>アクセスログ設定</li><li>アラート設計</li><li>死活監視</li><li>障害対応フロー</li><li>実装手段比較表</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>本番稼働後のログ収集+エラー通知+死活監視の設計テンプレート</td></tr>
+      <tr><th>Why</th><td>設計なしだとログがバラバラで障害の原因究明に時間がかかる</td></tr>
+      <tr><th>素材</th><td>新規作成（既存プロダクトに材料なし）</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 5: 性能ベースライン -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#18 T</span>
+    <span class="card-title">性能ベースライン計測表テンプレート</span>
+    <span class="card-phase">P1#9c</span>
+    <span class="gap-ref">Gap 5</span>
+  </div>
+  <div class="card-path">docs/standards/templates/performance-baseline.md</div>
+  <div class="card-desc">「今どれくらいの速さで動いているか」を記録する表。P1時点の基準値を計測し、P4で再計測して劣化を検知する。</div>
+  <div class="card-sections">
+    <li>Lighthouseスコア</li><li>API応答時間</li><li>外部API応答時間</li><li>リソースサイズ</li><li>エラー率</li><li>P4再計測比較表</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>主要操作の応答時間・エラー率・リソースサイズを計測し記録するテンプレート</td></tr>
+      <tr><th>Why</th><td>P4で劣化検知するにはP1時点の基準値が必要。「遅くなった気がする」を数値で判定する</td></tr>
+      <tr><th>素材</th><td>新規作成（既存プロダクトに材料なし）</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 6: SEOチェックリスト -->
+<div class="card checklist">
+  <div class="card-header">
+    <span class="card-num">#19 C</span>
+    <span class="card-title">SEO設定チェックリスト</span>
+    <span class="card-phase">P2#5-8</span>
+    <span class="gap-ref">Gap 6</span>
+  </div>
+  <div class="card-path">docs/standards/checklists/seo-checklist.md</div>
+  <div class="card-desc">全ページのtitle/description/OGP/JSON-LD/canonicalを1つずつ確認する表。設定漏れ=検索に出ない・SNSでサムネが出ない。</div>
+  <div class="card-sections">
+    <li>ページ×5項目マトリクス</li><li>title/description文字数</li><li>OGP設定</li><li>JSON-LD @type</li><li>canonical</li><li>検証結果</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>全ページのSEO関連メタ情報を一覧で確認するチェックリスト</td></tr>
+      <tr><th>Why</th><td>P2#5-8で4タスクに分かれているが「全ページに設定済み」を確認する記入表がない</td></tr>
+      <tr><th>素材</th><td>新規作成（既存プロダクトに材料なし）</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 7: 法令テンプレート -->
+<div class="card boilerplate">
+  <div class="card-header">
+    <span class="card-num">#20 B</span>
+    <span class="card-title">利用規約+プライバシーポリシー+免責事項テンプレート</span>
+    <span class="card-phase">P2#13</span>
+    <span class="gap-ref">Gap 7</span>
+  </div>
+  <div class="card-path">docs/standards/boilerplate/legal-template.html</div>
+  <div class="card-desc">法令で必要な項目が穴埋め式（{{ }}）で並んでいて、埋めれば完成するHTMLテンプレート。利用規約9条+プライバシーポリシー5条+免責事項。</div>
+  <div class="card-sections">
+    <li>利用規約 9条</li><li>プライバシーポリシー 5条</li><li>免責事項</li><li>運営者情報</li><li>EDIT HEREコメント</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>利用規約（9条）+プライバシーポリシー（5条）+免責事項の穴埋めHTMLテンプレート</td></tr>
+      <tr><th>Why</th><td>法令で必要な項目を漏れなく網羅。毎回ゼロから書くと条文を見落とす</td></tr>
+      <tr><th>素材</th><td>ai-concierge terms.html から共有資産化</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 8: 集客施策管理 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#21 T</span>
+    <span class="card-title">集客施策管理表テンプレート</span>
+    <span class="card-phase">P3#1,3</span>
+    <span class="gap-ref">Gap 8</span>
+  </div>
+  <div class="card-path">docs/standards/templates/marketing-tracker.md</div>
+  <div class="card-desc">「どこで集客するか」「何をやったか」「結果はどうだったか」を記録する表。チャネル選定→施策実行→効果記録まで1ファイルで管理。</div>
+  <div class="card-sections">
+    <li>チャネル選定</li><li>導線設計</li><li>施策管理表</li><li>KPI目標</li><li>追加チャネル検討</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>集客チャネル選定+施策管理+導線設計+KPI目標を記録するテンプレート</td></tr>
+      <tr><th>Why</th><td>P3で「何をやって何が効いたか」の記録がないと、同じ失敗を繰り返す</td></tr>
+      <tr><th>素材</th><td>design-seed channel-strategy.md から共有資産化</td></tr>
+    </table>
+  </details>
+</div>
+
+<!-- Gap 9: P4計測ダッシュボード -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#22 T</span>
+    <span class="card-title">P4計測ダッシュボードテンプレート</span>
+    <span class="card-phase">P4#1-2</span>
+    <span class="gap-ref">Gap 9</span>
+  </div>
+  <div class="card-path">docs/standards/templates/p4-measurement.md</div>
+  <div class="card-desc">「やったことが効いたかどうか」を数字で確認する表。KPI目標 vs 実績を突き合わせ、Go/No-Go判定を記録する。P0で立てた仮説の最終検証。</div>
+  <div class="card-sections">
+    <li>KPIステージ別計測</li><li>トラフィック計測</li><li>収益計測</li><li>性能劣化検知</li><li>Go/No-Go判定</li>
+  </div>
+  <details>
+    <summary>5W2H</summary>
+    <table class="w5h2">
+      <tr><th>What</th><td>KPI目標 vs 実績の突き合わせ+性能劣化検知+Go/No-Go判定を記録するテンプレート</td></tr>
+      <tr><th>Why</th><td>P0で立てた仮説・数値目標がP4で検証されないと「やった気」で終わる</td></tr>
+      <tr><th>素材</th><td>review-analysis CLAUDE.md §KPI + product-cycle.md P4セクション</td></tr>
+    </table>
+  </details>
+</div>
+
+<div class="footer">
+  vest1 ギャップ分析v2 → 9件新規作成 | vest1総数 13→22 | 2026-04-02
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vibe-base 司令塔 Check-out 2026-05-31</title>
+<style>
+  body{font-family:"Segoe UI","Noto Sans JP",sans-serif;line-height:1.7;color:#1a1a1a;background:#fafafa;max-width:900px;margin:0 auto;padding:20px}
+  header{background:linear-gradient(135deg,#0b6b5e,#0e4d4a);color:#fff;padding:24px;border-radius:10px;margin-bottom:20px}
+  header h1{margin:0 0 6px;font-size:22px}
+  header .meta{font-size:13px;opacity:.9}
+  h2{color:#0b6b5e;border-left:5px solid #0b6b5e;padding-left:12px;margin-top:28px;font-size:18px}
+  .alert{background:#fff4e6;border:1px solid #e0a96d;border-left:5px solid #d97706;border-radius:8px;padding:14px 18px;margin:16px 0}
+  .alert b{color:#b45309}
+  table{width:100%;border-collapse:collapse;margin:10px 0;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
+  th{background:#0b6b5e;color:#fff;font-weight:500}
+  code{background:#eef2f1;padding:1px 6px;border-radius:4px;font-size:13px}
+  ul li{margin-bottom:5px}
+  .h{color:#b91c1c;font-weight:700}.m{color:#b45309;font-weight:700}.l{color:#6b7280;font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <h1>vibe-base 司令塔 Check-out — 2026-05-31</h1>
+  <div class="meta">branch: master ／ 次セッションは本ファイルを<b>先頭で必ず Read</b>してから着手すること</div>
+</header>
+
+<div class="alert">
+<b>⚠️ skills repo の他者未コミット変更に注意</b><br>
+`~/.claude/skills/` に司令塔が作っていない未コミット変更が残存（<code>create-image/SKILL.md</code> 修正・<code>generate/harness/retake-detect/review/setup</code> の SKILL.md 5件削除・<code>checkout/</code> 新規）。本セッションでは<b>巻き込まず feed-check の2件のみ選択コミット</b>した。次セッションでこれら残存分の去就をマスター判断のうえ別途処理すること（5件削除は memory project_skill-inventory「保留5件」と関連）。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+<li><b>フリノバ協業企画を立案</b>（マスターが本日フリノバ訪問→「一緒に企画を」の流れ）。リサーチ4サブエージェントで競合・市場・AI効果を調査し、<b>「フリノバ AI大学」校長×講師招聘モデル</b>に到達。マスターが校長、周りのAI人材（画像/FX等）を講師に招き仕事を回すハブ構造。</li>
+<li>営業資料2枚を生成: <code>tmp/freelance-nova/proposal.html</code>（企画書）+ <code>data-appendix.html</code>（数字根拠・出典付きデータ集）。</li>
+<li><b>/feed-check 実行</b>: 前回5/28以降の新着61件取得。事業関連7件を vault に選別保存 + 全件分析レポート（<code>ナレッジ/分析/2026-05-31_feed-analysis.md</code>）。Gmail下書き「Vibe-base-news」保存。</li>
+<li><b>feed-check スキルを3点デフォルト化</b>（マスター指示「今回の工程をデフォルトに」）。</li>
+</ul>
+
+<h2>B. 完了 commit</h2>
+<table>
+<tr><th>hash / repo</th><th>内容</th></tr>
+<tr><td><code>a603320</code><br>claude-skills-base<br>(plan-mode-redesign)</td><td>feat(feed-check): 事業関連フィルタ・Gmail下書きをデフォルト化＋軸を飲食→フリーランス/在日外国人へ。feed-check/skill.md + sources.yml の2件のみ選択コミット（他者変更は非巻込）</td></tr>
+<tr><td>本 Check-out</td><td>chore(memory): 引継ぎHTML + memory.md @参照更新（vibe-base）</td></tr>
+</table>
+
+<h2>C. feed-check 改修の詳細（次回運用に影響）</h2>
+<ul>
+<li><b>STEP4 事業無関係スキップ（default ON）</b>: HN等の純技術ネタは保存しない。<code>--save-all</code>で従来の全保存に戻る。<b>分析は全件対象</b>（網羅性維持）。</li>
+<li><b>STEP5.7 Gmail下書き（default ON）</b>: 分析を件名<b>「Vibe-base-news」固定</b>で下書き保存。<code>--no-mail</code>でskip。</li>
+<li><b>軸変更</b>: 飲食特化（inshokuten-foodist）廃止 → <code>workship-magazine</code>（軸4フリーランス）+ <code>nippon-com</code>（軸7在日外国人・learning-suite-kanji-foreign連動）追加、両方default ON。引数なし /feed-check は<b>7経路</b>に。</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<ul>
+<li><span class="l">[L]</span> <code>.codex/hooks/area-gate.mjs</code> 同期要否のマスター判断（前回から継続・実害なし）</li>
+<li><span class="m">[M・マスター行動待ち]</span> フリノバ提案の実施 → 反応次第で企画詳細化（初回講座テーマ確定・LP制作等）が将来 AI タスク化しうる。資料は <code>tmp/freelance-nova/</code>。</li>
+<li><span class="l">[L]</span> skills repo の他者未コミット変更（alert参照）の去就判断</li>
+</ul>
+
+<h2>F. 本セッション生成物（次セッション参照可）</h2>
+<table>
+<tr><th>パス</th><th>内容 / 注意</th></tr>
+<tr><td><code>tmp/freelance-nova/proposal.html</code></td><td>フリノバ AI大学 企画書（校長×講師モデル）。<b>gitignored・vibe-base外バックアップ推奨</b></td></tr>
+<tr><td><code>tmp/freelance-nova/data-appendix.html</code></td><td>企画の数字根拠データ集（6カテゴリ・全出典URL付き）。同上</td></tr>
+<tr><td><code>ナレッジ/分析/2026-05-31_feed-analysis.md</code></td><td>feed-check 事業分析（Top10・行動推奨）</td></tr>
+<tr><td>vault 公式情報/トレンド 7件</td><td>Opus4.8 / Series H / MUFG / foogent / 居酒屋倒産 / AI業務リスク / BRANCH LEARNING</td></tr>
+</table>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本HTMLを読む → memory.md P1 確認</li>
+<li>マスターからフリノバ提案の結果報告があれば、企画詳細化（<code>tmp/freelance-nova/</code> 資料を起点）</li>
+<li>機械検証: シークレット混入なし ✓ / 実装系検証は本セッション対象外（コードレス）</li>
+<li>コードレビュー指摘: 0件（コード変更なし）</li>
+</ol>
+
+</body>
+</html>

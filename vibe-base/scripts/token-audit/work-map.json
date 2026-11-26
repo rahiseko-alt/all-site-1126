@@ -1,0 +1,22 @@
+{
+  "_note": "cwd path substring -> 作業種別 の対応表。判定は配列を上から順に走査し最初に一致した種別を採用（順序が優先度）。全ての /products/{name}/ を持つ cwd はどれかの category に一致するよう網羅済み（product 名の悉皆列挙は Step3 実測で確認: ai-company-ops, ai-concierge, aiueo, coach, code-review-skills, databank, demo-company, foodee, google-slides-gen, google-system-dev, homepage, hp-customizer, instagram-auto-ops, kobaraku, kosespark, learning-suite-kanji, learning-suite-kanji-foreign, medguide-rag, meishi-maker, n8n, new-trimmer-system, omotenashi-trainer, renai-game, review-analysis, shift-ai, shiota-karte, spire-lite, trimmer-system, writer-auto-ops, x-auto-post, ymm-shorts）。cwd に /products/ を含まない場合は司令塔(vibe-base ルート)またはunclassified。",
+  "_limitation": "cwd 単位の分類は proxy。html-toranomaki(docs/html-toranomaki 配下・vibe-base ルート cwd)や atelier(products/google-system-dev/agent-ag/atelier 配下)は products/ 直下でないため cwd だけでは既存カテゴリに正確に落ちない。この場合は 司令塔(root cwd) or google-system-dev(other) に含まれ、HP/LP・動画としては過小計上になり得る。attributionSkill(web-design 等)を併用して補正する。",
+  "categories": ["動画", "HP/LP", "RAG", "ゲーム", "司令塔", "other", "unclassified"],
+  "rules": [
+    { "pattern": "products/ymm-shorts", "category": "動画" },
+    { "pattern": "products/kosespark-video-shorts", "category": "動画" },
+    { "pattern": "products/kosespark/video-shorts", "category": "動画" },
+    { "pattern": "video-shorts", "category": "動画" },
+    { "pattern": "products/x-auto-post", "category": "動画" },
+    { "pattern": "products/homepage", "category": "HP/LP" },
+    { "pattern": "products/hp-customizer", "category": "HP/LP" },
+    { "pattern": "-lp", "category": "HP/LP" },
+    { "pattern": "products/medguide-rag", "category": "RAG" },
+    { "pattern": "products/spire-lite", "category": "ゲーム" },
+    { "pattern": "products/renai-game", "category": "ゲーム" },
+    { "pattern": "vibe-governance", "category": "司令塔" },
+    { "pattern": "products/", "category": "other" },
+    { "pattern": "vibe-base", "category": "司令塔" }
+  ],
+  "default_category": "unclassified"
+}

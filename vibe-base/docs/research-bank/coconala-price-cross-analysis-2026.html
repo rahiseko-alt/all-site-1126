@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ococonala 価格×実績クロス分析 2026</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #242836;
+  --border: #2e3348;
+  --text: #e4e4e7;
+  --text2: #9ca3af;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --green: #10b981;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --red: #ef4444;
+  --purple: #8b5cf6;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', 'Noto Sans JP', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem; }
+h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+h1 span { color: var(--accent2); }
+.meta { color: var(--text2); font-size: 0.8rem; margin-bottom: 2rem; }
+.tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-right: 0.35rem; }
+.tag-market { background: rgba(16,185,129,0.15); color: var(--green); }
+.tag-pricing { background: rgba(139,92,246,0.15); color: var(--purple); }
+.tag-platform { background: rgba(20,184,166,0.15); color: #14b8a6; }
+.tag-competitor { background: rgba(245,158,11,0.15); color: var(--amber); }
+
+section { margin-bottom: 2.5rem; }
+h2 { font-size: 1.1rem; font-weight: 700; color: var(--accent2); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+h3 { font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 1.2rem 0 0.6rem; }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+th { background: var(--surface2); color: var(--text2); font-weight: 600; text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+
+/* Rank card */
+.rank-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.rank-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; display: grid; grid-template-columns: 2.5rem 1fr auto; gap: 0.75rem; align-items: start; }
+.rank-num { font-size: 1.5rem; font-weight: 800; color: var(--accent2); line-height: 1; }
+.rank-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+.rank-desc { font-size: 0.78rem; color: var(--text2); line-height: 1.5; }
+.rank-price { font-size: 1rem; font-weight: 700; color: var(--green); white-space: nowrap; text-align: right; }
+.rank-reviews { font-size: 0.7rem; color: var(--text2); text-align: right; margin-top: 0.25rem; }
+
+/* Insight cards */
+.insight-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+.insight-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent2); margin-bottom: 0.5rem; }
+.insight-body { font-size: 0.82rem; color: var(--text2); line-height: 1.6; }
+.insight-body strong { color: var(--text); }
+
+/* Gap zone */
+.gap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; }
+.gap-card { background: var(--surface); border: 1px solid var(--amber); border-radius: 8px; padding: 1rem 1.25rem; }
+.gap-name { font-size: 0.88rem; font-weight: 600; color: var(--amber); margin-bottom: 0.4rem; }
+.gap-body { font-size: 0.78rem; color: var(--text2); line-height: 1.55; }
+
+/* Analysis points */
+.point-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.point { background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 0.75rem 1rem; font-size: 0.82rem; color: var(--text2); line-height: 1.6; }
+.point strong { color: var(--text); display: block; margin-bottom: 0.2rem; }
+
+/* Source list */
+.source-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+.source-list li { font-size: 0.78rem; color: var(--text2); padding-left: 1rem; position: relative; }
+.source-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent2); }
+.source-list a { color: var(--accent2); text-decoration: none; }
+.source-list a:hover { text-decoration: underline; }
+
+/* Badge */
+.badge { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 3px; font-size: 0.68rem; font-weight: 600; }
+.badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+.badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+.badge-purple { background: rgba(139,92,246,0.15); color: var(--purple); }
+.badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+.badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+
+.summary-box { background: var(--surface); border: 1px solid var(--accent); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.summary-box p { font-size: 0.85rem; color: var(--text2); line-height: 1.7; }
+.summary-box strong { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<h1>ococonala <span>価格×実績クロス分析</span></h1>
+<p class="meta">
+  <span class="tag tag-market">market</span>
+  <span class="tag tag-pricing">pricing</span>
+  <span class="tag tag-platform">platform</span>
+  <span class="tag tag-competitor">competitor</span>
+  調査日: 2026-04-06 | ソース数: 18 | 対象カテゴリ: AIチャットボット作成（categories/772）+ AI導入・生成AI活用相談（categories/28）
+</p>
+
+<div class="summary-box">
+  <p>
+    cocnoalaのAIチャットボット作成カテゴリ（480件超）を3ページ分直接調査。
+    <strong>レビュー最多は5,000円のDifyサービス（63件）</strong>、次いで<strong>50,000円のLINE Bot（53件）</strong>が続く。
+    価格×切り口の組み合わせで成功パターンが明確に分かれており、
+    「低価格×ノーコード汎用」「中価格×LINE特化」「高価格×企業向けフル機能」の3ゾーンが確認できた。
+    「業種特化×中価格帯」は出品数が少なく空白地帯として有望。
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<section>
+  <h2>価格帯別 売れ行き実データ</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>価格帯</th>
+          <th>売れている切り口</th>
+          <th>代表レビュー数（最多）</th>
+          <th>中央値レビュー数</th>
+          <th>売れ筋タイトル例</th>
+          <th>競合密度</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-green">4,000〜5,000円</span></td>
+          <td>Difyノーコード汎用、GPTs作成、相談・見積もり入口</td>
+          <td><strong>63件</strong>（たま@SE / Dify 5,000円）</td>
+          <td>2〜5件（大半が0件）</td>
+          <td>「DifyでAIチャットボット作ります」「自前データを元に回答するChatボット」</td>
+          <td><span class="badge badge-red">高</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">8,000〜15,000円</span></td>
+          <td>LINE Bot入門、業種特化（塾・占い）、GPT×業務ツール</td>
+          <td><strong>22件</strong>（AI Chatbot / CAMBRITEC 4,000円）</td>
+          <td>3〜8件</td>
+          <td>「占いの信頼を広げるBot」「小規模塾向けAIチャットボット」「ChatGPT LineBOT作成」</td>
+          <td><span class="badge badge-amber">中</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">20,000〜30,000円</span></td>
+          <td>オーダーメイドLINE Bot、AI LINEボット（会話記憶付き）</td>
+          <td><strong>21件</strong>（なる◆生成AI / LINE Bot 20,000円）</td>
+          <td>1〜5件</td>
+          <td>「オーダーメイドのAI LINEボットを構築します」「公式LINE×AI問い合わせ自動化」</td>
+          <td><span class="badge badge-amber">中</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-amber">50,000円</span></td>
+          <td>ChatGPT×LINE Bot本格実装、社内AIチャットボット、士業向け</td>
+          <td><strong>53件</strong>（けうまる / LINE Bot 50,000円）</td>
+          <td>0〜2件（大半が0件）</td>
+          <td>「ChatGPTを用いたLINE Botを作成します（TOPサービス）」「社内データAIチャットボット作ります」</td>
+          <td><span class="badge badge-green">低</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">75,000円以上</span></td>
+          <td>最新LLM（GPT-5等）活用、会話記憶・複雑フロー、企業向け本番</td>
+          <td><strong>26件</strong>（けうまる / GPT-5 LINE Bot 75,000円）</td>
+          <td>0〜1件</td>
+          <td>「最新モデルGPT-5でLINE Botを作成」「自然言語対話型人格形成チャットボット（75,000円）」</td>
+          <td><span class="badge badge-green">極低</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.75rem; color:var(--text2); margin-top:0.75rem;">
+    ※ レビュー数＝販売件数の代理指標。cocnoala上では購入者の大半がレビューを投稿するため、実売数に近い。
+    調査対象：categories/772（AIチャットボット作成）上位120件+その他ジャンル153件。調査日2026-04-06。
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <h2>最も「コスパ良く売れる」価格×切り口の組み合わせ TOP5</h2>
+  <p style="font-size:0.78rem; color:var(--text2); margin-bottom:1rem;">
+    ※ 評価基準: レビュー件数（＝実売数）× 競合密度の低さ × 価格の高さ の総合スコア
+  </p>
+  <div class="rank-list">
+    <div class="rank-item">
+      <div class="rank-num">1</div>
+      <div>
+        <div class="rank-title">Dify 5,000円 × 「相談からOK・ノーコード汎用」</div>
+        <div class="rank-desc">
+          カテゴリ最多レビュー63件（たま@SE）。低価格で入口広く、オプション（GAS連携+5,000円、ワークフロー+5,000円）で客単価を引き上げるファネル設計。
+          DSL納品でリピート工数ゼロ。「相談からOK」のコピーが購入障壁を下げる。
+          <strong style="color:var(--amber);">注意: 競合が多く、後発は埋もれやすい。</strong>
+        </div>
+      </div>
+      <div>
+        <div class="rank-price">5,000円〜</div>
+        <div class="rank-reviews">実売 63件 確認済み</div>
+      </div>
+    </div>
+    <div class="rank-item">
+      <div class="rank-num">2</div>
+      <div>
+        <div class="rank-title">50,000円 × 「ChatGPT×LINE Bot 本格実装・実績訴求」</div>
+        <div class="rank-desc">
+          53件のレビューを持つけうまる氏の構成。「cocnoala掲載TOPサービス」の訴求が信頼構築の核。
+          高単価にもかかわらず売れている唯一の例。実績の蓄積が自己強化ループを形成。
+          参入に時間はかかるが一度実績ができれば指名買いが増える。
+        </div>
+      </div>
+      <div>
+        <div class="rank-price">50,000円</div>
+        <div class="rank-reviews">実売 53件 確認済み</div>
+      </div>
+    </div>
+    <div class="rank-item">
+      <div class="rank-num">3</div>
+      <div>
+        <div class="rank-title">10,000円 × 「Dify×LINE Bot ノーコード連携」</div>
+        <div class="rank-desc">
+          たま@SE の2本目サービス（21件）。5,000円サービスで信頼を獲得したあと、LINE連携を求めるユーザーに10,000円商品でアップセル。
+          同一出品者の複数価格帯展開モデル。「ヨコ展開」の実証事例。
+        </div>
+      </div>
+      <div>
+        <div class="rank-price">10,000円</div>
+        <div class="rank-reviews">実売 21件 確認済み</div>
+      </div>
+    </div>
+    <div class="rank-item">
+      <div class="rank-num">4</div>
+      <div>
+        <div class="rank-title">20,000円 × 「オーダーメイドAI LINE Bot（会話記憶・複雑フロー）」</div>
+        <div class="rank-desc">
+          なる◆生成AI氏 21件。「会話記憶・自前データ・複雑なフロー」という機能訴求で5,000円サービスとの差別化を明確化。
+          中価格帯で機能差を売る戦略。Dify 5,000円圏から卒業した顧客の受け皿として機能。
+        </div>
+      </div>
+      <div>
+        <div class="rank-price">20,000円</div>
+        <div class="rank-reviews">実売 21件 確認済み</div>
+      </div>
+    </div>
+    <div class="rank-item">
+      <div class="rank-num">5</div>
+      <div>
+        <div class="rank-title">4,000円 × 「自前データRAG対応 ChatBot（国公立大出身・機能カスタマイズ）」</div>
+        <div class="rank-desc">
+          CAMBRITEC 22件。最安値水準ながら22件の実績。「国公立大出身」という権威訴求が信頼要素。
+          RAG機能でDifyより技術的に高機能に見せる差別化が有効。
+          価格を下げても「背景の権威」で差別化できる好例。
+        </div>
+      </div>
+      <div>
+        <div class="rank-price">4,000円〜</div>
+        <div class="rank-reviews">実売 22件 確認済み</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <h2>「価格を上げても売れる」条件（高単価商品の共通特徴）</h2>
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-label">条件1: 実績の可視化</div>
+      <div class="insight-body">
+        けうまる氏（50,000円・53件）は「<strong>cocnoala掲載TOPサービス</strong>」を前面に出す。
+        高単価でも売れる最大要因は「この人なら大丈夫」という購入者の安心感。
+        レビュー数・評価スコア・ランクバッジの3点セットが必須。
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">条件2: 明確な機能差の訴求</div>
+      <div class="insight-body">
+        75,000円サービス（GPT-5×会話記憶×複雑フロー）は「最新LLM・会話記憶・複雑なロジック」という
+        <strong>安い商品にはない機能</strong>を明示することで価格差を正当化している。
+        「5,000円と何が違うか」を説明できないと高単価は売れない。
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">条件3: 企業ターゲット明示</div>
+      <div class="insight-body">
+        「士業向け」「社内ナレッジ」「EC・店舗向け」など<strong>業種を絞った訴求</strong>は
+        法人購買者（経費処理・稟議が通りやすい金額感）に刺さる。
+        50,000円超は個人向けではなく事業主・中小企業向けのターゲティングが前提。
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">条件4: 継続収益の設計</div>
+      <div class="insight-body">
+        「初期構築＋月次保守オプション」や「運用マニュアル付き」のサービスは
+        <strong>購入後も関係が続く安心感</strong>を訴求できる。
+        高単価買い切りを正当化するのは「導入後のサポート」という要素が大きい。
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">条件5: ステップ型ファネル</div>
+      <div class="insight-body">
+        たま@SE は5,000円→10,000円→（相談）と<strong>複数商品でファネルを構築</strong>。
+        最初は低価格で信頼を取り、実績が積まれたら中価格商品が自然に売れる仕組み。
+        単品出品より複数価格帯の出品者の方が総合的な売上が高い。
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">条件6: レスポンス速度訴求</div>
+      <div class="insight-body">
+        63件実績の出品者は「<strong>初回返答1時間以内</strong>」「相談からOK」を明示。
+        購入前の「不安払拭」が高単価・中単価問わず成約の最大障壁。
+        価格帯に関係なく、レスポンス速度の訴求は全商品で有効。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <h2>ヨコ展開で狙うべき「空白地帯」</h2>
+  <div class="gap-grid">
+    <div class="gap-card">
+      <div class="gap-name">業種特化 × 中価格（8,000〜20,000円）</div>
+      <div class="gap-body">
+        「士業向け」「塾向け」は出品あるが、<strong>飲食・美容サロン・クリニック・不動産</strong>向けの
+        専用商品はほぼ不在。業種名を入れるだけで競合ゼロのブルーオーシャンになる可能性。
+        例: 「不動産仲介向けFAQ Bot」「整骨院LINE予約自動化Bot」
+      </div>
+    </div>
+    <div class="gap-card">
+      <div class="gap-name">Slack / Chatwork 特化 × 中価格（5,000〜15,000円）</div>
+      <div class="gap-body">
+        LINE Botに比べてSlack Bot・Chatwork Botの出品は極少。
+        <strong>社内コミュニケーションツール向け</strong>のニーズは実際のリクエストが存在（検索結果で確認）。
+        「Slack社内検索Bot」は4,000円/60分の相談ベースしかなく、完成品提供が不在。
+      </div>
+    </div>
+    <div class="gap-card">
+      <div class="gap-name">「教育・講師の分身Bot」× 高価格（50,000〜150,000円）</div>
+      <div class="gap-body">
+        「あなたの講座に分身を」（150,000円）は唯一無二の切り口。
+        <strong>オンライン講師・コーチ・コンサル</strong>をターゲットにしたAI分身は競合ゼロに近い。
+        価格根拠が「講師の時間単価×代替効果」で説明しやすく高額正当化が容易。
+      </div>
+    </div>
+    <div class="gap-card">
+      <div class="gap-name">YouTube / SNS運用Bot × 中価格（10,000〜20,000円）</div>
+      <div class="gap-body">
+        「台本作成AIツール」「サムネ・集客最適化」など動画制作支援Botは複数出品があるが、
+        <strong>レビューが少なく市場が成熟していない</strong>。早期参入の余地あり。
+        Difyでの実装が容易で、AI Answerの既存技術を流用可能。
+      </div>
+    </div>
+    <div class="gap-card">
+      <div class="gap-name">「AIボット×決済」連携 × 高価格（70,000〜100,000円）</div>
+      <div class="gap-body">
+        「AI×LINE決済フロー構築」（70,000円）は出品1件のみでレビューなし。
+        <strong>販売自動化・決済まで完結</strong>するBotは法人ニーズが高く、競合が存在しない穴。
+        実装難易度は高いが、付加価値も高く指名買い案件化しやすい。
+      </div>
+    </div>
+    <div class="gap-card">
+      <div class="gap-name">「Dify × 保守プラン付き」× セット価格（25,000〜35,000円）</div>
+      <div class="gap-body">
+        現在の出品の大多数が「初期構築のみ」で保守プランのセット販売が不在。
+        <strong>「構築＋3ヶ月保守込み」</strong>というパッケージは価格プレミアムを正当化しやすく、
+        既存出品者との明確な差別化になる。法人購入者に安心感を提供。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <h2>分析・示唆</h2>
+  <div class="point-list">
+    <div class="point">
+      <strong>示唆1: 「5,000円か50,000円か」の二極化が現実に存在する</strong>
+      中間の1万〜3万円帯は出品数こそ多いが、実売レビューが1〜5件の薄い層が大半。
+      ユーザーは「試すなら安い方、ちゃんとやるなら高い方」に分かれており、
+      中途半端な価格設定が最も難しい。出品者が現在5,000円・25,000円・50,000円の3商品を持つのは
+      この二極化に対応した理想的な構成。ただし25,000円の差別化訴求が重要。
+    </div>
+    <div class="point">
+      <strong>示唆2: 「切り口の変更」は価格帯の変更より効果が高い</strong>
+      同じDify構築でも「5,000円汎用」と「8,000円塾向け」では購入者層が完全に異なる。
+      業種名を入れるだけで競合がほぼゼロになり、検索にもヒットしやすい。
+      ヨコ展開の際は「価格±」よりも「業種名・用途名の追加」を優先すること。
+    </div>
+    <div class="point">
+      <strong>示唆3: 最多実績63件の出品者はオプション設計で単価を底上げしている</strong>
+      基本5,000円でも「GAS連携+5,000円」「複雑ワークフロー+5,000円」で実質10,000〜15,000円になる設計。
+      低価格で購入障壁を下げつつ、要望に応じてオプション追加で収益を最大化するモデル。
+      出品時は「基本安く・オプション充実」の設計が有効。
+    </div>
+    <div class="point">
+      <strong>示唆4: カテゴリ全体の480件中、レビューが10件超は10件程度（推定2%）</strong>
+      大多数の出品サービスは実売0〜3件で止まっている。売れているサービスは
+      「レスポンス速度」「相談受付」「明確な納品物」「実績の可視化」という
+      基本的なUX要素で差がついている。価格より先にこれらを整えることが優先課題。
+    </div>
+    <div class="point">
+      <strong>示唆5: 高価格帯は「自己強化ループ」が形成されており後発は難しい</strong>
+      50,000円・53件のサービスは「TOPサービス」訴求で上位表示→新規購入→さらに実績増 のループ。
+      後発が同価格帯で参入するのは困難。よって現在の出品者は「中価格帯(25,000円)の実績を積んで
+      高価格帯に移行する」または「業種特化で高価格帯のニッチを取る」の2択が現実的。
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <h2>売れ筋サービス 実データ一覧（調査確認済み）</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>サービスタイトル</th>
+          <th>価格</th>
+          <th>レビュー数</th>
+          <th>評価</th>
+          <th>切り口</th>
+          <th>出品者</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>DifyでAIチャットボット作ります（相談からOK）</td><td>5,000円〜</td><td><strong>63件</strong></td><td>5.0</td><td>Dify汎用・ノーコード</td><td>たま@SE（プラチナ）</td></tr>
+        <tr><td>2</td><td>ChatGPTを用いたLINE Botを作成します</td><td>50,000円</td><td><strong>53件</strong></td><td>5.0</td><td>LINE Bot・本格実装</td><td>けうまる（TOP訴求）</td></tr>
+        <tr><td>3</td><td>最新モデルGPT-5でLINE Botを作成</td><td>75,000円</td><td><strong>26件</strong></td><td>5.0</td><td>最新LLM・高機能</td><td>けうまる</td></tr>
+        <tr><td>4</td><td>自前のデータを元に回答するChatボット</td><td>4,000円〜</td><td><strong>22件</strong></td><td>5.0</td><td>RAG・カスタムデータ</td><td>AI活用@CAMBRITEC</td></tr>
+        <tr><td>5</td><td>オーダーメイドのAI LINEボットを構築します</td><td>20,000円</td><td><strong>21件</strong></td><td>5.0</td><td>LINE Bot・会話記憶</td><td>なる◆生成AI</td></tr>
+        <tr><td>6</td><td>DifyとMakeやGASでLINEbot作ります</td><td>10,000円</td><td><strong>21件</strong></td><td>5.0</td><td>Dify×LINE・GAS連携</td><td>たま@SE</td></tr>
+        <tr><td>7</td><td>オーダーメイドのDifyチャットbot開発</td><td>5,000円〜</td><td><strong>9件</strong></td><td>5.0</td><td>Dify・RAGナレッジ</td><td>なる◆生成AI</td></tr>
+        <tr><td>8</td><td>自然言語対話型人格形成チャットボット作成</td><td>75,000円</td><td><strong>9件</strong></td><td>5.0</td><td>人格形成・高機能</td><td>（不明）</td></tr>
+        <tr><td>9</td><td>GPT×Chatwork！ボット作成</td><td>5,000円</td><td><strong>11件</strong></td><td>4.9</td><td>Chatwork特化</td><td>ひろあき</td></tr>
+        <tr><td>10</td><td>Claude Codeの使い方教えます（60分）</td><td>8,000円</td><td><strong>30件</strong></td><td>5.0</td><td>教育・レクチャー</td><td>Piste BOSS</td></tr>
+        <tr><td>11</td><td>AI漫画制作完全ガイド</td><td>7,000円</td><td><strong>127件</strong></td><td>5.0</td><td>教育・コンテンツ</td><td>なる◆生成AI活用</td></tr>
+        <tr><td>12</td><td>最先端AI技術で業務効率化</td><td>20,000円</td><td><strong>20件</strong></td><td>4.9</td><td>業務効率化・汎用</td><td>CHAPPY_Engineer</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.75rem; color:var(--text2); margin-top:0.75rem;">
+    ※ #10・#11・#12はcategories/28（AI導入・生成AI活用相談）からのデータ。他はcategories/772（AIチャットボット作成）。
+    全て2026-04-06時点の直接ページ取得データ。
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <h2>価格帯マトリクス（切り口 × 実績）</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>切り口 \ 価格帯</th>
+          <th>〜5,000円</th>
+          <th>8,000〜20,000円</th>
+          <th>25,000〜35,000円</th>
+          <th>50,000〜75,000円</th>
+          <th>100,000円〜</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>汎用ノーコード（Dify）</strong></td>
+          <td><span class="badge badge-green">63件★最多</span></td>
+          <td><span class="badge badge-blue">21件 良</span></td>
+          <td><span class="badge badge-amber">0〜3件 薄</span></td>
+          <td>─</td>
+          <td>─</td>
+        </tr>
+        <tr>
+          <td><strong>LINE Bot</strong></td>
+          <td><span class="badge badge-blue">5件 平均</span></td>
+          <td><span class="badge badge-blue">21件 良</span></td>
+          <td><span class="badge badge-amber">2〜5件 薄</span></td>
+          <td><span class="badge badge-green">53件★高単価最多</span></td>
+          <td>─</td>
+        </tr>
+        <tr>
+          <td><strong>業種特化（士業・塾等）</strong></td>
+          <td><span class="badge badge-amber">1〜3件 薄</span></td>
+          <td><span class="badge badge-amber">1〜3件 薄</span></td>
+          <td><span class="badge badge-red">未開拓★空白</span></td>
+          <td><span class="badge badge-red">未開拓★空白</span></td>
+          <td>─</td>
+        </tr>
+        <tr>
+          <td><strong>RAG・独自データ</strong></td>
+          <td><span class="badge badge-green">22件 良</span></td>
+          <td><span class="badge badge-amber">3〜5件 薄</span></td>
+          <td><span class="badge badge-red">未開拓★空白</span></td>
+          <td><span class="badge badge-amber">0〜2件 薄</span></td>
+          <td>─</td>
+        </tr>
+        <tr>
+          <td><strong>Slack / Chatwork特化</strong></td>
+          <td><span class="badge badge-blue">11件 良</span></td>
+          <td><span class="badge badge-red">未開拓★空白</span></td>
+          <td><span class="badge badge-red">未開拓★空白</span></td>
+          <td>─</td>
+          <td>─</td>
+        </tr>
+        <tr>
+          <td><strong>教育・講師向け</strong></td>
+          <td>─</td>
+          <td><span class="badge badge-amber">0〜2件 薄</span></td>
+          <td><span class="badge badge-red">未開拓★空白</span></td>
+          <td><span class="badge badge-red">未開拓★空白</span></td>
+          <td><span class="badge badge-amber">1件 出品のみ</span></td>
+        </tr>
+        <tr>
+          <td><strong>動画制作支援（YouTube）</strong></td>
+          <td>─</td>
+          <td><span class="badge badge-amber">0〜2件 薄</span></td>
+          <td><span class="badge badge-amber">0〜2件 薄</span></td>
+          <td>─</td>
+          <td><span class="badge badge-amber">0〜1件 薄</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.75rem; color:var(--text2); margin-top:0.75rem;">
+    ★空白 = 出品数が極少または0件。狙い目のニッチ地帯。
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<section>
+  <h2>ソース一覧</h2>
+  <ul class="source-list">
+    <li><a href="https://coconala.com/categories/772" target="_blank">ococonala AIチャットボット作成カテゴリ（categories/772）— 直接調査 2026-04-06</a></li>
+    <li><a href="https://coconala.com/services/3294998" target="_blank">DifyでAIチャットボット作ります（たま@SE）— 価格5,000円・販売実績63件</a></li>
+    <li><a href="https://coconala.com/categories/772?page=2" target="_blank">AIチャットボット作成カテゴリ 2ページ目 — 40件の価格・レビュー調査</a></li>
+    <li><a href="https://coconala.com/categories/772?page=3" target="_blank">AIチャットボット作成カテゴリ 3ページ目 — 40件の価格・レビュー調査（業種特化多数）</a></li>
+    <li><a href="https://coconala.com/categories/772?genre_ids%5B%5D=366" target="_blank">AIチャットボット作成「その他」ジャンル — 153件（業種特化・珍しい切り口）</a></li>
+    <li><a href="https://coconala.com/categories/28" target="_blank">AI導入・生成AI活用相談カテゴリ（categories/28）— 累計9,000件実績</a></li>
+    <li><a href="https://coconala.com/services/3956251" target="_blank">Difyでチャットボットを開発します（50,000円）— 新規出品の価格・内容調査</a></li>
+    <li><a href="https://coconala.com/services/3291505" target="_blank">任意の情報を学習させたAIチャットボット（Dify）— 30,000円・レビュー0件</a></li>
+    <li><a href="https://coconala.com/services/3338856" target="_blank">公式LINEにAIチャットボット導入（15,000円）— レビュー2件・内容調査</a></li>
+    <li><a href="https://coconala.com/services/2730918" target="_blank">ChatGPT APIでLINE bot作成（5,500円）— レビュー2件・内容調査</a></li>
+    <li><a href="https://note.com/dapper_poppy7392/n/n4b2523e1d885" target="_blank">【2026年最新版】生成AIでococonala副業を始める完全ガイド — AIカテゴリ前年比394%成長データ</a></li>
+    <li><a href="https://coconala.com/blogs/5174436/671808" target="_blank">cocnoalaで売れるサービスは"AIで作れるもの"に変わった話 — 市場動向</a></li>
+    <li><a href="https://media.brain-market.com/akiharu-coconala/" target="_blank">ococonalaで開始2ヶ月で40万円の収益を出したプロが売れるスキルを解説 — 価格戦略</a></li>
+    <li><a href="https://ai-slave.com/fukugyou-coconala/" target="_blank">ococonala副業の始め方｜稼げるジャンル10選と月5万円ロードマップ — ジャンル別収益性</a></li>
+    <li><a href="https://coconala.com/blogs/1352122/524580" target="_blank">ococonalaのアルゴリズムを完全攻略：おすすめ順1位を取る7つのポイント</a></li>
+    <li>BI: ococonala AIカテゴリ前年比394%成長（2026年版ガイドより）</li>
+    <li>BI: ococonalaプラットフォーム手数料22%、累計購入者480万人超（公式ヘルプより）</li>
+    <li>BI: AIチャットボット作成カテゴリ総出品数480件超（2026-04-06時点直接確認）</li>
+  </ul>
+</section>
+
+<p style="font-size:0.72rem; color:var(--text2); margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border);">
+  reusableFor: ococonala出品戦略 / ヨコ展開の切り口設計 / 価格帯別競合分析 / AI Answerマネタイズ計画 |
+  products: ai-concierge | tags: market, pricing, platform, competitor
+</p>
+</body>
+</html>

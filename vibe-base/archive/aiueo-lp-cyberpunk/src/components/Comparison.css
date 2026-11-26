@@ -1,0 +1,90 @@
+.comparison-section {
+    padding: 8rem 0;
+    background-color: var(--color-bg-deep);
+    position: relative;
+}
+
+.comparison-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(176, 38, 255, 0.5), transparent);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 15, 30, 0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comparison-table th {
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: rgba(0, 0, 0, 0.4);
+    letter-spacing: 0.1em;
+}
+
+.comparison-table .opacity-50 {
+    opacity: 0.5;
+}
+
+.comparison-table td:first-child {
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    width: 20%;
+}
+
+.comparison-table tr:last-child td {
+    border-bottom: none;
+}
+
+.aiueo-col {
+    background: rgba(0, 240, 255, 0.03);
+    border-left: 2px solid rgba(0, 240, 255, 0.3) !important;
+    border-right: 2px solid rgba(0, 240, 255, 0.3) !important;
+    color: #fff;
+}
+
+.comparison-table th.aiueo-col {
+    border-top: 2px solid var(--color-neon-blue) !important;
+    background: rgba(0, 240, 255, 0.1);
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+    font-size: 1.5rem;
+}
+
+.comparison-table tr:last-child td.aiueo-col {
+    border-bottom: 2px solid rgba(0, 240, 255, 0.3) !important;
+}
+
+.font-bold {
+    font-weight: 700;
+    color: var(--color-neon-blue);
+    text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+}
+
+tbody tr {
+    transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}

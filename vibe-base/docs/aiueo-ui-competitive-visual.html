@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aiueo UI刷新 — 競合UIビジュアルリサーチ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.5; }
+
+  .header { background: #1a1a2e; color: #fff; padding: 32px 40px; }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header p { color: #8899aa; margin-top: 4px; font-size: 14px; }
+
+  .tabs { display: flex; background: #fff; border-bottom: 2px solid #e0e0e0; padding: 0 40px; position: sticky; top: 0; z-index: 100; }
+  .tab { padding: 16px 24px; cursor: pointer; font-weight: 600; font-size: 15px; color: #666; border-bottom: 3px solid transparent; transition: all .2s; }
+  .tab:hover { color: #1a1a2e; }
+  .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+  .content { padding: 32px 40px; max-width: 1400px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  h2 { font-size: 20px; margin-bottom: 24px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+  h3 { font-size: 16px; margin: 24px 0 12px; color: #444; }
+
+  /* Wireframe styles */
+  .wireframe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 40px; }
+  .wireframe-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .wireframe-card .card-header { padding: 16px 20px; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .wireframe-card .card-body { padding: 0 20px 20px; }
+
+  /* Color palette */
+  .color-row { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
+  .color-swatch { width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(0,0,0,.1); flex-shrink: 0; }
+  .color-label { font-size: 13px; }
+  .color-label strong { display: block; }
+  .color-label span { color: #888; font-size: 12px; }
+
+  /* Wireframe mockups */
+  .wf { border: 2px solid #ddd; border-radius: 8px; overflow: hidden; background: #fafafa; font-size: 11px; }
+  .wf-bar { height: 28px; background: #e8e8e8; display: flex; align-items: center; padding: 0 8px; font-size: 10px; color: #888; }
+  .wf-body { display: flex; min-height: 280px; }
+  .wf-body-3col { display: flex; min-height: 280px; }
+  .wf-panel { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .wf-panel-label { font-size: 9px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+
+  /* POS wireframe elements */
+  .wf-tile { border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
+  .wf-tile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; flex: 1; }
+  .wf-tile-grid .wf-tile { height: 52px; }
+  .wf-cart-item { display: flex; justify-content: space-between; padding: 4px 6px; background: #fff; border-radius: 3px; font-size: 10px; border: 1px solid #eee; }
+  .wf-total { font-size: 18px; font-weight: 800; text-align: right; padding: 6px; }
+  .wf-btn { padding: 8px; border-radius: 6px; text-align: center; font-weight: 700; font-size: 12px; color: #fff; }
+  .wf-divider { width: 1px; background: #ddd; }
+
+  /* KDS wireframe */
+  .wf-kds-body { display: flex; gap: 8px; padding: 8px; min-height: 280px; }
+  .wf-kds-card { border-radius: 6px; flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 140px; }
+  .wf-kds-header { padding: 6px 8px; font-size: 10px; font-weight: 700; display: flex; justify-content: space-between; }
+  .wf-kds-items { padding: 6px 8px; font-size: 10px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .wf-kds-item { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .wf-kds-mod { font-size: 9px; padding-left: 8px; }
+
+  /* Admin wireframe */
+  .wf-admin-body { display: flex; min-height: 280px; }
+  .wf-sidebar { width: 140px; background: #f5f5f5; padding: 8px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid #ddd; }
+  .wf-sidebar-item { padding: 6px 8px; font-size: 10px; border-radius: 4px; cursor: default; }
+  .wf-sidebar-item.active { background: #e0e7ff; color: #2563eb; font-weight: 600; }
+  .wf-main { flex: 1; padding: 12px; }
+  .wf-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .wf-kpi { background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 8px; }
+  .wf-kpi-label { font-size: 9px; color: #888; }
+  .wf-kpi-value { font-size: 16px; font-weight: 800; }
+  .wf-chart { background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 8px; height: 120px; position: relative; }
+  .wf-chart-bar { position: absolute; bottom: 28px; border-radius: 2px 2px 0 0; }
+  .wf-chart-label { position: absolute; bottom: 8px; font-size: 8px; color: #888; text-align: center; }
+
+  /* Comparison table */
+  .comp-table { width: 100%; border-collapse: collapse; margin: 16px 0 32px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .comp-table th { background: #f8f9fa; padding: 10px 14px; text-align: left; font-size: 13px; border-bottom: 2px solid #e0e0e0; }
+  .comp-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table .highlight { background: #fffbeb; }
+
+  /* Recommendation box */
+  .rec-box { background: #eff6ff; border: 2px solid #2563eb; border-radius: 12px; padding: 24px; margin: 32px 0; }
+  .rec-box h3 { color: #1e40af; margin-top: 0; font-size: 16px; }
+  .rec-box ul { margin: 8px 0 0 20px; }
+  .rec-box li { margin: 4px 0; font-size: 14px; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+
+  @media (max-width: 900px) {
+    .wireframe-grid { grid-template-columns: 1fr; }
+    .content { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Aiueo UI刷新 — 競合UIビジュアルリサーチ</h1>
+  <p>調査日 2026-03-15 / 対象: Square POS, Airレジ, スマレジ, Toast POS, Toast KDS, FreshKDS, QSR Automations</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showSection('cashier')">レジ画面</div>
+  <div class="tab" onclick="showSection('kds')">KDS画面</div>
+  <div class="tab" onclick="showSection('admin')">管理画面</div>
+  <div class="tab" onclick="showSection('proposal')">Aiueo設計案</div>
+</div>
+
+<div class="content">
+
+<!-- ==================== CASHIER ==================== -->
+<div id="cashier" class="section active">
+<h2>レジ（会計）画面 — 競合レイアウト比較</h2>
+
+<div class="wireframe-grid">
+
+  <!-- Square POS -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#f0f4ff; color:#006AFF;">
+      <span style="font-size:20px;">&#9632;</span> Square POS — 3カラム構成
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar">Square POS &mdash; iPad / Square Register</div>
+        <div class="wf-body-3col">
+          <!-- Left: Library -->
+          <div class="wf-panel" style="width:80px; background:#f7f8fa; border-right:1px solid #ddd;">
+            <div class="wf-panel-label">Library</div>
+            <div style="padding:4px; background:#fff; border-radius:3px; font-size:9px; margin:2px 0; border:1px solid #eee;">商品</div>
+            <div style="padding:4px; background:#fff; border-radius:3px; font-size:9px; margin:2px 0; border:1px solid #eee;">ギフト</div>
+            <div style="padding:4px; background:#fff; border-radius:3px; font-size:9px; margin:2px 0; border:1px solid #eee;">割引</div>
+            <div style="padding:4px; background:#fff; border-radius:3px; font-size:9px; margin:2px 0; border:1px solid #eee;">リワード</div>
+          </div>
+          <!-- Center: Grid -->
+          <div class="wf-panel" style="flex:1; background:#fff;">
+            <div class="wf-panel-label">Category Tabs</div>
+            <div style="display:flex; gap:4px; margin-bottom:6px;">
+              <div style="padding:3px 8px; background:#006AFF; color:#fff; border-radius:3px; font-size:9px;">ドリンク</div>
+              <div style="padding:3px 8px; background:#eee; border-radius:3px; font-size:9px;">フード</div>
+              <div style="padding:3px 8px; background:#eee; border-radius:3px; font-size:9px;">デザート</div>
+            </div>
+            <div class="wf-tile-grid">
+              <div class="wf-tile" style="background:#006AFF;">Latte</div>
+              <div class="wf-tile" style="background:#0088DD;">Mocha</div>
+              <div class="wf-tile" style="background:#00AACC;">Tea</div>
+              <div class="wf-tile" style="background:#4488DD;">Espresso</div>
+              <div class="wf-tile" style="background:#2266BB;">Water</div>
+              <div class="wf-tile" style="background:#5599EE;">Juice</div>
+            </div>
+          </div>
+          <div class="wf-divider"></div>
+          <!-- Right: Cart -->
+          <div class="wf-panel" style="width:160px; background:#fafafa;">
+            <div class="wf-panel-label">Active Sale</div>
+            <div class="wf-cart-item"><span>Latte x1</span><span>$4.50</span></div>
+            <div class="wf-cart-item"><span>Mocha x1</span><span>$5.00</span></div>
+            <div style="flex:1;"></div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; padding:2px 6px; color:#888;">
+              <span>Subtotal</span><span>$9.50</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; padding:2px 6px; color:#888;">
+              <span>Tax</span><span>$0.95</span>
+            </div>
+            <div class="wf-total" style="color:#1a1a1a;">$10.45</div>
+            <div class="wf-btn" style="background:#006AFF;">Charge $10.45</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="color-row">
+          <div class="color-swatch" style="background:#006AFF;"></div>
+          <div class="color-label"><strong>Square Blue</strong><span>#006AFF / アクセント・Chargeボタン</span></div>
+        </div>
+        <div class="color-row">
+          <div class="color-swatch" style="background:#FFFFFF; border:2px solid #ddd;"></div>
+          <div class="color-label"><strong>白背景</strong><span>#FFFFFF / クリーン・ミニマル</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Airレジ -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#e8f7fd; color:#00AAEE;">
+      <span style="font-size:20px;">&#11044;</span> Airレジ — 2カラム（左カート / 右商品）
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar">Airレジ &mdash; iPad横向き</div>
+        <div class="wf-body">
+          <!-- Left: Cart -->
+          <div class="wf-panel" style="width:180px; background:#fafafa; border-right:1px solid #ddd;">
+            <div class="wf-panel-label">注文リスト</div>
+            <div class="wf-cart-item"><span>カフェラテ x1</span><span>&yen;480</span></div>
+            <div class="wf-cart-item"><span>抹茶ラテ x1</span><span>&yen;520</span></div>
+            <div class="wf-cart-item"><span>チーズケーキ x1</span><span>&yen;450</span></div>
+            <div style="flex:1;"></div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; padding:2px 6px; color:#888;">
+              <span>小計</span><span>&yen;1,450</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; padding:2px 6px; color:#888;">
+              <span>消費税(10%)</span><span>&yen;145</span>
+            </div>
+            <div class="wf-total" style="color:#1a1a1a;">&yen;1,595</div>
+            <div class="wf-btn" style="background:#00AAEE;">支払いへ進む</div>
+          </div>
+          <!-- Right: Product Grid -->
+          <div class="wf-panel" style="flex:1; background:#fff;">
+            <div style="display:flex; gap:4px; margin-bottom:6px;">
+              <div style="padding:3px 8px; background:#00AAEE; color:#fff; border-radius:3px; font-size:9px;">タイル</div>
+              <div style="padding:3px 8px; background:#eee; border-radius:3px; font-size:9px;">リスト</div>
+              <div style="padding:3px 8px; background:#eee; border-radius:3px; font-size:9px;">検索</div>
+              <div style="padding:3px 8px; background:#eee; border-radius:3px; font-size:9px;">カスタム</div>
+            </div>
+            <div class="wf-tile-grid" style="grid-template-columns: repeat(3, 1fr);">
+              <div class="wf-tile" style="background:#E85D3A;">ドリンク</div>
+              <div class="wf-tile" style="background:#E85D3A;">カフェラテ<br><small>&yen;480</small></div>
+              <div class="wf-tile" style="background:#E85D3A;">抹茶ラテ<br><small>&yen;520</small></div>
+              <div class="wf-tile" style="background:#4CAF50;">フード</div>
+              <div class="wf-tile" style="background:#4CAF50;">チーズケーキ<br><small>&yen;450</small></div>
+              <div class="wf-tile" style="background:#4CAF50;">スコーン<br><small>&yen;380</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="color-row">
+          <div class="color-swatch" style="background:#00AAEE;"></div>
+          <div class="color-label"><strong>Airレジ Blue</strong><span>#00AAEE / 支払いボタン・タブ</span></div>
+        </div>
+        <div class="color-row">
+          <div class="color-swatch" style="background:#E85D3A;"></div>
+          <div class="color-label"><strong>カテゴリ色（例）</strong><span>ユーザー設定可能。カテゴリごとに色分け</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- スマレジ -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#e8f0fe; color:#0066CC;">
+      <span style="font-size:20px;">&#9679;</span> スマレジ — 2カラム（左商品 / 右カート）
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar">スマレジ &mdash; iPad横向き / 標準モード</div>
+        <div class="wf-body">
+          <!-- Left: Categories + Products -->
+          <div class="wf-panel" style="flex:1; background:#fff;">
+            <div style="display:flex; gap:0; margin-bottom:6px; height:100%;">
+              <!-- Category sidebar -->
+              <div style="width:70px; display:flex; flex-direction:column; gap:3px; padding-right:6px; border-right:1px solid #eee;">
+                <div class="wf-panel-label">部門</div>
+                <div style="padding:6px 4px; background:#0066CC; color:#fff; border-radius:3px; font-size:9px; text-align:center;">ドリンク</div>
+                <div style="padding:6px 4px; background:#eee; border-radius:3px; font-size:9px; text-align:center;">フード</div>
+                <div style="padding:6px 4px; background:#eee; border-radius:3px; font-size:9px; text-align:center;">酒類</div>
+                <div style="padding:6px 4px; background:#eee; border-radius:3px; font-size:9px; text-align:center;">セット</div>
+              </div>
+              <!-- Products -->
+              <div style="flex:1; padding-left:6px;">
+                <div class="wf-panel-label">商品</div>
+                <div class="wf-tile-grid" style="grid-template-columns: repeat(3, 1fr);">
+                  <div class="wf-tile" style="background:#0066CC;">カフェラテ<br><small>&yen;480</small></div>
+                  <div class="wf-tile" style="background:#0066CC;">抹茶ラテ<br><small>&yen;520</small></div>
+                  <div class="wf-tile" style="background:#0066CC;">エスプレッソ<br><small>&yen;380</small></div>
+                  <div class="wf-tile" style="background:#0066CC;">アイスティー<br><small>&yen;400</small></div>
+                  <div class="wf-tile" style="background:#0066CC;">ジュース<br><small>&yen;350</small></div>
+                  <div class="wf-tile" style="background:#0066CC;">水<br><small>&yen;0</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-divider"></div>
+          <!-- Right: Cart -->
+          <div class="wf-panel" style="width:170px; background:#fafafa;">
+            <div class="wf-panel-label">取引リスト</div>
+            <div class="wf-cart-item"><span>カフェラテ x1</span><span>&yen;480</span></div>
+            <div class="wf-cart-item"><span>抹茶ラテ x2</span><span>&yen;1,040</span></div>
+            <div style="flex:1;"></div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; padding:2px 6px; color:#888;">
+              <span>小計</span><span>&yen;1,520</span>
+            </div>
+            <div class="wf-total" style="color:#1a1a1a;">&yen;1,672</div>
+            <div class="wf-btn" style="background:#0066CC;">預り金入力</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="color-row">
+          <div class="color-swatch" style="background:#0066CC;"></div>
+          <div class="color-label"><strong>スマレジ Blue</strong><span>#0066CC / メインアクション・部門色</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast POS -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#fff4ed; color:#FF4C00;">
+      <span style="font-size:20px;">&#9650;</span> Toast POS — 2カラム + ダークモード対応
+    </div>
+    <div class="card-body">
+      <!-- Light mode -->
+      <div class="wf" style="margin-bottom:8px;">
+        <div class="wf-bar">Toast POS &mdash; Open View (Light)</div>
+        <div class="wf-body">
+          <!-- Left: Check -->
+          <div class="wf-panel" style="width:160px; background:#fafafa; border-right:1px solid #ddd;">
+            <div class="wf-panel-label">Check #1024</div>
+            <div class="wf-cart-item"><span>Latte x1</span><span>$4.50</span></div>
+            <div class="wf-cart-item"><span style="font-size:9px; color:#888; padding-left:4px;">+ Oat Milk</span><span></span></div>
+            <div class="wf-cart-item"><span>Bagel x1</span><span>$3.50</span></div>
+            <div style="flex:1;"></div>
+            <div class="wf-total" style="color:#1a1a1a;">$8.80</div>
+            <div class="wf-btn" style="background:#FF4C00;">Pay $8.80</div>
+          </div>
+          <!-- Right: Color columns -->
+          <div class="wf-panel" style="flex:1; background:#fff;">
+            <div class="wf-panel-label">Menu (Color Columns)</div>
+            <div style="display:flex; gap:4px; height:calc(100% - 20px);">
+              <div style="flex:1; background:#DBEAFE; border-radius:4px; padding:6px;">
+                <div style="font-size:9px; font-weight:700; margin-bottom:4px; color:#1E40AF;">Drinks</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Latte</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Mocha</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Tea</div>
+              </div>
+              <div style="flex:1; background:#FEF3C7; border-radius:4px; padding:6px;">
+                <div style="font-size:9px; font-weight:700; margin-bottom:4px; color:#92400E;">Food</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Bagel</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Toast</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Salad</div>
+              </div>
+              <div style="flex:1; background:#DCFCE7; border-radius:4px; padding:6px;">
+                <div style="font-size:9px; font-weight:700; margin-bottom:4px; color:#166534;">Add-ons</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Oat Milk</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Syrup</div>
+                <div style="font-size:9px; padding:3px; background:#fff; border-radius:2px; margin:2px 0;">Whip</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Dark mode -->
+      <div class="wf">
+        <div class="wf-bar" style="background:#111; color:#666;">Toast POS &mdash; Open View (Dark)</div>
+        <div class="wf-body" style="background:#1A1C23;">
+          <div class="wf-panel" style="width:160px; border-right:1px solid #333;">
+            <div class="wf-panel-label" style="color:#666;">Check #1024</div>
+            <div style="display:flex; justify-content:space-between; padding:4px 6px; background:#252830; border-radius:3px; font-size:10px; color:#ccc; margin:2px 0;"><span>Latte x1</span><span>$4.50</span></div>
+            <div style="display:flex; justify-content:space-between; padding:4px 6px; background:#252830; border-radius:3px; font-size:10px; color:#ccc; margin:2px 0;"><span>Bagel x1</span><span>$3.50</span></div>
+            <div style="flex:1;"></div>
+            <div class="wf-total" style="color:#fff;">$8.80</div>
+            <div class="wf-btn" style="background:#FF4C00;">Pay $8.80</div>
+          </div>
+          <div class="wf-panel" style="flex:1;">
+            <div class="wf-panel-label" style="color:#666;">Menu (Color Columns)</div>
+            <div style="display:flex; gap:4px; height:calc(100% - 20px);">
+              <div style="flex:1; background:#1E3A5F; border-radius:4px; padding:6px;">
+                <div style="font-size:9px; font-weight:700; margin-bottom:4px; color:#93C5FD;">Drinks</div>
+                <div style="font-size:9px; padding:3px; background:#252830; color:#ccc; border-radius:2px; margin:2px 0;">Latte</div>
+                <div style="font-size:9px; padding:3px; background:#252830; color:#ccc; border-radius:2px; margin:2px 0;">Mocha</div>
+              </div>
+              <div style="flex:1; background:#4A3728; border-radius:4px; padding:6px;">
+                <div style="font-size:9px; font-weight:700; margin-bottom:4px; color:#FCD34D;">Food</div>
+                <div style="font-size:9px; padding:3px; background:#252830; color:#ccc; border-radius:2px; margin:2px 0;">Bagel</div>
+                <div style="font-size:9px; padding:3px; background:#252830; color:#ccc; border-radius:2px; margin:2px 0;">Toast</div>
+              </div>
+              <div style="flex:1; background:#1A3D2E; border-radius:4px; padding:6px;">
+                <div style="font-size:9px; font-weight:700; margin-bottom:4px; color:#86EFAC;">Add-ons</div>
+                <div style="font-size:9px; padding:3px; background:#252830; color:#ccc; border-radius:2px; margin:2px 0;">Oat Milk</div>
+                <div style="font-size:9px; padding:3px; background:#252830; color:#ccc; border-radius:2px; margin:2px 0;">Syrup</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="color-row">
+          <div class="color-swatch" style="background:#FF4C00;"></div>
+          <div class="color-label"><strong>Toast Orange</strong><span>#FF4C00 / メインアクション</span></div>
+        </div>
+        <div class="color-row">
+          <div class="color-swatch" style="background:#1A1C23;"></div>
+          <div class="color-label"><strong>Dark BG</strong><span>#1A1C23 / ダークモード背景</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pattern Summary -->
+<h3>レジ画面 業界共通パターン</h3>
+<table class="comp-table">
+  <tr><th style="width:160px;">項目</th><th>業界標準</th><th>例外・バリエーション</th></tr>
+  <tr><td><strong>画面構成</strong></td><td>左右2カラム（商品 + カート）</td><td>Square: 3カラム（左にライブラリ追加）</td></tr>
+  <tr><td><strong>商品表示</strong></td><td>色分きグリッド（タイル）</td><td>Airレジ: 4モード切替。スマレジ: 左に部門ナビ</td></tr>
+  <tr><td><strong>合計金額</strong></td><td>カート下部。最大フォント・太字</td><td>全製品共通</td></tr>
+  <tr><td><strong>支払いボタン</strong></td><td>画面最下部。ブランドカラー。金額表示付き</td><td>全製品共通</td></tr>
+  <tr><td><strong>配色</strong></td><td>白背景 + ブランドカラーのアクセント</td><td>Toast: ダークモード対応</td></tr>
+  <tr><td><strong>カテゴリ色分け</strong></td><td>タイル色でカテゴリ識別</td><td>Toast: カラムごと色分け</td></tr>
+</table>
+</div>
+
+<!-- ==================== KDS ==================== -->
+<div id="kds" class="section">
+<h2>KDS（キッチンディスプレイ）画面 — 競合レイアウト比較</h2>
+
+<div class="wireframe-grid">
+
+  <!-- Toast KDS -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#fff4ed; color:#FF4C00;">
+      <span style="font-size:20px;">&#9650;</span> Toast KDS — Grid View
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar" style="background:#222; color:#888;">Toast KDS &mdash; Grid View (Dark)</div>
+        <div class="wf-kds-body" style="background:#1a1a2e;">
+          <div class="wf-kds-card" style="background:#252840;">
+            <div class="wf-kds-header" style="background:#22c55e; color:#fff;">
+              <span>#1024 Dine-in</span><span>2:15</span>
+            </div>
+            <div class="wf-kds-items" style="color:#ddd;">
+              <div class="wf-kds-item">1x Latte</div>
+              <div class="wf-kds-mod" style="color:#ef4444;">+ Oat Milk</div>
+              <div class="wf-kds-item">1x Cappuccino</div>
+              <div class="wf-kds-item">1x Matcha</div>
+            </div>
+          </div>
+          <div class="wf-kds-card" style="background:#252840;">
+            <div class="wf-kds-header" style="background:#eab308; color:#000;">
+              <span>#1025 To-Go</span><span>5:42</span>
+            </div>
+            <div class="wf-kds-items" style="color:#ddd;">
+              <div class="wf-kds-item">2x Espresso</div>
+              <div class="wf-kds-item">1x Bagel</div>
+              <div class="wf-kds-mod" style="color:#ef4444;">+ Cream Cheese</div>
+            </div>
+          </div>
+          <div class="wf-kds-card" style="background:#252840;">
+            <div class="wf-kds-header" style="background:#ef4444; color:#fff;">
+              <span>#1023 Dine-in</span><span>9:18</span>
+            </div>
+            <div class="wf-kds-items" style="color:#ddd;">
+              <div class="wf-kds-item">1x Sandwich</div>
+              <div class="wf-kds-item">1x Salad</div>
+              <div class="wf-kds-item">2x Orange Juice</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px; display:flex; gap:12px; align-items:center;">
+        <span class="badge badge-green">On-Time</span>
+        <span class="badge badge-yellow">Caution</span>
+        <span class="badge badge-red">Late</span>
+        <span style="font-size:11px; color:#888;">= ヘッダー色で経過時間を表現</span>
+      </div>
+      <div style="margin-top:8px; font-size:12px; color:#666;">
+        完了操作: 下スワイプ / ダブルタップ / Bump Bar<br>
+        特徴: フラッシュアニメ通知、音声アラート、コースペーシング
+      </div>
+    </div>
+  </div>
+
+  <!-- FreshKDS -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#f0fdf4; color:#166534;">
+      <span style="font-size:20px;">&#11044;</span> FreshKDS — Tiled View
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar" style="background:#222; color:#888;">FreshKDS &mdash; Tiled View (Dark)</div>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:repeat(2, 1fr); gap:6px; padding:8px; background:#1e1e2e; min-height:280px;">
+          <div style="background:#2a2a3a; border-radius:6px; overflow:hidden;">
+            <div style="padding:5px 8px; background:#22c55e; font-size:10px; font-weight:700; display:flex; justify-content:space-between; color:#fff;"><span>#201 John</span><span>1:30</span></div>
+            <div style="padding:6px 8px; font-size:10px; color:#ddd;">
+              <div>1x Flat White</div>
+              <div>1x Croissant</div>
+            </div>
+          </div>
+          <div style="background:#2a2a3a; border-radius:6px; overflow:hidden;">
+            <div style="padding:5px 8px; background:#22c55e; font-size:10px; font-weight:700; display:flex; justify-content:space-between; color:#fff;"><span>#202 Sarah</span><span>3:10</span></div>
+            <div style="padding:6px 8px; font-size:10px; color:#ddd;">
+              <div>2x Latte</div>
+              <div style="color:#ef4444; font-weight:700; font-size:9px; padding-left:6px;">ALLERGY: Nuts</div>
+            </div>
+          </div>
+          <div style="background:#2a2a3a; border-radius:6px; overflow:hidden;">
+            <div style="padding:5px 8px; background:#eab308; font-size:10px; font-weight:700; display:flex; justify-content:space-between; color:#000;"><span>#198 Mike</span><span>6:45</span></div>
+            <div style="padding:6px 8px; font-size:10px; color:#ddd;">
+              <div>1x Sandwich</div>
+              <div>1x Soup</div>
+              <div>1x Coffee</div>
+            </div>
+          </div>
+          <div style="background:#2a2a3a; border-radius:6px; overflow:hidden;">
+            <div style="padding:5px 8px; background:#ef4444; font-size:10px; font-weight:700; display:flex; justify-content:space-between; color:#fff;"><span>#195 DoorDash</span><span>11:20</span></div>
+            <div style="padding:6px 8px; font-size:10px; color:#ddd;">
+              <div>3x Wrap</div>
+              <div>3x Juice</div>
+            </div>
+          </div>
+          <div style="background:#2a2a3a; border-radius:6px; overflow:hidden;">
+            <div style="padding:5px 8px; background:#22c55e; font-size:10px; font-weight:700; display:flex; justify-content:space-between; color:#fff;"><span>#203 Walk-in</span><span>0:45</span></div>
+            <div style="padding:6px 8px; font-size:10px; color:#ddd;">
+              <div>1x Espresso</div>
+            </div>
+          </div>
+          <div style="background:#2a2a3a; border-radius:6px; overflow:hidden; opacity:.4; display:flex; align-items:center; justify-content:center; color:#666; font-size:10px;">
+            (空きスロット)
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px; font-size:12px; color:#666;">
+        4ビューモード: Classic / Tiled / Split / Takeout<br>
+        完了操作: <strong>タップ1回</strong>（最もシンプル）<br>
+        特徴: オーダーホールド、Order Tracker（顧客向け表示）、アレルゲン色付き強調
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- KDS Pattern -->
+<h3>KDS 業界共通パターン</h3>
+<table class="comp-table">
+  <tr><th style="width:160px;">項目</th><th>業界標準</th></tr>
+  <tr><td><strong>レイアウト</strong></td><td>カード（チケット）型の横並び or グリッド</td></tr>
+  <tr><td><strong>カード内容</strong></td><td>注文番号 / 注文タイプ / 顧客名 / アイテム一覧 / 経過時間</td></tr>
+  <tr class="highlight"><td><strong>時間管理</strong></td><td><strong>緑→黄→赤の信号機方式</strong>（ヘッダー色変化。全製品共通）</td></tr>
+  <tr class="highlight"><td><strong>ダークモード</strong></td><td><strong>全製品対応</strong>（キッチン＝暗い環境。必須）</td></tr>
+  <tr><td><strong>フォント</strong></td><td>大サイズ。モディファイアは赤/太字で強調</td></tr>
+  <tr><td><strong>完了操作</strong></td><td>タップ / スワイプ / Bump Bar</td></tr>
+  <tr><td><strong>背景色</strong></td><td>ダーク系（#1A1A2E〜#1E1E2E）にカード（#252840〜#2A2A3A）</td></tr>
+</table>
+</div>
+
+<!-- ==================== ADMIN ==================== -->
+<div id="admin" class="section">
+<h2>管理画面（ダッシュボード） — 競合レイアウト比較</h2>
+
+<div class="wireframe-grid">
+
+  <!-- Square Dashboard -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#f0f4ff; color:#006AFF;">
+      <span style="font-size:20px;">&#9632;</span> Square Dashboard — ウィジェット型
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar">Square Dashboard &mdash; Web</div>
+        <div class="wf-admin-body">
+          <div class="wf-sidebar">
+            <div class="wf-sidebar-item active">Home</div>
+            <div class="wf-sidebar-item">Payments</div>
+            <div class="wf-sidebar-item">Items</div>
+            <div class="wf-sidebar-item">Customers</div>
+            <div class="wf-sidebar-item">Reports</div>
+            <div class="wf-sidebar-item">Team</div>
+          </div>
+          <div class="wf-main" style="background:#f8f9fa;">
+            <div class="wf-kpi-grid">
+              <div class="wf-kpi">
+                <div class="wf-kpi-label">Today's Sales</div>
+                <div class="wf-kpi-value">$1,284</div>
+              </div>
+              <div class="wf-kpi">
+                <div class="wf-kpi-label">Transactions</div>
+                <div class="wf-kpi-value">47</div>
+              </div>
+              <div class="wf-kpi">
+                <div class="wf-kpi-label">Avg. Ticket</div>
+                <div class="wf-kpi-value">$27.32</div>
+              </div>
+            </div>
+            <div class="wf-chart">
+              <div style="font-size:9px; color:#888; margin-bottom:4px;">Sales Trend</div>
+              <div class="wf-chart-bar" style="left:10%; width:10%; height:30%; background:#c8d8f0;"></div>
+              <div class="wf-chart-bar" style="left:22%; width:10%; height:50%; background:#a0b8e0;"></div>
+              <div class="wf-chart-bar" style="left:34%; width:10%; height:40%; background:#a0b8e0;"></div>
+              <div class="wf-chart-bar" style="left:46%; width:10%; height:65%; background:#7098d0;"></div>
+              <div class="wf-chart-bar" style="left:58%; width:10%; height:55%; background:#7098d0;"></div>
+              <div class="wf-chart-bar" style="left:70%; width:10%; height:75%; background:#006AFF;"></div>
+              <div class="wf-chart-bar" style="left:82%; width:10%; height:45%; background:#a0b8e0; opacity:.5; border:1px dashed #006AFF;"></div>
+              <div class="wf-chart-label" style="left:10%; width:10%;">Mon</div>
+              <div class="wf-chart-label" style="left:22%; width:10%;">Tue</div>
+              <div class="wf-chart-label" style="left:34%; width:10%;">Wed</div>
+              <div class="wf-chart-label" style="left:46%; width:10%;">Thu</div>
+              <div class="wf-chart-label" style="left:58%; width:10%;">Fri</div>
+              <div class="wf-chart-label" style="left:70%; width:10%;">Sat</div>
+              <div class="wf-chart-label" style="left:82%; width:10%;">Sun</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Airレジ -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#e8f7fd; color:#20AEE5;">
+      <span style="font-size:20px;">&#11044;</span> Airレジ / Airメイト — シングルカラム
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar">Airメイト &mdash; スマホ最適化ダッシュボード</div>
+        <div style="max-width:220px; margin:0 auto; background:#fff; padding:12px; min-height:280px;">
+          <div style="text-align:center; font-size:11px; color:#20AEE5; font-weight:700; margin-bottom:8px;">今日の売上</div>
+          <div style="text-align:center; font-size:28px; font-weight:800; margin-bottom:4px;">&yen;48,500</div>
+          <div style="text-align:center; font-size:10px; color:#22c55e; margin-bottom:16px;">+12% vs 先週</div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:12px;">
+            <div style="background:#f8f9fa; padding:8px; border-radius:6px; text-align:center;">
+              <div style="font-size:9px; color:#888;">取引数</div>
+              <div style="font-size:16px; font-weight:700;">32</div>
+            </div>
+            <div style="background:#f8f9fa; padding:8px; border-radius:6px; text-align:center;">
+              <div style="font-size:9px; color:#888;">客単価</div>
+              <div style="font-size:16px; font-weight:700;">&yen;1,516</div>
+            </div>
+          </div>
+
+          <div style="font-size:10px; font-weight:700; color:#333; margin-bottom:4px;">時間帯別売上</div>
+          <div style="display:flex; align-items:flex-end; gap:2px; height:60px; margin-bottom:4px;">
+            <div style="flex:1; background:#b8e6f8; height:15%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#b8e6f8; height:25%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#20AEE5; height:80%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#20AEE5; height:100%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#b8e6f8; height:40%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#b8e6f8; height:30%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#20AEE5; height:70%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#20AEE5; height:90%; border-radius:2px 2px 0 0;"></div>
+            <div style="flex:1; background:#b8e6f8; height:50%; border-radius:2px 2px 0 0;"></div>
+          </div>
+          <div style="display:flex; gap:2px; font-size:7px; color:#aaa;">
+            <div style="flex:1; text-align:center;">9</div><div style="flex:1; text-align:center;">10</div>
+            <div style="flex:1; text-align:center;">11</div><div style="flex:1; text-align:center;">12</div>
+            <div style="flex:1; text-align:center;">13</div><div style="flex:1; text-align:center;">14</div>
+            <div style="flex:1; text-align:center;">15</div><div style="flex:1; text-align:center;">16</div>
+            <div style="flex:1; text-align:center;">17</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- スマレジ -->
+  <div class="wireframe-card">
+    <div class="card-header" style="background:#e8f0fe; color:#0066CC;">
+      <span style="font-size:20px;">&#9679;</span> スマレジ管理画面 — 左サイドバー型
+    </div>
+    <div class="card-body">
+      <div class="wf">
+        <div class="wf-bar">スマレジ管理画面 &mdash; PCブラウザ</div>
+        <div class="wf-admin-body">
+          <div class="wf-sidebar">
+            <div class="wf-sidebar-item active">ダッシュボード</div>
+            <div class="wf-sidebar-item">商品</div>
+            <div class="wf-sidebar-item">売上分析</div>
+            <div class="wf-sidebar-item">取引履歴</div>
+            <div class="wf-sidebar-item">在庫管理</div>
+            <div class="wf-sidebar-item">会員管理</div>
+            <div class="wf-sidebar-item">設定</div>
+          </div>
+          <div class="wf-main" style="background:#f8f9fa;">
+            <div class="wf-kpi-grid">
+              <div class="wf-kpi">
+                <div class="wf-kpi-label">本日売上</div>
+                <div class="wf-kpi-value" style="color:#0066CC;">&yen;52,300</div>
+              </div>
+              <div class="wf-kpi">
+                <div class="wf-kpi-label">取引数</div>
+                <div class="wf-kpi-value">38</div>
+              </div>
+              <div class="wf-kpi">
+                <div class="wf-kpi-label">客単価</div>
+                <div class="wf-kpi-value">&yen;1,376</div>
+              </div>
+            </div>
+            <div class="wf-chart">
+              <div style="font-size:9px; color:#888; margin-bottom:4px;">時間帯別売上</div>
+              <div class="wf-chart-bar" style="left:8%; width:8%; height:20%; background:#b0c8e8;"></div>
+              <div class="wf-chart-bar" style="left:18%; width:8%; height:35%; background:#b0c8e8;"></div>
+              <div class="wf-chart-bar" style="left:28%; width:8%; height:70%; background:#0066CC;"></div>
+              <div class="wf-chart-bar" style="left:38%; width:8%; height:85%; background:#0066CC;"></div>
+              <div class="wf-chart-bar" style="left:48%; width:8%; height:45%; background:#b0c8e8;"></div>
+              <div class="wf-chart-bar" style="left:58%; width:8%; height:30%; background:#b0c8e8;"></div>
+              <div class="wf-chart-bar" style="left:68%; width:8%; height:60%; background:#0066CC;"></div>
+              <div class="wf-chart-bar" style="left:78%; width:8%; height:75%; background:#0066CC;"></div>
+              <div class="wf-chart-bar" style="left:88%; width:8%; height:40%; background:#b0c8e8;"></div>
+              <div class="wf-chart-label" style="left:6%; width:12%;">9時</div>
+              <div class="wf-chart-label" style="left:16%; width:12%;">10時</div>
+              <div class="wf-chart-label" style="left:26%; width:12%;">11時</div>
+              <div class="wf-chart-label" style="left:36%; width:12%;">12時</div>
+              <div class="wf-chart-label" style="left:46%; width:12%;">13時</div>
+              <div class="wf-chart-label" style="left:56%; width:12%;">14時</div>
+              <div class="wf-chart-label" style="left:66%; width:12%;">15時</div>
+              <div class="wf-chart-label" style="left:76%; width:12%;">16時</div>
+              <div class="wf-chart-label" style="left:86%; width:12%;">17時</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h3>管理画面 業界共通パターン</h3>
+<table class="comp-table">
+  <tr><th style="width:160px;">項目</th><th>業界標準</th></tr>
+  <tr><td><strong>レイアウト</strong></td><td>左サイドバー + メインコンテンツ（PC）/ シングルカラム（モバイル）</td></tr>
+  <tr><td><strong>ダッシュボード</strong></td><td>KPIカード（売上・取引数・客単価）が最上部</td></tr>
+  <tr><td><strong>グラフ</strong></td><td>時間帯別売上の棒グラフが最も一般的</td></tr>
+  <tr><td><strong>配色</strong></td><td>白/ライトグレー背景 + ブランドカラーのアクセント</td></tr>
+  <tr><td><strong>ナビ</strong></td><td>6〜8項目のサイドバー。階層1〜2段</td></tr>
+</table>
+</div>
+
+<!-- ==================== PROPOSAL ==================== -->
+<div id="proposal" class="section">
+<h2>Aiueo UI設計方針案</h2>
+<p style="color:#666; margin-bottom:24px;">競合調査結果に基づく、Aiueo各画面のデザイン方向性の提案です。</p>
+
+<!-- Cashier Proposal -->
+<div class="rec-box">
+  <h3>レジ画面 — 設計方針</h3>
+  <ul>
+    <li><strong>2カラム構成:</strong> 左=商品グリッド（カテゴリ色分けタイル） / 右=カート+合計+支払いボタン</li>
+    <li><strong>白背景 + Aiueoブランドカラーのアクセント</strong>（業界標準に準拠）</li>
+    <li><strong>合計金額を最大フォント</strong>で表示。金額の視認性が最優先</li>
+    <li><strong>「支払いへ進む」ボタン:</strong> 画面最下部、ブランドカラー、金額表示付き</li>
+    <li><strong>カテゴリ色分け:</strong> タイルの背景色でカテゴリを識別（Airレジ方式）</li>
+    <li><strong>参考元:</strong> Airレジ（シンプルさ・4モード切替）+ Square（グリッドの自由度）</li>
+  </ul>
+</div>
+
+<!-- Cashier Proposal Wireframe -->
+<div class="wireframe-card" style="margin-bottom:32px;">
+  <div class="card-header" style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff;">
+    Aiueo レジ画面 — 提案レイアウト
+  </div>
+  <div class="card-body">
+    <div class="wf">
+      <div class="wf-bar" style="background:#f8f9fa;">Aiueo POS &mdash; iPad横向き</div>
+      <div class="wf-body">
+        <!-- Left: Products -->
+        <div class="wf-panel" style="flex:1; background:#fff;">
+          <div style="display:flex; gap:4px; margin-bottom:8px;">
+            <div style="padding:4px 10px; background:#E85D3A; color:#fff; border-radius:20px; font-size:10px; font-weight:600;">ドリンク</div>
+            <div style="padding:4px 10px; background:#eee; border-radius:20px; font-size:10px;">フード</div>
+            <div style="padding:4px 10px; background:#eee; border-radius:20px; font-size:10px;">酒類</div>
+            <div style="padding:4px 10px; background:#eee; border-radius:20px; font-size:10px;">セット</div>
+          </div>
+          <div class="wf-tile-grid" style="grid-template-columns: repeat(4, 1fr); gap:6px;">
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">カフェラテ<br><small>&yen;480</small></div>
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">抹茶ラテ<br><small>&yen;520</small></div>
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">エスプレッソ<br><small>&yen;380</small></div>
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">アイスティー<br><small>&yen;400</small></div>
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">ハイボール<br><small>&yen;450</small></div>
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">生ビール<br><small>&yen;550</small></div>
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">ジュース<br><small>&yen;350</small></div>
+            <div class="wf-tile" style="background:#E85D3A; height:60px; border-radius:8px;">水<br><small>&yen;0</small></div>
+          </div>
+        </div>
+        <div class="wf-divider"></div>
+        <!-- Right: Cart -->
+        <div class="wf-panel" style="width:200px; background:#fafafa;">
+          <div style="font-size:11px; font-weight:700; color:#333; margin-bottom:6px;">注文内容</div>
+          <div class="wf-cart-item"><span>カフェラテ x1</span><span>&yen;480</span></div>
+          <div class="wf-cart-item"><span>抹茶ラテ x2</span><span>&yen;1,040</span></div>
+          <div class="wf-cart-item"><span>チーズケーキ x1</span><span>&yen;450</span></div>
+          <div style="flex:1;"></div>
+          <div style="border-top:1px solid #ddd; padding-top:6px; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; padding:2px 6px; color:#888;">
+              <span>小計</span><span>&yen;1,970</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; padding:2px 6px; color:#888;">
+              <span>消費税(10%)</span><span>&yen;197</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:22px; font-weight:800; padding:6px; color:#1a1a1a;">
+              <span>合計</span><span>&yen;2,167</span>
+            </div>
+          </div>
+          <div class="wf-btn" style="background:#667eea; font-size:14px; padding:12px; border-radius:8px;">支払いへ進む</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KDS Proposal -->
+<div class="rec-box">
+  <h3>KDS画面 — 設計方針</h3>
+  <ul>
+    <li><strong>カード型グリッド:</strong> FreshKDSのTiled Viewがベスト（情報密度と視認性のバランス）</li>
+    <li><strong>ダークモード基本:</strong> 背景 #1a1a2e、カード #252840（キッチン環境の標準）</li>
+    <li><strong>信号機方式:</strong> ヘッダー色で経過時間表現（緑→黄→赤）。全競合共通のパターン</li>
+    <li><strong>大フォント・高コントラスト:</strong> キッチンでは1m以上離れて見る前提</li>
+    <li><strong>タップ1回で完了:</strong> FreshKDS方式。最もシンプル</li>
+    <li><strong>モディファイア強調:</strong> 赤テキスト + 太字（Toast方式）</li>
+  </ul>
+</div>
+
+<!-- KDS Proposal Wireframe -->
+<div class="wireframe-card" style="margin-bottom:32px;">
+  <div class="card-header" style="background:linear-gradient(135deg,#1a1a2e,#2d2d4e); color:#fff;">
+    Aiueo KDS画面 — 提案レイアウト
+  </div>
+  <div class="card-body">
+    <div class="wf">
+      <div class="wf-bar" style="background:#111; color:#666;">Aiueo KDS &mdash; ダーク / タップで完了</div>
+      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; padding:10px; background:#1a1a2e; min-height:300px;">
+        <!-- Card 1: On-time -->
+        <div style="background:#252840; border-radius:8px; overflow:hidden;">
+          <div style="padding:8px 10px; background:#22c55e; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13px; font-weight:800; color:#fff;">#1024</span>
+            <span style="font-size:12px; font-weight:600; color:#fff;">1:30</span>
+          </div>
+          <div style="padding:4px 10px; background:rgba(34,197,94,.15); font-size:10px; color:#86efac;">店内 / Table 3</div>
+          <div style="padding:10px; color:#e2e8f0;">
+            <div style="font-size:14px; font-weight:600; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08);">1x カフェラテ</div>
+            <div style="font-size:11px; color:#ef4444; font-weight:700; padding:2px 0 4px 12px;">+ オーツミルク変更</div>
+            <div style="font-size:14px; font-weight:600; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08);">1x 抹茶ラテ</div>
+            <div style="font-size:14px; font-weight:600; padding:4px 0;">1x チーズケーキ</div>
+          </div>
+        </div>
+        <!-- Card 2: On-time -->
+        <div style="background:#252840; border-radius:8px; overflow:hidden;">
+          <div style="padding:8px 10px; background:#22c55e; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13px; font-weight:800; color:#fff;">#1025</span>
+            <span style="font-size:12px; font-weight:600; color:#fff;">3:15</span>
+          </div>
+          <div style="padding:4px 10px; background:rgba(34,197,94,.15); font-size:10px; color:#86efac;">テイクアウト</div>
+          <div style="padding:10px; color:#e2e8f0;">
+            <div style="font-size:14px; font-weight:600; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08);">2x エスプレッソ</div>
+            <div style="font-size:14px; font-weight:600; padding:4px 0;">1x スコーン</div>
+          </div>
+        </div>
+        <!-- Card 3: Caution -->
+        <div style="background:#252840; border-radius:8px; overflow:hidden;">
+          <div style="padding:8px 10px; background:#eab308; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13px; font-weight:800; color:#000;">#1022</span>
+            <span style="font-size:12px; font-weight:600; color:#000;">6:45</span>
+          </div>
+          <div style="padding:4px 10px; background:rgba(234,179,8,.15); font-size:10px; color:#fde047;">店内 / Table 7</div>
+          <div style="padding:10px; color:#e2e8f0;">
+            <div style="font-size:14px; font-weight:600; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08);">1x サンドイッチ</div>
+            <div style="font-size:11px; color:#ef4444; font-weight:700; padding:2px 0 4px 12px;">+ パン: 全粒粉</div>
+            <div style="font-size:14px; font-weight:600; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08);">1x サラダ</div>
+            <div style="font-size:14px; font-weight:600; padding:4px 0;">2x OJ</div>
+          </div>
+        </div>
+        <!-- Card 4: Late -->
+        <div style="background:#252840; border-radius:8px; overflow:hidden;">
+          <div style="padding:8px 10px; background:#ef4444; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13px; font-weight:800; color:#fff;">#1020</span>
+            <span style="font-size:12px; font-weight:600; color:#fff;">10:22</span>
+          </div>
+          <div style="padding:4px 10px; background:rgba(239,68,68,.15); font-size:10px; color:#fca5a5;">UberEats</div>
+          <div style="padding:10px; color:#e2e8f0;">
+            <div style="font-size:14px; font-weight:600; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08);">3x タコライス</div>
+            <div style="font-size:14px; font-weight:600; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.08);">3x ドリンクセット</div>
+            <div style="font-size:14px; font-weight:600; padding:4px 0;">1x デザート</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:8px; display:flex; gap:16px; align-items:center;">
+      <span class="badge badge-green">0〜5分: On-Time</span>
+      <span class="badge badge-yellow">5〜8分: Caution</span>
+      <span class="badge badge-red">8分超: Late</span>
+      <span style="font-size:11px; color:#888;">タップで完了 → カードが消える</span>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Proposal -->
+<div class="rec-box">
+  <h3>管理画面 — 設計方針</h3>
+  <ul>
+    <li><strong>左サイドバー + メインコンテンツ:</strong> Square/スマレジの標準パターン</li>
+    <li><strong>ダッシュボード最上部にKPIカード:</strong> 本日売上・取引数・客単価（3枚）</li>
+    <li><strong>時間帯別売上グラフ:</strong> 飲食店で最も使われる分析切り口</li>
+    <li><strong>シンプルなメニュー管理:</strong> テーブル形式のCRUD</li>
+    <li><strong>参考元:</strong> Airレジ（親しみやすさ）+ Square（ウィジェットの柔軟性）</li>
+  </ul>
+</div>
+
+<!-- Admin Proposal Wireframe -->
+<div class="wireframe-card" style="margin-bottom:32px;">
+  <div class="card-header" style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff;">
+    Aiueo 管理画面 — 提案レイアウト
+  </div>
+  <div class="card-body">
+    <div class="wf">
+      <div class="wf-bar" style="background:#f8f9fa;">Aiueo Admin &mdash; PCブラウザ</div>
+      <div class="wf-admin-body" style="min-height:300px;">
+        <div class="wf-sidebar" style="background:#1a1a2e;">
+          <div style="padding:10px 8px; font-size:12px; font-weight:800; color:#fff; margin-bottom:4px;">Aiueo</div>
+          <div class="wf-sidebar-item active" style="color:#fff; background:rgba(102,126,234,.3);">ダッシュボード</div>
+          <div class="wf-sidebar-item" style="color:#8899aa;">注文履歴</div>
+          <div class="wf-sidebar-item" style="color:#8899aa;">売上分析</div>
+          <div class="wf-sidebar-item" style="color:#8899aa;">メニュー管理</div>
+          <div class="wf-sidebar-item" style="color:#8899aa;">クーポン</div>
+          <div class="wf-sidebar-item" style="color:#8899aa;">スタッフ</div>
+          <div class="wf-sidebar-item" style="color:#8899aa;">設定</div>
+        </div>
+        <div class="wf-main" style="background:#f8f9fa;">
+          <div style="font-size:12px; font-weight:700; margin-bottom:8px; color:#333;">ダッシュボード</div>
+          <div class="wf-kpi-grid">
+            <div class="wf-kpi" style="border-left:3px solid #667eea;">
+              <div class="wf-kpi-label">本日売上</div>
+              <div class="wf-kpi-value" style="color:#667eea;">&yen;48,500</div>
+              <div style="font-size:9px; color:#22c55e;">+12% vs 先週</div>
+            </div>
+            <div class="wf-kpi" style="border-left:3px solid #22c55e;">
+              <div class="wf-kpi-label">取引数</div>
+              <div class="wf-kpi-value">32</div>
+              <div style="font-size:9px; color:#22c55e;">+5件</div>
+            </div>
+            <div class="wf-kpi" style="border-left:3px solid #f59e0b;">
+              <div class="wf-kpi-label">客単価</div>
+              <div class="wf-kpi-value">&yen;1,516</div>
+              <div style="font-size:9px; color:#ef4444;">-3%</div>
+            </div>
+          </div>
+          <div class="wf-chart" style="height:130px;">
+            <div style="font-size:9px; color:#888; margin-bottom:4px;">時間帯別売上</div>
+            <div class="wf-chart-bar" style="left:6%; width:7%; height:15%; background:#c7d2fe;"></div>
+            <div class="wf-chart-bar" style="left:15%; width:7%; height:25%; background:#c7d2fe;"></div>
+            <div class="wf-chart-bar" style="left:24%; width:7%; height:65%; background:#667eea;"></div>
+            <div class="wf-chart-bar" style="left:33%; width:7%; height:80%; background:#667eea;"></div>
+            <div class="wf-chart-bar" style="left:42%; width:7%; height:40%; background:#c7d2fe;"></div>
+            <div class="wf-chart-bar" style="left:51%; width:7%; height:30%; background:#c7d2fe;"></div>
+            <div class="wf-chart-bar" style="left:60%; width:7%; height:55%; background:#667eea;"></div>
+            <div class="wf-chart-bar" style="left:69%; width:7%; height:70%; background:#667eea;"></div>
+            <div class="wf-chart-bar" style="left:78%; width:7%; height:45%; background:#c7d2fe;"></div>
+            <div class="wf-chart-bar" style="left:87%; width:7%; height:20%; background:#c7d2fe;"></div>
+            <div class="wf-chart-label" style="left:4%; width:11%;">9時</div>
+            <div class="wf-chart-label" style="left:13%; width:11%;">10時</div>
+            <div class="wf-chart-label" style="left:22%; width:11%;">11時</div>
+            <div class="wf-chart-label" style="left:31%; width:11%;">12時</div>
+            <div class="wf-chart-label" style="left:40%; width:11%;">13時</div>
+            <div class="wf-chart-label" style="left:49%; width:11%;">14時</div>
+            <div class="wf-chart-label" style="left:58%; width:11%;">15時</div>
+            <div class="wf-chart-label" style="left:67%; width:11%;">16時</div>
+            <div class="wf-chart-label" style="left:76%; width:11%;">17時</div>
+            <div class="wf-chart-label" style="left:85%; width:11%;">18時</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /proposal -->
+
+</div><!-- /content -->
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>

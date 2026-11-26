@@ -1,0 +1,259 @@
+# Backups
+.claude/settings.local.json.bak-*
+
+# root 散在物（Git完全独立ロードマップ A-4・2026-07-05）
+**/.serena/
+extract_*.js
+fetch_*.js
+replace_*.js
+split_*.js
+scratch/
+screenshot*.png
+null
+
+# 肥大源（再生成物・一時出力・共有 index 肥大の発生源 / git 詰まり根治 2026-06-21）
+# outputs/ は screenshot・Edge dev profile 等のデバッグ出力。backups/ は虎の巻ローカル退避（RULES §5・読み取り専用）。
+# 永続化したい成果物は docs/ 等へ昇格する運用。
+outputs/
+backups/
+.playwright-mcp/
+test-results/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.key
+*.key.pub
+*.pem
+secrets/
+ga4-*.json
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.vercel
+
+# Build output
+dist/
+build/
+.next/
+/out/
+/coverage
+*.tsbuildinfo
+next-env.d.ts
+
+# Next.js / Yarn / Pnp
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+**/dev-server.*.log
+
+# SQLite / Prisma local DB
+*.db
+
+# Prisma generated client (review-app)
+products/review-analysis/bot/review-app/src/generated/prisma/
+
+# biz-efficiency: binary delivery artifacts (bloat git history)
+products/biz-efficiency/*-delivery.zip
+products/biz-efficiency/*-delivery/
+products/biz-efficiency/eff-py01/deliveries/
+products/biz-efficiency/*/output.csv
+
+# Tool config
+.claude/*
+# Skills は user-level (~/.claude/skills/) 単一正本に移行済 (Session 282)
+# 復元: cd ~/.claude && git clone <claude-skills-base> skills
+!.claude/rules/
+!.claude/hooks/
+!.claude/agents/
+!.claude/commands/
+!.claude/settings.json
+# Claude Code 公式仕様 #3: settings.local.json は Local スコープ（gitignored 前提）
+**/.claude/settings.local.json
+
+# 外部AIツール config（未使用、追跡解除 2026-04-27）
+/skills/
+.commandcode/
+.continue/
+.crush/
+.factory/
+.goose/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.windsurf/
+.zencoder/
+
+# Playwright MCP: スナップショット/コンソールログ（フォーム入力値=シークレット混入リスク）
+.playwright-mcp/
+**/.playwright-mcp/
+
+# PocketBase temp
+*.db-shm
+*.db-wal
+
+# Dify CE: moved out of vibe-base → C:/Users/user/Desktop/dify-src (2026-04-10)
+.chrome-for-testing/
+~$*
+
+# 本番ファイル編集承認マーカー（pre-edit.shで参照、10分有効）
+.allow-prod-edit
+.allow-skill-edit
+.allow-destructive
+.allow-research-write
+
+# Serena 提案 hook のセッション別発火マーカー（serena-suggest-gate.mjs が書く・連呼防止用）
+**/.serena-suggest/
+
+# hook manifest 自動生成バックアップ（generate-hook-manifest.mjs が --write 毎に作成）
+scripts/hook-integrity-manifest.json.backup-*
+
+# 外部ツール（vibe-base管理外。各リポは独自ライセンス）
+tools/
+
+# ymm-shorts 生成物のみ除外（src/ 本体は git tracking 対象・Session 277 構造正常化）
+products/ymm-shorts/src/output/
+products/ymm-shorts/src/__pycache__/
+products/ymm-shorts/src/**/__pycache__/
+products/ymm-shorts/src/ai-chatbot-output/
+products/ymm-shorts/src/tmp_*.py
+
+# coach: reviewer ランタイムログ
+products/coach/.claude/logs/
+
+# code-review-skills: reviewer ランタイムログ
+products/code-review-skills/.claude/logs/
+
+# learning-suite-kanji-foreign: SvelteKit ビルド成果物
+products/learning-suite-kanji-foreign/.svelte-kit/
+
+# coconala-sync: 日次成果物（MCP半手動フロー）
+tmp/coconala-data-*.json
+
+# 一時作業領域（プレビュー HTML / 検証スクリプト等。コミット対象外）
+tmp/
+
+# clone 検証用ワークスペース（実体ソース無し）。scratch は無視するが、
+# agent-ag 自治憲法と提出口仕様は恒久ガバナンスとして追跡する（提出物自体は無視）。
+agent-ag/*
+!agent-ag/CLAUDE.md
+!agent-ag/.toranomaki-outbox/
+agent-ag/.toranomaki-outbox/*
+!agent-ag/.toranomaki-outbox/README.md
+# sudowrite-clone: A(Desktop\vibe-base・git管理外)から救出した手作り React エディタ。
+# 他 scratch clone と異なり実体ソースを持つ固有資産のため例外的に追跡（2026-06-19 2フォルダ統合）。
+!agent-ag/sudowrite-clone/
+# dive-test-run-A-variant: A から救出した独自 WebGL 実験（CatmullRomトンネル+4D turbulence・
+# B の dive-test-run とは別方向の実装）。消失防止のため例外的に追跡（2026-06-19 2フォルダ統合）。
+!agent-ag/dive-test-run-A-variant/
+# atelier: Antigravity 専用 Web デザイン作業場。司令塔が保存→虎の巻昇格する追跡資産のため
+# scratch とは別扱いで例外的に追跡（2026-06-26 ルート直下から agent-ag 配下へ移設・二重ホーム矛盾根治）。
+!agent-ag/atelier/
+!agent-ag/atelier/**
+
+# portfolio/ は build-portfolio.mjs の純生成物（原本 = docs/html-toranomaki/ + portfolio/_portal-shell.html）。
+# 生成物（creative-portfolio-portal.html・各 {slug}/）は追跡せず冪等再生成。原本ソースのみ追跡。
+portfolio/*
+!portfolio/vercel.json
+!portfolio/server.mjs
+!portfolio/_portal-shell.html
+
+# coach LP参考のため取得した外部サイトデータ（リポジトリ管理外）
+products/homepage/anthropic-com/
+products/coach/_research/
+
+# coach Cloudflare Pages デプロイビルド成果物（build-coach.mjs 生成・追跡不要）
+products/coach/dist-lp/
+products/coach/dist-class-*/
+
+# wrangler ローカル状態
+.wrangler/
+
+# 一時 Excel メモ（Session 253 から持ち越し・コミット対象外）
+memo*.xlsb*
+# learning-suite-kanji: 外部リポ rahiseko-alt のクローン本体は vibe-base 管理外
+# 保管庫・パイプライン（CLAUDE.md/hypotheses/runbook/docs/scripts）のみ vibe-base 追跡
+products/learning-suite-kanji/*
+!products/learning-suite-kanji/CLAUDE.md
+!products/learning-suite-kanji/hypotheses.md
+!products/learning-suite-kanji/memory.md
+!products/learning-suite-kanji/runbook.md
+!products/learning-suite-kanji/docs/
+!products/learning-suite-kanji/docs/**
+!products/learning-suite-kanji/scripts/
+!products/learning-suite-kanji/scripts/**
+products/meishi-maker/
+products/coach/
+products/code-review-skills/
+products/databank/
+products/google-system-dev/
+products/homepage/
+archive/hp-customizer/
+products/instagram-auto-ops/
+products/kosespark/
+products/learning-suite-kanji/
+products/learning-suite-kanji-foreign/
+products/n8n/
+products/new-trimmer-system/
+products/renai-game/
+products/shiota-karte/
+products/spire-lite/
+products/trimmer-system/
+products/writer-auto-ops/
+products/ymm-shorts/
+products/foodee/
+products/aiueo/
+products/kobaraku/
+products/omotenashi-trainer/
+products/review-analysis/
+products/medguide-rag/
+products/google-slides-gen/
+products/shift-ai/
+products/ai-concierge/
+products/x-auto-post/
+# 新アーキテクチャ (2026-07-05): vibe-base は製品を一切追跡しない（1フォルダ=1リポ）
+products/
+# 旧 monorepo 履歴のローカル温存（絶対に commit しない・4.1GB）
+.git-monorepo-archive/
+.worktrees/
+products/ai-company/
+products/web-platform/
+products/ig-card/
+products/nippo-ops/

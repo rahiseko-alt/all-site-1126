@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ヨコ展開戦略レポート — Dify/チャットアプリ × ococonala（2026年4月）</title>
+<style>
+:root{--bg:#0f1117;--s1:#1a1d27;--s2:#232733;--bd:#2d3140;--tx:#e4e6ed;--mu:#8b8fa3;--ac:#4f8cff;--gn:#36d399;--or:#f59e42;--rd:#ef4444;--pp:#a78bfa;--yl:#fbbf24;--pk:#f472b6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',-apple-system,'Hiragino Kaku Gothic ProN',sans-serif;background:var(--bg);color:var(--tx);line-height:1.7}
+.hero{background:linear-gradient(135deg,#1a1d27,#0f1117 50%,#1a2744);border-bottom:1px solid var(--bd);padding:48px 40px 36px;text-align:center}
+.hero h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.hero h1 span{color:var(--ac)}
+.hero .sub{color:var(--mu);font-size:.9rem;margin-bottom:16px}
+.meta-bar{display:inline-flex;gap:20px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 24px;font-size:.8rem;color:var(--mu);flex-wrap:wrap;justify-content:center}
+.meta-bar strong{color:var(--tx)}
+.c{max-width:1200px;margin:0 auto;padding:32px 20px}
+.sec{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:28px;margin-bottom:22px}
+.sec h2{font-size:1.2rem;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--bd);display:flex;align-items:center;gap:8px}
+.sec h2 .n{background:var(--ac);color:#fff;font-size:.75rem;font-weight:700;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec h3{font-size:1rem;font-weight:600;margin:18px 0 8px;color:var(--ac)}
+.sec h4{font-size:.9rem;font-weight:600;margin:12px 0 4px;color:var(--or)}
+table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:.82rem}
+thead th{background:var(--s2);border:1px solid var(--bd);padding:8px 10px;text-align:left;font-weight:600;font-size:.78rem;color:var(--mu);letter-spacing:.03em;white-space:nowrap}
+tbody td{border:1px solid var(--bd);padding:7px 10px;vertical-align:top}
+tbody tr:hover{background:rgba(79,140,255,.04)}
+.al{border-radius:8px;padding:14px 18px;margin:14px 0;font-size:.86rem;border-left:4px solid}
+.al-b{background:rgba(79,140,255,.08);border-color:var(--ac)}
+.al-g{background:rgba(54,211,153,.08);border-color:var(--gn)}
+.al-o{background:rgba(245,158,66,.08);border-color:var(--or)}
+.al-r{background:rgba(239,68,68,.08);border-color:var(--rd)}
+.al-y{background:rgba(251,191,36,.08);border-color:var(--yl)}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+.kp{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:16px;text-align:center}
+.kp .v{font-size:1.6rem;font-weight:800}
+.kp .l{font-size:.75rem;color:var(--mu);margin-top:4px}
+.kp .vc{color:var(--ac)}
+.kp .vg{color:var(--gn)}
+.kp .vo{color:var(--or)}
+.kp .vr{color:var(--rd)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600;margin:1px}
+.tg{background:rgba(54,211,153,.15);color:var(--gn)}
+.tb{background:rgba(79,140,255,.15);color:var(--ac)}
+.to{background:rgba(245,158,66,.15);color:var(--or)}
+.tr{background:rgba(239,68,68,.15);color:var(--rd)}
+.tp{background:rgba(167,139,250,.15);color:var(--pp)}
+.ty{background:rgba(251,191,36,.15);color:var(--yl)}
+.priority{display:inline-block;width:28px;height:28px;border-radius:6px;font-size:.72rem;font-weight:800;text-align:center;line-height:28px;margin-right:6px}
+.p-s{background:#fbbf24;color:#000}
+.p-a{background:#4f8cff;color:#fff}
+.p-b{background:#36d399;color:#000}
+.p-c{background:#8b8fa3;color:#fff}
+.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin:14px 0}
+.action-card{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:18px}
+.action-card .badge{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;display:inline-block}
+.badge-now{background:rgba(239,68,68,.2);color:var(--rd)}
+.badge-mid{background:rgba(245,158,66,.2);color:var(--or)}
+.badge-long{background:rgba(167,139,250,.2);color:var(--pp)}
+.action-card .title{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.action-card .price{color:var(--gn);font-weight:700;font-size:1.1rem}
+.action-card .desc{font-size:.8rem;color:var(--mu);margin-top:6px}
+.action-card .bullets{font-size:.8rem;margin:8px 0;padding-left:16px}
+.action-card .bullets li{margin-bottom:3px}
+ul,ol{margin:6px 0 10px 20px;font-size:.84rem}
+li{margin-bottom:4px}
+p{font-size:.84rem;margin-bottom:8px}
+.highlight{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:12px 16px;margin:10px 0}
+.footer{text-align:center;padding:24px;font-size:.72rem;color:var(--mu);border-top:1px solid var(--bd)}
+@media(max-width:768px){.hero{padding:24px 16px}.c{padding:16px 8px}table{font-size:.75rem}thead th,tbody td{padding:5px 6px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>ヨコ展開戦略 <span>レポート</span></h1>
+  <div class="sub">Dify/チャットアプリ × ococonala — 既存3商品を切り口変えで最大化する</div>
+  <div class="meta-bar">
+    <span>調査日: <strong>2026-04-06</strong></span>
+    <span>調査軸: <strong>4本並列</strong></span>
+    <span>タグ: <strong>market, pricing, competitor, platform</strong></span>
+    <span>関連: <strong>dify-service</strong></span>
+    <span>ソース数: <strong>30+</strong></span>
+  </div>
+</div>
+
+<div class="c">
+
+<!-- ===== EXECUTIVE SUMMARY ===== -->
+<div class="sec">
+  <h2><span class="n">0</span> 統合エグゼクティブサマリー</h2>
+
+  <div class="kr">
+    <div class="kp"><div class="v vc">5,000円</div><div class="l">スイートスポット①<br>最多63件レビュー</div></div>
+    <div class="kp"><div class="v vg">50,000円</div><div class="l">スイートスポット②<br>高単価最多53件</div></div>
+    <div class="kp"><div class="v vo">1/30〜1/240</div><div class="l">業種名追加だけで<br>検索競合が激減</div></div>
+    <div class="kp"><div class="v vr">0件</div><div class="l">業種特化型の<br>レビュー10件以上</div></div>
+  </div>
+
+  <div class="al al-g">
+    <strong>核心的結論:</strong> 既存3商品（DSL/構築代行/アプリ）のコードや価格を変える必要はない。<br>
+    「業種名をタイトルに追加する」だけで検索競合が1/30〜1/240に激減し、先行者がゼロの市場に即入れる。<br>
+    さらに「チャットbot以外の切り口」（議事録・EC自動化・AI診断）でDifyスキルを流用すると実績ゼロ競合ゾーンに先行できる。
+  </div>
+
+  <div class="al al-y">
+    <strong>価格の死の谷:</strong> 1万〜3万円帯は出品数が多いが実売が薄い。既存の25,000円構築代行コースは要注意。<br>
+    業種特化名を付けて「専門性プレミアム」を演出するか、価格を5,000円か50,000円に寄せる検討が必要。
+  </div>
+</div>
+
+<!-- ===== EXISTING 3 PRODUCTS ===== -->
+<div class="sec">
+  <h2><span class="n">1</span> 既存3商品の現在地</h2>
+  <table>
+    <thead><tr><th>商品</th><th>価格</th><th>競合状況</th><th>現時点の課題</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Dify DSL納品</strong></td>
+        <td>5,000円</td>
+        <td>スイートスポット価格帯。たま(63件)が壁として存在</td>
+        <td>汎用タイトルのため検索で埋もれる。業種名なし</td>
+      </tr>
+      <tr>
+        <td><strong>Dify構築代行</strong></td>
+        <td>25,000円</td>
+        <td>「死の谷」帯。競合多いが実売薄い</td>
+        <td>差別化軸が弱い。汎用構築代行と同じ土俵</td>
+      </tr>
+      <tr>
+        <td><strong>アプリ開発</strong></td>
+        <td>50,000円</td>
+        <td>スイートスポット価格帯。けうまる(53件)が参考事例</td>
+        <td>管理画面付きは唯一の差別化だが伝え方が不足</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== YOKOTEN MAP ===== -->
+<div class="sec">
+  <h2><span class="n">2</span> ヨコ展開マップ — 3軸 × 切り口</h2>
+
+  <h3>軸A: 業種特化（最速・最低コスト）</h3>
+  <p>タイトルに業種名を追加するだけ。既存3商品を業種ごとに複製する。</p>
+  <table>
+    <thead><tr><th>業種</th><th>優先度</th><th>競合出品数</th><th>最高レビュー</th><th>推奨価格</th><th>根拠</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>宿泊・旅館</strong></td>
+        <td><span class="priority p-s">S</span></td>
+        <td>2件</td><td>0件</td><td>50,000円〜</td>
+        <td>出品最少・高単価帯・インバウンド需要で問い合わせ多い</td>
+      </tr>
+      <tr>
+        <td><strong>不動産</strong></td>
+        <td><span class="priority p-a">A</span></td>
+        <td>14件</td><td>0件</td><td>25,000〜50,000円</td>
+        <td>専用出品1〜2件のみ・物件問い合わせ自動化ニーズ明確</td>
+      </tr>
+      <tr>
+        <td><strong>士業（弁護士・税理士・社労士）</strong></td>
+        <td><span class="priority p-a">A</span></td>
+        <td>13件</td><td>1件(4.0)</td><td>25,000〜50,000円</td>
+        <td>初回相談自動化の強ニーズ・専門特化で高単価自然</td>
+      </tr>
+      <tr>
+        <td><strong>採用・HR</strong></td>
+        <td><span class="priority p-b">B+</span></td>
+        <td>7〜12件</td><td>0件</td><td>30,000〜80,000円</td>
+        <td>採用業務50%削減事例あり・グローバルで最高成長率</td>
+      </tr>
+      <tr>
+        <td><strong>美容室・サロン</strong></td>
+        <td><span class="priority p-b">B+</span></td>
+        <td>31件</td><td>0件</td><td>5,000〜25,000円</td>
+        <td>出品31件あるがレビューゼロ・LINE予約自動化ニーズ明確</td>
+      </tr>
+      <tr>
+        <td><strong>医療・クリニック</strong></td>
+        <td><span class="priority p-b">B</span></td>
+        <td>14〜23件</td><td>2件(5.0)</td><td>25,000〜80,000円</td>
+        <td>NOMOCa等の専門SaaSが存在→SaaS以下の価格帯で戦える</td>
+      </tr>
+      <tr>
+        <td><strong>EC・ショップ</strong></td>
+        <td><span class="priority p-b">B</span></td>
+        <td>55件</td><td>0〜1件</td><td>5,000〜25,000円</td>
+        <td>出品数多めだが実績なし・返品/送料の自動回答ニーズ大</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="al al-b">
+    <strong>実行方法:</strong> 既存出品文を業種名に合わせてタイトル・冒頭2行だけ書き換える。
+    「不動産業のご担当者様へ」「クリニックのスタッフ様へ」の一文追加で業種特化に見える。工数30分/出品。
+  </div>
+
+  <h3>軸B: 用途特化（Difyスキル流用・チャットbot以外）</h3>
+  <p>同じDifyで「チャットbot以外」のワークフローを提供。競合ゼロ〜極少のブルーオーシャン。</p>
+  <table>
+    <thead><tr><th>切り口</th><th>優先度</th><th>ococonala出品数</th><th>推奨価格</th><th>技術難易度</th><th>根拠</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>議事録自動作成ワークフロー</strong><br><small>音声→テキスト→要約→Notion保存</small></td>
+        <td><span class="priority p-s">S</span></td>
+        <td>ほぼ0件</td><td>8,000〜15,000円</td><td>低</td>
+        <td>技術記事豊富・需要実証済み・Difyで完結できる</td>
+      </tr>
+      <tr>
+        <td><strong>DSLテンプレ集（教材）</strong><br><small>業種別DSL5種パック等</small></td>
+        <td><span class="priority p-a">A</span></td>
+        <td>ほぼ0件</td><td>1,500〜3,000円</td><td>最低</td>
+        <td>作成済み資産の転用。低単価×高回転。受注コストほぼゼロ</td>
+      </tr>
+      <tr>
+        <td><strong>社内ヘルプデスクbot</strong><br><small>PDF/社内wiki学習型Q&A</small></td>
+        <td><span class="priority p-a">A</span></td>
+        <td>113件（レビュー少）</td><td>25,000〜50,000円</td><td>中</td>
+        <td>出品113件あるが実績ある競合が少ない。Slackとの差別化で法人狙い</td>
+      </tr>
+      <tr>
+        <td><strong>営業提案書・メール自動生成</strong><br><small>顧客情報入力→AI文章生成</small></td>
+        <td><span class="priority p-b">B+</span></td>
+        <td>数件</td><td>5,000〜15,000円</td><td>低</td>
+        <td>Dify×n8n連携事例豊富。ococonalaではほぼ未出品</td>
+      </tr>
+      <tr>
+        <td><strong>経費精算・請求書OCR自動処理</strong><br><small>Dify+Gemini OCR→スプレッドシート</small></td>
+        <td><span class="priority p-b">B</span></td>
+        <td>ほぼ0件</td><td>10,000〜20,000円</td><td>中</td>
+        <td>技術記事多数。中小企業の経費処理DX需要に直結</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>軸C: アプリ開発ヨコ展開（既存スキル流用・チャットbot以外）</h3>
+  <p>React+Vercel+AI APIスキルで「チャットbot以外のアプリ」を提供。</p>
+  <table>
+    <thead><tr><th>切り口</th><th>優先度</th><th>競合実績</th><th>推奨価格</th><th>根拠</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>EC/物販自動化ツール</strong><br><small>Amazon/楽天API在庫監視・価格追跡</small></td>
+        <td><span class="priority p-s">S</span></td>
+        <td>56〜62件(最多実績)</td><td>15,000〜30,000円</td>
+        <td>実証済み需要。せどり事業者はROIで判断→即決率高い。購買力最高</td>
+      </tr>
+      <tr>
+        <td><strong>AI診断/スコアリングWebアプリ</strong><br><small>入力→AI分析→結果表示</small></td>
+        <td><span class="priority p-a">A</span></td>
+        <td>新規多・実績少</td><td>30,000〜80,000円</td>
+        <td>採用スクリーニング/LP診断/店舗評価等、切り口無数。管理画面と相性最高</td>
+      </tr>
+      <tr>
+        <td><strong>LINE予約システム</strong><br><small>LINE上の予約管理・顧客管理</small></td>
+        <td><span class="priority p-a">A</span></td>
+        <td>既存LINE bot 38件実績</td><td>30,000〜80,000円</td>
+        <td>月額不要を訴求軸に予約SaaS差別化。美容/飲食/整体に直結</td>
+      </tr>
+      <tr>
+        <td><strong>Slack/Teams社内AI bot</strong><br><small>社内ドキュメント学習型Q&A</small></td>
+        <td><span class="priority p-b">B+</span></td>
+        <td>ほぼ実績ゼロ</td><td>50,000円</td>
+        <td>Webウィジェットとの明確差別化。法人向けで予算あり</td>
+      </tr>
+      <tr>
+        <td><strong>SNS自動投稿システム</strong><br><small>AI文章生成→X/Instagram自動投稿</small></td>
+        <td><span class="priority p-b">B</span></td>
+        <td>少数・実績少</td><td>20,000〜50,000円</td>
+        <td>個人事業主・小規模店舗のSNS運用課題に直結。管理画面+スケジューラ付き</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== ACTION PLAN ===== -->
+<div class="sec">
+  <h2><span class="n">3</span> 実行計画 — フェーズ別アクション</h2>
+
+  <div class="action-grid">
+
+    <div class="action-card">
+      <div class="badge badge-now">即行動 — 1週間以内</div>
+      <div class="title">業種特化出品 × 3業種</div>
+      <div class="price">5,000円 / 25,000円 / 50,000円</div>
+      <ul class="bullets">
+        <li>既存3商品 × 3業種（宿泊・不動産・士業）= 計9出品追加</li>
+        <li>タイトルと冒頭2行を業種名に書き換えるだけ</li>
+        <li>1出品30分。合計4.5時間で9商品ラインナップ完成</li>
+        <li>検索競合: 480件→2〜14件に激減</li>
+      </ul>
+      <div class="desc">期待効果: 業種ワード検索でトップ表示。レビュー1件で即ランキング入り</div>
+    </div>
+
+    <div class="action-card">
+      <div class="badge badge-now">即行動 — 1週間以内</div>
+      <div class="title">DSLテンプレ集（教材）</div>
+      <div class="price">1,500〜3,000円</div>
+      <ul class="bullets">
+        <li>作成済みDSLファイルを「業種別パック」として再利用</li>
+        <li>出品形態: データ販売（PDF手順書+DSLファイルZIP）</li>
+        <li>受注コストほぼゼロ。低単価×高回転</li>
+        <li>「自分で構築したい人向け」として構築代行との住み分け明確</li>
+      </ul>
+      <div class="desc">期待効果: ロングテールでの購買。購入者が構築代行に昇格するケースも</div>
+    </div>
+
+    <div class="action-card">
+      <div class="badge badge-mid">中期 — 2〜4週間</div>
+      <div class="title">議事録自動化ワークフロー（Dify）</div>
+      <div class="price">8,000〜15,000円</div>
+      <ul class="bullets">
+        <li>音声→テキスト化→要約→Notion/Slack保存のワークフロー</li>
+        <li>チャットbot以外なので既存商品と完全に被らない</li>
+        <li>技術難易度低・実装2〜3時間・競合ほぼゼロ</li>
+        <li>法人利用が多い→リピートやアップセルにつながりやすい</li>
+      </ul>
+      <div class="desc">期待効果: 新カテゴリで先行者利益。月3件で24,000〜45,000円</div>
+    </div>
+
+    <div class="action-card">
+      <div class="badge badge-mid">中期 — 2〜4週間</div>
+      <div class="title">EC/物販自動化ツール</div>
+      <div class="price">15,000〜30,000円</div>
+      <ul class="bullets">
+        <li>Amazon/楽天API連携による在庫・価格自動化</li>
+        <li>競合実績56〜62件（全カテゴリで最多）で需要実証済み</li>
+        <li>既存React+Vercel+APIスキルをそのまま流用</li>
+        <li>せどり事業者はROI計算で即決→成約率が高い</li>
+      </ul>
+      <div class="desc">期待効果: 購買力が高い顧客層。既存スキルで最短で実装可能</div>
+    </div>
+
+    <div class="action-card">
+      <div class="badge badge-long">長期 — 1〜2ヶ月</div>
+      <div class="title">LINE予約システム</div>
+      <div class="price">30,000〜80,000円</div>
+      <ul class="bullets">
+        <li>美容/飲食/整体向けLINEで完結する予約管理</li>
+        <li>月額不要を訴求軸に既存予約SaaSと差別化</li>
+        <li>管理画面（予約確認・顧客管理）付きで既存スキル流用</li>
+        <li>業種名で出品すれば検索競合ほぼゼロ</li>
+      </ul>
+      <div class="desc">期待効果: 高単価 × 業種特化 × 月額不要の三点で差別化</div>
+    </div>
+
+    <div class="action-card">
+      <div class="badge badge-long">長期 — 1〜2ヶ月</div>
+      <div class="title">AI診断Webアプリ</div>
+      <div class="price">30,000〜80,000円</div>
+      <ul class="bullets">
+        <li>採用スクリーニング/LP診断/店舗評価など切り口無数</li>
+        <li>入力→AI分析→結果表示という最もシンプルなパターン</li>
+        <li>管理画面付き（診断結果蓄積・設問編集）で差別化</li>
+        <li>業種で切れば競合ゼロゾーンを複数作れる</li>
+      </ul>
+      <div class="desc">期待効果: 汎用開発案件との差別化。業種 × 診断の組み合わせで多出品化</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== PRICE STRATEGY ===== -->
+<div class="sec">
+  <h2><span class="n">4</span> 価格戦略 — 死の谷と回避方法</h2>
+
+  <table>
+    <thead><tr><th>価格帯</th><th>評価</th><th>実売データ</th><th>対処方針</th></tr></thead>
+    <tbody>
+      <tr><td><strong>〜5,000円</strong></td><td><span class="tag tg">スイートスポット</span></td><td>最多63件(たま)。実売が集中</td><td>業種特化 or テンプレ教材で参入。汎用では差別化困難</td></tr>
+      <tr><td><strong>5,000〜10,000円</strong></td><td><span class="tag tb">狙い目</span></td><td>Dify切り口別8件前後/件</td><td>議事録・営業提案書等の用途特化で参入</td></tr>
+      <tr><td><strong>1万〜3万円</strong></td><td><span class="tag tr">死の谷</span></td><td>出品多・実売薄</td><td>業種名追加で「専門性プレミアム」演出が必須</td></tr>
+      <tr><td><strong>3万〜5万円</strong></td><td><span class="tag to">注意</span></td><td>実績がある場合に成立</td><td>「管理画面付き」「保守込み」など機能差明示が必要</td></tr>
+      <tr><td><strong>50,000円〜</strong></td><td><span class="tag tg">スイートスポット</span></td><td>高単価最多53件(けうまる)</td><td>企業ターゲット + 実績可視化 + 機能差明示の3点必須</td></tr>
+    </tbody>
+  </table>
+
+  <div class="al al-r">
+    <strong>既存25,000円コースの懸念点:</strong> 「死の谷」のど真ん中。業種名を追加して「士業向け Dify構築代行」「不動産向け Dify構築代行」に分割出品することで価格帯ではなく専門性で戦える。価格据え置きOK。
+  </div>
+</div>
+
+<!-- ===== PRIORITY RANKING ===== -->
+<div class="sec">
+  <h2><span class="n">5</span> 優先順位まとめ — やること一覧</h2>
+
+  <table>
+    <thead><tr><th>優先度</th><th>アクション</th><th>工数</th><th>価格</th><th>競合</th><th>期待売上/月</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="priority p-s">S1</span></td>
+        <td><strong>業種特化出品 × 宿泊・不動産・士業</strong><br><small>既存3商品 × 3業種 = 9出品</small></td>
+        <td>4.5h</td><td>5,000〜50,000円</td>
+        <td>2〜14件</td>
+        <td>最初の受注で即実績。単価は既存と同等</td>
+      </tr>
+      <tr>
+        <td><span class="priority p-s">S2</span></td>
+        <td><strong>DSLテンプレ集（教材）出品</strong><br><small>作成済みDSLの再パッケージ</small></td>
+        <td>2h</td><td>1,500〜3,000円</td>
+        <td>ほぼ0件</td>
+        <td>月5〜10件で7,500〜30,000円。受注コスト最低</td>
+      </tr>
+      <tr>
+        <td><span class="priority p-a">A1</span></td>
+        <td><strong>議事録自動化ワークフロー</strong><br><small>Difyで音声→要約→Notion</small></td>
+        <td>1日</td><td>8,000〜15,000円</td>
+        <td>0件</td>
+        <td>月3件で24,000〜45,000円</td>
+      </tr>
+      <tr>
+        <td><span class="priority p-a">A2</span></td>
+        <td><strong>EC/物販自動化ツール</strong><br><small>Amazon/楽天API連携</small></td>
+        <td>3〜5日</td><td>15,000〜30,000円</td>
+        <td>62件実績あり（後追い）</td>
+        <td>月2〜3件で30,000〜90,000円</td>
+      </tr>
+      <tr>
+        <td><span class="priority p-b">B1</span></td>
+        <td><strong>美容・採用向け業種特化追加</strong><br><small>S1の拡張</small></td>
+        <td>3h</td><td>5,000〜50,000円</td>
+        <td>0〜31件</td>
+        <td>S1実績後に追加</td>
+      </tr>
+      <tr>
+        <td><span class="priority p-b">B2</span></td>
+        <td><strong>LINE予約システム</strong><br><small>美容/飲食向け</small></td>
+        <td>1〜2週間</td><td>30,000〜80,000円</td>
+        <td>ほぼ0件</td>
+        <td>月1〜2件で30,000〜160,000円</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== SOURCES ===== -->
+<div class="sec">
+  <h2><span class="n">6</span> ソース（4軸統合）</h2>
+  <div style="font-size:.8rem;color:var(--mu)">
+    <p><strong>ソース一覧（ococonala直接調査）</strong></p>
+    <ol style="padding-left:20px">
+      <li><a href="https://coconala.com/categories/772" style="color:var(--ac)">AIチャットボット制作カテゴリ（480件）</a></li>
+      <li><a href="https://coconala.com/services/3294998" style="color:var(--ac)">DifyでAIチャットボット作ります（たま@SE・63件）</a></li>
+      <li><a href="https://coconala.com/services/2765644" style="color:var(--ac)">ChatGPTを用いたLINE Bot作成（けうまる・53件）</a></li>
+      <li><a href="https://coconala.com/services/1242823" style="color:var(--ac)">API連携でデータ取得・投稿・通知を自動化（62件）</a></li>
+      <li><a href="https://coconala.com/services/1650047" style="color:var(--ac)">せどり・物販用の自動化ツール作成（56件）</a></li>
+      <li><a href="https://coconala.com/services/3128468" style="color:var(--ac)">n8n業務自動化・AIエージェント構築（6件）</a></li>
+      <li><a href="https://coconala.com/categories/774" style="color:var(--ac)">AIアプリケーション制作カテゴリ（376件）</a></li>
+      <li><a href="https://coconala.com/categories/230" style="color:var(--ac)">作業自動化・効率化カテゴリ</a></li>
+    </ol>
+    <br>
+    <p><strong>参照レポート（Research Bank内）</strong></p>
+    <ul style="padding-left:20px">
+      <li>coconala-dify-competitor-2026.html — Dify上位5出品者競合調査</li>
+      <li>coconala-ai-chatbot-market-2026.html — AIチャットボット市場全体</li>
+      <li>dify-market-viability-2026.html — Dify構築代行市場の成立構造</li>
+      <li>dify-yokoten-patterns-2026.html — Difyヨコ展開パターン（軸1）</li>
+      <li>coconala-industry-chatbot-2026.html — 業種特化パターン（軸2）</li>
+      <li>coconala-ai-tools-lateral-expansion-2026.html — アプリ開発ヨコ展開（軸3）</li>
+      <li>coconala-price-cross-analysis-2026.html — 価格×実績クロス分析（軸4）</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  調査日: 2026-04-06 | tags: market, pricing, competitor, platform | 関連プロダクト: dify-service<br>
+  reusableFor: ococonala出品戦略全般, ヨコ展開商品企画, 価格設定根拠
+</div>
+
+</body>
+</html>

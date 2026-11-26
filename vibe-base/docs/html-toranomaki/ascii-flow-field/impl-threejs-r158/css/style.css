@@ -1,0 +1,17 @@
+:root { --ink: #ADADAD; --bg: #ffffff; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+
+/* AsciiEffect が #ascii-stage 直下に生成する DOM テキスト層。全画面・最背面に固定 */
+#ascii-stage > div {
+  position: fixed; inset: 0; z-index: 0;
+  color: var(--ink); background: var(--bg);
+  font-family: "Courier New", monospace;
+  line-height: 1; letter-spacing: 0; white-space: pre; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 前景コンテンツ（背景 ASCII の上に重ねるブランドコピー） */
+.fg { position: fixed; z-index: 2; pointer-events: none; }
+.fg.tl { top: 18px; left: 20px; font: 600 14px/1 system-ui, sans-serif; color: #111; }
+.fg.bl { left: 20px; bottom: 24px; font: 700 clamp(28px, 6vw, 88px)/0.95 system-ui, sans-serif; color: #111; max-width: 70vw; }

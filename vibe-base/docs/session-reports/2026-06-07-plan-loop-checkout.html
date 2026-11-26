@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check-out 2026-06-07 — 新方式「product plan + 毎チェックイン照合」接続線</title>
+<style>
+  :root { --bg:#0f1115; --card:#1a1d24; --fg:#e6e8eb; --muted:#9aa3ad; --red:#ff5d5d; --grn:#46d39a; --bd:#2a2f3a; --acc:#6ea8fe; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:-apple-system,"Segoe UI",sans-serif; line-height:1.7; padding:32px; max-width:980px; margin-inline:auto; }
+  h1 { font-size:22px; border-bottom:2px solid var(--acc); padding-bottom:10px; }
+  h2 { font-size:17px; margin-top:28px; color:var(--acc); }
+  .meta { color:var(--muted); font-size:13px; }
+  .alert { background:#2a1518; border:1px solid var(--red); border-radius:8px; padding:12px 16px; margin:16px 0; }
+  .card { background:var(--card); border:1px solid var(--bd); border-radius:8px; padding:14px 18px; margin:12px 0; }
+  table { border-collapse:collapse; width:100%; font-size:14px; margin:8px 0; }
+  th,td { border:1px solid var(--bd); padding:7px 10px; text-align:left; vertical-align:top; }
+  th { background:#222732; }
+  code { background:#11141a; padding:1px 6px; border-radius:4px; font-size:13px; color:#e6c07b; }
+  .grn { color:var(--grn); } .red { color:var(--red); } .muted { color:var(--muted); }
+  ul { margin:6px 0; padding-left:22px; }
+  .pri-h { color:var(--red); font-weight:700; } .pri-m { color:#ffc857; } .pri-l { color:var(--muted); }
+</style>
+</head>
+<body>
+<h1>Check-out 2026-06-07 — 新方式「product plan + 毎チェックイン照合」接続線の実装</h1>
+<p class="meta">branch: vibe-base=<code>master</code> / skills=<code>plan-mode-redesign</code>　|　agent: vibe-base 司令塔（Opus 4.8 1M）<br>
+<strong>次セッションは本ファイルを先頭から Read してから着手すること。</strong></p>
+
+<div class="alert">
+<strong>⚠ 唯一の未解決事項（次セッション再検証）:</strong> code-reviewer 指摘2（<code>check-in-verify.sh</code> B-6 / <code>pc-checkin</code> STEP3 の awk P1 抽出が「P1 が最終セクションのファイル」で false negative になる懸念）。
+本セッションでは「awk は次見出しが無くても EOF まで印字する／memory は構造上 P1-P4 必須で P1 が最終になり得ない」と評価し<strong>無効</strong>と判断したが、マスター指示により次セッションで P1 最終セクションの fixture を作って実機再検証する。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<div class="card">
+<ul>
+<li>PC 表廃止後に<strong>未接続だった「product plan + 毎チェックイン照合」運用ループ</strong>を接続し、運用可能状態にした。</li>
+<li><code>pc-checkin</code> STEP3 を「全 product 共通最新1件（<code>ls -t｜head -1</code>）」→「対象 product memory.md P1 の直近 plan path 起点」へ書換。PC 表文言は skill 全体から除去（残存 0）。</li>
+<li><code>product-development.md</code> に「plan 作成時 memory.md P1 へ plan path 常駐・チェックイン照合起点」規律を明記。</li>
+<li><code>check-in-verify.sh</code> に <strong>B-6 検証</strong>追加（各 product memory.md P1 の plan path デッドリンク検証・path 無しは軽量 skip・products 限定＋P1 セクション限定で誤検知ゼロ化）。</li>
+<li><code>coach/memory.md</code> P1 に直近 plan path（<code>plan-lesson-slides-letterbox.md</code>）を追記。</li>
+<li><code>checkout</code> skill に<strong>書込頻度規律テーブル</strong>追加（P1/@参照=毎回必須 100%・P2-P4=条件付き・無条件全書き禁止）。</li>
+<li>Check-out コードレビュー指摘1（printf %b 化）・指摘3（STEP3 を P1 限定化し検証側 B-6 と一致）を即修正。</li>
+</ul>
+</div>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+<tr><th>repo</th><th>hash</th><th>種別</th><th>内容</th></tr>
+<tr><td>vibe-base</td><td><code>89828ae1</code></td><td>feat</td><td>新方式接続線（product-development.md / check-in-verify.sh B-6 / coach memory.md）</td></tr>
+<tr><td>vibe-base</td><td><code>d3362731</code></td><td>fix</td><td>B-6 の printf を %b 化（指摘1）</td></tr>
+<tr><td>skills</td><td><code>bb00710</code></td><td>feat</td><td>pc-checkin STEP3 を plan path 起点へ・PC表文言全廃</td></tr>
+<tr><td>skills</td><td><code>bb9d09e</code></td><td>docs</td><td>checkout に書込頻度規律テーブル追加</td></tr>
+<tr><td>skills</td><td><code>db1e43b</code></td><td>fix</td><td>pc-checkin STEP3 を P1 限定化（指摘3・~展開追加）</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<div class="card">
+<ul>
+<li><strong>読む側</strong>（<code>pc-checkin</code> STEP3）と<strong>検証側</strong>（<code>check-in-verify.sh</code> B-6）が同一ロジック（P1 セクション awk 抽出）で一致。</li>
+<li><strong>書く側</strong>（<code>checkout</code>）は頻度規律テーブルで P1/@参照を 100% 必須化。<span class="muted">ただし「P1 へ直近 plan path を書く」明示工程は未追加（D 残作業参照）。</span></li>
+<li>規律正本 <code>product-development.md</code>（paths: products/**・自動注入）に plan path 常駐規律を追加。全 product に効く。</li>
+</ul>
+</div>
+
+<h2>D. 残作業（次セッション着手対象）</h2>
+<table>
+<tr><th>優先</th><th>内容</th></tr>
+<tr><td class="pri-h">H</td><td>指摘2の再検証（P1 最終セクション fixture で awk P1 抽出の false negative を実機確認）。無効と判断済だがマスター指示で要再検証。</td></tr>
+<tr><td class="pri-m">M</td><td>新方式の<strong>書く側接続線</strong>：<code>checkout</code> B-2.1 に「memory.md P1 へ直近 plan path を最新化する」明示工程を追加するか判断（読む側 STEP3・検証側 B-6 は接続済だが、書く側が頻度表のみで明示工程なし）。本セッションで提案したがマスター未決。</td></tr>
+<tr><td class="pri-l">L</td><td>（前セッションからの継続）Claude Code 運用近代化 Phase 3 以降 / design ガバナンス運用化フェーズ / trimmer-system v2 回収・ponchi-v2 unstaged 確認。</td></tr>
+</table>
+
+<h2>E. 配備済 subagent / skill / hook（本セッション）</h2>
+<p class="muted">新規配備なし。既存 skill 改修のみ（pc-checkin / checkout）。</p>
+
+<h2>F. 本セッション生成レポート</h2>
+<p class="muted">本 HTML のみ。tmp/ 生成物なし。</p>
+
+<h2>G. 次セッション初手</h2>
+<div class="card">
+<ol>
+<li><code>bash scripts/check-in-verify.sh</code> で EXIT 0 + B-6 OK を確認。</li>
+<li>残作業 D-H（指摘2 再検証）: P1 を最終セクションにした fixture memory.md を <code>tests/fixtures/</code> に作り、B-6 の awk 抽出を実機検証。</li>
+<li>残作業 D-M（書く側接続線）の要否をマスター判断 → 必要なら checkout B-2.1 へ工程追加。</li>
+</ol>
+<p class="muted">機械検証サマリ（Wave A-2）: シークレット 0 件 / check-in-verify EXIT 0（OK 10・WARN 2＝既存 runbook 不在等・NG 0）。コードレビュー指摘（Wave A-3）: 3 件（1・3 修正済 / 2 再検証へ）。</p>
+</div>
+
+</body>
+</html>

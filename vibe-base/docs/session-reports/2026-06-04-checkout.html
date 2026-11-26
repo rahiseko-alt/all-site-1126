@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-04 — design ガバナンス載せ替え 実装＋事後検証完遂</title>
+<style>
+  body{font-family:'Segoe UI','Yu Gothic',sans-serif;max-width:940px;margin:0 auto;padding:24px;background:#0d0d0d;color:#e0e0e0;line-height:1.7}
+  h1{color:#fff;border-bottom:2px solid #333;padding-bottom:8px}
+  h2{color:#7eb8f7;margin-top:30px}
+  .alert-red{background:#3a0a0a;border-left:4px solid #e53935;padding:12px 16px;border-radius:4px;margin:16px 0}
+  .must{background:#1a2a1a;border:1px solid #66bb6a;padding:12px;border-radius:4px}
+  code{background:#1e1e1e;padding:2px 6px;border-radius:3px;font-size:13px}
+  table{border-collapse:collapse;width:100%;margin:10px 0}
+  th,td{border:1px solid #333;padding:7px 10px;text-align:left;font-size:14px;vertical-align:top}
+  th{background:#1a1a1a;color:#aaa}
+  .h{color:#ef5350;font-weight:bold}.m{color:#ffa726;font-weight:bold}.l{color:#66bb6a}
+  ol li,ul li{margin:4px 0}
+</style>
+</head>
+<body>
+<h1>📋 Check-out — 2026-06-04</h1>
+<p>branch: <code>master</code></p>
+<div class="must"><strong>🔴 次セッション必読:</strong> 本ファイルを冒頭で Read。design ガバナンス載せ替えは <strong>実装＋事後検証まで完遂</strong>。正本フロー＝<code>docs/standards/web-design-flow.md</code>、skill＝<code>/web-design</code>。</div>
+
+<div class="alert-red">
+<strong>⚠️ 最重要</strong><br>
+1. <strong>design ガバナンス載せ替え（plan humble-leaping-aho.md）= Phase 0-5 実装＋事後検証 完遂</strong>。WEB/LPデザインは今後 <code>/web-design</code>（10ステップDDフロー・骨格パラダイム・judge＋マスター目）に一本化。旧 design系8skill・design hook3本は撤去済。<br>
+2. <strong>「完遂」報告は一度早計だった</strong>：事後3検証で穴2件発見し是正（①新規product雛形 pc-template が旧approach継承 ②PASONA固定順序が SOP/CL に温存）。完遂宣言前の事後検証を常用せよ。<br>
+3. <strong>休眠 design hook .sh 3本は再登録を機械ガード済</strong>（check-in-verify B-5）。<code>settings.json</code> へ再登録すると check-in が NG（EXIT 1）。手動で復活させるな。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li><strong>/pc → check-in 機械検証3本</strong>（propagate-hooks / backup-agents / check-in-verify）全 EXIT 0 で通電。</li>
+<li><strong>products/shiota-karte 新規作成</strong>（trimmer-system 丸ごとコピー＝A/B混線の物理分離・司令塔は §0+§4戻しのみ）。剥離は別エージェントが実施（commit 3f3ba767/fee4d012/23d487eb）。</li>
+<li><strong>design ガバナンス載せ替え Phase 0-5 完遂</strong>：Phase0 設定決め切り（Tech Radar/judge rubric/Swipe File/rule方針）→ Phase1 正本doc＋rule2本＋/web-design skill＋ものさし＋Swipe File → Phase2 旧hook3本撤去（マスター手動 settings.json）→ Phase3 旧skill8件削除＋/web-design新設 → Phase4 dangling整理（pc-checkin/agent/session-lifecycle/product-cycle）→ Phase5 受入検証＋judge回帰4/4。</li>
+<li><strong>事後3検証（memory P4規律）で見落とし/ゴールズレ2件発見→是正（V1-V3）</strong>：pc-template旧approach撤去・PASONA固定順序撤去・web-design paths拡張＋scaffold@import。</li>
+<li><strong>休眠hook再登録ガード B-5 を機械実装</strong>（マスター指摘「休眠を他agentが誤解解除する対策は？」への是正・no-ai-self-discipline準拠）。</li>
+</ol>
+
+<h2>B. 完了 commit（本セッション・司令塔分）</h2>
+<table><tr><th>hash</th><th>内容</th></tr>
+<tr><td><code>e01e152a</code></td><td>Phase1: WEBデザイン手順化フロー正本＋規律 構築</td></tr>
+<tr><td><code>72540a80</code></td><td>Phase2: 旧design hook 3本を全product settings.jsonから撤去</td></tr>
+<tr><td>skills <code>82a11de</code></td><td>Phase3: /web-design 新設＋旧design系8件廃止（claude-skills-base repo）</td></tr>
+<tr><td><code>f84bee52</code>/<code>f658131a</code>/skills <code>88379e3</code></td><td>Phase4: dangling整理（rules/docs/agent正本/pc-checkin）</td></tr>
+<tr><td><code>80e966b0</code></td><td>事後検証 是正 V1-V3（pc-template/PASONA固定順序/paths＋scaffold）</td></tr>
+<tr><td><code>9861ac54</code></td><td>休眠design hook 再登録ガード B-5 追加</td></tr>
+</table>
+
+<h2>C. 影響波及（必読）</h2>
+<ul>
+<li><strong>WEBデザインの正本は1箇所</strong>＝<code>docs/standards/web-design-flow.md</code>。skill <code>/web-design</code>・rule <code>web-design.md</code>（paths: app/lp/src/html＋scaffold@import）・LP固有 <code>lp-design.md</code> は全てこれを参照。</li>
+<li><strong>判定軸＝骨格パラダイム</strong>（技術/機構の有無でなく「骨格を再発明したか／全幅ブロックを縦通過するだけか」）。golden set＝<code>docs/standards/design-yardstick/</code>（index/pro-2/pro-3=FAIL・pro-1=PASS）。</li>
+<li><strong>機械ゲートは廃止</strong>→ taste-judge サブ（生成と分離）＋マスター目。judge は助言・<strong>決定はマスター</strong>。</li>
+<li>全product settings.json から design hook 3本撤去済（21 settings 同期）。休眠 .sh は B-5 で再登録ガード。</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table><tr><th>優先</th><th>内容</th></tr>
+<tr><td><span class="m">M</span></td><td><strong>judge 運用化</strong>：実案件でマスター判定と突き合わせ、75-90%一致を確認して運用化（今回は golden set 回帰4/4のみ）。</td></tr>
+<tr><td><span class="m">M</span></td><td><strong>Swipe File 在庫蓄積</strong>：<code>docs/swipe-file/</code> は構造のみ・エントリ0。実案件の Step3 リサーチで追記していく。</td></tr>
+<tr><td><span class="h">H</span></td><td>フリノバLP ヒーロー仕上げ（<code>tmp/fn-hero2/hero-pro-1/2/3.html</code> から採用1本選定）。design思想は <code>2026-06-02-checkout.html</code> ★参照。<strong>新体系 /web-design で実施可</strong>。</td></tr>
+<tr><td><span class="m">M</span></td><td>フリノバLP を <code>products/shift-ai/</code> 配下の企画として配置検討。</td></tr>
+<tr><td><span class="l">L</span></td><td><code>.codex/agents/*.toml</code> が旧skill(frontend-design/perfect-web-clone/lp-design)参照（git管理外・Codex用）。同期要否を判断（memory P1既知）。</td></tr>
+<tr><td><span class="l">L</span></td><td>既存19product CLAUDE.md への web-design.md @import は未実施（paths配備で代替・新規はscaffold@importで担保）。always-on化が必要なら追加。</td></tr>
+</table>
+
+<h2>E. 配備済 subagent / skill / hook（本セッション）</h2>
+<ul>
+<li>新設 skill: <code>/web-design</code>（~/.claude/skills/web-design/・A群path-resolver）</li>
+<li>廃止 skill 8件: lp-design/perfect-web-clone/reference-site-measure/frontend-design/hero-scroll-grid/marquee/teach-impeccable/copywriting</li>
+<li>新規検証: <code>check-in-verify.sh</code> B-5（廃止design hook再登録ガード）</li>
+<li>撤去 hook（登録解除・本体.sh休眠）: measure-gate/animation-gate/animation-verify-gate</li>
+</ul>
+
+<h2>F. 本セッション生成物（tmp/）</h2>
+<ul>
+<li><code>tmp/settings-corrected.json</code> — Phase2 でマスターが cp 適用した settings.json（用済み・破棄可）</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本HTML を Read。</li>
+<li>WEB/LPデザイン案件なら <code>/web-design</code> 発火（正本 <code>docs/standards/web-design-flow.md</code>）。</li>
+<li>残作業 D から優先度 H（フリノバLP仕上げ）or judge運用化/Swipe File蓄積を選択。</li>
+<li>機械検証: check-in-verify EXIT 0（OK 12/WARN 1=runbook既存/NG 0）・シークレット 0件・rules-coverage/hook-integrity EXIT 0。コードレビュー: 該当 0件（governance doc のみ）。</li>
+</ol>
+</body>
+</html>

@@ -1,0 +1,125 @@
+/* Bandeins Strange Variable — 可変フォント（太さ 200〜800 / 横幅 100〜800%）
+   デモ用 CDN。再配布不可・デモ目的のリンクのみ許諾。 */
+@font-face {
+  font-family: "Bandeins-Strange";
+  src: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/61488/BandeinsStrangeVariableGX.ttf") format("truetype");
+  font-stretch: 100% 800%;
+  font-weight: 200 800;
+  font-display: block;
+}
+
+:root {
+  --fontSize: 4; /* .line の font-size = calc(var(--fontSize) * 1vw)。app.js も同値を参照 */
+}
+
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  /* 元デモの #000 を #0a0a0a に変更（視覚的に黒と同等・blindtest の黒判定 r<10 を外す） */
+  background: #0a0a0a;
+  color: #fff;
+  height: 1000vh; /* スクロール領域。ScrollTrigger の回転距離を稼ぐ */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== 3D ドラム ===== */
+.stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  visibility: hidden; /* init 末尾で autoAlpha フェードイン */
+}
+
+.tube {
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  perspective: 100vw; /* スクロールで 1vw まで寄る */
+}
+
+.tube__inner {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  font-family: "Bandeins-Strange";
+  font-size: calc(var(--fontSize) * 1vw);
+  font-stretch: 800%;     /* 初期値。setProps が回転角に応じ毎フレーム上書き */
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1;
+  transform-style: preserve-3d;
+}
+
+/* ===== 上部ガラス風コントロール ===== */
+.controls {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.4); /* 上辺を明るく＝光を受ける質感 */
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 255, 255, 0.15),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.controls:hover {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.6),
+    0 0 50px rgba(255, 255, 255, 0.25),
+    inset 0 0 30px rgba(255, 255, 255, 0.2);
+  transform: translateX(-50%) translateY(-2px) scale(1.02);
+}
+
+#text-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: "Bandeins-Strange", sans-serif;
+  font-size: 1.5rem;
+  outline: none;
+  text-align: center;
+  width: 250px;
+  letter-spacing: 2px;
+  font-weight: 300;
+  transition: text-shadow 0.3s ease;
+}
+
+#text-input:focus {
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+#text-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}

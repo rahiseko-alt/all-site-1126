@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-01 Session2 — trimmer-system + vibe-base</title>
+<style>
+  body { font-family: 'Noto Sans JP', sans-serif; max-width: 900px; margin: 0 auto; padding: 24px; background: #0d0d0d; color: #e0e0e0; }
+  h1 { color: #fff; border-bottom: 2px solid #333; padding-bottom: 8px; }
+  h2 { color: #7eb8f7; margin-top: 32px; }
+  h3 { color: #aaa; }
+  .alert-red { background: #3a0a0a; border-left: 4px solid #e53935; padding: 12px 16px; border-radius: 4px; margin: 16px 0; }
+  .alert-yellow { background: #2a2000; border-left: 4px solid #f9a825; padding: 12px 16px; border-radius: 4px; margin: 16px 0; }
+  .ok { color: #66bb6a; }
+  .ng { color: #ef5350; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #333; padding: 8px 12px; text-align: left; font-size: 14px; }
+  th { background: #1a1a1a; color: #aaa; }
+  code { background: #1e1e1e; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 13px; }
+  .tag-h { color: #ef5350; font-weight: bold; }
+  .tag-m { color: #ffa726; font-weight: bold; }
+  .tag-l { color: #66bb6a; }
+  .must-read { background: #1a2a1a; border: 1px solid #66bb6a; padding: 12px; border-radius: 4px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<h1>📋 Check-out レポート — 2026-06-01 Session2</h1>
+<p>branch: <code>master</code> | 次セッションは本ファイルを先に Read してから着手すること</p>
+
+<div class="must-read">
+  <strong>🔴 次セッション必読:</strong> <code>docs/session-reports/2026-06-01-checkout.html</code> を冒頭で Read せよ
+</div>
+
+<div class="alert-red">
+  <strong>⚠️ 最重要3件</strong><br>
+  1. <strong>ponchi-v2.html 未マスター確認</strong> — カルーセル修正・肉球%変換コミット済。実機ブラウザ確認がまだ<br>
+  2. <strong>MCP 無効化を次セッション開始前に手動実行</strong> — 104.2k/turn のオーバーヘッド削減（下記 G 参照）<br>
+  3. <strong>本番 E2E 未確認</strong> — 公開フロー（📤公開→パスコード→顧客→/p/{slug}）未通電
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+  <li>trimmer-system pc-checkin・P1 引継ぎ確認</li>
+  <li>司令塔代行分の引継ぎ書作成（<code>docs/handover-from-commander-2026-06-01.md</code>）</li>
+  <li>カルーセルのページ縦スクロール問題修正（scrollIntoView → c.scrollTo()）</li>
+  <li>肉球UIを Component Encapsulation 原則で再設計（px絶対値 → % + --paw-size CSS変数）</li>
+  <li>UI設計基礎哲学を agent-rules.md v4.0 に永続記録（全エージェント・全プロダクト共通）</li>
+  <li>トークン消費の仕組みをリサーチ（cache_read が大半・正常）</li>
+  <li>コンテキスト異常消費の原因特定 → MCP idle コストが主犯（104.2k/turn）</li>
+  <li>MCP 無効化コマンドを特定（実行はマスター手動・次セッション前）</li>
+</ol>
+
+<h2>B. 完了コミット一覧</h2>
+<table>
+  <tr><th>hash</th><th>種別</th><th>内容</th></tr>
+  <tr><td><code>d5f4be9</code></td><td>feat</td><td>ponchi-v2 カルーセル修正 + 肉球UI % 変換</td></tr>
+  <tr><td><code>26f08c2</code></td><td>docs</td><td>UI設計基礎哲学を agent-rules.md に追加（v4.0）</td></tr>
+  <tr><td><code>2b27698</code></td><td>docs</td><td>司令塔→trimmer-system 引継ぎ書作成</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<ul>
+  <li><strong>agent-rules.md v4.0</strong> — 全プロダクト・全エージェントに「Component Encapsulation 原則」が適用される</li>
+  <li><strong>ponchi-v2.html</strong> — --paw-size 1変数で肉球全体がスケールする構造に変更済</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table>
+  <tr><th>優先度</th><th>内容</th></tr>
+  <tr><td><span class="tag-h">H</span></td><td>ponchi-v2.html マスター実機確認（カルーセル + 肉球）</td></tr>
+  <tr><td><span class="tag-h">H</span></td><td>beauty-report-mobile.html マスター実機スマホ目視（情報設計OK判定）</td></tr>
+  <tr><td><span class="tag-h">H</span></td><td>本番 E2E 通電確認（📤公開→パスコード→新規顧客→/p/{slug}）</td></tr>
+  <tr><td><span class="tag-m">M</span></td><td>テスト顧客 KV クリーンアップ</td></tr>
+  <tr><td><span class="tag-m">M</span></td><td>固定素材差替（SALTY DOG ロゴ・歯/爪解剖図 → 塩田様素材受領後）</td></tr>
+  <tr><td><span class="tag-l">L</span></td><td>QRコード生成・PC編集版 Konva 統一検討</td></tr>
+</table>
+
+<h2>E. 配備済ルール（本セッション新規）</h2>
+<ul>
+  <li><strong>agent-rules.md §UI設計基礎哲学</strong>（v4.0・2026-06-01）</li>
+</ul>
+
+<h2>F. 機械検証結果</h2>
+<ul>
+  <li>シークレット混入: <span class="ok">PASS（0件）</span></li>
+  <li>コードレビュー: <span class="ok">no issues</span></li>
+  <li>unstaged: <span class="ok">PASS（コミット済）</span></li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+  <li><strong>セッション開始前にターミナルで実行:</strong><br>
+  <code>claude mcp disable "claude.ai Canva" &amp;&amp; claude mcp disable "claude.ai Notion" &amp;&amp; claude mcp disable "claude.ai Google Drive" &amp;&amp; claude mcp disable "claude.ai Gmail" &amp;&amp; claude mcp disable "claude.ai Google Calendar" &amp;&amp; claude mcp disable notion &amp;&amp; claude mcp disable stitch &amp;&amp; claude mcp disable notebooklm-mcp</code>
+  </li>
+  <li>pc-checkin 実行</li>
+  <li>マスターに ponchi-v2.html 実機確認を促す（<code>http://localhost:59283/ponchi-v2.html</code>）</li>
+  <li>OK → beauty-report-mobile.html 実機確認 → 本番 E2E 通電確認</li>
+</ol>
+</body>
+</html>

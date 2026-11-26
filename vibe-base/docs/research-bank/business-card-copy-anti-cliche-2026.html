@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>名刺コピー「ダサい」と「カッコいい」の構造差 — Research Bank</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e4e7;--text2:#9ca3af;--accent:#6366f1;--accent2:#818cf8;--ok:#10b981;--warn:#f59e0b;--danger:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+h1{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em;}
+h1 span{color:var(--accent2);}
+h2{font-size:1.2rem;margin:2.5rem 0 1rem;padding-bottom:.4rem;border-bottom:2px solid var(--accent);color:var(--accent2);}
+h3{font-size:1rem;margin:1.5rem 0 .6rem;color:var(--text);}
+p{margin:.6rem 0;}
+a{color:var(--accent2);word-break:break-all;}
+.meta{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0 1.5rem;font-size:.85rem;color:var(--text2);display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.4rem 1.5rem;}
+.meta b{color:var(--text);}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.82rem;background:var(--surface);border-radius:8px;overflow:hidden;}
+th{background:var(--surface2);color:var(--accent2);padding:.6rem .7rem;text-align:left;font-weight:600;}
+td{padding:.55rem .7rem;border-top:1px solid var(--border);vertical-align:top;}
+tr:hover td{background:var(--surface2);}
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.7rem;font-weight:600;background:rgba(244,114,182,.15);color:#f472b6;}
+ul,ol{margin:.6rem 0 .6rem 1.4rem;}
+li{margin:.35rem 0;}
+.callout{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1rem 0;}
+.callout.ok{border-left-color:var(--ok);}
+.callout.warn{border-left-color:var(--warn);}
+.callout.danger{border-left-color:var(--danger);}
+.num{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent2);}
+.note{font-size:.78rem;color:var(--text2);margin-top:.4rem;}
+.bad{color:var(--danger);font-weight:600;}
+.good{color:var(--ok);font-weight:600;}
+.cop{font-size:1.15rem;font-weight:500;color:var(--accent2);font-family:'Yu Mincho','Noto Serif JP',serif;padding:.5rem 0;}
+</style>
+</head>
+<body>
+
+<h1>名刺コピー <span>「ダサい」と「カッコいい」</span><br>の構造差 — 逆張り検証</h1>
+<p class="note">前提：マスターが要求する「短く誠実で力強い」と「テンプレ的AI業界コピー」は両立しない仮説の検証</p>
+
+<div class="meta">
+  <div><b>調査日:</b> 2026-05-29</div>
+  <div><b>調査軸:</b> 3本</div>
+  <div><b>ソース数:</b> 107（重複排除後）</div>
+  <div><b>タグ:</b> <span class="tag">design</span></div>
+  <div><b>関連プロダクト:</b> 横断（名刺・コピー・PRコピー全般）</div>
+  <div style="grid-column:1/-1"><b>再利用:</b> 名刺コピー作成 / LP/SNS自己紹介文 / 肩書設計 / コピーレビュー基準</div>
+</div>
+
+<!-- 最重要結論 -->
+<div class="callout ok">
+<b>最重要結論 — 仮説は強く支持される</b><br>
+著名デザイナー名刺の <b>支配的構造は「A. 肩書一行のみ・コピーなし」「F. 白紙・余白勝負」「G. 個性的肩書のみ」の3系統</b>。Behance/Creative Boom Featured 名刺 16件 <b>全てタグライン非搭載</b>。Sagmeister 個人名刺は 30 年同一・コピー皆無。<br><br>
+プロが裏面に説明コピーを書かない理由は4つ：①権威確立済みドメインでは説明が権威を毀損 ②記憶資源の節約（1ワード=1アンカー） ③肩書一語が宣言文として機能（原研哉「グラフィックデザイナー」） ④余白＝「私はコピーで売る人ではない」という最強の非言語宣言。<br><br>
+逆張りが成立する条件：<b>業界定型を熟知 + 顧客期待を一度裏切る勇気 + 裏切ったあと納得させる説明力</b>。AI業界の定型語（AI/DX/伴走/最適化/価値提供）を <b>1つも使わずに自分の仕事を説明できれば本物</b>。
+</div>
+
+<!-- ============= 私の前回提案の解剖 ============= -->
+<h2>★ 私の前回提案「AIを、あなたの仕事に。/ 教えて、組み込んで、つくる。」が なぜダサかったか（構造分析）</h2>
+
+<table>
+<tr><th>該当箇所</th><th>診断</th><th>分類</th></tr>
+<tr><td><span class="bad">「AIを、あなたの仕事に。」</span></td><td>「あなたの〇〇に」式 二人称呼びかけ。M5「クライアント代弁の押しつけ」。ペルソナ解像度ゼロ</td><td>カテゴリB「クライアント代弁の押しつけ系」</td></tr>
+<tr><td><span class="bad">「教えて、組み込んで、つくる。」</span></td><td>3動詞リズム = ChatGPT 多用パターン（jennylucascopywriting 2025 指摘）</td><td>カテゴリD「営業テンプレ系」</td></tr>
+<tr><td><span class="bad">「AIコーチング / AI業務改善 / AI開発」</span></td><td>"AI-powered" = TrustRadius 2024 #1 annoying buzzword。「業務改善」= zombie nouns + コンサル業界バズワード</td><td>カテゴリC「業界バズワード系」</td></tr>
+<tr><td><span class="bad">「ご相談無料 / お気軽に」</span></td><td>士業LPの量産テンプレ。受け手は「またコレか」と認識</td><td>カテゴリD「営業テンプレ系」</td></tr>
+<tr><td><span class="bad">「1万円から」</span></td><td>起業ガイド頻出。差別化ゼロ</td><td>カテゴリD「営業テンプレ系」</td></tr>
+</table>
+
+<div class="callout danger">
+<b>5項目中5項目がダサ語ランキング上位。マスターが「ダサい」と即断したのは構造的に正しい。</b>
+</div>
+
+<!-- ============= 軸1: ダサい構造 ============= -->
+<h2>軸1. ダサく見える 5 つの心理学的メカニズム</h2>
+
+<table>
+<tr><th>#</th><th>メカニズム</th><th>定義</th><th>本件への該当</th></tr>
+<tr><td>M1</td><td>クリシェ化</td><td>全員が "innovative" を名乗ると「実体なし」のマーカーになる</td><td>「AI」「業務改善」</td></tr>
+<tr><td>M2</td><td>zombie nouns（動詞死亡）</td><td>動詞を `-tion/-ment/-ance` で名詞化すると文から生命が抜ける（Helen Sword）</td><td>「業務改善」「ご相談」「最適化」</td></tr>
+<tr><td>M3</td><td>Weasel Words（イタチ語）</td><td>"world class" "passionate about" など検証不能な空語</td><td>「組み込んで」「伴走」</td></tr>
+<tr><td>M4</td><td>自己中心バイアス</td><td>Trust = (Cred × Rel × Intimacy) / <b>Self-orientation</b> — 自分軸が強いほど信頼が割算で削れる</td><td>「3ヶ月コードを書いてきました」</td></tr>
+<tr><td>M5</td><td>クライアント代弁の押しつけ</td><td>「あなたの夢を叶える」式の解像度ゼロ二人称</td><td>「あなたの仕事に」</td></tr>
+</table>
+
+<h3>AI / コンサル / コーチ業界の「信頼を下げる語彙」</h3>
+<table>
+<tr><th>業界</th><th>ダサ語 Top（頻度高 → 低）</th></tr>
+<tr><td>AI/SaaS</td><td>AI-powered / next-gen / DX / cutting-edge / transform</td></tr>
+<tr><td>コンサル</td><td>伴走 / 並走 / 価値提供 / 最適化 / ソリューション / カスタマイズ / ワンストップ</td></tr>
+<tr><td>コーチ</td><td>寄り添う / 夢を叶える / あなたらしさ / 一緒に成長 / thought leader / passionate</td></tr>
+<tr><td>士業</td><td>親身 / 丁寧 / 安心 / 信頼 / 第一 / 初回無料</td></tr>
+<tr><td>クリエイター</td><td>想いをカタチに / 唯一無二 / こだわり / 寄り添う制作</td></tr>
+</table>
+
+<!-- ============= 軸2: 著名デザイナーの実例 ============= -->
+<h2>軸2. 著名デザイナー自身の名刺は何を書いているか</h2>
+
+<h3>海外の支配構造</h3>
+<table>
+<tr><th>人物</th><th>裏面コピー</th><th>戦略</th></tr>
+<tr><td>Stefan Sagmeister</td><td><b>コピー文なし</b>（名前+"S"ロゴのみ）</td><td>半透明スリーブ構造の光学イルージョン。30年同一</td></tr>
+<tr><td>Massimo Vignelli</td><td><b>コピー文なし</b>（タイトルのみ）</td><td>"Design must rid itself of the superfluous and show only what is essential"</td></tr>
+<tr><td>Pentagram partners</td><td><b>非公開</b>（外部公開対象ですらない）</td><td>partner個人 identity を house style に縛らない文化</td></tr>
+<tr><td>Steve Jobs（1998）</td><td><b>"iCEO"</b> のみ</td><td>個性的肩書1ワード。"i" prefix は iMac G3 より先行</td></tr>
+<tr><td>Jerry Yang / David Filo（Yahoo!）</td><td><b>"Chief Yahoo" / "Cheap Yahoo"</b></td><td>肩書発明型。Wall Streetに即座に愛された</td></tr>
+<tr><td>McKinsey / BCG / Bain Partners</td><td><b>"Partner" 一語のみ</b></td><td>企業ブランドが説明を不要にする</td></tr>
+</table>
+
+<h3>国内クリエイティブ業界</h3>
+<table>
+<tr><th>人物</th><th>公式肩書（名刺記載最有力）</th></tr>
+<tr><td>原研哉</td><td><b>「グラフィックデザイナー」</b></td></tr>
+<tr><td>佐藤可士和</td><td><b>「クリエイティブディレクター」</b></td></tr>
+<tr><td>佐藤卓</td><td><b>「グラフィックデザイナー」</b></td></tr>
+<tr><td>水野学</td><td><b>「good design company 代表」「クリエイティブディレクター」</b></td></tr>
+<tr><td>落合陽一（過剰情報型）</td><td>「メディアアーティスト/筑波大准教授/PXDT代表/感覚的物書きで博士持ちのスナップ写真家であり多様性社会を目指す波動使いの准教授」</td></tr>
+</table>
+
+<h3>Behance / Creative Boom Featured 16件 全件分析</h3>
+<div class="callout warn">
+<b>16件全てタグライン非搭載。</b>勝負ポイントは全て以下のいずれか:<br>
+①用紙 + foil/emboss/印圧 ②構造ギミック（折り・抜き・透明・反射）③タイポグラフィ単発 ④カラーフィールド
+</div>
+
+<h3>支配的構造類型（7類型）</h3>
+<table>
+<tr><th>類型</th><th>定義</th><th>事例</th></tr>
+<tr><td><b>A. 肩書一行のみ</b></td><td>役職名1ワードで勝負</td><td>原研哉・佐藤卓・Vignelli・McKinsey "Partner"</td></tr>
+<tr><td>B. 単一強い宣言文</td><td>1行マニフェスト</td><td>Sagmeister & Walsh "Your eyes are lovely."</td></tr>
+<tr><td>C. 問いかけ型</td><td>仮説のみ・実例希少</td><td>（採取できず）</td></tr>
+<tr><td>D. 詩的フレーズ型</td><td>業務説明でなく自己定義</td><td>落合陽一「波動使いの准教授」</td></tr>
+<tr><td>E. 過剰情報で魅せる</td><td>多重肩書を全列挙</td><td>落合陽一・前澤友作</td></tr>
+<tr><td><b>F. 白紙・余白勝負</b></td><td>用紙・加工・余白がコピー代替</td><td>Sagmeister 30年同一・Pentagram・Mary Hemming</td></tr>
+<tr><td><b>G. 個性的肩書のみ</b></td><td>役職名そのものを発明</td><td>Jerry Yang "Chief Yahoo"・Steve Jobs "iCEO"</td></tr>
+</table>
+<p class="note"><b>支配は A + F + G の3系統。</b>B は企画もの限定、C/D は西欧で希少、E は超有名人専用。</p>
+
+<!-- ============= 軸3: 逆張りフレームワーク ============= -->
+<h2>軸3. 「逆張りでしか本物の差別化はできない」仮説の検証</h2>
+
+<div class="callout ok">
+<b>結論: 90% 正しい（条件付き）</b><br>
+April Dunford / Seth Godin / Bernbach VW "Think Small" / 落合陽一・糸井重里 すべて業界定型の輪郭把握→逆張りで成立。<br>
+留保: <b>「業界定型を完璧に知った上で、その語彙を1つも使わずに自分の仕事を説明できれば本物」</b>。知識ゼロでの逆張りは「変な人」で終わる。
+</div>
+
+<h3>コピーライティング理論 10原則</h3>
+<table>
+<tr><th>#</th><th>原則</th><th>本件適用</th></tr>
+<tr><td>1</td><td>One Idea Principle（Rule of One）</td><td>1 reader / 1 offer / 1 idea に絞る</td></tr>
+<tr><td>2</td><td>5-Second Test</td><td>業界外の人に5秒で「何やってる人？」が伝わるか</td></tr>
+<tr><td>3</td><td>Specificity Principle</td><td>「業績改善」→「請求書 3 時間→8 分」</td></tr>
+<tr><td>4</td><td>POV宣言</td><td>サービスでなく「世界をどう見ているか」</td></tr>
+<tr><td>5</td><td>Signature Phrase</td><td>入れ替えテスト合格＝唯一語</td></tr>
+<tr><td>6</td><td>Negation（逆張り）</td><td>"Think Small" 型。業界定型の反転</td></tr>
+<tr><td>7</td><td>Question Hook</td><td>断言でなく問い</td></tr>
+<tr><td>8</td><td>Poetic Restraint</td><td>修飾語削り余白で語らせる</td></tr>
+<tr><td>9</td><td>Silence as Power</td><td>VW白地・糸井「おいしい生活。」</td></tr>
+<tr><td>10</td><td>Anti-Sales Positioning</td><td>売り込まないことで売る</td></tr>
+</table>
+
+<h3>「短く誠実で力強い」の数値基準</h3>
+<ul>
+<li>文字数上限: <span class="num">10文字以内</span>（名作キャッチの60〜70%が10字以内）</li>
+<li>動詞数上限: <span class="num">1個</span>（Luke Sullivan "draconian simplicity"）</li>
+<li>修飾語: <span class="num">原則ゼロ</span>（形容詞・副詞は最後に消去・Ogilvy "go easy on adjectives"）</li>
+<li>音節: <span class="num">8拍以下</span>（575川柳型・仲畑万能川柳）</li>
+<li>読了時間: <span class="num">1.5秒以内</span>（5秒テストの1/3＝即解像）</li>
+</ul>
+
+<h3>テスト方法（最重要）</h3>
+<ol>
+<li><b>入れ替えテスト</b>: 名前を伏せて10人に見せ「これ誰の名刺？」を当てさせる。3人以上が同じ業種を当てなければ陳腐</li>
+<li><b>5秒テスト</b>: 業界外の人に5秒見せて「何やってる人？」を答えさせる。即答できすぎる＝陳腐 / 答えられない＝詩に寄りすぎ / 「気になる、もっと聞きたい」反応が正解</li>
+<li><b>質問誘発テスト</b>: 「どんなことされてるんですか？」と相手が質問してくる肩書が正解</li>
+</ol>
+
+<!-- ============= マスター文脈での逆張りコピー案 ============= -->
+<h2>★ マスター文脈でのコピー案（逆張り原則準拠）</h2>
+
+<h3>A. 詩的省略型（哲学一句）</h3>
+<div class="cop">「やめることから、はじめる。」</div>
+<p>AI 導入＝足し算という業界定型の逆。POV 宣言＋句点。1万円・小規模事業の本質と整合。</p>
+
+<div class="cop">「道具より、段取り。」</div>
+<p>AI 自体ではなく業務設計を売る anti-sales positioning。受け手は「あ、ふつうのAI屋じゃない」と認識。</p>
+
+<div class="cop">「便利を、ひとつずつ。」</div>
+<p>1万円・小規模の本質を抽象化、体言止め。糸井「おいしい生活。」型の余韻。</p>
+
+<h3>B. 質問フック型</h3>
+<div class="cop">「その作業、本当に必要ですか。」</div>
+<p>Question Hook。問いで終わり、相手の頭の中で続きを書かせる。質問誘発テスト合格率高。</p>
+
+<h3>C. 逆張り肩書型（コピー文を載せず、肩書だけで勝負）</h3>
+<div class="cop">「面倒の仕分け人」</div>
+<p>AI も DX も書かない。anthimeria による職業創造。原研哉「グラフィックデザイナー」型の支配構造に近い。</p>
+
+<div class="cop">「やめること設計士」</div>
+<p>引き算ポジショニング、独自カテゴリ宣言。Jerry Yang "Chief Yahoo" 型。</p>
+
+<div class="cop">「小商いの段取り屋」</div>
+<p>既存「DX屋」を1段抽象化、「小さな会社」を「小商い」へ詩化。和の語彙で逆張り。</p>
+
+<h3>推奨組合せ（リサーチ準拠の最強形）</h3>
+<div class="callout ok">
+<b>表面:</b> 氏名 + 肩書一行（例「やめること設計士」または現行「AIコーチ / AI業務改善」を温存）<br>
+<b>裏面:</b> 「便利を、ひとつずつ。」+ 連絡先のみ<br>
+<b>あえて書かない:</b> サービス説明・AI/DX単語・1万円表記・「ご相談無料」・「お気軽に」<br><br>
+→ <b>質問誘発を狙う引き算設計</b>。「これだけ？」と相手が思った瞬間に勝ち。
+</div>
+
+<!-- ============= ソース ============= -->
+<h2>ソース一覧（107・重複排除後）</h2>
+
+<h3>軸1: ダサい構造分析（36ソース）</h3>
+<ol>
+<li><a href="https://www.jennylucascopywriting.co.uk/2025/01/annoying-words-and-phrases-that-are-killing-your-marketing-copy/">Annoying words killing marketing copy 2026 — Jenny Lucas</a></li>
+<li><a href="https://www.success.com/marketing-copywriting-cliches-to-avoid-2024/">Cliches to Avoid 2024 — Success.com</a></li>
+<li><a href="https://www.articulatemarketing.com/blog/worst-corporate-buzzwords">18 buzzwords to stop — Articulate Marketing</a></li>
+<li><a href="https://supercopyeditors.com/blog/writing/avoiding-cliches-business-writing/">Avoiding Business Clichés — Super Copy Editors</a></li>
+<li><a href="https://solutions.trustradius.com/buyer-blog/annoying-business-buzzwords/">21 Most Annoying Buzzwords 2024 — TrustRadius</a></li>
+<li><a href="https://www.creativeboom.com/insight/buzzwords-for-the-bin-in-2025/">Buzzwords for bin 2025 — Creative Boom</a></li>
+<li><a href="https://www.thedrum.com/news/the-30-buzziest-words-that-ruled-2025">30 buzziest words 2025 — The Drum</a></li>
+<li><a href="https://charleslange.blog/2025/09/18/10-marketing-buzzwords-that-mean-nothing-in-2025-and-what-to-do-instead/">10 Marketing Buzzwords 2025 — Charles Lange</a></li>
+<li><a href="https://www.marketersremote.com/p/marketing-jargon-buzzwords-to-avoid">Marketing Jargon — Marketers Remote</a></li>
+<li><a href="https://www.siliconsnark.com/the-complete-guide-to-tech-marketing-buzzwords-1995-2025/">Tech Buzzwords 1995-2026 — Silicon Snark</a></li>
+<li><a href="https://business.nikkei.com/atcl/gen/19/00535/060800003/">DX失敗の原因「バズワードに飛びつく」— 日経ビジネス 2024</a></li>
+<li><a href="https://note.com/kteshigawara/n/n797417d9535c">"伴走支援"インフレ化 — 勅使川原晃司 note</a></li>
+<li><a href="https://www.insightnow.jp/article/3505">ワンストップソリューションは強みじゃない — Insight Now</a></li>
+<li><a href="https://copyblogger.com/concrete-details/">Show, Don't Tell — Copyblogger</a></li>
+<li><a href="https://www.forrest-turner.co.uk/7-ways-to-stop-writing-the-obvious-or-how-to-replace-cliches-with-sincerity/">Stop Writing the Obvious — Marlow</a></li>
+<li><a href="https://www.redwoodink.com/resources/how-abstract-nouns-steal-vigor-from-your-writing">Zombie Nouns — Redwood Ink</a></li>
+<li><a href="https://www.marketersremote.com/p/ogilvy-advertising-principles-guide">Ogilvy 38 rules — Marketers Remote</a></li>
+<li><a href="https://postcron.com/en/blog/david-ogilvy-7-commandments-advertising-marketers-need-know/">Ogilvy 7 commandments — Postcron</a></li>
+<li><a href="https://quillbot.com/blog/reasoning/weasel-words/">Weasel Words — Quillbot</a></li>
+<li><a href="https://www.breezywords.com.au/what-are-weasel-words/">Weasel Words — Breezywords</a></li>
+<li><a href="https://www.trinityp3.com/podcasts/weasel-words-business-marketing/">Weasel Words in Business — Trinity P3</a></li>
+<li><a href="https://www.inc.com/suzanne-lucas/the-50-most-annoying-corporate-jargon-words-and-phrases/90982240">50 Annoying Corporate Jargon — Inc</a></li>
+<li><a href="https://medium.com/@renataskarpa/linkedin-is-a-zoo-of-corporate-cringe-and-thought-leaders-who-would-starve-if-likes-were-calories-0cbe4afa7758">LinkedIn corporate cringe — Medium</a></li>
+<li><a href="https://www.linkedin.com/posts/thinkingslow_thought-leadership-is-a-cringe-inducing-activity-7267493566141153282-vcKF">Thought leadership is cringe — Ryan Law</a></li>
+<li><a href="https://felloai.com/2025/05/how-ai-has-quietly-taken-over-thought-leadership-on-linkedin/">AI 54% LinkedIn — Fello AI 2025</a></li>
+<li><a href="https://www.inc.com/kim-gravel/the-psychology-of-trust-the-most-underrated-sales-strategy-in-business/91317951">Psychology of Trust — Inc</a></li>
+<li><a href="https://www.dentaleconomics.com/practice/marketing/article/55315882/stop-selling-start-earning-trust-the-psychology-behind-ground-marketing-that-actually-converts">Stop Selling Start Earning Trust — Dental Economics</a></li>
+<li><a href="https://www.b2bmarketing.net/21-marketing-and-branding-cliches-to-avoid-at-all-costs/">21 Branding Clichés — B2B Marketing</a></li>
+<li><a href="https://www.1101.com/n/s/nakahata2022/2022-01-05.html">仲畑貴志×糸井重里 — ほぼ日 2022</a></li>
+<li><a href="https://shosetsu-maru.com/essay/catchcopy">名作広告キャッチコピー — 小説丸</a></li>
+<li><a href="https://iso-labo.com/labo/words_of_TakashiNakahata.html">仲畑貴志名コピー — iso.labo</a></li>
+<li><a href="https://copyhackers.com/2012/06/101-copywriting-dos-and-donts/">101 Copywriting Dos and Don'ts — Copyhackers</a></li>
+<li><a href="https://copyhackers.com/how-to-be-specific/">How to be specific — Copyhackers</a></li>
+<li><a href="https://iro-color.com/catchcopy/?id=%E5%90%8D%E5%88%BA">名刺のキャッチコピー集 — iro-color</a></li>
+<li><a href="https://www.marketmindshift.com/blog/the-psychology-of-trust-and-credibility-in-business-how-to-build-a-strong-online-reputation/">Psychology of Trust — Market Mind Shift</a></li>
+<li><a href="https://r.librenesia.com/r/LinkedInLunatics/comments/1fp7740/corporate_jargon_that_makes_you_cringe/">Corporate Jargon Cringe — Reddit</a></li>
+</ol>
+
+<h3>軸2: 著名デザイナー名刺実例（41ソース）</h3>
+<ol start="37">
+<li><a href="https://www.creativeboom.com/inspiration/16-of-the-sweetest-business-card-designs-from-some-of-the-worlds-best-designers/">16 Sweetest Business Cards — Creative Boom</a></li>
+<li><a href="https://www.itsnicethat.com/articles/sagmeister-and-walsh-halftone-satisfaction">Sagmeister Halftone Satisfaction — It's Nice That</a></li>
+<li><a href="https://www.adweek.com/performance-marketing/sagmeister-walsh-business-cards/">Sagmeister Walsh Cards — AdWeek</a></li>
+<li><a href="https://design-milk.com/sagmeister-walsh-halftone-satisfaction-for-the-luxe-project/">Halftone Satisfaction — Design Milk</a></li>
+<li><a href="https://www.underconsideration.com/fpo/archives/2013/06/halftone-satisfaction-business-cards.php">Halftone Cards — Under Consideration FPO</a></li>
+<li><a href="http://www.cardonizer.com/business_cards/sagmeister">Sagmeister card — Cardonizer</a></li>
+<li><a href="https://www.pentagram.com/about/michael-bierut">Michael Bierut — Pentagram</a></li>
+<li><a href="https://www.pentagram.com/about/paula-scher">Paula Scher — Pentagram</a></li>
+<li><a href="https://www.creativebloq.com/features/paula-scher-pentagram">Paula Scher interview — Creative Bloq</a></li>
+<li><a href="https://www.wallpaper.com/design-interiors/corporate-design-branding/michael-bierut-interview">Michael Bierut — Wallpaper*</a></li>
+<li><a href="https://www.pixartprinting.com/blog/graphic-design-massimo-vignelli/">Massimo Vignelli — Pixartprinting</a></li>
+<li><a href="https://www.knoll.com/designer/Lella-and-Massimo-Vignelli">Lella and Massimo Vignelli — Knoll</a></li>
+<li><a href="https://thevisualcommunicationguy.com/2018/09/10/why-every-business-professional-needs-to-know-dieter-rams-10-principles-of-design/">Dieter Rams 10 Principles</a></li>
+<li><a href="https://www.rrauction.com/auctions/lot-detail/349053006984009-steve-jobs-3-apple-business-cards-1997-1998-and-1999-as-interim-ceo-and-iceo/">Steve Jobs cards 1997-1999 — RR Auction</a></li>
+<li><a href="https://www.cultofmac.com/news/steve-jobs-apple-ceo">Steve Jobs CEO — Cult of Mac</a></li>
+<li><a href="https://news.artnet.com/art-world/steve-jobs-business-card-auction-results-2459151">Steve Jobs auction — artnet 2025</a></li>
+<li><a href="https://fontsinuse.com/uses/49529/american-psycho-titles-and-business-cards">American Psycho cards — Fonts In Use</a></li>
+<li><a href="https://hobancards.com/blogs/thoughts-and-curiosities/american-psycho-business-cards">American Psycho cards — Hoban Cards</a></li>
+<li><a href="https://www.elegantepress.com/blog/patrick-bateman-business-card/">Patrick Bateman card — Elegante</a></li>
+<li><a href="https://www.projectdesign.jp/202105/creators-philosophy/009295.php">佐藤可士和フィロソフィー — 事業構想 2021</a></li>
+<li><a href="https://www.ndc.co.jp/">日本デザインセンター（原研哉）</a></li>
+<li><a href="https://hara.ndc.co.jp/">HARA DESIGN INSTITUTE</a></li>
+<li><a href="https://www.tsdo.jp/">TSDO（佐藤卓）</a></li>
+<li><a href="http://gooddesigncompany.com/notes?number=18">good design company（水野学）</a></li>
+<li><a href="https://ja.wikipedia.org/wiki/%E8%90%BD%E5%90%88%E9%99%BD%E4%B8%80">落合陽一 Wikipedia</a></li>
+<li><a href="https://note.com/ochyai/n/n050971ff6a00">落合陽一 自己紹介 — note</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Jerry_Yang">Jerry Yang Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/David_Filo">David Filo Wikipedia</a></li>
+<li><a href="https://www.entrepreneur.com/growing-a-business/david-filo-jerry-yang/197564">Filo & Yang — Entrepreneur</a></li>
+<li><a href="https://www.hackingthecaseinterview.com/pages/consulting-job-titles">Consulting Job Titles — HackingTheCaseInterview</a></li>
+<li><a href="https://strategyu.co/consulting-roles/">Consulting roles — StrategyU</a></li>
+<li><a href="https://umbrex.com/resources/guide-to-consulting-firm-titles/cross-firm-title-equivalency-matrices/">Consulting Title Matrices — Umbrex</a></li>
+<li><a href="https://www.vistaprint.com/hub/business-card-trends">8 Business Card Trends 2026 — VistaPrint</a></li>
+<li><a href="https://www.optamark.com/blog/whats-in-style-business-card-design-ideas-for-2025/">Business Card Design 2025 — Optamark</a></li>
+<li><a href="https://www.behance.net/search/projects/business%20card%20designs">Business Card Designs — Behance</a></li>
+<li><a href="https://www.nissindou.co.jp/magazine/meishi-title/">名刺の肩書き表記 — 日新堂印刷</a></li>
+<li><a href="https://www.canva.com/ja_jp/learn/business-card-layout/">名刺レイアウト — Canva</a></li>
+</ol>
+
+<h3>軸3: 差別化コピーのフレームワーク（30ソース）</h3>
+<ol start="78">
+<li><a href="https://kaistory0617.com/cp-matome-nakahata/">仲畑貴志全コピー集 — kai story</a></li>
+<li><a href="https://ja.wikipedia.org/wiki/%E4%BB%B2%E7%95%91%E8%B2%B4%E5%BF%97">仲畑貴志 Wikipedia</a></li>
+<li><a href="https://www.tcc.gr.jp/copitan/id/%E5%B2%A9%E5%B4%8E%E4%BF%8A%E4%B8%80/">岩崎俊一 — TCC 2014</a></li>
+<li><a href="https://shuffle.genkosha.com/report/copywriting/">刻んでおきたい名作コピー120選 — 玄光社</a></li>
+<li><a href="https://www.amazon.co.jp/dp/4167469014">糸井重里 萬流コピー塾</a></li>
+<li><a href="https://www.amazon.co.jp/dp/4883351793">谷山雅計 広告コピーってこう書くんだ!</a></li>
+<li><a href="https://koukoku-ya.com/piriodo/">句点「。」の付け方 — koukoku-ya</a></li>
+<li><a href="https://reiro.co.jp/blog/catchphrase-examples/">キャッチフレーズ名作30選 — reiro 2026</a></li>
+<li><a href="https://karolakarlson.com/advertising-rules/">Ogilvy headline rules — Karola</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Think_Small">Think Small — Wikipedia</a></li>
+<li><a href="https://medium.com/theagency/the-ad-that-changed-advertising-18291a67488c">The ad that changed advertising — Medium</a></li>
+<li><a href="https://copyhackers.com/about-joanna-wiebe-copywriter/">Joanna Wiebe — Copyhackers</a></li>
+<li><a href="https://www.gabrieldeluna.com/p/conversion-copywriting-principles-joanna-wiebe">10 Conversion Principles — Wiebe</a></li>
+<li><a href="https://www.kathirvel.com/guide-april-dunford-positioning-framework/">April Dunford framework</a></li>
+<li><a href="https://www.lennysnewsletter.com/p/summary-april-dunford-on-product">April Dunford 5-component — Lenny</a></li>
+<li><a href="https://grupobcc.com/en/speakers/sally-hogshead/">Sally Hogshead Fascinate — BCC</a></li>
+<li><a href="https://designhoops.com/brand-positioning-strategy-seth-godins-positioning-grid/">Seth Godin positioning</a></li>
+<li><a href="https://www.willpatrick.co.uk/notes/hey-whipple-squeeze-this-luke-sullivan-edward-boches/">Hey Whipple Squeeze This — Sullivan</a></li>
+<li><a href="https://www.silke.co.uk/how-to-form-a-tagline">Taglines verb論 — Silke</a></li>
+<li><a href="https://cxl.com/blog/5-characteristics-high-converting-headlines/">5 Characteristics of High-Converting Headlines — CXL</a></li>
+<li><a href="https://www.lyssna.com/templates/test-the-impact-of-your-taglines/">5-second tagline test — Lyssna</a></li>
+<li><a href="https://faincu.net/minotake-kigyo/meishi-katagaki/">名刺と肩書きの12ポイント — 一人商い塾</a></li>
+<li><a href="https://sensei-biz.com/business_card_position_requirement/">名刺肩書き25選 — 先生ビジネス百科</a></li>
+<li><a href="https://www.jcpo.jp/archives/2928">怪しいコンサルの見分け方 — 日本コンサルティング推進機構</a></li>
+<li><a href="https://www.kotora.jp/c/65878/">コンサル肩書きの工夫 — KOTORA</a></li>
+<li><a href="https://harrisonamy.com/workaround-copywriting-technique/">The Workaround — HarrisonAmy</a></li>
+<li><a href="https://www.littleflamecreative.com/blog/copywriting-without-salesiness">Copywriting Without Salesy — Little Flame</a></li>
+<li><a href="https://ai-keiei.shift-ai.co.jp/ai-business-efficiency-ideas/">AI業務効率化失敗 — AI経営総研 2025</a></li>
+<li><a href="https://www.japan-it.jp/hub/ja-jp/blog/article-71.html">AI業務効率化失敗パターン — Japan IT Week</a></li>
+</ol>
+
+</body>
+</html>

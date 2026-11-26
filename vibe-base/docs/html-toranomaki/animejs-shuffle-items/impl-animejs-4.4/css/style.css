@@ -1,0 +1,125 @@
+/* Modified from verbatim: Externalized from agent-ag/animejs-shuffle-demo/index.html */
+:root {
+    --bg-color: #0F0F11;
+    --card-bg: #18181C;
+    --text-color: #E4E4E7;
+    --text-muted: #A1A1AA;
+    --accent-violet: #8B5CF6;
+    --border-color: #27272A;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-sans);
+    padding: 1.5rem;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+.pane {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 
+                0 0 30px rgba(139, 92, 246, 0.05);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pane-header {
+    margin-bottom: 1.25rem;
+}
+
+.pane-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
+    background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.pane-header p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.controls {
+    margin-bottom: 1.25rem;
+}
+
+.btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    border-color: transparent;
+    color: #FFFFFF;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.layout-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    min-height: 250px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    align-content: start;
+}
+
+.item {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4), 
+                0 0 10px rgba(124, 58, 237, 0.1);
+    user-select: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.item:hover {
+    transform: scale(1.05);
+}

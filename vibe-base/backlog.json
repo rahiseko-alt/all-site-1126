@@ -1,0 +1,116 @@
+{
+  "_note": "後回し付箋（§3 微細エラー判定）。読むのは roadmap.md の完走判定時のみ。詳細は git log とコードで追え（文章で残すと記録時の解釈が固定化されハルシネーション源になる）。",
+  "_rules": "AI は status のみ編集可。項目の削除・改変は禁止（誰も見ないリストは消えても気づかれない）。追加は可。",
+  "_status_values": ["open", "done", "wontfix"],
+  "updated_at": "2026-07-17",
+  "items": [
+    {
+      "id": 1,
+      "date": "2026-07-17",
+      "note": ".claude/rules/structural-ops.md の誤記述削除: 「独立 .git でルート CLAUDE.md 不達」は実測で反証済（product の /memory でロード確認）",
+      "status": "open"
+    },
+    {
+      "id": 2,
+      "date": "2026-07-17",
+      "note": "root-config-propagate.mjs の伝播対象に .claude/commands/** を追加（現状は hooks/** と settings.json のみ。product 側 plan-template.md 16件が手書き取り残し）",
+      "status": "open"
+    },
+    {
+      "id": 3,
+      "date": "2026-07-17",
+      "note": "root-config-propagate.mjs の件数誤報告: 「29/29 deny updated」だが実数25（settings.json 所持 product 数）",
+      "status": "open"
+    },
+    {
+      "id": 4,
+      "date": "2026-07-17",
+      "note": "settings.json 不在の 7 product の deny 確認（settings がディレクトリツリーを遡上解決するかは未検証）",
+      "status": "open"
+    },
+    {
+      "id": 5,
+      "date": "2026-07-17",
+      "note": ".gitignore:252 の products/ により ripgrep 系（Grep tool/Explore/Agent）が products 配下を検索不可。横断探索は grep -rn products/ を使う旨を .claude/rules/ か docs/ops/ に記録（CLAUDE.md は60行 hook で差し戻し済）",
+      "status": "open"
+    },
+    {
+      "id": 6,
+      "date": "2026-07-17",
+      "note": "旧 P0-P4 語彙の残骸除去: 16product・18行が対象（19ファイル31行中、履歴記録13行は保持確定）",
+      "status": "open"
+    },
+    {
+      "id": 7,
+      "date": "2026-07-17",
+      "note": "session-start-handover-inject.mjs の @参照解決は memory.md 冒頭の最初の @*.md 1本のみ（.json 非対応・複数 @ 非対応）。daigiBlock は固定パス直読みで回避済だが、引継ぎレポート側の @ 機構は 1本制約のまま",
+      "status": "open"
+    },
+    {
+      "id": 8,
+      "date": "2026-07-17",
+      "note": "Edit(**/secrets/**) の有効性は 2026-07-17 の新規セッション起動で実証（Write(.env) には警告が出るが Edit(...) には出ない = 有効な matcher）。残: scripts/check-settings-spec.mjs の F-1〜F-7 に自動検証項目を追加",
+      "status": "open"
+    },
+    {
+      "id": 11,
+      "date": "2026-07-17",
+      "note": ".claude/settings.local.json の vault 3経路（倉庫/事業戦略/ナレッジ/{公式情報,トレンド,分析}）が Write(path) allow のため無効（起動時に Claude Code が警告）。Edit(path) へ要修正。同時刻の check-in が「vault 反映11日滞留・連続失敗19回」を警告しており因果の可能性あり（未検証）",
+      "status": "open"
+    },
+    {
+      "id": 9,
+      "date": "2026-07-17",
+      "note": "deny に MultiEdit のエントリが無い（settings.json 自身の PreToolUse matcher は Write|Edit|MultiEdit を使用＝有効ツール）。**/secrets/** 等への MultiEdit 経路が未検証。security-reviewer advisory",
+      "status": "open"
+    },
+    {
+      "id": 10,
+      "date": "2026-07-17",
+      "note": "roadmap.md/roadmap-state.json/backlog.json に書込時の内容検証 hook が無い。daigiBlock がこれらを無検証で毎セッション最上位注入するため、外部テキスト混入時に永続 prompt injection 経路になりうる（到達段は AI 裁量依存のため blocking でない）。security-reviewer advisory",
+      "status": "open"
+    },
+    {
+      "id": 12,
+      "date": "2026-07-17",
+      "note": "vibe-base の親ディレクトリ（C:/Users/user/Desktop/ClaudeCode）を cwd に起動すると vibe-base の .claude/settings.json がロードされず hook 26 本が全滅する（2026-07-17 実証: hook-errors.jsonl に当日エントリ 0・SessionStart の大義注入も未発火）。H2大義の完了条件『機械が回って初めて完了』を直撃する（plan-daigi-gate も同様に発火しない）。起動場所に依存せず機械が回る経路を要検討 → 2026-07-17 対処: User スコープ（~/.claude/settings.json・cwd 非依存で必ずロードされる唯一の場所）に SessionStart hook `vibe-base-root-guard.mjs` を登録。誤った場所での起動を検知し H2大義を代わりに注入する。ただし**起動し直しの強制はできない**（SessionStart は block 不可）＝「黙って死ぬ」を「声を上げて死ぬ」に変えただけ。強制が要るならマスター判断",
+      "status": "closed"
+    },
+    {
+      "id": 13,
+      "date": "2026-07-17",
+      "note": "~/.claude/commands/plan.md（実使用の /plan 雛形）が固定 H2 8 個のうち 3 個を欠く（上位 plan からの constraint 変更 / サブエージェント割り振り方針 / 承認後モード）。見出し名も『## リスク』で canonical の『## リスク・トラブル想定とリカバリープラン』と不一致。かつ死んだパス vibe-governance/.claude/rules/plan-mode.md を参照。2026-07-17 は大義照合と無関係のため scope 外として起票のみ",
+      "status": "open"
+    },
+    {
+      "id": 14,
+      "date": "2026-07-17",
+      "note": "docs/adr/0001-plan-mode-c-design.md が dead-link 防止を名乗る dead-link。参照先 vibe-governance/docs/adr/0001-plan-mode-c-design.md は実在せず（repo 全走査で確認・ヒット 5 本は全て同一のポインタ本文）、.claude/rules/plan-mode.md が言う『canonical 5450 B 詳細版』は消失。Plan Mode の設計経緯（A・B 抹消と C 採用）が現在どこからも辿れない",
+      "status": "open"
+    },
+    {
+      "id": 15,
+      "date": "2026-07-17",
+      "note": "plan-daigi-gate の hasH1() は親ディレクトリ名が products かの2条件AND だが、depth-3 product（products/{name}/{dept}/）内で AI が自作業ディレクトリに mkdir products すると H1 詐称でき 照合先: N/A が無検査通過する（security-reviewer 実機再現・depth-3 product 現存ゼロで休眠）。対策案: products/ の実在でなく『祖先に vibe-base root マーカーを持つか』で判定する",
+      "status": "open"
+    },
+    {
+      "id": 16,
+      "date": "2026-07-17",
+      "note": "secret-write-gate の check-secret-patterns.mjs 隣接 import は静的 import のため、隣接ファイル欠損時に try/catch 外で ERR_MODULE_NOT_FOUND→exit 1（fail-open。Claude Code は exit 2 のみ blocking）。旧版から同型・新規回帰でない。propagate が必ず同居配布するため実発生しないが、動的 import + catch で fail-closed 化すれば堅い",
+      "status": "open"
+    },
+    {
+      "id": 17,
+      "date": "2026-07-17",
+      "note": "session-start-handover-inject の daigiBlock は daigi 未設定時に定型文のみ返し、roadmap.md 本文・現在地行を出さない。vibe-base root 自身は daigi 未設定のため、root セッションで自分のロードマップ現在地が機械注入で見えなくなった（code-reviewer advisory）。root の daigi をマスター判定で設定するか、daigi 未設定でも roadmap/現在地は注入する分岐を足すか",
+      "status": "open"
+    },
+    {
+      "id": 18,
+      "date": "2026-07-18",
+      "note": "root側 P0-P4/PC表 残骸（pc-checklist.md本体+直接参照元14件+product-development.mdゲート通過節+gate-failure-sop.mdは2026-07-18に撤去済・本項目はスコープ外とした残り）。現役ファイルに「P0#/P1#/P2#/P4#」固定タスク番号または「PC表」語が残存: docs/rules/agent-rules-canonical.md（ゲート通過時の報告義務節・v1.7変更履歴・P1#3a言及）、.claude/rules/{quality-templates,risk-assessment,delivery-onboarding}.md、docs/ops/{comparison,backup-strategy,cost-budget,incident-response,rate-limit,risk-diagnosis,p4-zero-procedure,notebooklm-mcp}-sop.md、docs/ops/risk-registry.md、docs/standards/{README,verification-panel}.md、docs/standards/checklists/{seo,idempotency}-checklist.md、docs/standards/templates/配下の複数ファイル。product側の語彙残骸（backlog id:6・16product・18行）とは対象ファイル集合が重複しない別トラック（root側のみ）",
+      "status": "open"
+    }
+  ]
+}

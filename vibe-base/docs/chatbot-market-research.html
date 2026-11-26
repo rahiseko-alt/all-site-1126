@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIチャットボット市場調査 - ココナラ・クラウドワークス・ランサーズ実データ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #333; line-height: 1.7; padding: 24px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 24px; }
+  .platform { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .platform h2 { font-size: 1.25rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid; }
+  .coconala h2 { border-color: #25b; color: #25b; }
+  .crowdworks h2 { border-color: #e63; color: #e63; }
+  .lancers h2 { border-color: #0a8; color: #0a8; }
+  .summary-box h2 { border-color: #555; color: #555; }
+  .stat { display: inline-block; background: #f0f4ff; border-radius: 8px; padding: 8px 16px; margin: 4px 4px 4px 0; font-size: 0.9rem; }
+  .coconala .stat { background: #eef2ff; }
+  .crowdworks .stat { background: #fff0ec; }
+  .lancers .stat { background: #e8f8f0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+  th { background: #fafafa; font-weight: 600; white-space: nowrap; }
+  tr:hover td { background: #f9f9f9; }
+  .price { font-weight: 700; color: #c30; }
+  .sales { font-weight: 700; color: #07a; }
+  .section-title { font-size: 1rem; font-weight: 700; margin: 16px 0 8px; }
+  .insight { background: #fffce8; border-left: 4px solid #e8b; padding: 12px 16px; margin: 12px 0; border-radius: 0 8px 8px 0; font-size: 0.88rem; }
+  .source { font-size: 0.78rem; color: #888; margin-top: 4px; }
+  .source a { color: #07a; text-decoration: none; }
+  .source a:hover { text-decoration: underline; }
+  .review-box { background: #f8f8f8; border-radius: 8px; padding: 12px; margin: 8px 0; font-size: 0.85rem; }
+  .review-box .buyer { font-weight: 600; color: #555; }
+  .badge { display: inline-block; background: #333; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
+  .warn { background: #ffeaea; border-left: 4px solid #e55; padding: 10px 16px; margin: 10px 0; border-radius: 0 8px 8px 0; font-size: 0.85rem; }
+  ul { padding-left: 20px; margin: 6px 0; }
+  li { margin: 3px 0; font-size: 0.88rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>AIチャットボット制作 クラウドソーシング市場調査</h1>
+<p class="subtitle">調査日: 2026-03-28 / 対象: ココナラ・クラウドワークス・ランサーズ / 推測禁止: 数字はすべてプラットフォーム掲載実データ</p>
+
+<!-- ============================================================ -->
+<!-- ココナラ -->
+<!-- ============================================================ -->
+<div class="platform coconala">
+  <h2>1. ココナラ カテゴリ772（AIチャットボット制作）</h2>
+
+  <div>
+    <span class="stat">出品総数: <b>462件</b></span>
+    <span class="stat">価格帯: <b>4,000円 ~ 350,000円</b></span>
+    <span class="stat">中心価格帯: <b>5,000円 ~ 50,000円</b></span>
+    <span class="stat">評価平均: <b>ほぼ全出品 5.0</b></span>
+  </div>
+  <p class="source">出典: <a href="https://coconala.com/categories/772" target="_blank">coconala.com/categories/772</a></p>
+
+  <p class="section-title">上位出品 詳細データ（人気順）</p>
+  <table>
+    <tr>
+      <th>#</th><th>タイトル</th><th>価格</th><th>レビュー数</th><th>評価</th><th>出品者</th><th>主な技術</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>DifyでAIチャットボット作ります</td>
+      <td class="price">5,000円~</td>
+      <td class="sales">63件販売 / 51レビュー</td>
+      <td>5.0</td>
+      <td>たま＠SE</td>
+      <td>Dify, GAS, LINE連携</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>ChatGPTを用いたLINE Botを作成します</td>
+      <td class="price">50,000円</td>
+      <td class="sales">53レビュー</td>
+      <td>5.0</td>
+      <td>けうまる</td>
+      <td>ChatGPT API, LINE</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>自前のデータを元に回答するChatボットを作ります</td>
+      <td class="price">4,000円</td>
+      <td class="sales">22レビュー</td>
+      <td>5.0</td>
+      <td>AI活用＠CAMBRITEC</td>
+      <td>RAG, カスタムデータ</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>DifyとMakeやGASでLINEbot作ります</td>
+      <td class="price">10,000円</td>
+      <td class="sales">21レビュー</td>
+      <td>5.0</td>
+      <td>たま＠SE</td>
+      <td>Dify, Make, GAS, LINE</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>オーダーメイドのAI LINEボットを構築します</td>
+      <td class="price">20,000円</td>
+      <td class="sales">21レビュー</td>
+      <td>5.0</td>
+      <td>なる◆生成AI収益化</td>
+      <td>LINE Bot, AI</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>オーダーメイドのDifyチャットbot開発します</td>
+      <td class="price">5,000円</td>
+      <td class="sales">9レビュー</td>
+      <td>5.0</td>
+      <td>なる◆生成AI収益化</td>
+      <td>Dify</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>AIChatBot開発します</td>
+      <td class="price">10,000円</td>
+      <td class="sales">7レビュー</td>
+      <td>5.0</td>
+      <td>AidxelSystems</td>
+      <td>AI全般</td>
+    </tr>
+    <tr>
+      <td>参考</td>
+      <td>ChatGPTが応答するLINE bot開発（けうまる別出品）</td>
+      <td class="price">9,500円</td>
+      <td class="sales">4件販売 / 5レビュー</td>
+      <td>5.0</td>
+      <td>株式会社AI WORKS</td>
+      <td>ChatGPT, LINE, 運用費0円</td>
+    </tr>
+    <tr>
+      <td>参考</td>
+      <td>買切りタイプ社内用AIチャットボット</td>
+      <td class="price">50,000円</td>
+      <td class="sales">1件販売</td>
+      <td>-</td>
+      <td>-</td>
+      <td>ChatGPT API, 社内向け</td>
+    </tr>
+  </table>
+
+  <p class="section-title">購入者像（レビューコメントから推定）</p>
+
+  <div class="review-box">
+    <p class="buyer">エフォートケアシステム株式会社 <span class="badge">法人</span></p>
+    <p>「初回の相談から納品まで、一貫してとても丁寧に対応していただきました。こちらの目的や意図をしっかり汲み取ってくださり、専門的な内容についてもわかりやすく説明してもらえた」</p>
+    <p class="source">Dify AIチャットボット（5,000円~出品）のレビューより</p>
+  </div>
+
+  <div class="review-box">
+    <p class="buyer">Hakuhodo Consulting <span class="badge">大手法人</span></p>
+    <p>「お見積りの段階から、非常に適切なご提案をくださり、提示額よりも安い見積りを提示してくださいました」</p>
+    <p class="source">Dify AIチャットボット（5,000円~出品）のレビューより</p>
+  </div>
+
+  <div class="review-box">
+    <p class="buyer">輝 ケミストリーエンジニア <span class="badge">技術者/個人</span></p>
+    <p>「Difyでのチャットフローアプリを自力で作成しておりましたが、思った通りに動作しなく、ご相談させていただきました。リスポンスが早く、的確なアドバイスを頂けて、短期間で期待していた動作環境が構築できた」</p>
+    <p class="source">→ 自分でDifyを触ったが行き詰まり、プロに依頼したケース</p>
+  </div>
+
+  <div class="review-box">
+    <p class="buyer">こばやしとしゆき <span class="badge">個人</span></p>
+    <p>「ビデオ通話を通じてとてもわかり易く説明して頂けました」</p>
+    <p class="source">LINE Bot（9,500円出品）のレビューより → 非エンジニアが手取り足取り支援を求めている</p>
+  </div>
+
+  <div class="insight">
+    <b>購入者の傾向まとめ:</b>
+    <ul>
+      <li><b>法人（中小～大手）</b>が確認済み。博報堂コンサルティングのような大手も5,000円~出品を利用</li>
+      <li><b>非エンジニア</b>が多い。Difyを自力で触って詰まった人、ビデオ通話で丁寧な説明を求める人</li>
+      <li><b>依頼内容の主流:</b> LINE Bot（自動応答）、Webサイト埋め込みFAQ、社内マニュアル検索Bot</li>
+    </ul>
+  </div>
+
+  <p class="section-title">よくある依頼内容（カテゴリ分析）</p>
+  <table>
+    <tr><th>依頼種別</th><th>割合（出品数ベース推定）</th><th>典型的な用途</th></tr>
+    <tr><td><b>LINE Bot</b></td><td>最多</td><td>公式LINE自動応答、予約受付、キャラクター会話</td></tr>
+    <tr><td><b>Dify構築</b></td><td>急増中</td><td>社内FAQ、ナレッジ検索、RAG構築</td></tr>
+    <tr><td><b>Web埋め込み</b></td><td>多い</td><td>Webサイトの問い合わせ自動応答</td></tr>
+    <tr><td><b>社内ツール</b></td><td>一定数</td><td>社内規定検索、マニュアル応答、業務アシスタント</td></tr>
+    <tr><td><b>カスタムアプリ</b></td><td>少数・高単価</td><td>iOS/Android対応、フルスクラッチ開発</td></tr>
+  </table>
+
+  <p class="source">オプション価格例: GAS連携+5,000円 / 複雑ワークフロー+5,000円 / Webサイト埋め込み支援+10,000円 / ビデオチャット相談30分+1,000円</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- クラウドワークス -->
+<!-- ============================================================ -->
+<div class="platform crowdworks">
+  <h2>2. クラウドワークス AI・チャットボット開発案件</h2>
+
+  <div>
+    <span class="stat">AI関連 累計契約: <b>40,000件超</b>（2024年6月時点）</span>
+    <span class="stat">生成AI案件 年間: <b>5,832件</b>（2022/12-2023/11）</span>
+    <span class="stat">前年比: <b>8.4倍</b>増</span>
+    <span class="stat">AI案件単価: <b>非AI比 1.8倍</b></span>
+  </div>
+  <p class="source">出典: <a href="https://prtimes.jp/main/html/rd/p/000000198.000050142.html" target="_blank">クラウドワークス プレスリリース (2023/12/25)</a> / <a href="https://crowdworks.co.jp/news/ij14qbirt985/" target="_blank">AI活用40,000件突破 (2024/06)</a></p>
+
+  <p class="section-title">チャットボット関連 案件例と予算帯</p>
+  <table>
+    <tr><th>案件タイトル</th><th>予算</th><th>備考</th></tr>
+    <tr>
+      <td>ChatGPTのAPIを活用したLINEbotでの求人情報表示機能の開発</td>
+      <td class="price">50万~100万円</td>
+      <td>大型案件</td>
+    </tr>
+    <tr>
+      <td>LINE公式アカウント自動応答AI構築</td>
+      <td class="price">10万~30万円</td>
+      <td>中規模</td>
+    </tr>
+    <tr>
+      <td>ネットショップ埋め込み用チャットツール作成</td>
+      <td class="price">10万~30万円</td>
+      <td>EC向け</td>
+    </tr>
+    <tr>
+      <td>Slack BOTにChatGPTを実装</td>
+      <td class="price">5万~10万円</td>
+      <td>社内ツール</td>
+    </tr>
+    <tr>
+      <td>自社WEBサイト Q&A回答ボット開発</td>
+      <td class="price">5万~10万円</td>
+      <td>FAQ型</td>
+    </tr>
+    <tr>
+      <td>ChatGPTによる相談サービス開発</td>
+      <td class="price">5万~10万円</td>
+      <td>要件定義含む</td>
+    </tr>
+    <tr>
+      <td>AI彼女のチャットボット作成</td>
+      <td class="price">100万~300万円</td>
+      <td>データ収集+AIモデル訓練</td>
+    </tr>
+    <tr>
+      <td>AIチャットボット開発エンジニア募集（月額）</td>
+      <td class="price">月10万~20万円</td>
+      <td>継続案件</td>
+    </tr>
+    <tr>
+      <td>機械学習エンジニア募集（生成AI経験者）</td>
+      <td class="price">~80万円</td>
+      <td>ハイスキル人材</td>
+    </tr>
+  </table>
+  <p class="source">出典: <a href="https://crowdworks.jp/static/lp/chatgpt_special_feature/" target="_blank">ChatGPTお仕事特集</a> / <a href="https://crowdworks.jp/times/topics/18829/" target="_blank">AI開発費用相場（クラウドソーシングTimes）</a></p>
+
+  <p class="section-title">予算帯の分布</p>
+  <table>
+    <tr><th>予算帯</th><th>案件の性質</th><th>出現頻度</th></tr>
+    <tr><td class="price">~5万円</td><td>プロンプト作成、簡易Bot、既存ツール設定</td><td>多い</td></tr>
+    <tr><td class="price">5万~10万円</td><td>FAQ Bot、Slack/LINE Bot（小規模）</td><td>多い</td></tr>
+    <tr><td class="price">10万~30万円</td><td>LINE公式自動応答、EC埋め込みBot</td><td>中程度</td></tr>
+    <tr><td class="price">50万~100万円</td><td>本格的なBot開発（API連携+UI）</td><td>少ない</td></tr>
+    <tr><td class="price">100万円超</td><td>AI学習+カスタムモデル+アプリ開発</td><td>希少</td></tr>
+  </table>
+
+  <p class="section-title">職種別 AI案件単価（非AI案件比）</p>
+  <table>
+    <tr><th>職種</th><th>AI案件単価倍率</th><th>案件例</th></tr>
+    <tr><td>ITエンジニア</td><td class="price">3.5倍</td><td>5万~30万円</td></tr>
+    <tr><td>非IT技術者</td><td class="price">6.8倍</td><td>1.5万~2.5万円</td></tr>
+    <tr><td>ビジネス職種</td><td class="price">3.3倍</td><td>3.7万~8万円</td></tr>
+  </table>
+
+  <div class="insight">
+    <b>発注者の傾向:</b>
+    <ul>
+      <li>具体的な業種データは非公開だが、案件内容から<b>EC事業者</b>（ネットショップ埋め込み）、<b>人材業界</b>（求人情報LINE Bot）、<b>サービス業</b>が多い</li>
+      <li>AI関連案件のうちライティング系が<b>35.4%</b>、プログラミング・開発系は<b>高単価層</b>を形成</li>
+      <li>チャットボット開発スキル保有者: <b>91名以上</b>が登録</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ランサーズ -->
+<!-- ============================================================ -->
+<div class="platform lancers">
+  <h2>3. ランサーズ チャットボット開発パッケージ</h2>
+
+  <div>
+    <span class="stat">チャットボット全体: <b>267件</b></span>
+    <span class="stat">うちAI搭載: <b>107件</b>（124件とも表示あり）</span>
+    <span class="stat">価格帯: <b>25,000円 ~ 900,000円</b></span>
+  </div>
+  <p class="source">出典: <a href="https://www.lancers.jp/menu/browse/programming_tech/chatbots" target="_blank">ランサーズ チャットボット開発</a> / <a href="https://www.lancers.jp/menu/browse/programming_tech/chatbots/bot_ai" target="_blank">AI搭載カテゴリ</a></p>
+
+  <p class="section-title">サブカテゴリ別 出品件数</p>
+  <table>
+    <tr><th>利用シーン</th><th>件数</th><th>プラットフォーム</th><th>件数</th></tr>
+    <tr><td>お客さま相談室</td><td class="sales">115件</td><td>LINE</td><td class="sales">104件</td></tr>
+    <tr><td>その他</td><td class="sales">75件</td><td>Slack</td><td class="sales">54件</td></tr>
+    <tr><td>ショッピング・注文</td><td class="sales">72件</td><td>Webサイト</td><td class="sales">54件</td></tr>
+    <tr><td>健康・フィットネス</td><td class="sales">66件</td><td>Discord</td><td class="sales">33件</td></tr>
+    <tr><td>スケジュール・アシスタント</td><td class="sales">65件</td><td>-</td><td>-</td></tr>
+  </table>
+
+  <p class="section-title">主要パッケージ 詳細データ</p>
+  <table>
+    <tr><th>#</th><th>タイトル</th><th>価格</th><th>販売件数</th><th>出品者</th></tr>
+    <tr>
+      <td>1</td>
+      <td>ChatGPTチャットボット（買い切り・編集機能付き）</td>
+      <td class="price">90,000円~</td>
+      <td class="sales">96件（満足）</td>
+      <td>みつばスタジオ</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>LINE×AIチャットボット（買い切り・編集機能付き）</td>
+      <td class="price">90,000円~</td>
+      <td class="sales">96件（満足）</td>
+      <td>みつばスタジオ</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>チャットワークのようなリアルタイムチャット</td>
+      <td class="price">55,000円~</td>
+      <td class="sales">59件（満足）</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>AI（人工知能）搭載チャットボット・ライブコマース開発</td>
+      <td class="price">547,369円</td>
+      <td class="sales">41件（満足）/ 6件（残念）</td>
+      <td>akichan2016（法人）</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>FX-MT4/5インジケーター・EA、BOTゲームBOT</td>
+      <td class="price">50,000円~</td>
+      <td class="sales">27件（満足）/ 2件（残念）</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>あなたのノウハウを学習させた公式LINEのBot</td>
+      <td class="price">25,000円~</td>
+      <td class="sales">27件</td>
+      <td>山本龍児@AI開発</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Difyでホームページの問い合わせ対応を効率化</td>
+      <td class="price">25,000円~</td>
+      <td class="sales">27件</td>
+      <td>山本龍児@AI開発</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>ナレッジ型のAIチャットボットを導入</td>
+      <td class="price">150,000円~</td>
+      <td class="sales">13件</td>
+      <td>WordPress制作・改修</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>資料を渡すだけでOK！AIチャットボット開発</td>
+      <td class="price">200,000円~</td>
+      <td class="sales">7件</td>
+      <td>林直広</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Chat-GPTを活用してAIチャットボットを作成します</td>
+      <td class="price">70,000円~900,000円</td>
+      <td class="sales">0件</td>
+      <td>株式会社ディーシステム</td>
+    </tr>
+  </table>
+
+  <p class="section-title">プラン別価格の実例</p>
+  <table>
+    <tr><th>出品者</th><th>ベーシック</th><th>スタンダード</th><th>プレミアム</th></tr>
+    <tr>
+      <td>株式会社ディーシステム（東京港区・100名超）</td>
+      <td class="price">70,000円（7日）</td>
+      <td class="price">300,000円（30日）</td>
+      <td class="price">900,000円（90日）</td>
+    </tr>
+    <tr>
+      <td>山本龍児@AI開発（LINE Bot）</td>
+      <td class="price">25,000円~</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>株式会社QuickBuild（ナレッジ型）</td>
+      <td class="price">50,000円~</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>フルスタックAI Slack/LINEボット</td>
+      <td class="price">400,000円~</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+  </table>
+
+  <div class="insight">
+    <b>ランサーズの特徴:</b>
+    <ul>
+      <li>ココナラより<b>単価が高い</b>（ベーシック25,000円~が最低ライン。ココナラは4,000円~）</li>
+      <li><b>みつばスタジオ</b>が販売96件で圧倒的トップ（買い切り型が支持される）</li>
+      <li>LINE Bot（104件）が最多プラットフォーム。次点でSlack/Webサイト（各54件）</li>
+      <li>「お客さま相談室」用途が115件で最多 = <b>カスタマーサポート自動化</b>が主需要</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 横断比較 -->
+<!-- ============================================================ -->
+<div class="platform summary-box">
+  <h2>4. 三社横断比較</h2>
+
+  <table>
+    <tr>
+      <th>項目</th><th>ココナラ</th><th>クラウドワークス</th><th>ランサーズ</th>
+    </tr>
+    <tr>
+      <td>形式</td>
+      <td>スキル出品（定額）</td>
+      <td>案件募集（発注者起点）</td>
+      <td>パッケージ出品（定額）</td>
+    </tr>
+    <tr>
+      <td>出品/案件数</td>
+      <td class="sales">462件</td>
+      <td class="sales">AI全体40,000件超<br>（うちBot開発は一部）</td>
+      <td class="sales">267件（うちAI搭載107件）</td>
+    </tr>
+    <tr>
+      <td>最低価格</td>
+      <td class="price">4,000円</td>
+      <td class="price">~5万円（小規模）</td>
+      <td class="price">25,000円</td>
+    </tr>
+    <tr>
+      <td>ボリュームゾーン</td>
+      <td class="price">5,000~50,000円</td>
+      <td class="price">5万~30万円</td>
+      <td class="price">50,000~150,000円</td>
+    </tr>
+    <tr>
+      <td>高額帯</td>
+      <td class="price">~350,000円</td>
+      <td class="price">50万~300万円</td>
+      <td class="price">~900,000円</td>
+    </tr>
+    <tr>
+      <td>トップ出品の販売数</td>
+      <td class="sales">63件（Dify Bot）</td>
+      <td>-（案件形式）</td>
+      <td class="sales">96件（みつばスタジオ）</td>
+    </tr>
+    <tr>
+      <td>主要技術</td>
+      <td>Dify, ChatGPT API, LINE</td>
+      <td>Python, Node.js, API</td>
+      <td>ChatGPT, LINE, Python</td>
+    </tr>
+    <tr>
+      <td>購入者/発注者</td>
+      <td>中小法人~大手、非エンジニア個人</td>
+      <td>EC, 人材, サービス業</td>
+      <td>法人中心（カスタマーサポート需要）</td>
+    </tr>
+  </table>
+
+  <p class="section-title">市場全体の開発費用相場（SaaS/制作会社含む参考値）</p>
+  <table>
+    <tr><th>開発種別</th><th>初期費用</th><th>月額費用</th></tr>
+    <tr><td>シナリオ型（ルールベース）</td><td class="price">0~10万円</td><td>数千円~</td></tr>
+    <tr><td>FAQ型（最低限実装）</td><td class="price">5~15万円</td><td>-</td></tr>
+    <tr><td>FAQ型（基本実装）</td><td class="price">15~40万円</td><td>-</td></tr>
+    <tr><td>AI型（既存エンジン利用）</td><td class="price">20~50万円</td><td>数万円~10万円</td></tr>
+    <tr><td>AI型（複雑な応答）</td><td class="price">40~80万円</td><td>-</td></tr>
+    <tr><td>フルカスタム開発</td><td class="price">100万円~数百万円</td><td>-</td></tr>
+  </table>
+  <p class="source">出典: <a href="https://ds-b.jp/dsmagazine/chatbot-cost/" target="_blank">DS.b</a> / <a href="https://www.helpfeel.com/blog/chatbot_cost" target="_blank">Helpfeel</a> / <a href="https://hitobo.io/blog/cost-effective-chatbot/" target="_blank">hitobo</a></p>
+
+  <div class="insight">
+    <b>重要な示唆:</b>
+    <ul>
+      <li><b>Difyの台頭:</b> ココナラ上位出品の多くがDifyベース。ノーコードで構築→5,000円~で販売可能なため、参入障壁が極めて低い</li>
+      <li><b>LINE Botが主戦場:</b> 三社すべてでLINE連携が最多需要。日本市場のLINE依存を反映</li>
+      <li><b>価格破壊が進行中:</b> ココナラでは4,000~5,000円の出品が人気上位。博報堂コンサルティングですら5,000円~サービスを利用</li>
+      <li><b>「買い切り」が売れる:</b> ランサーズでは「買い切り・編集機能付き」が96件販売でダントツ。月額SaaSへの抵抗がある層が一定数存在</li>
+      <li><b>クラウドワークスは高単価:</b> 発注者起点のため5万円~が最低ライン。本格開発は50万~100万円帯</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <b>データ上の制約:</b>
+    <ul>
+      <li>ココナラの「販売件数」はレビュー数から推定（レビュー非投稿の購入者を含まないため実販売数はこれより多い）</li>
+      <li>クラウドワークスはJavaScript必須の動的ページのため、案件一覧の直接スクレイピングが不可。案件例はChatGPT特集ページ・プレスリリースから取得</li>
+      <li>クラウドワークスの「AI関連40,000件」にはライティング等も含まれ、チャットボット開発のみの件数は非公開</li>
+      <li>ランサーズの「満足/残念」は購入者フィードバック数であり、正確な販売件数とは異なる可能性がある</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

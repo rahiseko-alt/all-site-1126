@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サムネイル黄金律レポート | 2026-04-09</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222633;
+    --border: #2a2d3a;
+    --text: #e4e4e7;
+    --muted: #71717a;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --cyan: #06b6d4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 32px; line-height: 1.7; }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 40px; }
+
+  /* セクション */
+  .section { margin-bottom: 48px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 800; color: #fff; flex-shrink: 0;
+  }
+  .section-title { font-size: 1.15rem; font-weight: 700; }
+  .section-scope { font-size: 0.7rem; color: var(--muted); background: var(--surface2); padding: 2px 10px; border-radius: 4px; margin-left: auto; }
+
+  /* ルールカード */
+  .rule {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 12px;
+  }
+  .rule-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .rule-icon { font-size: 1.1rem; }
+  .rule-name { font-size: 0.95rem; font-weight: 700; }
+  .rule-body { font-size: 0.85rem; color: #c4c4cc; line-height: 1.7; }
+  .rule-data {
+    display: inline-block;
+    background: rgba(59,130,246,0.12);
+    color: var(--blue);
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+  .rule-warn {
+    display: inline-block;
+    background: rgba(239,68,68,0.12);
+    color: var(--red);
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+
+  /* 比較テーブル */
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 16px 0; }
+  th, td { padding: 10px 14px; border: 1px solid var(--border); }
+  th { background: var(--surface2); color: var(--muted); font-weight: 600; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
+  td { background: var(--surface); }
+  .val { color: var(--amber); font-weight: 700; }
+  .bad { color: var(--red); }
+  .good { color: var(--green); }
+
+  /* ソース */
+  .sources {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .sources a { color: var(--blue); text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+
+  /* 診断 */
+  .diagnosis {
+    background: rgba(239,68,68,0.06);
+    border: 2px solid rgba(239,68,68,0.25);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 40px;
+  }
+  .diagnosis h2 { color: var(--red); font-size: 1.1rem; margin-bottom: 16px; }
+  .diag-row { display: flex; gap: 12px; margin-bottom: 8px; align-items: baseline; }
+  .diag-label { font-size: 0.8rem; color: var(--muted); width: 120px; flex-shrink: 0; }
+  .diag-val { font-size: 0.85rem; }
+
+  footer { color: var(--muted); font-size: 0.7rem; margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>サムネイル黄金律レポート</h1>
+<p class="subtitle">プラットフォーム横断 + 出品物特性 + バナーCTRデータ | 2026-04-09 調査</p>
+
+<!-- ============ 1. 3秒ルール ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--red)">1</div>
+    <div class="section-title">3秒ルール — 0.3秒で伝わるのは1つだけ</div>
+    <div class="section-scope">全プラットフォーム共通</div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#9889;</span><span class="rule-name">文字数上限</span></div>
+    <div class="rule-body">
+      サムネイル内のテキストは <span class="rule-data">15〜20文字</span> が上限。それ以上は読まれない。<br>
+      Fiverrのトップセラーは <span class="rule-data">5語以下</span>（英語基準）。日本語換算で10〜15文字。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#9889;</span><span class="rule-name">要素数は2つまで</span></div>
+    <div class="rule-body">
+      「情報を詰め込む」は逆効果。伝えたい要素は <span class="rule-data">最大2つ</span> に絞る。<br>
+      0.3秒では3つ伝えても1つしか届かない。2つ目は「補足」として認識される程度。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#9889;</span><span class="rule-name">フォントサイズ</span></div>
+    <div class="rule-body">
+      メインコピー: <span class="rule-data">300pt以上</span>。補足テキスト: <span class="rule-data">100pt以上</span>。<br>
+      フォントは太め（Bold/Black）。細いフォントはスクロール中に消える。<br>
+      フォントの種類は <span class="rule-data">2種類まで</span>。3種以上は散らかる。
+    </div>
+  </div>
+
+  <div class="sources">
+    <a href="https://note.com/kawaidesign/n/n5cca856a5e88">プロのサムネイル設計14の定量ルール</a> /
+    <a href="https://www.profuture.co.jp/mk/column/about-create-thumbnail">サムネイルの作り方10のコツ</a>
+  </div>
+</div>
+
+<!-- ============ 2. ココナラ固有 ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--amber)">2</div>
+    <div class="section-title">ココナラ固有ルール</div>
+    <div class="section-scope">ココナラ</div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128208;</span><span class="rule-name">画像サイズと安全領域</span></div>
+    <div class="rule-body">
+      推奨サイズ: <span class="rule-data">1220 x 1240 px</span>（比率 61:62）<br>
+      一覧表示で見える領域: <span class="rule-data">1220 x 1009 px</span><br>
+      上下 <span class="rule-warn">115.5px は切れる</span> → テキスト・重要要素は中央寄りに配置必須<br>
+      高画質にするには推奨サイズの2倍（2440x2480px）で作成→書き出し
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#127942;</span><span class="rule-name">売れてる出品者の共通点</span></div>
+    <div class="rule-body">
+      <strong>「シンプル・コピー・コントラスト」</strong> の3要素がカギ。<br>
+      ランキング上位者はサムネを「ミニLP」として作り込んでいる。<br>
+      サムネ改善後 <span class="rule-data">1週間でお気に入り3倍</span> → 初受注に繋がった実証事例あり。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128200;</span><span class="rule-name">アルゴリズムへの影響</span></div>
+    <div class="rule-body">
+      ココナラの検索順位は <span class="rule-data">クリック率</span> と <span class="rule-data">滞在時間</span> が影響する。<br>
+      サムネのCTRが低い → 検索順位が落ちる → さらに表示されなくなる悪循環。
+    </div>
+  </div>
+
+  <div class="sources">
+    <a href="https://yorudakedesignblog.com/coconala-samuneiru-size/">ココナラサムネイルサイズ一覧</a> /
+    <a href="https://coconala.com/blogs/2027462/618314">出品画像の正解デザインとNG例</a> /
+    <a href="https://yorudakedesignblog.com/coconala-samuneiru/">選ばれるための工夫</a>
+  </div>
+</div>
+
+<!-- ============ 3. Fiverr ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--green)">3</div>
+    <div class="section-title">Fiverrトップセラーの鉄則</div>
+    <div class="section-scope">海外マーケットプレイス</div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128142;</span><span class="rule-name">トップセラーのサムネ構成（2026年）</span></div>
+    <div class="rule-body">
+      1. <strong>高コントラスト背景</strong>（他と被らない）<br>
+      2. <strong>人の顔</strong>がテキストを指す構図 → 視線誘導<br>
+      3. <strong>5語以下</strong>で「何をするか」が伝わるテキスト<br><br>
+      サムネ更新で <span class="rule-data">インプレッション30%増</span>、<span class="rule-data">受注2倍</span> のデータあり。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128683;</span><span class="rule-name">禁止事項</span></div>
+    <div class="rule-body">
+      <span class="rule-warn">クリックベイト・無関係画像</span> → ランキングに悪影響<br>
+      <span class="rule-warn">プラットフォームのバッジを自分で入れる</span> → フラグされて削除<br>
+      出品テキストと同じ文言をサムネで繰り返さない
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#127912;</span><span class="rule-name">ニッチに合わせた実物提示</span></div>
+    <div class="rule-body">
+      サービス内容を視覚的に証明する。<br>
+      ロゴデザイン→ロゴバリエーション / 開発→コードのスクリーンショット / <br>
+      <strong>AIチャットボット → チャット画面のモックアップ</strong>
+    </div>
+  </div>
+
+  <div class="sources">
+    <a href="https://help.fiverr.com/hc/en-us/articles/15863342952977-Guidelines-for-selecting-Gig-images">Fiverr Gig Image Guidelines</a> /
+    <a href="https://touhfa.art/blog/designtips/fiverr-gig-thumbnail-size-design-guide/">Fiverr Thumbnail Guide 2026</a> /
+    <a href="https://www.jobbers.io/the-complete-fiverr-gig-optimization-guide-2026/">Complete Gig Optimization Guide</a>
+  </div>
+</div>
+
+<!-- ============ 4. バナーCTRデータ ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--blue)">4</div>
+    <div class="section-title">バナー広告CTRデータ</div>
+    <div class="section-scope">広告業界</div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#127912;</span><span class="rule-name">高CTR配色</span></div>
+    <div class="rule-body">
+      CTRが高い背景色: <span class="rule-data">白</span> <span class="rule-data">ピンク</span> <span class="rule-data">青</span><br>
+      赤は「進出色」→ 緊急性・行動喚起に強い。CTAボタンやセール情報に最適。<br>
+      青は信頼感・安定感 → 金融・専門サービスに効果的。<br>
+      配色は <span class="rule-data">3色まで</span>: ベースカラー + メインカラー + アクセントカラー（補色）
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128064;</span><span class="rule-name">視線誘導（Z型の法則）</span></div>
+    <div class="rule-body">
+      人の目線は <span class="rule-data">左上 → 右上 → 左下 → 右下</span> に流れる（Z型）。<br>
+      左上にキャッチコピー、右下にCTA/価格を配置すると自然に誘導できる。<br>
+      バナーに最も使われるレイアウトパターン。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128202;</span><span class="rule-name">業種別の使い分け</span></div>
+    <div class="rule-body">
+      <strong>BtoB・専門サービス:</strong> テキスト面積が大きい方がCTR高い<br>
+      <strong>BtoC・一般消費者:</strong> 画像面積が大きい方がCTR高い<br>
+      → AIチャットボット（BtoB寄り）= <span class="rule-data">テキスト主体が有効</span>
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128100;</span><span class="rule-name">人物写真の効果</span></div>
+    <div class="rule-body">
+      女性写真: CTR <span class="rule-data">3倍以上</span>（男性写真比）<br>
+      複数人: さらに <span class="rule-data">2倍</span><br>
+      → ただしココナラの出品サムネでは顔出し必須ではない。チャットUIモックアップが実物提示として代替になる。
+    </div>
+  </div>
+
+  <div class="sources">
+    <a href="https://buildupp.net/seo/banner-design-psychology">CTRを高める心理学14選</a> /
+    <a href="https://subsc-designoffice.jp/blog/banner/click/">クリック率が劇的に上がるバナー5つの法則</a> /
+    <a href="https://www.seleqt.net/design/high-ctr-banner-for-recruit/">クリック率の高いバナーの特徴</a> /
+    <a href="https://bruceclay.jpn.com/column/banner_design/">バナーの勝ちレイアウト4選</a>
+  </div>
+</div>
+
+<!-- ============ 5. ブロック構成とグーテンベルク・ダイアグラム ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#ec4899">5</div>
+    <div class="section-title">ブロック構成とグーテンベルク・ダイアグラム</div>
+    <div class="section-scope">全プラットフォーム共通</div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128220;</span><span class="rule-name">ブロック数の上限</span></div>
+    <div class="rule-body">
+      バナー/サムネの情報ブロックは <span class="rule-data">最大3つ</span>。<br>
+      「画像 + ヘッドライン + CTA（またはロゴ）」の3点構成が鉄則。<br>
+      3要素に絞った場合、CVR <span class="rule-data">最大40%向上</span> のデータあり。<br>
+      ミラーの法則（7±2）はリスト記憶の話であり、一瞬で走査するサムネには適用しない。サムネは3が上限。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128200;</span><span class="rule-name">グーテンベルク・ダイアグラム（4象限モデル）</span></div>
+    <div class="rule-body">
+      Z型視線誘導の根拠となるモデル。画面を4象限に分割する:<br><br>
+      <table style="width:100%;font-size:0.82rem;margin:8px 0;">
+        <tr>
+          <td style="background:rgba(34,197,94,0.15);padding:12px;border:1px solid var(--border);width:50%">
+            <strong style="color:var(--green)">第1象限: Primary Optical Area（左上）</strong><br>
+            視線の起点。最も注目される。<br>
+            → <strong>ヘッドライン/メインコピーを置く</strong>
+          </td>
+          <td style="background:rgba(59,130,246,0.1);padding:12px;border:1px solid var(--border)">
+            <strong style="color:var(--blue)">第2象限: Strong Fallow Area（右上）</strong><br>
+            起点から自然に流れて到達。<br>
+            → <strong>サブ情報/ビジュアルを置く</strong>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:rgba(239,68,68,0.1);padding:12px;border:1px solid var(--border)">
+            <strong style="color:var(--red)">第3象限: Weak Fallow Area（左下）</strong><br>
+            <span class="rule-warn">最も注目されない死角</span><br>
+            → <strong>重要情報を置くな。空けるか弱い補足のみ</strong>
+          </td>
+          <td style="background:rgba(245,158,11,0.12);padding:12px;border:1px solid var(--border)">
+            <strong style="color:var(--amber)">第4象限: Terminal Area（右下）</strong><br>
+            視線の終着点。行動決定点。<br>
+            → <strong>CTA/価格を置く</strong>
+          </td>
+        </tr>
+      </table>
+      視線の流れ: 第1 → 第2 → <span class="rule-warn">第3を飛ばして</span> → 第4（Z字）
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128736;</span><span class="rule-name">ブロック配置ルール（Z型の正しい使い方）</span></div>
+    <div class="rule-body">
+      3ブロック構成の場合の配置:<br>
+      ・<strong>第1象限（左上）:</strong> ヘッドライン — 最重要情報。2〜3行以内に収める<br>
+      ・<strong>第2象限（右上）:</strong> ビジュアル/実物提示 — 視線が水平移動で到達<br>
+      ・<strong>第4象限（右下）:</strong> CTA/価格 — 対角線移動で到達する終着点<br>
+      ・<span class="rule-warn">第3象限（左下）には重要ブロックを置かない</span><br><br>
+      ヘッドラインが第1象限からはみ出して第3象限に侵食すると、Z型動線が崩壊する。<br>
+      <strong>各ブロックは割り当てられた象限内に収めること。</strong>
+    </div>
+  </div>
+
+  <div class="sources">
+    <a href="https://medium.com/user-experience-3/the-gutenberg-diagram-in-web-design-e5347c172627">Gutenberg Diagram - Medium</a> /
+    <a href="https://vanseodesign.com/web-design/3-design-layouts/">3 Design Layouts - Vanseo Design</a> /
+    <a href="https://instapage.com/blog/z-pattern-layout">Z-Pattern Layout - Instapage</a> /
+    <a href="https://www.speedpro.com/blog/design-tips-to-create-the-perfect-banner/">SpeedPro Banner Design Tips</a> /
+    <a href="https://lawsofux.com/chunking/">Chunking - Laws of UX</a>
+  </div>
+</div>
+
+<!-- ============ 6. ブロック内 vs ブロック間の視線動線 ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#f97316">6</div>
+    <div class="section-title">2階層の視線動線（マクロ/ミクロ）</div>
+    <div class="section-scope">全プラットフォーム共通</div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#127758;</span><span class="rule-name">マクロレベル（ブロック間）</span></div>
+    <div class="rule-body">
+      画面全体をZ型で走査。<strong>どのブロックをどの順番で見るか</strong>を制御する。<br>
+      第1象限→第2象限→第4象限の順で視線が移動。<br>
+      ブロック間の距離・サイズ差・コントラスト差で誘導を強化できる。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128269;</span><span class="rule-name">ミクロレベル（ブロック内）</span></div>
+    <div class="rule-body">
+      各ブロック内部も <span class="rule-data">左上→右下</span> で読まれる（ミニZ）。<br>
+      ブロック内の要素数は少ないほど認知負荷が下がる。<br>
+      関連する要素は近くに（近接の法則）、関係ない要素は離す → ブロックの「塊」が自然に認識される。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#9888;</span><span class="rule-name">象限侵食の禁止</span></div>
+    <div class="rule-body">
+      1つのブロックが複数の象限にまたがると、Z型動線が崩壊する。<br>
+      例: ヘッドラインが6行で第1象限（左上）から第3象限（左下）まで侵食 → 視線がZ型で動かず縦読みになる。<br>
+      <strong>各ブロックは1象限に収めるのが原則。</strong>
+    </div>
+  </div>
+
+  <div class="sources">
+    <a href="https://ixdf.org/literature/topics/visual-hierarchy">Visual Hierarchy - IxDF</a> /
+    <a href="https://www.marukin-ad.co.jp/marulog/?p=4512">サムネイル制作のレイアウト例</a> /
+    <a href="https://www.xencreate.com/blog/the-z-pattern-why-smart-web-design-starts-with-how-people-actually-look-at-a-page">Z-Pattern - XenCreate</a>
+  </div>
+</div>
+
+<!-- ============ 7. 出品物特性 ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--purple)">7</div>
+    <div class="section-title">AIチャットボット出品に特化した指針</div>
+    <div class="section-scope">出品物特性</div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128172;</span><span class="rule-name">実物提示 = チャットUIモックアップ</span></div>
+    <div class="rule-body">
+      Fiverrの鉄則「ニッチに合わせた実物提示」を適用すると、AIチャットボットの場合は<strong>チャット画面のモックアップ</strong>が最も効果的。<br>
+      「これを買うとこういう画面が動く」が一目で伝わる。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#127919;</span><span class="rule-name">BtoB寄り = テキスト主体が正解</span></div>
+    <div class="rule-body">
+      AIチャットボット導入は事業者向け（BtoB寄り）。<br>
+      バナーCTRデータでは、BtoB・専門サービスは <span class="rule-data">テキスト面積が大きい方がCTR高い</span>。<br>
+      装飾画像より「何が解決するか」を文字で伝えた方が効く。
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="rule-head"><span class="rule-icon">&#128176;</span><span class="rule-name">価格の見せ方</span></div>
+    <div class="rule-body">
+      5,000円は競合より安い場合、価格自体がフック（注意喚起）になる。<br>
+      Z型レイアウトの <span class="rule-data">右下</span> に配置（視線の終着点=行動決定点）。
+    </div>
+  </div>
+</div>
+
+<!-- ============ 統合チェックリスト ============ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--cyan)">&#10003;</div>
+    <div class="section-title">統合チェックリスト</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:40%">チェック項目</th>
+        <th style="width:25%">基準値</th>
+        <th style="width:35%">根拠</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>文字数</td><td class="val">15〜20文字</td><td>3秒ルール（0.3秒で1つ）</td></tr>
+      <tr><td>伝える要素数</td><td class="val">最大2つ</td><td>3秒ルール</td></tr>
+      <tr><td>フォント種類</td><td class="val">2種類まで</td><td>バナーデザイン原則</td></tr>
+      <tr><td>メインフォントサイズ</td><td class="val">300pt+</td><td>スクロール視認性</td></tr>
+      <tr><td>配色数</td><td class="val">3色まで</td><td>ベース+メイン+アクセント</td></tr>
+      <tr><td>テキスト配置</td><td class="val">中央寄り</td><td>ココナラ上下115px切れ問題</td></tr>
+      <tr><td>レイアウト</td><td class="val">Z型</td><td>左上=キャッチ、右下=価格/CTA</td></tr>
+      <tr><td>実物提示</td><td class="val">チャットUIモック</td><td>Fiverr「ニッチに合わせた実物」</td></tr>
+      <tr><td>画像サイズ</td><td class="val">1220x1240px</td><td>ココナラ推奨</td></tr>
+      <tr><td>コントラスト</td><td class="val">背景と文字が明確に区別</td><td>バナーCTRデータ</td></tr>
+      <tr><td>ブロック数</td><td class="val">最大3つ</td><td>バナー3要素鉄則（CVR+40%）</td></tr>
+      <tr><td>ブロック配置（4象限）</td><td class="val">第1=コピー / 第2=ビジュアル / 第3=空 / 第4=CTA・価格</td><td>グーテンベルク・ダイアグラム</td></tr>
+      <tr><td>象限侵食</td><td class="val">各ブロックが1象限内に収まっていること</td><td>Z型動線崩壊防止</td></tr>
+      <tr><td>ヘッドライン行数</td><td class="val">2〜3行以内</td><td>第1象限内に収めるため</td></tr>
+      <tr><td>目視確認の実施</td><td class="val">スクリーンショットを撮影し実レンダリング結果を目視</td><td>コードと出力の乖離防止</td></tr>
+      <tr><td>目視結果の自己評価</td><td class="val">発見した問題点を正直に全て記載</td><td>自己申告の虚偽防止</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ 現状診断 ============ -->
+<div class="diagnosis">
+  <h2>現サムネイル（v3）の診断</h2>
+
+  <div class="diag-row">
+    <div class="diag-label">文字数</div>
+    <div class="diag-val"><span class="bad">約80文字</span> — 基準の4倍以上。痛み文2行+ヘッドライン2行+サブコピー+チャット内テキスト</div>
+  </div>
+  <div class="diag-row">
+    <div class="diag-label">要素数</div>
+    <div class="diag-val"><span class="bad">9個以上</span> — 痛み / ヘッドライン / サブコピー / チャットモック / ピル4つ / 価格バッジ</div>
+  </div>
+  <div class="diag-row">
+    <div class="diag-label">フォント</div>
+    <div class="diag-val"><span class="bad">サイズ不足</span> — メインコピーが86px。300pt基準に対して大幅に不足</div>
+  </div>
+  <div class="diag-row">
+    <div class="diag-label">Z型配置</div>
+    <div class="diag-val"><span class="bad">中央揃え</span> — Z型視線誘導になっていない。全要素が縦積みセンタリング</div>
+  </div>
+  <div class="diag-row">
+    <div class="diag-label">3秒テスト</div>
+    <div class="diag-val"><span class="bad">不合格</span> — 0.3秒で「何のサービスか」が伝わらない。情報過多で視線が散る</div>
+  </div>
+
+  <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(239,68,68,0.2);">
+    <div style="font-size:0.9rem;font-weight:700;color:var(--amber);margin-bottom:8px;">黄金律に基づく修正方針</div>
+    <div style="font-size:0.85rem;color:#c4c4cc;">
+      1. 文字を <strong>15〜20文字</strong> に削減（メインコピー1行 + サブ1行のみ）<br>
+      2. 要素を <strong>2つ</strong> に絞る（コピー + チャットモック or コピー + 価格）<br>
+      3. メインフォントを <strong>300pt+</strong> に拡大<br>
+      4. <strong>Z型レイアウト</strong> に変更（左上=コピー、右下=価格）<br>
+      5. ピル4つ・痛み文・サブコピーは全て <strong>削除</strong>（紹介画像に回す）
+    </div>
+  </div>
+</div>
+
+<footer>
+  調査日: 2026-04-09 | データソース: ココナラ公式ブログ / Fiverr Help Center / バナーCTR研究 / 視線誘導研究 / YouTube サムネイル定量ルール
+</footer>
+
+</div>
+</body>
+</html>

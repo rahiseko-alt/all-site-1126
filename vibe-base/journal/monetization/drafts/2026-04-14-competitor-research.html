@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>競合調査レポート — カテゴリ230 業務自動化・効率化支援</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --fg: #222;
+    --muted: #6b6b6b;
+    --line: #e0e0e0;
+    --soft: #f4f4f4;
+    --accent: #111;
+    --hot: #047857;
+    --low: #b91c1c;
+    --warn: #b45309;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    font-size: 14px;
+    padding: 32px 48px 60px;
+  }
+  header {
+    border-bottom: 2px solid var(--fg);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: 22px;
+    margin: 0 0 4px;
+    letter-spacing: 0.02em;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  h2 {
+    font-size: 16px;
+    margin: 32px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 {
+    font-size: 14px;
+    margin: 20px 0 8px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  p { margin: 6px 0; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+    margin: 8px 0 16px;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  th {
+    background: var(--soft);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.center { text-align: center; }
+  tr:hover { background: #f9f9f9; }
+  .rank { color: var(--muted); font-size: 12px; }
+
+  /* Rating stars */
+  .star { color: #b45309; font-size: 12px; }
+
+  /* ROI badge */
+  .roi-yes { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .roi-no  { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+
+  /* Verdict badges */
+  .v-aa { display: inline-block; padding: 2px 10px; border-radius: 2px; font-size: 12px; font-weight: 700; background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+  .v-a  { display: inline-block; padding: 2px 10px; border-radius: 2px; font-size: 12px; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; }
+  .v-b  { display: inline-block; padding: 2px 10px; border-radius: 2px; font-size: 12px; font-weight: 700; background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+  .v-c  { display: inline-block; padding: 2px 10px; border-radius: 2px; font-size: 12px; font-weight: 700; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+  /* Quote block */
+  blockquote {
+    margin: 8px 0;
+    padding: 10px 16px;
+    border-left: 3px solid var(--line);
+    background: #fff;
+    font-size: 13px;
+    color: var(--fg);
+    font-style: italic;
+  }
+  blockquote cite {
+    display: block;
+    margin-top: 4px;
+    font-style: normal;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Implication box */
+  .implication {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .implication .tool-id {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .implication ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  .implication li {
+    margin-bottom: 4px;
+  }
+  .implication .verdict {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  /* Price distribution */
+  .price-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .price-row:last-child { border-bottom: none; }
+  .price-range {
+    min-width: 130px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .bar-wrap {
+    flex: 1;
+    background: var(--soft);
+    height: 14px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .bar-count {
+    min-width: 40px;
+    text-align: right;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .bar-verdict {
+    min-width: 28px;
+    text-align: center;
+  }
+
+  /* Note */
+  .note {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 4px 0 12px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 24px;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  .meta-item {
+    padding: 10px 16px;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  .meta-item .label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+  .meta-item .value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .tag-eff { display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; margin: 1px; }
+  .tag-time { display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; margin: 1px; }
+  .tag-err { display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; margin: 1px; }
+  .tag-cost { display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; margin: 1px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>競合調査レポート — カテゴリ230 業務自動化・効率化支援</h1>
+  <p class="subtitle">調査日: 2026-04-14 ／ 対象: Excel/VBA・Pythonスクレイピング・RPA ／ データ取得元: coconala.com 販売数順</p>
+</header>
+
+<!-- § 1 -->
+<h2>§1 ジャンル別競合マップ</h2>
+
+<h3>1-A Excel / VBA 自動化</h3>
+<p class="note">販売数順。カテゴリ230内VBAキーワード検索 + 全体販売数上位から抽出。</p>
+<table>
+  <thead>
+    <tr>
+      <th class="rank">#</th>
+      <th>サービスタイトル</th>
+      <th>出品者</th>
+      <th>最安価格</th>
+      <th>販売数</th>
+      <th>評価</th>
+      <th>ROI訴求</th>
+      <th>納品形式</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="num rank">1</td>
+      <td>面倒な繰り返しの作業を自動化します</td>
+      <td>ネバーピース</td>
+      <td class="num">¥3,000</td>
+      <td class="num">815</td>
+      <td><span class="star">★</span> 5.0 (632件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>VBAマクロ</td>
+    </tr>
+    <tr>
+      <td class="num rank">2</td>
+      <td>Google Apps Scriptで自動化します</td>
+      <td>n00518</td>
+      <td class="num">¥3,000</td>
+      <td class="num">892</td>
+      <td><span class="star">★</span> 5.0 (824件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>GASスクリプト / 実装済みファイル</td>
+    </tr>
+    <tr>
+      <td class="num rank">3</td>
+      <td>エクセル業務をマクロ(VBA)で自動化します</td>
+      <td>ゆふづつ</td>
+      <td class="num">¥9,000</td>
+      <td class="num">490</td>
+      <td><span class="star">★</span> 5.0 (407件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Excelマクロ(VBA)ファイル</td>
+    </tr>
+    <tr>
+      <td class="num rank">4</td>
+      <td>Excel VBAによる自動化。なんでも承ります</td>
+      <td>いき 育児中</td>
+      <td class="num">¥29,000</td>
+      <td class="num">439</td>
+      <td><span class="star">★</span> 5.0 (351件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Excelブック / 操作解説動画付</td>
+    </tr>
+    <tr>
+      <td class="num rank">5</td>
+      <td>VBAのプロがExcelエクセル業務を自動化します</td>
+      <td>らくはた ■資格保有</td>
+      <td class="num">¥3,000</td>
+      <td class="num">368</td>
+      <td><span class="star">★</span> 5.0 (302件)</td>
+      <td><span class="roi-yes">あり</span></td>
+      <td>VBAツール（Excel/Word/PPT/Outlook）</td>
+    </tr>
+    <tr>
+      <td class="num rank">6</td>
+      <td>Excelの自動化ツール（マクロVBA）作成します</td>
+      <td>ExcelVBA匠</td>
+      <td class="num">¥10,000</td>
+      <td class="num">383</td>
+      <td><span class="star">★</span> 5.0 (339件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Excelブック</td>
+    </tr>
+    <tr>
+      <td class="num rank">7</td>
+      <td>繰り返す面倒なExcel作業自動化！効率化します</td>
+      <td>カスミ Excel VBA 講師</td>
+      <td class="num">¥3,000</td>
+      <td class="num">314</td>
+      <td><span class="star">★</span> 5.0 (269件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Excelファイル / VBAマクロ / 動画説明</td>
+    </tr>
+    <tr>
+      <td class="num rank">8</td>
+      <td>あらゆるエクセル/Excelの作業を代行します</td>
+      <td>yamazero</td>
+      <td class="num">¥9,000</td>
+      <td class="num">1,806</td>
+      <td><span class="star">★</span> 5.0 (1,607件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Excelファイル / Wordファイル（代行型）</td>
+    </tr>
+    <tr>
+      <td class="num rank">9</td>
+      <td>コード開示！Excel VBA・マクロ開発承ります</td>
+      <td>キタノネコセンセイ</td>
+      <td class="num">¥15,000</td>
+      <td class="num">225</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Excelブック（コード開示）</td>
+    </tr>
+    <tr>
+      <td class="num rank">10</td>
+      <td>Excelマクロでそのお仕事自動化します</td>
+      <td>しゃあs Labo</td>
+      <td class="num">¥6,000</td>
+      <td class="num">229</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Excelマクロ</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>1-B Python スクレイピング・データ収集</h3>
+<p class="note">スクレイピングキーワード検索 + 全体販売数上位から抽出。</p>
+<table>
+  <thead>
+    <tr>
+      <th class="rank">#</th>
+      <th>サービスタイトル</th>
+      <th>出品者</th>
+      <th>最安価格</th>
+      <th>販売数</th>
+      <th>評価</th>
+      <th>ROI訴求</th>
+      <th>納品形式</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="num rank">1</td>
+      <td>PythonでWebスクレイピングツール作成します</td>
+      <td>エイトさん</td>
+      <td class="num">¥10,000</td>
+      <td class="num">585</td>
+      <td><span class="star">★</span> 5.0 (446件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Pythonスクリプト / .exe / サーバー形式</td>
+    </tr>
+    <tr>
+      <td class="num rank">2</td>
+      <td>WEB上のデータをCSV化するツールを提供します</td>
+      <td>bakuta</td>
+      <td class="num">¥5,000</td>
+      <td class="num">92</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>CSVツール</td>
+    </tr>
+    <tr>
+      <td class="num rank">3</td>
+      <td>スクレイピングでデータを収集します</td>
+      <td>ろぽまる</td>
+      <td class="num">¥5,000</td>
+      <td class="num">68</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>CSV / Excel</td>
+    </tr>
+    <tr>
+      <td class="num rank">4</td>
+      <td>GASによる業務自動化システム作成します</td>
+      <td>エイトさん</td>
+      <td class="num">¥5,000</td>
+      <td class="num">65</td>
+      <td><span class="star">★</span> 4.9</td>
+      <td><span class="roi-no">—</span></td>
+      <td>GASスクリプト</td>
+    </tr>
+    <tr>
+      <td class="num rank">5</td>
+      <td>指定サイトからデータ抽出、スクレイピングします</td>
+      <td>SCRAPRO</td>
+      <td class="num">¥3,000</td>
+      <td class="num">217</td>
+      <td><span class="star">★</span> 5.0 (195件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>CSV / Excel / .exe（Win10以上 64bit）</td>
+    </tr>
+    <tr>
+      <td class="num rank">6</td>
+      <td>高品質｜高耐久なデータ収集ツールを開発します</td>
+      <td>CHAPPY_Engineer</td>
+      <td class="num">¥8,000</td>
+      <td class="num">153</td>
+      <td><span class="star">★</span> 5.0 (129件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>.exe / Excel / CSV / JSON</td>
+    </tr>
+    <tr>
+      <td class="num rank">7</td>
+      <td>WEBスクレイピング出来ます</td>
+      <td>RPA_miyazaki</td>
+      <td class="num">¥28,000</td>
+      <td class="num">41</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>スクリプト</td>
+    </tr>
+    <tr>
+      <td class="num rank">8</td>
+      <td>Octoparse（オクトパス）設定を代行します</td>
+      <td>ココ生活</td>
+      <td class="num">¥3,000</td>
+      <td class="num">169</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Octoparse設定ファイル（代行型）</td>
+    </tr>
+    <tr>
+      <td class="num rank">9</td>
+      <td>Pythonを使ってスクレイピングします</td>
+      <td>いとシステムズ</td>
+      <td class="num">¥6,000</td>
+      <td class="num">2</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Pythonスクリプト</td>
+    </tr>
+    <tr>
+      <td class="num rank">10</td>
+      <td>Octoparseツール（OTD）作成代行します</td>
+      <td>KM WORKS</td>
+      <td class="num">¥30,000</td>
+      <td class="num">16</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Octoparse設定ファイル</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>1-C RPA・PC 自動化</h3>
+<p class="note">RPAキーワード検索 + 全体販売数上位から抽出。</p>
+<table>
+  <thead>
+    <tr>
+      <th class="rank">#</th>
+      <th>サービスタイトル</th>
+      <th>出品者</th>
+      <th>最安価格</th>
+      <th>販売数</th>
+      <th>評価</th>
+      <th>ROI訴求</th>
+      <th>納品形式</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="num rank">1</td>
+      <td>RPAによる業務の自動化プログラムを開発します</td>
+      <td>HasegawaTech</td>
+      <td class="num">¥15,000</td>
+      <td class="num">156</td>
+      <td><span class="star">★</span> 5.0 (141件)</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Python / Power Automate Desktop / GAS</td>
+    </tr>
+    <tr>
+      <td class="num rank">2</td>
+      <td>面倒なPC作業の自動化・RPAのご相談に乗ります</td>
+      <td>yousystem</td>
+      <td class="num">¥75,000</td>
+      <td class="num">98</td>
+      <td><span class="star">★</span> 5.0 (88件)</td>
+      <td><span class="roi-yes">あり</span></td>
+      <td>要相談（コンサル型）</td>
+    </tr>
+    <tr>
+      <td class="num rank">3</td>
+      <td>Power Automate質問・開発お受けします</td>
+      <td>Hitoshi Hirata</td>
+      <td class="num">¥10,000</td>
+      <td class="num">128</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Power Automateフロー</td>
+    </tr>
+    <tr>
+      <td class="num rank">4</td>
+      <td>ツール代無料！定型業務自動化</td>
+      <td>ブライラント</td>
+      <td class="num">¥5,000</td>
+      <td class="num">38</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>RPA / 自動化ツール</td>
+    </tr>
+    <tr>
+      <td class="num rank">5</td>
+      <td>windowsの面倒なパソコン作業自動化</td>
+      <td>ECエンジニア neger</td>
+      <td class="num">¥50,000</td>
+      <td class="num">29</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Windowsツール</td>
+    </tr>
+    <tr>
+      <td class="num rank">6</td>
+      <td>RPA・自動化ツールを開発</td>
+      <td>SNchan ー しんの</td>
+      <td class="num">¥5,000</td>
+      <td class="num">7</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>RPAツール</td>
+    </tr>
+    <tr>
+      <td class="num rank">7</td>
+      <td>自動化・自動購入ツール開発</td>
+      <td>tanaka_s_001</td>
+      <td class="num">¥45,000</td>
+      <td class="num">651</td>
+      <td><span class="star">★</span> 4.8</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Pythonスクリプト</td>
+    </tr>
+    <tr>
+      <td class="num rank">8</td>
+      <td>業務効率化(RPA)ツールを開発</td>
+      <td>イプシロン_デルタ</td>
+      <td class="num">¥5,000</td>
+      <td class="num">4</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>RPAツール</td>
+    </tr>
+    <tr>
+      <td class="num rank">9</td>
+      <td>パソコン作業自動化</td>
+      <td>PYCreate</td>
+      <td class="num">¥18,000</td>
+      <td class="num">34</td>
+      <td><span class="star">★</span> 5.0</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Pythonスクリプト</td>
+    </tr>
+    <tr>
+      <td class="num rank">10</td>
+      <td>RPA、Power Automateで自動化</td>
+      <td>海野ひろし</td>
+      <td class="num">¥20,000</td>
+      <td class="num">—</td>
+      <td>—</td>
+      <td><span class="roi-no">—</span></td>
+      <td>Power Automateフロー</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- § 2 -->
+<h2>§2 値付けパターン分析</h2>
+
+<p class="note">カテゴリ230全体（1-2ページ目、計80サービス）の最安価格を集計。ROI観点の評価：「月1回以上使う定型業務なら1ヶ月以内に元が取れる価格帯」を基準。</p>
+
+<div class="meta-row">
+  <div class="meta-item">
+    <div class="label">最安値（確認範囲）</div>
+    <div class="value">¥3,000</div>
+  </div>
+  <div class="meta-item">
+    <div class="label">最高値（確認範囲）</div>
+    <div class="value">¥100,000</div>
+  </div>
+  <div class="meta-item">
+    <div class="label">中央値（確認範囲）</div>
+    <div class="value">¥10,000</div>
+  </div>
+  <div class="meta-item">
+    <div class="label">最多出現価格帯</div>
+    <div class="value">¥3,000〜¥10,000</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>価格帯</th>
+      <th>件数（概算）</th>
+      <th>代表サービス</th>
+      <th>販売数傾向</th>
+      <th>ROI評価</th>
+      <th>判定</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="num">¥3,000</td>
+      <td class="num">約15件</td>
+      <td>ネバーピース(815件)、n00518(892件)、らくはた(368件)、カスミ(314件)</td>
+      <td>高（200〜900件の高販売数が集中）</td>
+      <td>月1回1時間の作業削減=¥3,750(時給2,500円換算)。初月回収可</td>
+      <td><span class="v-aa">◎</span></td>
+    </tr>
+    <tr>
+      <td class="num">¥5,000〜¥6,000</td>
+      <td class="num">約12件</td>
+      <td>bakuta(92件)、ろぽまる(68件)、SCRAPRO(217件)</td>
+      <td>中（50〜200件）</td>
+      <td>月2回2時間削減で初月回収可。心理的障壁も低い</td>
+      <td><span class="v-aa">◎</span></td>
+    </tr>
+    <tr>
+      <td class="num">¥8,000〜¥10,000</td>
+      <td class="num">約10件</td>
+      <td>CHAPPY(153件)、エイトさん(585件)、ExcelVBA匠(383件)</td>
+      <td>中〜高（スクレイピング・VBAカスタムの主力価格帯）</td>
+      <td>月4〜5時間削減で初月回収。業務特化なら十分成立</td>
+      <td><span class="v-a">○</span></td>
+    </tr>
+    <tr>
+      <td class="num">¥15,000〜¥20,000</td>
+      <td class="num">約10件</td>
+      <td>HasegawaTech(156件)、キタノネコ(225件)</td>
+      <td>中（100〜200件）</td>
+      <td>月10時間削減が必要。中〜大規模業務向けなら成立</td>
+      <td><span class="v-b">△</span></td>
+    </tr>
+    <tr>
+      <td class="num">¥25,000〜¥30,000</td>
+      <td class="num">約8件</td>
+      <td>いき育児中(439件)、RPA_miyazaki(41件)</td>
+      <td>低〜中。いき育児中は単価が高くても高販売数の例外</td>
+      <td>週1回の大規模自動化が前提。個人・小規模には重い</td>
+      <td><span class="v-b">△</span></td>
+    </tr>
+    <tr>
+      <td class="num">¥45,000〜¥75,000+</td>
+      <td class="num">約6件</td>
+      <td>yousystem(98件)、tanaka_s_001(651件)、いき育児中ハイエンド</td>
+      <td>低〜中（コンサル型・特殊ツール）</td>
+      <td>業務単価が高い（人件費100万円/年以上削減）企業向けのみ成立</td>
+      <td><span class="v-c">×</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="note">◎=初月回収ほぼ確実（衝動買いしやすい価格） ○=2〜3ヶ月で回収できるライン △=中〜大規模業務向け ×=企業向け・費用対効果を自力で説明できる購買層のみ</p>
+
+<div style="margin: 16px 0;">
+  <div class="section-label">価格別 販売数分布（可視化）</div>
+
+  <div class="price-row">
+    <span class="price-range">¥3,000</span>
+    <div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div>
+    <span class="bar-count">最多</span>
+    <span class="bar-verdict"><span class="v-aa">◎</span></span>
+  </div>
+  <div class="price-row">
+    <span class="price-range">¥5,000〜¥6,000</span>
+    <div class="bar-wrap"><div class="bar-fill" style="width:70%"></div></div>
+    <span class="bar-count">多</span>
+    <span class="bar-verdict"><span class="v-aa">◎</span></span>
+  </div>
+  <div class="price-row">
+    <span class="price-range">¥8,000〜¥10,000</span>
+    <div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div>
+    <span class="bar-count">中</span>
+    <span class="bar-verdict"><span class="v-a">○</span></span>
+  </div>
+  <div class="price-row">
+    <span class="price-range">¥15,000〜¥20,000</span>
+    <div class="bar-wrap"><div class="bar-fill" style="width:40%"></div></div>
+    <span class="bar-count">中</span>
+    <span class="bar-verdict"><span class="v-b">△</span></span>
+  </div>
+  <div class="price-row">
+    <span class="price-range">¥25,000〜¥30,000</span>
+    <div class="bar-wrap"><div class="bar-fill" style="width:25%"></div></div>
+    <span class="bar-count">少</span>
+    <span class="bar-verdict"><span class="v-b">△</span></span>
+  </div>
+  <div class="price-row">
+    <span class="price-range">¥45,000+</span>
+    <div class="bar-wrap"><div class="bar-fill" style="width:15%"></div></div>
+    <span class="bar-count">少</span>
+    <span class="bar-verdict"><span class="v-c">×</span></span>
+  </div>
+</div>
+
+<p class="note">補足: ¥3,000 スタート価格帯が圧倒的な件数・販売数シェアを占める。¥10,000超になると「品質・実績・説明文の説得力」が購買を左右する。</p>
+
+
+<!-- § 3 -->
+<h2>§3 ROI訴求パターン集</h2>
+
+<p class="note">実際のサービス説明文・タイトルから抽出したROI・効果訴求フレーズの原文引用。括弧内は出品者名・サービスID。</p>
+
+<h3>3-A 時間削減型</h3>
+<span class="tag-time">時間削減</span>
+
+<blockquote>
+  「作業時間を1/10に短縮」「業務効率を10倍向上」「ミス発生ゼロを実現」「手作業の繰り返しで毎日残業に追われていた状態から、作業時間を1/10に短縮、ミスをゼロ化」
+  <cite>— らくはた■資格保有の自動化プロ（ID: 1919061）VBA自動化</cite>
+</blockquote>
+
+<blockquote>
+  「人的ミスを減らし時間を有効利用するためにも、手作業をやめてツールに任せてしまいませんか？」
+  <cite>— ゆふづつ（ID: 1488131）エクセル業務をマクロ(VBA)で自動化</cite>
+</blockquote>
+
+<blockquote>
+  「作業時間が激減します」
+  <cite>— カスミ Excel VBA 講師（ID: 3069157）繰り返す面倒なExcel作業自動化！効率化します</cite>
+</blockquote>
+
+<blockquote>
+  「膨大なCSVや複数ブックのデータを一瞬で集計・転記」
+  <cite>— いき 育児中（ID: 1855272）Excel VBAによる自動化。なんでも承ります</cite>
+</blockquote>
+
+<h3>3-B 反復作業解放型</h3>
+<span class="tag-eff">作業解放</span>
+
+<blockquote>
+  「毎日のPCで同じことの繰り返し作業をしている方、もしかしたら、ボタン１つで全自動でその作業を終わらせることが出来るかもしれません。業務が大幅に省力化・効率化が図れるかもしれません」「面倒な作業はボタン１つで終わらせて、本来仕事をすべき貴重なお時間を作りだしませんか」
+  <cite>— yousystem（ID: 661432）面倒なPC作業の自動化・RPAのご相談に乗ります</cite>
+</blockquote>
+
+<blockquote>
+  「同じ作業を手作業でおこなっていませんか」「ご依頼者様の作業を軽減できるものを作成します」「大量のデータから欲しいデータのみ抽出」「いろいろなサイトから欲しい情報の取得」
+  <cite>— ネバーピース（ID: 1087571）面倒な繰り返しの作業を自動化します</cite>
+</blockquote>
+
+<blockquote>
+  「エクセル（Excel）でコピーや貼り付けを繰り返し行っていたり、関数を多用して動作が遅くなっている場合は、エクセルのマクロと呼ばれる機能を利用して自動化することができます。作業が辛いと感じている方はご相談ください。」
+  <cite>— 亀助2022（ID: 2110790）エクセル（Excel）の作業を自動化します</cite>
+</blockquote>
+
+<h3>3-C 品質・エラーゼロ型</h3>
+<span class="tag-err">ミスゼロ</span>
+
+<blockquote>
+  「単にデータを集めるだけでなく『止まらない』『エラーに強い』エンタープライズ品質のスクレイピング」「自動リトライ機能」「自動復旧機能によりデータ欠損防止」
+  <cite>— CHAPPY_Engineer（ID: 2968340）高品質｜高耐久なデータ収集ツールを開発します</cite>
+</blockquote>
+
+<blockquote>
+  「収集がスピーディー」「ミスのない正確なデータ」「一度作成すれば何度も再利用可能」
+  <cite>— SCRAPRO（ID: 2880003）指定サイトからデータ抽出、スクレイピングします</cite>
+</blockquote>
+
+<h3>3-D データ収集・分析への橋渡し型</h3>
+<span class="tag-eff">作業解放</span>
+
+<blockquote>
+  「Webサイトから必要なデータを収集し、CSV / Excel / Googleスプレッドシートへの出力を自動化」「クリック・入力・遷移などの定型作業（例：出品、在庫・価格更新）を自動化」
+  <cite>— エイトさん（ID: 1232408）PythonでWebスクレイピングツール作成します</cite>
+</blockquote>
+
+<blockquote>
+  「手作業では時間がかかり、分析に十分な時間が割けない」という課題を、スクレイピング技術で「効率的かつ正確に解決」
+  <cite>— SCRAPRO（ID: 2880003）</cite>
+</blockquote>
+
+<h3>3-E 実績・権威型（ROIの間接訴求）</h3>
+<span class="tag-cost">実績</span>
+
+<blockquote>
+  「年間で120件以上の『自動化』のご依頼を専門に対応」「蓄積した《ノウハウ》で個人、法人、幅広い業務の自動化に対応が可能」
+  <cite>— n00518（ID: 1478262）Google Apps Scriptで自動化します</cite>
+</blockquote>
+
+<blockquote>
+  「第一種情報処理技術者の国家資格保有、実際にプロとして活躍中！」「工数の時間単価はおおよそ5,000円として算出」
+  <cite>— ExcelVBA匠（ID: 1787004）Excelの自動化ツール（マクロVBA）作成します</cite>
+</blockquote>
+
+<p class="note">観察: ¥3,000帯の圧倒的販売数を誇るサービス（ネバーピース 815件、n00518 892件）は数値的ROI訴求を持たない。一方、具体的数値を出しているらくはた（¥3,000、368件）は上位に食い込んでいる。数値ROI訴求＋低価格の組み合わせが最も強力なパターンと考えられる。</p>
+
+
+<!-- § 4 -->
+<h2>§4 我々の3ツールへの示唆</h2>
+
+<div class="implication">
+  <div class="tool-id">EFF-VBA01 — Excel / VBA 自動化 現行: ¥3,000</div>
+  <ul>
+    <li><strong>値付け:</strong> ¥3,000 は競合最頻価格帯と完全一致。価格競争力は十分。現状維持が妥当。値上げするなら実績（支持数50件以上）を積んでから¥5,000〜¥9,000への段階移行を検討する。</li>
+    <li><strong>ROI訴求:</strong> 競合上位（ネバーピース 815件・n00518 892件）はROI訴求なしで売れているが、らくはた（368件）は「作業時間1/10」「業務効率10倍」という具体数値を明示し上位に入っている。eff-vba01 の説明文に「繰り返し作業を月〇時間削減」「毎日のコピペ作業をボタン一つで完了」などの具体フレーズを追加すべき。</li>
+    <li><strong>納品形式:</strong> 主流は「VBAマクロファイル」。ボタン実行形式が標準。コード開示あり・なしで差別化が可能（コード開示ありはキタノネコ 225件が実績）。</li>
+    <li><strong>差別化余地:</strong> 競合の多くがオーダーメイド相談型。eff-vba01 が「定型パターンを素早く低価格で納品するパッケージ型」なら、相談不要・即購入できる訴求を前面に出せる。</li>
+  </ul>
+  <div class="verdict">結論: 価格¥3,000は維持。説明文に「月○時間削減」の具体数値フレーズを1行追加する。</div>
+</div>
+
+<div class="implication">
+  <div class="tool-id">EFF-PY01 — Python スクレイピング 現行: ¥10,000</div>
+  <ul>
+    <li><strong>値付け:</strong> ¥10,000 はエイトさん（585件・当カテゴリ最高販売数）と同価格帯。競合の中央値（¥8,000〜¥10,000）と一致しており適切。¥5,000まで下げると bakuta（92件）・ろぽまる（68件）と競合するが、いずれも販売数でエイトさんに大差をつけられていることから「¥5,000への値下げはROIが悪い」と判断できる。¥10,000維持が正解。</li>
+    <li><strong>ROI訴求:</strong> スクレイピング競合はROI訴求がほぼ皆無。SCRAPRO（217件）のみ「ミスのない正確なデータ」「一度作成すれば何度も再利用可能」という再利用価値訴求を持つ。eff-py01 では「一度作れば毎日自動収集」「調査・リストアップ作業を0分に」などのフレーズで差別化できる。</li>
+    <li><strong>納品形式:</strong> .exe（インストール不要）・CSV出力・スケジューラ対応が上位競合の標準。CHAPPY_Engineer（153件）は「エンタープライズ品質・自動リトライ・自動復旧」を差別化軸にしており、品質訴求で高評価を維持している。</li>
+    <li><strong>差別化余地:</strong> エイトさんが圧倒的シェアを持つが、「特定業種特化（EC・不動産・求人等）」や「設定画面付きGUI」での差別化は空白地帯。</li>
+  </ul>
+  <div class="verdict">結論: 価格¥10,000は維持。「一度作れば毎日自動収集」の再利用価値訴求を説明文冒頭に追加する。</div>
+</div>
+
+<div class="implication">
+  <div class="tool-id">EFF-RPA01 — RPA・PC 自動化 現行: ¥5,000（→¥3,000以下に改定要検討）</div>
+  <ul>
+    <li><strong>値付け:</strong> RPAカテゴリの価格帯は¥5,000〜¥75,000と広い。販売数が最も多い HasegawaTech（156件）は¥15,000。¥5,000の競合（ブライラント 38件・SNchan 7件・イプシロン_デルタ 4件）は販売数が少なく、低価格だから売れるわけではない。「¥3,000以下への引き下げ」は価値を下げるだけで販売数増に直結しないリスクが高い。改定方向は¥3,000以下への引き下げではなく、¥10,000〜¥15,000への引き上げ（HasegawaTechと同価格帯）を検討すべき。</li>
+    <li><strong>ROI訴求:</strong> RPA競合でROI訴求があるのは yousystem（¥75,000、98件）のみ。「ボタン１つで全自動」「貴重なお時間を作りだす」という表現が特徴的。RPA文脈では「何日分の作業を短縮できるか」を具体化する訴求が差別化要素になりうる。</li>
+    <li><strong>納品形式:</strong> Python / Power Automate Desktop / GAS など複数ツール対応が上位競合の標準。「使用ツールを指定しない（最適な手段を選ぶ）」訴求も有効。</li>
+    <li><strong>注意:</strong> RPAカテゴリは汎用性・業種特化・ツール選定力が差別化軸になっており、純粋な価格競争は下位に沈む構造。</li>
+  </ul>
+  <div class="verdict">結論: ¥5,000→¥3,000以下の引き下げ案は棄却。競合データからは¥10,000〜¥15,000への引き上げが合理的。「何時間・何日分の作業を1ボタンで終わらせるか」の具体数値を説明文に追加する。</div>
+</div>
+
+<p style="margin-top:32px; font-size:12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px;">
+  調査範囲: coconala.com カテゴリ230 販売数順1〜2ページ目（約80サービス）+ 個別サービスページ計12件 + キーワード検索（VBA/スクレイピング/RPA）各1ページ ／
+  データ取得日: 2026-04-14 ／
+  推測・補完なし。取得できなかった情報は「—」表記。
+</p>
+
+</body>
+</html>

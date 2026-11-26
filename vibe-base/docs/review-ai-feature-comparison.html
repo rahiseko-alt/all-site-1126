@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>クチコミ分析AI — 機能別競合比較表</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans JP', sans-serif; background: #f8fafc; color: #1e293b; padding: 24px; }
+h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+h2 { font-size: 1.1rem; font-weight: 700; margin: 32px 0 12px; }
+.subtitle { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+
+.legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; font-size: 0.8rem; }
+.legend span { display: flex; align-items: center; gap: 4px; }
+.dot { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.dot-yes { background: #16a34a; }
+.dot-partial { background: #d97706; }
+.dot-no { background: #dc2626; }
+.dot-unique { background: #ecfdf5; border: 1px solid #86efac; }
+.dot-gap { background: #fef2f2; border: 1px solid #fca5a5; }
+
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 0.82rem; }
+thead { background: #1e293b; color: #fff; }
+thead th { padding: 10px 8px; text-align: center; font-weight: 600; font-size: 0.78rem; white-space: nowrap; position: sticky; top: 0; z-index: 2; }
+thead th:first-child { text-align: center; width: 30px; }
+thead th:nth-child(2) { text-align: left; min-width: 160px; }
+thead th.ours { background: #ea580c; }
+tbody td { padding: 8px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+tbody td:nth-child(2) { text-align: left; font-weight: 500; }
+tbody tr:hover:not(.cat-row) { background: #f1f5f9; }
+
+.cat-row { background: #f1f5f9 !important; }
+.cat-row td { font-weight: 700; color: #475569; padding: 6px 8px; font-size: 0.8rem; border-bottom: 2px solid #cbd5e1; }
+
+.yes { color: #16a34a; font-weight: 700; }
+.partial { color: #d97706; font-weight: 700; }
+.no { color: #dc2626; font-weight: 600; }
+
+.unique-bg { background: #ecfdf5 !important; }
+.gap-bg { background: #fef2f2 !important; }
+
+.dev { text-align: center; width: 50px; }
+.dev input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #ea580c; }
+
+.prog { text-align: center; width: 80px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+.prog-live { color: #16a34a; }
+.prog-new { color: #2563eb; background: #dbeafe; }
+.prog-fix { color: #7c3aed; background: #ede9fe; }
+.prog-wip { color: #d97706; background: #FFF3E0; }
+.prog-skip { color: #6b7280; background: #f3f4f6; }
+.prog-no { color: #bbb; }
+
+td.notes { text-align: left; font-size: 0.75rem; color: #64748b; max-width: 180px; }
+td.notes[contenteditable] { cursor: text; }
+td.notes[contenteditable]:focus { outline: 2px solid #3b82f6; background: #eff6ff; }
+td.price { font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+td.mono-note { text-align: left; font-size: 0.72rem; color: #444; min-width: 80px; cursor: text; }
+td.mono-note:empty::before { content: '記入...'; color: #ccc; font-style: italic; }
+td.mono-note:focus { outline: 2px solid #3b82f6; background: #eff6ff; }
+
+/* --- プロダクト定義 --- */
+.product-def { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.product-def h2 { margin: 0 0 12px; }
+.def-table { width: 100%; box-shadow: none; border-radius: 0; }
+.def-table th { background: #f1f5f9; color: #334155; width: 30px; text-align: center; font-size: 1rem; padding: 10px; }
+.def-table td:nth-child(2) { width: 240px; font-weight: 600; font-size: 0.82rem; padding: 10px; }
+.def-table td:nth-child(3) { font-size: 0.82rem; padding: 10px; cursor: text; }
+.def-table td:nth-child(3):empty::before { content: 'クリックして入力...'; color: #ccc; font-style: italic; }
+.def-table td:nth-child(3):focus { outline: 2px solid #ea580c; outline-offset: -2px; background: #fff7ed; }
+
+/* --- ポジショニング勢力図 --- */
+.pos-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.pos-section h2 { margin: 0 0 8px; }
+.pos-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; font-size: 0.82rem; flex-wrap: wrap; }
+.pos-controls select { padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.82rem; }
+.pos-controls .auto-tag { background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+.pos-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 0.78rem; }
+.pos-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.pos-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+/* --- ツールバー --- */
+.toolbar { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
+.toolbar button { background: #1e293b; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-family: inherit; font-weight: 600; }
+.toolbar button:hover { background: #334155; }
+.toolbar .status { font-size: 0.78rem; color: #16a34a; font-weight: 600; display: none; }
+.toolbar .export-link { font-size: 0.72rem; color: #64748b; cursor: pointer; text-decoration: underline; margin-left: 8px; }
+.toolbar .export-link:hover { color: #ea580c; }
+
+.score-table { width: auto; margin-top: 24px; }
+.score-table td, .score-table th { padding: 6px 14px; }
+
+.sim-section { margin-top: 32px; background: #fff; border-radius: 8px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.sim-section h2 { margin-top: 0; }
+.sim-section p { font-size: 0.85rem; color: #64748b; margin-bottom: 12px; }
+.sim-table { width: auto; font-size: 0.85rem; }
+.sim-table th { background: #1e293b; color: #fff; padding: 8px 16px; text-align: center; }
+.sim-table th.ours { background: #ea580c; }
+.sim-table td { padding: 8px 16px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+.sim-table td:first-child { text-align: left; font-weight: 600; }
+.sim-highlight { background: #ecfdf5; font-weight: 700; }
+.sim-na { color: #9ca3af; font-style: italic; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 24px; }
+.summary-box { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.summary-box h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid; }
+.summary-box ul { list-style: none; padding: 0; }
+.summary-box ul li { padding: 4px 0; font-size: 0.82rem; line-height: 1.5; }
+.summary-box ul li::before { margin-right: 6px; font-weight: 700; }
+.box-gap { border-left: 4px solid #dc2626; }
+.box-gap h3 { border-color: #dc2626; color: #dc2626; }
+.box-gap li::before { content: "!"; color: #dc2626; }
+.box-strength { border-left: 4px solid #16a34a; }
+.box-strength h3 { border-color: #16a34a; color: #16a34a; }
+.box-strength li::before { content: "+"; color: #16a34a; }
+.box-opp { border-left: 4px solid #2563eb; }
+.box-opp h3 { border-color: #2563eb; color: #2563eb; }
+.box-opp li::before { content: ">"; color: #2563eb; }
+.why { display: block; font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<h1>クチコミ分析AI — 機能別競合比較表</h1>
+<p class="subtitle">初版: 2026-03-14 | SOP準拠更新: 2026-03-18 | 対象: 国内クチコミ管理ツール 5社 + 海外参考 1社</p>
+
+<!-- ===== 開発の方向性（3指標） ===== -->
+<div class="product-def">
+  <h2>開発の方向性</h2>
+  <table class="def-table">
+    <tr>
+      <th>①</th>
+      <td>一言でどんなクチコミアプリか？</td>
+      <td contenteditable="true" data-def="def1"></td>
+    </tr>
+    <tr>
+      <th>②</th>
+      <td>狙うポジション</td>
+      <td contenteditable="true" data-def="def2"></td>
+    </tr>
+    <tr>
+      <th>③</th>
+      <td>①②の意図 vs 実装計画の過不足</td>
+      <td contenteditable="true" data-def="def3"></td>
+    </tr>
+  </table>
+</div>
+
+<!-- ===== ポジショニング勢力図 ===== -->
+<div class="pos-section">
+  <h2>ポジショニング勢力図</h2>
+  <p style="font-size:0.78rem;color:#64748b;margin:0 0 8px;">
+    カテゴリ別スコアの分散が大きい＝各社が戦略的に差をつけている軸。上位2軸を自動選出。
+  </p>
+  <div class="pos-controls">
+    <label>X軸: <select id="axisX"></select></label>
+    <label>Y軸: <select id="axisY"></select></label>
+    <span class="auto-tag" id="autoTag">自動選出</span>
+  </div>
+  <div id="posChartArea"></div>
+  <div class="pos-legend" id="posLegend"></div>
+</div>
+
+<!-- ===== ツールバー ===== -->
+<div class="toolbar">
+  <button onclick="save()">保存</button>
+  <span class="status" id="saveStatus">保存しました</span>
+  <span class="export-link" onclick="exportMd()">Markdown書出</span>
+</div>
+
+<div class="legend">
+    <span><i class="dot dot-yes"></i> 対応済み</span>
+    <span><i class="dot dot-partial"></i> 一部対応 / 制限あり</span>
+    <span><i class="dot dot-no"></i> 未対応</span>
+    <span><i class="dot dot-unique"></i> 当社の独自強み</span>
+    <span><i class="dot dot-gap"></i> 致命的ギャップ（全社対応・当社なし）</span>
+</div>
+
+<table id="compTable">
+<thead>
+<tr>
+    <th>#</th>
+    <th>機能</th>
+    <th class="ours">クチコミ<br>分析AI</th>
+    <th>口コミコム</th>
+    <th>星トルン</th>
+    <th>MEOチェキ</th>
+    <th>Gyro-n</th>
+    <th>STOREPAD</th>
+    <th>Birdeye<br>(参考)</th>
+    <th>開発</th>
+    <th>進捗</th>
+    <th>備考</th>
+</tr>
+</thead>
+<tbody>
+
+<!-- ===== 口コミ取得 ===== -->
+<tr class="cat-row"><td colspan="12">口コミ取得</td></tr>
+<tr>
+    <td>1</td><td>Google Maps口コミ取得</td>
+    <td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="1"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>Places API。最大5件/回</td>
+</tr>
+<tr class="gap-bg">
+    <td>2</td><td>口コミ新着通知（メール/プッシュ）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="2"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>全社対応。最優先で必要</td>
+</tr>
+<tr>
+    <td>6</td><td>口コミ一括閲覧（全店舗横断）</td>
+    <td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="6"></td><td class="prog prog-wip">途中</td><td class="notes" contenteditable>店舗別閲覧のみ。横断ビューなし</td>
+</tr>
+<tr>
+    <td>7</td><td>口コミ重複排除</td>
+    <td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="7"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>sourceUrlで重複チェック</td>
+</tr>
+<tr>
+    <td>8</td><td>口コミ自動定期取得（スケジュール）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="8"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>現在は手動ボタン押下のみ</td>
+</tr>
+
+<!-- ===== サイト連携 ===== -->
+<tr class="cat-row"><td colspan="12">サイト連携</td></tr>
+<tr>
+    <td>3</td><td>食べログ連携</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="3"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>口コミコムのみ公式連携</td>
+</tr>
+<tr>
+    <td>4</td><td>ホットペッパー連携</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="4"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>5</td><td>その他口コミサイト連携（3サイト以上）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="5"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>口コミコム31サイト、STOREPAD23媒体</td>
+</tr>
+<tr>
+    <td>34</td><td>大衆点評連携</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="34"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>口コミコムのみ。国内唯一</td>
+</tr>
+
+<!-- ===== AI分析 ===== -->
+<tr class="cat-row"><td colspan="12">AI分析</td></tr>
+<tr class="unique-bg">
+    <td>9</td><td>感情分析（ポジ/ネガ/中立/混合）</td>
+    <td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="9"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>4分類は当社とBirdeyeのみ</td>
+</tr>
+<tr class="unique-bg">
+    <td>10</td><td>感情スコアリング（数値化）</td>
+    <td class="yes">○</td><td class="partial">△</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="10"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>-1.0〜1.0の連続値。独自強み</td>
+</tr>
+<tr class="unique-bg">
+    <td>11</td><td>テーマ・トピック抽出</td>
+    <td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="11"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>#料理の味 #接客 等のタグ抽出</td>
+</tr>
+<tr>
+    <td>12</td><td>QSCA分析（品質/接客/清潔/雰囲気）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="12"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>口コミコムのみ。差別化機会</td>
+</tr>
+<tr>
+    <td>13</td><td>トレンド分析（月次推移）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="13"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>テーマ別の月次推移</td>
+</tr>
+<tr>
+    <td>14</td><td>競合店舗の口コミ分析</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="14"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>15</td><td>AI改善提案生成</td>
+    <td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="15"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>分析→アクション提案。空白地帯</td>
+</tr>
+<tr>
+    <td>16</td><td>一括分析（全口コミ自動分析）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="16"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>現在は1件ずつ手動実行</td>
+</tr>
+
+<!-- ===== 返信 ===== -->
+<tr class="cat-row"><td colspan="12">返信</td></tr>
+<tr>
+    <td>17</td><td>AI返信文生成</td>
+    <td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="17"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>星トルンのみテンプレ方式</td>
+</tr>
+<tr class="unique-bg">
+    <td>18</td><td>トーン調整（丁寧/カジュアル/謝罪）</td>
+    <td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="18"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>3トーン選択は当社の独自強み</td>
+</tr>
+<tr>
+    <td>19</td><td>ブランドボイス学習（店舗個性反映）</td>
+    <td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="19"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>Birdeyeのみ。差別化大</td>
+</tr>
+<tr>
+    <td>20</td><td>自動返信（無人投稿）</td>
+    <td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="20"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>テンプレ自動のみ。AI全自動は慎重に</td>
+</tr>
+<tr>
+    <td>21</td><td>返信テンプレート管理</td>
+    <td class="no">×</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="21"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>22</td><td>Google口コミへの直接返信投稿</td>
+    <td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="22"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>GBP API連携が必要</td>
+</tr>
+
+<!-- ===== 口コミ獲得 ===== -->
+<tr class="cat-row"><td colspan="12">口コミ獲得</td></tr>
+<tr>
+    <td>23</td><td>QRコード生成（口コミ投稿用）</td>
+    <td class="no">×</td><td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="partial">△</td><td class="partial">△</td>
+    <td class="dev"><input type="checkbox" data-id="23"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>星トルン/MEOチェキの主力機能</td>
+</tr>
+<tr>
+    <td>24</td><td>SMS/メールでレビュー依頼</td>
+    <td class="no">×</td><td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="24"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>25</td><td>アンケート機能</td>
+    <td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="partial">△</td>
+    <td class="dev"><input type="checkbox" data-id="25"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>26</td><td>高評価者の口コミ投稿誘導</td>
+    <td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="partial">△</td>
+    <td class="dev"><input type="checkbox" data-id="26"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>MEOチェキ星カクトくん特許的</td>
+</tr>
+
+<!-- ===== レポート ===== -->
+<tr class="cat-row"><td colspan="12">レポート</td></tr>
+<tr>
+    <td>27</td><td>KPIダッシュボード（評価/件数/返信率）</td>
+    <td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="27"></td><td class="prog prog-wip">途中</td><td class="notes" contenteditable>平均星/件数のみ。返信率なし</td>
+</tr>
+<tr class="gap-bg">
+    <td>28</td><td>評価推移グラフ</td>
+    <td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="28"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>全社対応。致命的ギャップ</td>
+</tr>
+<tr>
+    <td>29</td><td>店舗間比較（ランキング）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="29"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr class="gap-bg">
+    <td>30</td><td>レポートエクスポート（CSV/PDF）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="30"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>経営者のチーム共有に必須</td>
+</tr>
+
+<!-- ===== 多言語 ===== -->
+<tr class="cat-row"><td colspan="12">多言語</td></tr>
+<tr>
+    <td>31</td><td>多言語UI</td>
+    <td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="31"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>32</td><td>多言語口コミ分析</td>
+    <td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="32"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>インバウンド客の声を分析</td>
+</tr>
+<tr>
+    <td>33</td><td>多言語返信生成</td>
+    <td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="33"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>Geminiは多言語対応可能</td>
+</tr>
+
+<!-- ===== 管理・運用 ===== -->
+<tr class="cat-row"><td colspan="12">管理・運用</td></tr>
+<tr>
+    <td>35</td><td>多店舗一括管理</td>
+    <td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="35"></td><td class="prog prog-wip">途中</td><td class="notes" contenteditable>複数店舗登録は可能だが一括操作なし</td>
+</tr>
+<tr class="gap-bg">
+    <td>36</td><td>認証・ログイン</td>
+    <td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="36"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>現在は認証なし。致命的</td>
+</tr>
+<tr>
+    <td>37</td><td>ユーザー権限管理（ロール）</td>
+    <td class="no">×</td><td class="yes">○</td><td class="partial">△</td><td class="partial">△</td><td class="no">×</td><td class="partial">△</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="37"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>オーナー/スタッフ等の権限分離</td>
+</tr>
+<tr>
+    <td>38</td><td>低評価アラート・エスカレーション</td>
+    <td class="no">×</td><td class="partial">△</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="38"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>★2以下→即通知等</td>
+</tr>
+<tr>
+    <td>39</td><td>改善タスク管理（PDCA）</td>
+    <td class="no">×</td><td class="no">×</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="39"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>星トルンの独自機能</td>
+</tr>
+<tr>
+    <td>40</td><td>レスポンシブ（モバイル対応）</td>
+    <td class="partial">△</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="40"></td><td class="prog prog-wip">途中</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>41</td><td>API提供</td>
+    <td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="41"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>42</td><td>Webhook/外部連携</td>
+    <td class="no">×</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="42"></td><td class="prog prog-no">未着手</td><td class="notes" contenteditable>Slack/LINE通知等</td>
+</tr>
+
+<!-- ===== 価格・導入 ===== -->
+<tr class="cat-row"><td colspan="12">価格・導入</td></tr>
+<tr class="unique-bg">
+    <td>43</td><td>無料プラン</td>
+    <td class="yes">○</td><td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="43"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>現在は全機能無料</td>
+</tr>
+<tr class="unique-bg">
+    <td>44</td><td>月額1万円以下の有料プラン</td>
+    <td class="yes">○</td><td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="44"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>¥980は最安水準</td>
+</tr>
+<tr>
+    <td>45</td><td>初期費用なし</td>
+    <td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="45"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>STOREPADのみ初期¥5,000</td>
+</tr>
+<tr class="unique-bg">
+    <td>46</td><td>セルフサービス導入（営業不要）</td>
+    <td class="yes">○</td><td class="no">×</td><td class="partial">△</td><td class="partial">△</td><td class="partial">△</td><td class="no">×</td><td class="no">×</td>
+    <td class="dev"><input type="checkbox" data-id="46"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>登録→即利用。最大の導入障壁低さ</td>
+</tr>
+<tr>
+    <td>47</td><td>料金の透明性（サイト上に明記）</td>
+    <td class="yes">○</td><td class="no">×</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td>
+    <td class="dev"><input type="checkbox" data-id="47"></td><td class="prog prog-live">稼働中</td><td class="notes" contenteditable>口コミコムは非公開</td>
+</tr>
+
+<!-- ===== 料金詳細（実数値） ===== -->
+<tr class="cat-row"><td colspan="12">料金詳細（実数値）</td></tr>
+<tr>
+    <td>48</td><td>初期費用</td>
+    <td class="price">¥0</td><td class="price sim-na">非公開</td><td class="price">¥0</td><td class="price">¥0</td><td class="price">¥0</td><td class="price">¥5,000</td><td class="price sim-na">非公開</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable>STOREPADのみ初期費用あり</td>
+</tr>
+<tr>
+    <td>49</td><td>月額最低料金</td>
+    <td class="price" style="color:#16a34a;font-weight:700">¥0</td><td class="price sim-na">非公開</td><td class="price">¥0</td><td class="price">¥0</td><td class="price">¥0</td><td class="price">¥5,000/店</td><td class="price">$299</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable>無料プランの最低料金</td>
+</tr>
+<tr>
+    <td>50</td><td>有料プラン最安</td>
+    <td class="price" style="color:#16a34a;font-weight:700">¥980</td><td class="price sim-na">非公開</td><td class="price">¥7,000</td><td class="price">¥3,278</td><td class="price">従量制</td><td class="price">¥5,000/店</td><td class="price">$299</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable>当社は競合の1/3〜1/7</td>
+</tr>
+<tr>
+    <td>51</td><td>上位プラン</td>
+    <td class="price">未定</td><td class="price sim-na">非公開</td><td class="price">¥50,000〜</td><td class="price">¥16,500〜</td><td class="price">—</td><td class="price">—</td><td class="price">$449</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable>エンタープライズ向け</td>
+</tr>
+<tr>
+    <td>52</td><td>従量課金（SMS等）</td>
+    <td class="price">なし</td><td class="price">—</td><td class="price">—</td><td class="price">—</td><td class="price">¥20/通</td><td class="price">—</td><td class="price">—</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable>Gyro-nはSMS口コミ依頼が別途課金</td>
+</tr>
+
+<!-- ===== マネタイズ動線（競合の実態） ===== -->
+<tr class="cat-row"><td colspan="12">マネタイズ動線（競合の実態）</td></tr>
+<tr>
+    <td>53</td><td>無料プランの範囲（何が無料か）</td>
+    <td class="mono-note" contenteditable>全機能無料(Stage1-2)</td>
+    <td class="mono-note" contenteditable>無料プランなし</td>
+    <td class="mono-note" contenteditable>閲覧のみ。管理・返信は有料</td>
+    <td class="mono-note" contenteditable>MEO順位のみ。口コミ管理は有料</td>
+    <td class="mono-note" contenteditable>基本無料。SMS送信は従量</td>
+    <td class="mono-note" contenteditable>無料プランなし</td>
+    <td class="mono-note" contenteditable>無料プランなし</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>54</td><td>有料化トリガー（何で制限/飢えさせるか）</td>
+    <td class="mono-note" contenteditable>Stage3でプレミアム機能制限予定</td>
+    <td class="mono-note" contenteditable>営業接触→デモ→契約</td>
+    <td class="mono-note" contenteditable>閲覧→「管理したい」欲求</td>
+    <td class="mono-note" contenteditable>MEO順位確認→「改善したい」欲求</td>
+    <td class="mono-note" contenteditable>口コミ依頼SMS送信量</td>
+    <td class="mono-note" contenteditable>営業→デモ→契約</td>
+    <td class="mono-note" contenteditable>営業→デモ→契約</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>55</td><td>低額→上位プランの誘導要素</td>
+    <td class="mono-note" contenteditable>未設計(S5で検討)</td>
+    <td class="mono-note" contenteditable>店舗数・機能の段階制</td>
+    <td class="mono-note" contenteditable>Personal→Enterprise:多店舗一括+API</td>
+    <td class="mono-note" contenteditable>Entry→Pro:MEO施策代行+レポート</td>
+    <td class="mono-note" contenteditable>SMS送信量の自然増加</td>
+    <td class="mono-note" contenteditable>店舗数課金のため自然増加</td>
+    <td class="mono-note" contenteditable>Starter→Growth:自動化+AI Agent</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable></td>
+</tr>
+<tr>
+    <td>56</td><td>課金ゲート種別</td>
+    <td class="mono-note" contenteditable>未定(機能制限想定)</td>
+    <td class="mono-note" contenteditable>機能+店舗数</td>
+    <td class="mono-note" contenteditable>機能制限(閲覧→管理)</td>
+    <td class="mono-note" contenteditable>機能制限(MEO→口コミ→施策)</td>
+    <td class="mono-note" contenteditable>従量(SMS通数)</td>
+    <td class="mono-note" contenteditable>店舗数課金</td>
+    <td class="mono-note" contenteditable>機能+自動化レベル</td>
+    <td class="dev"></td><td class="prog"></td><td class="notes" contenteditable></td>
+</tr>
+
+</tbody>
+</table>
+
+<!-- スコア集計 -->
+<div>
+<h2>スコア集計（機能#1-47のみ）</h2>
+<table class="score-table" id="scoreTable">
+<thead>
+<tr>
+    <th></th>
+    <th style="background:#ea580c;color:#fff;padding:6px 14px;">クチコミ分析AI</th>
+    <th style="padding:6px 14px;">口コミコム</th>
+    <th style="padding:6px 14px;">星トルン</th>
+    <th style="padding:6px 14px;">MEOチェキ</th>
+    <th style="padding:6px 14px;">Gyro-n</th>
+    <th style="padding:6px 14px;">STOREPAD</th>
+    <th style="padding:6px 14px;">Birdeye</th>
+</tr>
+</thead>
+<tbody id="scoreBody"></tbody>
+</table>
+</div>
+
+<!-- 月商500万シミュレーション -->
+<div class="sim-section">
+<h2>月商500万円の飲食店（1店舗）年間コスト試算</h2>
+<p>想定: 個人飲食店1店舗、月商500万円、口コミ管理+AI分析+返信が主目的。各社の最安有料プランで比較。</p>
+<table class="sim-table">
+<thead>
+<tr>
+    <th></th>
+    <th class="ours">クチコミ分析AI</th>
+    <th>口コミコム</th>
+    <th>星トルン</th>
+    <th>MEOチェキ</th>
+    <th>Gyro-n</th>
+    <th>STOREPAD</th>
+    <th>Birdeye(参考)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>初期費用</td>
+    <td class="sim-highlight">¥0</td>
+    <td class="sim-na">非公開</td>
+    <td>¥0</td>
+    <td>¥0</td>
+    <td>¥0</td>
+    <td>¥5,000</td>
+    <td class="sim-na">非公開</td>
+</tr>
+<tr>
+    <td>月額</td>
+    <td class="sim-highlight">¥980</td>
+    <td class="sim-na">非公開(推定¥30,000〜)</td>
+    <td>¥7,000</td>
+    <td>¥3,278</td>
+    <td>¥0+SMS</td>
+    <td>¥5,000</td>
+    <td>$299(≈¥45,000)</td>
+</tr>
+<tr>
+    <td>SMS/従量(100通/月)</td>
+    <td>¥0</td>
+    <td>—</td>
+    <td>—</td>
+    <td>—</td>
+    <td>¥2,000</td>
+    <td>—</td>
+    <td>—</td>
+</tr>
+<tr style="font-weight:700;border-top:2px solid #1e293b;">
+    <td>年間合計</td>
+    <td class="sim-highlight" style="font-size:1.1em;">¥11,760</td>
+    <td class="sim-na">推定¥360,000〜</td>
+    <td>¥84,000</td>
+    <td>¥39,336</td>
+    <td>¥24,000</td>
+    <td>¥65,000</td>
+    <td>≈¥540,000</td>
+</tr>
+<tr>
+    <td>当社との差額(年)</td>
+    <td>—</td>
+    <td class="sim-na">推定+¥348,240〜</td>
+    <td>+¥72,240</td>
+    <td>+¥27,576</td>
+    <td>+¥12,240</td>
+    <td>+¥53,240</td>
+    <td>+≈¥528,240</td>
+</tr>
+</tbody>
+</table>
+<p style="margin-top:12px;font-size:0.8rem;color:#64748b;">
+    ※ 口コミコムは料金非公開。エンタープライズSaaSの一般的価格帯から推定。<br>
+    ※ Gyro-nは基本無料+SMS従量。月100通想定。<br>
+    ※ Birdeye日本未展開。¥150/$換算。<br>
+    ※ 当社¥980はStage3想定料金。現在は全機能無料。
+</p>
+</div>
+
+<!-- サマリーボックス -->
+<div class="summary-grid">
+    <div class="summary-box box-gap">
+        <h3>致命的ギャップ（最優先で対応）</h3>
+        <ul>
+            <li>#2 口コミ新着通知 — 管理ツールの基本要件
+                <span class="why">Why未実装: MVP初版は分析精度優先。通知インフラ(cron+メール)を後回し。技術障壁低い。</span>
+            </li>
+            <li>#28 評価推移グラフ — 改善効果の可視化
+                <span class="why">Why未実装: 時系列データ蓄積が浅い。日次スナップショット仕組み未構築。</span>
+            </li>
+            <li>#30 レポートエクスポート — チーム共有
+                <span class="why">Why未実装: 分析データ構造化が先決。CSV/PDFテンプレート自体は実装容易。</span>
+            </li>
+            <li>#36 認証・ログイン — セキュリティ必須
+                <span class="why">Why未実装: MVPスピード重視で省略。NextAuth/Supabase Authで実装予定。</span>
+            </li>
+        </ul>
+    </div>
+    <div class="summary-box box-strength">
+        <h3>当社の独自強み（維持・強化）</h3>
+        <ul>
+            <li>#10 感情スコアリング -1〜1 — 数値で追跡可能
+                <span class="why">Why競合にない: 国内はChatGPT/テンプレでカテゴリ判定止まり。連続値はGeminiプロンプト設計の独自実装。</span>
+            </li>
+            <li>#11 テーマ・トピック抽出 — 自動タグ付け
+                <span class="why">Why競合に少ない: LLMベース抽出は精度がモデル依存。中小ツールはAI投資不足。</span>
+            </li>
+            <li>#18 トーン調整3種 — 国内唯一
+                <span class="why">Why競合にない: トーンパラメータ組込にプロンプト追加工数要。テンプレ方式には構造的に不可能。</span>
+            </li>
+            <li>#44 ¥980/月 — 競合の1/3〜1/7
+                <span class="why">Why実現可能: Gemini Flash低コスト+Vercel無料枠+Neon無料枠。インフラ¥0が源泉。</span>
+            </li>
+            <li>#46 セルフサービス導入 — 営業不要
+                <span class="why">Why競合にない: 口コミコム/STOREPADは営業組織前提。単価が低いため大手は採用しない。</span>
+            </li>
+        </ul>
+    </div>
+    <div class="summary-box box-opp">
+        <h3>差別化機会（競合が手薄な領域）</h3>
+        <ul>
+            <li>#12 QSCA分析 — 口コミコムのみ。飲食特化で深掘り
+                <span class="why">Why手薄: 飲食ドメイン+NLPの組合せ要。汎用ツールは業種特化の投資対効果が合わない。Geminiプロンプトで低コスト実現可能。</span>
+            </li>
+            <li>#15 AI改善提案 — 分析→アクションの一気通貫
+                <span class="why">Why手薄: ハルシネーションリスクで大手は慎重。個人店特化で行動パターン限定→精度担保しやすい。</span>
+            </li>
+            <li>#19 ブランドボイス学習 — Birdeyeのみ
+                <span class="why">Why手薄: 店舗ごとの文体学習にファインチューニング/RAG要。¥980帯では過去返信のfew-shot方式で簡易実現を狙う。</span>
+            </li>
+            <li>#16 一括自動分析 — 取得即分析のワンストップ
+                <span class="why">Why手薄: 大量LLM呼び出し=APIコスト増。Gemini Flash低単価なら月100件でも数十円。</span>
+            </li>
+            <li>#38 低評価アラート — 炎上防止の即時通知
+                <span class="why">Why手薄: 通知インフラ(#2)が前提。#2と同時実装で差別化可能。</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+const PRODUCT_KEY = 'review-ai';
+const SK = PRODUCT_KEY + '-state';
+const COMP_COLORS = ['#ea580c','#3b82f6','#16a34a','#8b5cf6','#ec4899','#64748b','#f59e0b'];
+
+// ========== 保存・復元 ==========
+function gatherState() {
+  const checks = {}, notes = {}, monos = {}, defs = {};
+  document.querySelectorAll('input[data-id]').forEach(cb => { checks[cb.dataset.id] = cb.checked; });
+  document.querySelectorAll('.notes[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) notes[i] = el.textContent.trim(); });
+  document.querySelectorAll('.mono-note[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) monos[i] = el.textContent.trim(); });
+  document.querySelectorAll('[data-def]').forEach(el => { defs[el.dataset.def] = el.textContent.trim(); });
+  return { checks, notes, monos, defs, axisX: document.getElementById('axisX').value, axisY: document.getElementById('axisY').value };
+}
+
+function applyState(s) {
+  if (!s) return;
+  if (s.checks) Object.entries(s.checks).forEach(([id, v]) => { const cb = document.querySelector(`input[data-id="${id}"]`); if (cb) cb.checked = v; });
+  if (s.notes) { const els = document.querySelectorAll('.notes[contenteditable]'); Object.entries(s.notes).forEach(([i, t]) => { if (els[+i]) els[+i].textContent = t; }); }
+  if (s.monos) { const els = document.querySelectorAll('.mono-note[contenteditable]'); Object.entries(s.monos).forEach(([i, t]) => { if (els[+i]) els[+i].textContent = t; }); }
+  if (s.defs) Object.entries(s.defs).forEach(([k, t]) => { const el = document.querySelector(`[data-def="${k}"]`); if (el) el.textContent = t; });
+}
+
+function save() {
+  localStorage.setItem(SK, JSON.stringify(gatherState()));
+  const el = document.getElementById('saveStatus');
+  el.style.display = 'inline';
+  setTimeout(() => el.style.display = 'none', 2500);
+}
+
+function autoSave() { localStorage.setItem(SK, JSON.stringify(gatherState())); }
+
+document.querySelectorAll('input[data-id]').forEach(cb => cb.addEventListener('change', autoSave));
+document.querySelectorAll('.notes[contenteditable], .mono-note[contenteditable], [data-def]').forEach(el => el.addEventListener('blur', autoSave));
+
+// ========== スコア集計 ==========
+function getCompHeaders() { return Array.from(document.querySelectorAll('#compTable thead th.ours, #compTable thead th:not(.ours)')).filter(th => th.classList.contains('ours') || (th.cellIndex >= 3 && th.cellIndex <= 8)); }
+
+function calcScores() {
+    const rows = document.querySelectorAll('#compTable tbody tr:not(.cat-row)');
+    const cols = [2,3,4,5,6,7,8];
+    const names = ['クチコミ分析AI','口コミコム','星トルン','MEOチェキ','Gyro-n','STOREPAD','Birdeye'];
+    const scores = cols.map(() => ({yes:0, partial:0, no:0}));
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const num = parseInt(cells[0]?.textContent);
+        if (isNaN(num) || num > 47) return;
+        cols.forEach((c, i) => {
+            const t = cells[c]?.textContent?.trim();
+            if (t === '○') scores[i].yes++;
+            else if (t === '△') scores[i].partial++;
+            else if (t === '×') scores[i].no++;
+        });
+    });
+    const body = document.getElementById('scoreBody');
+    body.innerHTML = '';
+    const labels = ['○ 対応','△ 一部','× 未対応','対応率'];
+    const keys = ['yes','partial','no'];
+    labels.forEach((label, li) => {
+        const tr = document.createElement('tr');
+        const th = document.createElement('td');
+        th.textContent = label;
+        th.style.fontWeight = '600';
+        tr.appendChild(th);
+        scores.forEach((s, i) => {
+            const td = document.createElement('td');
+            if (li < 3) { td.textContent = s[keys[li]]; }
+            else {
+                const total = s.yes + s.partial + s.no;
+                td.textContent = total ? Math.round((s.yes + s.partial * 0.5) / total * 100) + '%' : '—';
+                td.style.fontWeight = '700';
+            }
+            if (i === 0) td.style.background = '#fff7ed';
+            tr.appendChild(td);
+        });
+        body.appendChild(tr);
+    });
+}
+
+// ========== ポジショニング勢力図 ==========
+function getCategoryScores() {
+    const compNames = ['クチコミ分析AI','口コミコム','星トルン','MEOチェキ','Gyro-n','STOREPAD','Birdeye'];
+    const cols = [2,3,4,5,6,7,8];
+    const rawCats = []; // { name, rows(NodeList[]) }
+    let currentCat = null, catRows = [];
+
+    document.querySelectorAll('#compTable tbody tr').forEach(row => {
+        if (row.classList.contains('cat-row')) {
+            if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+            currentCat = row.textContent.trim();
+            catRows = [];
+        } else {
+            const cells = row.querySelectorAll('td');
+            const num = parseInt(cells[0]?.textContent);
+            if (isNaN(num) || num > 47) return;
+            let hasSymbol = false;
+            cols.forEach(c => { if ('○△×'.includes(cells[c]?.textContent?.trim())) hasSymbol = true; });
+            if (hasSymbol) catRows.push(cells);
+        }
+    });
+    if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+
+    // カテゴリ別: 実装スコア（○=1, △=0.5）と項目数
+    const categories = rawCats.map(cat => {
+        const n = cat.rows.length; // このカテゴリの全項目数
+        const scores = cols.map(c => {
+            let sum = 0;
+            cat.rows.forEach(cells => {
+                const t = cells[c]?.textContent?.trim();
+                if (t === '○') sum += 1;
+                else if (t === '△') sum += 0.5;
+            });
+            return sum; // 実装スコア（実数。最大=n）
+        });
+        // 分散は正規化ベースで計算（項目数が違うカテゴリ間を公平に比較）
+        const normed = scores.map(s => n ? s / n : 0);
+        const mean = normed.reduce((a, b) => a + b, 0) / normed.length;
+        const variance = normed.reduce((a, b) => a + (b - mean) ** 2, 0) / normed.length;
+        return { name: cat.name, scores, maxScore: n, variance };
+    });
+
+    // 総合: 全47項目での実装スコア（バブルサイズ用）
+    const overallScores = cols.map((c, ci) => {
+        let sum = 0;
+        rawCats.forEach(cat => {
+            cat.rows.forEach(cells => {
+                const t = cells[c]?.textContent?.trim();
+                if (t === '○') sum += 1;
+                else if (t === '△') sum += 0.5;
+            });
+        });
+        return sum; // 実数。最大=47
+    });
+    const totalFeatures = rawCats.reduce((a, c) => a + c.rows.length, 0);
+
+    return { compNames, categories, overallScores, totalFeatures };
+}
+
+function populateAxisSelectors(catData) {
+    const selX = document.getElementById('axisX');
+    const selY = document.getElementById('axisY');
+    selX.innerHTML = ''; selY.innerHTML = '';
+    const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+    sorted.forEach(cat => {
+        const label = `${cat.name} (${cat.maxScore}項目)`;
+        selX.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+        selY.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+    });
+    if (sorted.length >= 2) { selX.value = sorted[0].name; selY.value = sorted[1].name; }
+    try {
+        const state = JSON.parse(localStorage.getItem(SK));
+        if (state?.axisX && sorted.find(c => c.name === state.axisX)) selX.value = state.axisX;
+        if (state?.axisY && sorted.find(c => c.name === state.axisY)) selY.value = state.axisY;
+    } catch(e) {}
+}
+
+function renderChart(catData) {
+    const area = document.getElementById('posChartArea');
+    const legendEl = document.getElementById('posLegend');
+    const autoTag = document.getElementById('autoTag');
+    if (!catData.categories.length) { area.innerHTML = '<p style="color:#94a3b8;text-align:center;padding:40px 0;">データなし</p>'; return; }
+
+    const axisXName = document.getElementById('axisX').value;
+    const axisYName = document.getElementById('axisY').value;
+    const catX = catData.categories.find(c => c.name === axisXName);
+    const catY = catData.categories.find(c => c.name === axisYName);
+    if (!catX || !catY) return;
+
+    const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+    autoTag.style.display = (sorted.length >= 2 && axisXName === sorted[0].name && axisYName === sorted[1].name) ? 'inline' : 'none';
+
+    const W = 600, H = 440, PAD = 70;
+    const cW = W - PAD * 2, cH = H - PAD * 2;
+    const maxX = catX.maxScore, maxY = catY.maxScore;
+
+    let svg = `<svg width="${W}" height="${H}" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;">`;
+
+    // グリッド（整数刻み）
+    for (let v = 0; v <= maxX; v++) {
+        const x = PAD + (v / maxX) * cW;
+        svg += `<line x1="${x}" y1="${PAD}" x2="${x}" y2="${PAD+cH}" stroke="${v === 0 ? '#cbd5e1' : '#f1f5f9'}"/>`;
+        svg += `<text x="${x}" y="${PAD+cH+16}" text-anchor="middle" font-size="10" fill="#94a3b8">${v}</text>`;
+    }
+    for (let v = 0; v <= maxY; v++) {
+        const y = PAD + ((maxY - v) / maxY) * cH;
+        svg += `<line x1="${PAD}" y1="${y}" x2="${PAD+cW}" y2="${y}" stroke="${v === 0 ? '#cbd5e1' : '#f1f5f9'}"/>`;
+        svg += `<text x="${PAD-8}" y="${y+4}" text-anchor="end" font-size="10" fill="#94a3b8">${v}</text>`;
+    }
+    svg += `<rect x="${PAD}" y="${PAD}" width="${cW}" height="${cH}" fill="none" stroke="#cbd5e1"/>`;
+
+    // 軸ラベル
+    svg += `<text x="${PAD+cW/2}" y="${H-8}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">${axisXName}（${maxX}項目中の実装スコア）</text>`;
+    svg += `<text x="16" y="${PAD+cH/2}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569" transform="rotate(-90,16,${PAD+cH/2})">${axisYName}（${maxY}項目中）</text>`;
+
+    // バブルサイズ: 総合実装スコア → 半径 (min 14, max 42)
+    const oS = catData.overallScores;
+    const total = catData.totalFeatures || 47;
+    const minO = Math.min(...oS), maxO = Math.max(...oS);
+    const oRange = maxO - minO || 1;
+    const bubbleR = oS.map(s => 14 + ((s - minO) / oRange) * 28);
+
+    // 描画順: 大バブル(奥)→小バブル(手前)
+    const order = catData.compNames.map((_, i) => i).sort((a, b) => bubbleR[b] - bubbleR[a]);
+
+    order.forEach(i => {
+        const name = catData.compNames[i];
+        const vx = catX.scores[i], vy = catY.scores[i];
+        const cx = PAD + (vx / maxX) * cW;
+        const cy = PAD + ((maxY - vy) / maxY) * cH;
+        const color = COMP_COLORS[i];
+        const r = bubbleR[i];
+        const isOurs = i === 0;
+
+        // バブル本体
+        svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="${isOurs ? 3 : 1.5}"/>`;
+        svg += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}"/>`;
+
+        // ラベル: 右上にオフセット
+        const lx = cx + r + 5, ly = cy - 4;
+        svg += `<text x="${lx}" y="${ly}" font-size="11" font-weight="${isOurs ? '700' : '500'}" fill="${color}">${name}</text>`;
+        svg += `<text x="${lx}" y="${ly + 13}" font-size="9" fill="#94a3b8">${oS[i]}/${total}項目</text>`;
+    });
+
+    svg += '</svg>';
+    area.innerHTML = svg;
+
+    // 凡例
+    let legHtml = catData.compNames.map((n, i) =>
+        `<span><span class="pos-dot" style="background:${COMP_COLORS[i]}"></span>${n} (${oS[i]}/${total})</span>`
+    ).join('');
+    legHtml += '<span style="color:#94a3b8;margin-left:12px;">○=1点 △=0.5点 | バブル大＝総合実装数が多い</span>';
+    legendEl.innerHTML = legHtml;
+}
+
+function updateMap() { const d = getCategoryScores(); if (d.categories.length >= 2) { populateAxisSelectors(d); renderChart(d); } }
+
+document.getElementById('axisX').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+document.getElementById('axisY').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+
+// ========== Markdown書出 ==========
+function exportMd() {
+    let md = `# クチコミ分析AI 開発チェックリスト\n\n> ${new Date().toISOString().slice(0,19).replace('T',' ')}\n\n`;
+    const d1 = document.querySelector('[data-def="def1"]')?.textContent?.trim();
+    const d2 = document.querySelector('[data-def="def2"]')?.textContent?.trim();
+    const d3 = document.querySelector('[data-def="def3"]')?.textContent?.trim();
+    if (d1||d2||d3) { md += '## 開発の方向性\n\n'; if(d1) md+=`1. **一言:** ${d1}\n`; if(d2) md+=`2. **ポジション:** ${d2}\n`; if(d3) md+=`3. **過不足:** ${d3}\n`; md+='\n'; }
+    md += '## チェック済み\n\n'; let unc = '\n## 未チェック\n\n';
+    document.querySelectorAll('input[data-id]').forEach(cb => {
+        const row = cb.closest('tr'), cells = row.children, id = cb.dataset.id;
+        const name = cells[1]?.textContent, self = cells[2]?.textContent?.trim();
+        const note = cells[cells.length-1]?.textContent?.trim()||'';
+        const icon = self==='○'?'(済)':self==='△'?'(部分)':'(未)';
+        const line = `- [${cb.checked?'x':' '}] #${id} ${name} ${icon}${note?' — '+note:''}\n`;
+        if (cb.checked) md += line; else if (self==='×'||self==='△') unc += line;
+    });
+    const blob = new Blob([md+unc], {type:'text/markdown'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'review-ai-dev-checklist.md'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ========== 初期化 ==========
+try { applyState(JSON.parse(localStorage.getItem(SK))); } catch(e) {}
+calcScores();
+updateMap();
+</script>
+
+</body>
+</html>

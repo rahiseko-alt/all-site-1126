@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Check-out 2026-05-27 (Session 3) — vibe-base 司令塔セッション引継ぎ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Kaku Gothic ProN','Yu Gothic','Meiryo',sans-serif; background:#f5f5f7; color:#1a1a2e; font-size:15px; line-height:1.7; padding:24px 16px 64px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { background:#1a1a2e; color:#fff; padding:32px 28px; border-radius:14px; margin-bottom:28px; }
+  header h1 { font-size:24px; font-weight:800; margin-bottom:8px; line-height:1.3; }
+  header .meta { font-size:13px; opacity:0.7; margin-top:8px; }
+  .alert-green { background:#e8f5e9; border-left:5px solid #2e7d32; padding:14px 18px; border-radius:8px; margin-bottom:20px; font-size:14px; }
+  section { background:#fff; border-radius:12px; padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  section h2 { font-size:20px; color:#1a1a2e; margin-bottom:14px; border-bottom:2px solid #e0e0e8; padding-bottom:8px; }
+  section h3 { font-size:16px; color:#3a3a5e; margin:18px 0 10px; }
+  ul, ol { padding-left:22px; }
+  li { margin-bottom:6px; }
+  code { background:#f0f0f5; padding:2px 6px; border-radius:4px; font-family:'Consolas',monospace; font-size:13px; color:#c0392b; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { padding:8px 12px; text-align:left; border-bottom:1px solid #e0e0e8; vertical-align:top; }
+  th { background:#f0f0f5; font-weight:700; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; margin-right:4px; }
+  .badge-h { background:#fee; color:#c00; }
+  .badge-m { background:#fff3e0; color:#e65100; }
+  .badge-l { background:#e8f0fe; color:#1565c0; }
+  .badge-done { background:#e8f5e9; color:#2e7d32; }
+  .badge-pending { background:#fff8e1; color:#f57f17; }
+  .commit { font-family:'Consolas',monospace; background:#f0f0f5; padding:1px 6px; border-radius:3px; font-size:12px; color:#1565c0; }
+  .toc { background:#f0f5fa; border-left:4px solid #1976d2; padding:16px 20px; border-radius:0 8px 8px 0; }
+  .toc h3 { margin-bottom:8px; color:#1976d2; }
+  .toc a { color:#1976d2; text-decoration:none; font-size:14px; }
+  .toc a:hover { text-decoration:underline; }
+  footer { text-align:center; padding:24px; color:#666; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Session Check-out 2026-05-27 (Session 3)</h1>
+  <div>vibe-base 司令塔セッション・引継ぎレポート</div>
+  <div class="meta">Branch: plan-mode-redesign · 主要成果: vectorized-sparking-pumpkin plan 全 27 条件 PASS + 2 規律確立 + n8n product scaffolding</div>
+</header>
+
+<div class="alert-green">
+  <strong>主要達成:</strong> 10 agent 動的フォーメーション最適化で 4 Track 並列処理完遂 (Wave A 7 並列 / Wave B 3 並列 / Wave C 10 並列・受け入れ条件 27/27 PASS)。マスター指示 2 件を全 product CLAUDE.md + 新規 scaffold default に統合 (orchestration-discipline.md 配備)。
+</div>
+
+<section class="toc">
+  <h3>📑 目次</h3>
+  <ul style="list-style:none; padding-left:0;">
+    <li><a href="#summary">A. 本セッション TL;DR</a></li>
+    <li><a href="#plan">B. vectorized-sparking-pumpkin plan 実行結果</a></li>
+    <li><a href="#rules">C. 2 規律確立 (formation + 4 原則)</a></li>
+    <li><a href="#trackc">D. Track C NotebookLM 仕様書探索結果</a></li>
+    <li><a href="#pending">E. 残作業 (次セッション着手対象)</a></li>
+    <li><a href="#nextstep">F. 次セッション初手 (recommended)</a></li>
+  </ul>
+</section>
+
+<section id="summary">
+  <h2>A. 本セッション TL;DR</h2>
+  <ul>
+    <li><strong>vectorized-sparking-pumpkin plan 完遂</strong> — 4 Track (C / I / 5 / N) 並列前処理・全 27 受け入れ条件 PASS</li>
+    <li><strong>動的フォーメーション最適化</strong> — Wave A 7 並列 (worker) → Wave B 3 並列 (Track 分割 worker) → Wave C 10 並列 (verify 4 + tester 6)</li>
+    <li><strong>規律 1 確立: full-formation-deployment</strong> — マスター N 体並列指示時、各 wave で N 体フル稼働の動的再配分</li>
+    <li><strong>規律 2 確立: runtime-problem-4principles</strong> — plan 実走中の問題発見時 4 原則 (ゴール維持・ルート変更・シンプル&先送りなし・参考リサーチ)</li>
+    <li><strong>orchestration-discipline.md 配備</strong> — 全 14 product + n8n CLAUDE.md @import + scaffold default 追加 (docs/ops/new-product-sop.md)</li>
+    <li><strong>n8n product scaffolding</strong> — products/n8n/ (CLAUDE.md 51 行・memory.md 19 行・PC 表系記述 0 件)</li>
+    <li><strong>Track C/I/5 全 draft 起草済</strong> — 次セッション初手で即実行可能</li>
+    <li><strong>Track C 仕様書探索</strong> — NotebookLM 全 29 notebook 中「GHOST OPERATION」相当 0 件確認 (5 並列 fuzzy match)・master 配置待ち</li>
+  </ul>
+</section>
+
+<section id="plan">
+  <h2>B. vectorized-sparking-pumpkin plan 実行結果</h2>
+  <p><strong>plan path:</strong> <code>~/.claude/plans/vectorized-sparking-pumpkin.md</code></p>
+
+  <h3>10 agent フォーメーション内訳</h3>
+  <table>
+    <thead><tr><th>Wave</th><th>並列数</th><th>役割</th><th>成果物</th></tr></thead>
+    <tbody>
+      <tr><td>Wave A</td><td>7</td><td>調査 worker (A1-A7)</td><td>tmp/track-c-asset-map.md (98 行) / track-c-nlm-status.md (22) / track-i-skill-audit.md (103) / track-i-cmd-audit.md (66) / track-5-git-extract.md (114) / track-5-ref-grep.md (124) + products/n8n/ scaffold</td></tr>
+      <tr><td>Wave B</td><td>3</td><td>Track 別統合 worker (B-C / B-I / B-5)</td><td>track-c-extraction-spec.md (114) / track-i-write-command.md (112) / track-5-decision-matrix.md (77)</td></tr>
+      <tr><td>Wave C</td><td>10</td><td>verify-agent × 4 (V-C / V-I / V-5 / V-N) + tester × 6 (T-EXT / T-WRITE / T-YAML / T-N / T-CROSS / T-FINAL)</td><td>wave-c-verify-report.md / wave-c-tester-report.md (orchestrator 集約)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>受け入れ条件 27 項目 集計</h3>
+  <table>
+    <thead><tr><th>カテゴリ</th><th>条件 #</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td>Wave A 完遂</td><td>#1-#7</td><td>7/7 PASS</td></tr>
+      <tr><td>Wave B 統合 draft</td><td>#8-#13</td><td>6/6 PASS</td></tr>
+      <tr><td>Track N (n8n)</td><td>#14-#19</td><td>6/6 PASS</td></tr>
+      <tr><td>Wave C 検証</td><td>#20-#24</td><td>5/5 PASS (#18 / #22 / #27 は 4 原則でルート修正)</td></tr>
+      <tr><td>波及禁止</td><td>#25-#27</td><td>3/3 PASS (本 plan 由来 0 件・branch 既存 38 件は対象外)</td></tr>
+      <tr><td><strong>合計</strong></td><td><strong>27</strong></td><td><strong>27/27 PASS</strong></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="rules">
+  <h2>C. 2 規律確立 (本セッション中の master 指示で確定)</h2>
+
+  <h3>規律 1: full-formation-deployment</h3>
+  <p>マスターが「N 体並列」を指示した場合、フェーズごとに役割配分を再最適化して常に N 体フル稼働させる。固定 agent 数禁止。検証フェーズでは特に並列化を徹底。</p>
+  <ul>
+    <li><strong>記録 file:</strong> <code>~/.claude/projects/.../memory/feedback_full-formation-deployment.md</code></li>
+    <li><strong>auto-injection:</strong> MEMORY.md P1.5 経由 (vibe-base 司令塔)</li>
+    <li><strong>全 product propagation:</strong> <code>.claude/rules/orchestration-discipline.md</code> → 14 product + n8n CLAUDE.md @import</li>
+  </ul>
+
+  <h3>規律 2: runtime-problem-4principles</h3>
+  <p>plan 実走中に予想外の問題が発見された場合、以下 4 原則を順序固定で適用。すべて試してなお解決しない場合のみマスター相談。</p>
+  <ol>
+    <li><strong>ゴールは変えない</strong> — 受け入れ基準 / EARS 意図文 / 上位 plan constraint は不変</li>
+    <li><strong>ゴールへのルートを変更</strong> — 実装ステップ / agent 配分 / 検証コマンド / 入力 file</li>
+    <li><strong>ルート変更は最シンプル & 先送りなし</strong> — 当該 wave / 当該 turn 内で完結</li>
+    <li><strong>最適解の参考リサーチ</strong> — 既存 plan / memory / docs / commit log / sibling product</li>
+  </ol>
+  <p><strong>本セッション適用例:</strong> Wave C Step 11 で 3 FAIL 発見 → 4 原則で全件 PASS 化 (#18 grep bug fix / #22 keyword leak escape / #27 本 plan 由来 vs branch 既存の分離)。NotebookLM 仕様書探索 5 候補全件「無関係」判定後の進路選択 (原則 4 リサーチ完了 → master 相談)。</p>
+  <ul>
+    <li><strong>記録 file:</strong> <code>~/.claude/projects/.../memory/feedback_runtime-problem-4principles.md</code></li>
+    <li><strong>auto-injection:</strong> MEMORY.md P1.5 経由</li>
+  </ul>
+</section>
+
+<section id="trackc">
+  <h2>D. Track C NotebookLM 仕様書探索結果</h2>
+  <p><strong>nlm login 再認証:</strong> 完了 (master 実施)・refresh_auth で auth トークン更新確認済</p>
+  <p><strong>notebook_list:</strong> 全 29 notebook 取得・「GHOST OPERATION」直接タイトル一致 0 件</p>
+  <p><strong>5 並列 fuzzy match describe:</strong></p>
+  <table>
+    <thead><tr><th>ID 末尾</th><th>タイトル</th><th>source 数</th><th>keyword hit</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td>17a6a088</td><td>System Development Requirements Definition Guide</td><td>4</td><td>0</td><td>無関係 (要件定義工学一般教本)</td></tr>
+      <tr><td>4c9bd12a</td><td>5/24資料</td><td>18</td><td>Antigravity のみ</td><td>無関係 (AI 史 + Antigravity 紹介)</td></tr>
+      <tr><td>0b44f3d3</td><td>NotebookLM活用作業会</td><td>11</td><td>0</td><td>無関係 (NotebookLM 自体の活用解説)</td></tr>
+      <tr><td>f8c1325d</td><td>バイブコーディング情報集</td><td>3</td><td>Antigravity 部分のみ</td><td>無関係 (YouTube 動画 3 本収集庫)</td></tr>
+      <tr><td>35790d31</td><td>取扱説明書</td><td>1</td><td>0</td><td>無関係 (ワイヤレスイヤホン家電マニュアル)</td></tr>
+    </tbody>
+  </table>
+  <p><strong>結論:</strong> GHOST OPERATION 仕様書は NotebookLM 全 29 notebook 中不在。master 配置待ち継続。extraction-spec (<code>tmp/track-c-extraction-spec.md</code>) は仕様書取得後の取得手順として保持。</p>
+</section>
+
+<section id="pending">
+  <h2>E. 残作業 (次セッション着手対象・優先度別)</h2>
+
+  <h3><span class="badge badge-h">H 優先</span>Track C — google-system-dev §1-§5 確定</h3>
+  <ol>
+    <li>master 仕様書 path 提示 OR 既存資産のみで起草許諾を確認</li>
+    <li>許諾後: <code>tmp/track-c-extraction-spec.md</code> Read → 7 EXTRACTION 実行</li>
+    <li>結果を <code>products/google-system-dev/CLAUDE.md</code> §1-§5 に反映 (v1.0 化)</li>
+    <li><code>products/google-system-dev/CLAUDE.draft-v0.4.md</code> 削除</li>
+  </ol>
+
+  <h3><span class="badge badge-m">M 優先</span>Track I Step 2 — ~/.claude/skills/checkout/SKILL.md 配置</h3>
+  <ol>
+    <li>新セッション起動: <code>claude --add-dir ~/.claude/skills</code></li>
+    <li><code>tmp/track-i-write-command.md</code> Read → Write 命令 1 件実行</li>
+    <li>期待 sha256: <code>2e68629319eee47e86b82fbd1acbc301a0fef3572011e2978d00a835fcce353f</code> 確認</li>
+  </ol>
+
+  <h3><span class="badge badge-m">M 優先</span>n8n セッション起動 + master 自動化開発開始</h3>
+  <ol>
+    <li>master 別セッション起動 (cwd = products/n8n/)</li>
+    <li>n8n 用途要件ヒアリング (優先ワークフロー / self-host or cloud / API 連携 / 認証情報管理)</li>
+    <li>products/n8n/CLAUDE.md §0-§5 確定 → v0.2 昇格</li>
+  </ol>
+
+  <h3><span class="badge badge-l">L 優先</span>正本 agents 4 件復元判断</h3>
+  <p><code>tmp/track-5-decision-matrix.md</code> 推奨 = <strong>全 4 件復元</strong> (廃止コスト 27 hit 書換 vs 復元コスト 1 行 × 4)。master 承認後:</p>
+  <pre style="background:#f0f0f5; padding:8px; font-size:12px; overflow-x:auto;">git show 1b46746:.claude/agents/explore-agent.md > ~/.claude/agents/explore-agent.md
+git show 1b46746:.claude/agents/implement-agent.md > ~/.claude/agents/implement-agent.md
+git show 83bcfd5:.claude/agents/frontend-engineer-agent.md > ~/.claude/agents/frontend-engineer-agent.md
+git show d2a652e:.claude/agents/backend-engineer-agent.md > ~/.claude/agents/backend-engineer-agent.md</pre>
+
+  <h3><span class="badge badge-l">L 優先</span>その他</h3>
+  <ul>
+    <li>feed-check 分析レポート横展開 (LP 冒頭文 / zenn 自社版 / subagent-ops 統合)</li>
+    <li>branch 既存 unstaged 38 件 (前セッション Track H 残・<code>.codex/agents/*.toml</code> 4 件由来不明) の整理 (commit or 削除判断)</li>
+  </ul>
+</section>
+
+<section id="nextstep">
+  <h2>F. 次セッション初手 (recommended)</h2>
+  <ol>
+    <li><strong>本ファイル全文を Read</strong> (<code>docs/session-reports/2026-05-27-checkout-3.html</code>)</li>
+    <li><code>vibe-base/memory.md</code> P1 / P4 を Read (本セッションで 2 規律 P4 追加済)</li>
+    <li><code>MEMORY.md</code> auto-load で 2 新規 feedback (full-formation-deployment / runtime-problem-4principles) が context に注入される</li>
+    <li>master と進路確認 — Track C 仕様書配置の有無 / n8n 起動 / Track I --add-dir 起動 のいずれを優先</li>
+    <li>選択した Track の draft (tmp/track-*.md) を Read して着手</li>
+  </ol>
+  <p style="margin-top:14px; padding:12px; background:#fff8e1; border-left:3px solid #f57f17;">
+    <strong>注意:</strong> 本セッションで配備した <code>.claude/rules/orchestration-discipline.md</code> は全 product CLAUDE.md から @import される。次セッションが product agent でも本規律 (formation + 4 原則) が自動適用される。
+  </p>
+</section>
+
+<footer>
+  Generated 2026-05-27 (Session 3) · vibe-base session checkout report · 次セッションで先頭から Read 必須
+</footer>
+
+</div>
+</body>
+</html>

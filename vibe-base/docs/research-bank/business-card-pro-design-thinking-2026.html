@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロの名刺デザイン思考回路（カード×余白×黄金比の統合） — Research Bank</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e4e7;--text2:#9ca3af;--accent:#6366f1;--accent2:#818cf8;--ok:#10b981;--warn:#f59e0b;--danger:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+h1{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em;}
+h1 span{color:var(--accent2);}
+h2{font-size:1.2rem;margin:2.5rem 0 1rem;padding-bottom:.4rem;border-bottom:2px solid var(--accent);color:var(--accent2);}
+h3{font-size:1rem;margin:1.5rem 0 .6rem;color:var(--text);}
+p{margin:.6rem 0;}
+a{color:var(--accent2);word-break:break-all;}
+.meta{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0 1.5rem;font-size:.85rem;color:var(--text2);display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.4rem 1.5rem;}
+.meta b{color:var(--text);}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.82rem;background:var(--surface);border-radius:8px;overflow:hidden;}
+th{background:var(--surface2);color:var(--accent2);padding:.6rem .7rem;text-align:left;font-weight:600;}
+td{padding:.55rem .7rem;border-top:1px solid var(--border);vertical-align:top;}
+tr:hover td{background:var(--surface2);}
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.7rem;font-weight:600;background:rgba(244,114,182,.15);color:#f472b6;}
+ul,ol{margin:.6rem 0 .6rem 1.4rem;}
+li{margin:.35rem 0;}
+.callout{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1rem 0;}
+.callout.ok{border-left-color:var(--ok);}
+.callout.warn{border-left-color:var(--warn);}
+.callout.danger{border-left-color:var(--danger);}
+.callout.q{border-left-color:var(--accent2);background:#1d2030;}
+.num{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent2);}
+.note{font-size:.78rem;color:var(--text2);margin-top:.4rem;}
+.q-list{counter-reset:q;list-style:none;padding-left:0;}
+.q-list li{counter-increment:q;padding-left:2.5rem;position:relative;margin:.6rem 0;}
+.q-list li::before{content:"Q" counter(q);position:absolute;left:0;top:0;width:2rem;height:1.6rem;background:var(--accent);color:#fff;font-weight:700;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.75rem;}
+</style>
+</head>
+<body>
+
+<h1>プロの名刺デザイン <span>思考回路</span><br>カード構成 × 余白 × 黄金比の統合判断</h1>
+<p class="note">「知識として何を知っているか」ではなく「どう判断するか」「いつ適用し、いつ破るか」</p>
+
+<div class="meta">
+  <div><b>調査日:</b> 2026-05-29</div>
+  <div><b>調査軸:</b> 3本</div>
+  <div><b>ソース数:</b> 85（重複排除後）</div>
+  <div><b>タグ:</b> <span class="tag">design</span></div>
+  <div><b>関連プロダクト:</b> 横断（名刺・印刷物・LP全般）</div>
+  <div><b>メソドロジー:</b> 計画→収集→分析→報告</div>
+  <div style="grid-column:1/-1"><b>再利用:</b> 名刺デザイン実務 / LP・印刷物全般のレイアウト判断 / デザインレビュー基準 / 余白決定の意思決定軸</div>
+</div>
+
+<!-- ============= 最重要結論 ============= -->
+<div class="callout ok">
+<b>最重要結論 — 仮説「ルールではなく道具」は強く支持される</b><br>
+プロは黄金比・三分割・グリッドを <b>① 設計時の先行スキャフォールド（grid 構築時の比例システム）＋ ② 事後診断（破綻チェック）＋ ③ クライアント説明（post-rationalisation）</b> の三重道具として使う。<br>
+名刺の小サイズ（91×55mm）では <b>Markowsky 実験で人は 1.6〜1.7 比を区別できない</b> ことから、厳密な φ 適用は知覚不能。<b>タイポスケール ×1.618 と大ブロック面積比のみが φ の実用領域</b>で、それ以外は optical balance（目視）が最終決定権を持つ。<br>
+プロの設計プロセスは「<b>grid で土台 → 視覚で配置 → 黄金比で診断 → 破綻なら修正 → squint test で重心確認 → 引き算で終了</b>」のループ。
+</div>
+
+<!-- ============= 軸1 ============= -->
+<h2>軸1. 余白決定の思考回路（mm 単位の意思決定）</h2>
+
+<h3>プロが余白量を導く6ステップ</h3>
+<ol>
+<li><b>媒体と用途から「基準余白」の当たり</b> — 名刺は外周5mm以上、A4チラシは10mm（ハットツール 2100件超実績）</li>
+<li><b>比例システムを当てる</b> — Van de Graaf canon（2:3:4:6 = 内:上:外:下）、黄金比、ルート2比をクラシカルキャノンとして配置</li>
+<li><b>グリッド/モジュール選択</b> — Webは8の倍数（4/8/16/24/32/64px）、印刷は3〜12列モジュラーグリッド</li>
+<li><b>テキスト密度測定</b> — 紙面のテキスト占有率 <span class="num">30〜50%（余白比率）</span>。luxury寄り60〜70%白、情報密度型30〜40%白</li>
+<li><b>proximity ratio 検査</b> — グループ内間隔 < グループ間間隔。実証データ：40px以内は89%が「同一グループ」と知覚、120px超は94%が「別グループ」と知覚（NN/g, Wertheimer 1923）</li>
+<li><b>0.5px〜1mm単位で nudge</b> — Sketch Pixel Grid plugin等は0.25px刻みを可能にする。光学調整が pixel-perfect の本質</li>
+</ol>
+
+<h3>「呼吸／間／リズム」の言語化</h3>
+<table>
+<tr><th>用語</th><th>定義（プロの言葉）</th><th>判断基準</th></tr>
+<tr><td>呼吸している（breathing）</td><td>各要素が隣接要素から十分距離を取り、視覚階層が努力なしに識別できる</td><td>Vignelli：「whitespace は音楽の五線譜のように、無限の構成を生む枠組み」</td></tr>
+<tr><td>窮屈（cramped）</td><td>紙端ぎりぎりまで要素配置、圧迫感・雑な印象</td><td>ハットツール松田氏</td></tr>
+<tr><td>間が抜ける</td><td>余白過剰で関係性が読み取れない、焦点が定まらない</td><td>エムハンド「揃える・寄せる・ばらけさせる」3層リズム</td></tr>
+<tr><td>リズム</td><td>8の倍数等のスケール内に全余白が収まる</td><td>スケール外の数値が混じると視覚的リズムが崩れる</td></tr>
+</table>
+
+<h3>3階層原則の倍率（実務最頻値）</h3>
+<table>
+<tr><th>階層</th><th>倍率（基準=行間）</th><th>8ptグリッド実値</th></tr>
+<tr><td>文字間（micro）</td><td>1.0x（基準）</td><td>4px</td></tr>
+<tr><td>行間（leading）</td><td>1.5x</td><td>8px</td></tr>
+<tr><td>段落間</td><td>2.0x（WCAG 2.2 最低基準）</td><td>16px</td></tr>
+<tr><td>ブロック間</td><td>4.0x</td><td>32px</td></tr>
+<tr><td>セクション/外周</td><td>8.0x</td><td>64px</td></tr>
+</table>
+
+<div class="callout warn">
+<b>Cieden の "internal ≤ external rule"</b><br>
+同一コンポーネント内余白は隣接コンポーネント間余白以下にする。違反するとグルーピングが破綻する（gestalt proximity が逆転する）。<br>
+比率: <b>最低 1:1.5、理想 1:2</b>
+</div>
+
+<h3>微調整ラウンドの実態 — 「pushing pixels」7段階</h3>
+<p>希望 → 自信 → 疑念 → 怒り → 諦め → 受容 → 完了 の心理ループ（Web Designer Depot）。**Shift Nudge** という微調整スキル専門教育が商業成立するほど「最後の10%」が技能差を決める。</p>
+
+<div class="callout">
+<b>光学調整（optical adjustment）必須</b><br>
+計算上は中央でも目視で中央に「見えない」ケースが多発。三角形を10px右にずらす、文字を2px小さくするなど、論理と光学の乖離を埋める作業。<br>
+<b>「one looks right, the other feels right」</b> — 数値中心 ≠ 視覚中心
+</div>
+
+<h3>判断力の鍛え方</h3>
+<ol>
+<li><b>コピーワーク（copywork）</b> — Da Vinci 以来の古典手法。Smashing「Copy If You Can」（2017）</li>
+<li><b>Dribbbleバケット運用</b> — 上位作品を pixel for pixel で写経 → twist 加えて rebound</li>
+<li><b>トレース → 模写 → オリジナル の3段階</b>（国内DTP標準） — 『けっきょく、よはく。』『トレース&模写で学ぶデザインのドリル』が定番教材</li>
+<li><b>日常観察</b> — 建物・看板・自然の構図を「なぜ整って見えるか」で見続ける</li>
+<li><b>シニアからのフィードバック収集</b></li>
+<li><b>意図の言語化練習</b> — 「なぜこの余白にしたか」を3行以内で説明できる状態を作る</li>
+</ol>
+
+<!-- ============= 軸2 ============= -->
+<h2>軸2. 黄金比・三分割の実務判断 — 「ルールではなく道具」仮説の検証</h2>
+
+<h3>黄金比 賛否双方の論拠</h3>
+<table>
+<tr><th>立場</th><th>論者</th><th>主要主張</th></tr>
+<tr><td><b>批判</b></td><td>George Markowsky (Harvard Math, 1992)</td><td>48種の長方形比較実験で「人は <span class="num">1.6〜1.7 を見分けられない</span>」。著名作品の黄金比は計測者の恣意</td></tr>
+<tr><td><b>批判</b></td><td>Keith Devlin (Stanford 数学教授)</td><td>「urban legend / design unicorn」。"people think they see the golden ratio... but they can't actually substantiate it"</td></tr>
+<tr><td><b>批判</b></td><td>John Brownlee (Fast Company, 2015)</td><td>既存デザインに後付け円を被せれば何にでも黄金比は現れる（post-rationalisation）<br>Apple ロゴ原作者 Rob Janoff: <i>"Years later you find out supposedly why you did certain things. And, they are all bullshit"</i></td></tr>
+<tr><td><b>推奨</b></td><td>Darrin Crescenzi (Interbrand NY)</td><td>φ は「<b>見えない・感じる</b>」組織原理。"intended to be invisible, felt rather than understood"</td></tr>
+<tr><td><b>推奨</b></td><td>Müller-Brockmann</td><td>「秩序のシステム」として grid に組み込むが creativity を縛らない。"One must learn how to use the grid"</td></tr>
+<tr><td><b>推奨</b></td><td>Massimo Vignelli</td><td>grid を "structural guide" として使い "did not allow it to become a restraint"</td></tr>
+<tr><td><b>中立（実務者）</b></td><td>99designs / Figma / Inkbot</td><td>"<b>tool, not a rule</b> — refine するためのもので force するものではない"</td></tr>
+</table>
+
+<h3>「使う／使わない」判断基準</h3>
+<table>
+<tr><th>シナリオ</th><th>使う</th><th>使わない</th></tr>
+<tr><td>情報量が多い・複雑構図</td><td>黄金スパイラル（視線誘導）</td><td>—</td></tr>
+<tr><td>情報量少・ミニマル</td><td>三分割（rule of thirds）</td><td>黄金比は過剰</td></tr>
+<tr><td>ロゴ（中〜大サイズ）</td><td>グリッド検証ツール</td><td>ブランド意図と矛盾するなら無視</td></tr>
+<tr><td>密集都市建築</td><td>—</td><td>Crescenzi自ら「効果激減」と明言</td></tr>
+<tr><td>A系・名刺・複写媒体</td><td>1:√2（Lichtenberg比）</td><td>黄金比（半折で比崩れ）</td></tr>
+<tr><td>タイポ階層</td><td>×1.618階段（22→14/15→9pt）</td><td>×1.5でも可</td></tr>
+<tr><td>クライアント提案資料</td><td>post-rationalisation として</td><td>—</td></tr>
+</table>
+
+<div class="callout ok">
+<b>仮説「ルールではなく道具」の検証結果 → 強く支持（Yes）</b><br>
+ただし「検証道具」よりやや広く、<b>「① 先行スキャフォールド（grid 設定時）＋ ② 事後診断（破綻チェック・クライアント説明）」の二重道具</b> として運用されているのが実態。<br>
+マスター仮説は ② に該当し、これがプロの主流運用に最も近い。
+</div>
+
+<h3>名刺の小サイズ面における適用の限界</h3>
+<ul>
+<li><b>物理寸法:</b> 91×55mm の比は 1.655（φ ≈ 1.618）に近いが、Japan Print NYC が "approximately / inexact" と認める</li>
+<li><b>視認距離:</b> 名刺は腕の長さ（30〜40cm）で短時間視認 → Markowsky の「1.6〜1.7 区別不能」が強く効く</li>
+<li><b>情報密度:</b> 氏名・社名・連絡先・QR・ロゴが詰まる小面積で「黄金分割で空白配分」を厳守すると必須情報が入らない</li>
+<li><b>タイポ階層の例外:</b> ×1.618 の階段は実用性が高い唯一の確実な φ 応用</li>
+<li><b>結論:</b> 名刺における φ は「タイポスケール」「色面比の大ブロック」までは有効、それ以下の精度では人間が知覚できず、ルール強制の根拠は弱い</li>
+</ul>
+
+<h3>代替フレームワーク</h3>
+<table>
+<tr><th>比率</th><th>用途</th><th>採用文脈</th></tr>
+<tr><td>1:√2（Lichtenberg, 1.414）</td><td>A系用紙、複写・半折を伴う印刷物</td><td>ISO 216、日本「大和比」（法隆寺）</td></tr>
+<tr><td>Rule of Thirds（1:2分割）</td><td>ミニマル構図、写真、簡素なLP</td><td>Photoshop/Lightroom標準</td></tr>
+<tr><td>3:5 / 5:8 / 8:13（Fibonacci近似）</td><td>φの整数近似</td><td>実装が楽</td></tr>
+<tr><td>Optical Center</td><td>数学比でなく「上に約5〜10%オフセット」</td><td>"physically centered ≠ optically centered"</td></tr>
+<tr><td>Modular Scale</td><td>タイポ階層 ×1.25 / ×1.333 / ×1.5</td><td>web typography実務</td></tr>
+<tr><td>Visual weight balancing</td><td>grid 破壊・非対称構成</td><td>Sagmeister系</td></tr>
+</table>
+
+<h3>「破る」判断基準</h3>
+<ul>
+<li><b>習熟前提:</b> "Mastering grids means knowing when to break them"</li>
+<li><b>目的明示:</b> 破壊は communication 目的が明確なときのみ。「ただ崩す」は禁忌</li>
+<li><b>基底構造は必須:</b> "asymmetric designs still maintain a sense of balance"</li>
+<li><b>多数派は遵守:</b> 「majority of the layout adheres to the grid with grid-breaking as a deliberate and controlled deviation」</li>
+</ul>
+
+<!-- ============= 軸3 ============= -->
+<h2>軸3. カード構成 × 余白の統合思考と自問リスト</h2>
+
+<h3>カード境界の決定（Chunking）</h3>
+<ul>
+<li><b>チャンク上限（認知容量）:</b> 古典 Miller 7±2 ／ 新説 Cowan <span class="num">4±1</span>。プロは「<b>4 を超えたら分割を検討、7 を超えたら必ず分割</b>」を頭に置く</li>
+<li><b>Atomic Design 由来の境界判断:</b> 「意味で割れるか／意味で割ったとき各塊が単独で成立するか」</li>
+<li><b>NN/g Common Region 原則:</b> 「<b>枠線・背景色は cluttered になりがち。可能なら whitespace 単独で分けろ</b>」。判断順: ①余白だけで分かる → 枠なし ②余白を確保しても紛れる → 背景色（薄） ③それでも分からない → 線</li>
+</ul>
+
+<h3>カード間ギャップの設計法</h3>
+<table>
+<tr><th>原則</th><th>値</th><th>根拠</th></tr>
+<tr><td>ベース単位の倍数で離散化</td><td>8ptグリッド（8/16/24/32/40/48/64）</td><td>連続値（11px, 13px）禁止。リズム死</td></tr>
+<tr><td>カード間 gap の下限</td><td>16〜24px = <span class="num">5〜6mm印刷換算</span></td><td>Webflow / Atlassian標準</td></tr>
+<tr><td>Z/Fパターンの折れ目に境界</td><td>視線が自然に区切る</td><td>99designs</td></tr>
+</table>
+
+<h3>内余白：カード間余白の比率（ネスト縮小則）</h3>
+<table>
+<tr><th>階層</th><th>推奨値</th><th>比率</th></tr>
+<tr><td>カード間</td><td>24px</td><td>3</td></tr>
+<tr><td>セクション間</td><td>16px</td><td>2</td></tr>
+<tr><td>行間</td><td>8px</td><td>1</td></tr>
+<tr><td>文字間</td><td>4px</td><td>0.5</td></tr>
+</table>
+<p>「internal ≤ external」絶対則。比率 <b>最低 1:1.5、理想 1:2</b>（NN/g 系一致）。</p>
+
+<h3>重心・密度バランス（Visual Weight 5要素）</h3>
+<ul>
+<li><b>位置</b>（中央から離れるほど重い）</li>
+<li><b>サイズ</b>（大きいほど重い）</li>
+<li><b>色</b>（暖色・暗色が重い）</li>
+<li><b>テクスチャ</b>（密なほど重い）</li>
+<li><b>方向</b>（<span class="num">vertical elements seem heavier than horizontal</span> ← 縦書きテキストは横書きより重い）</li>
+</ul>
+
+<div class="callout warn">
+<b>Optical Center（光学中心） — 数値中心の落とし穴</b><br>
+幾何中心ではなく <b>幾何中心より約 5% 上</b> が視覚的中心。重心を「数値中心」で取ると沈んで見える。
+</div>
+
+<h3>Squint Test（重心・階層確認の古典技法）</h3>
+<p>目を細めて細部を消し、ブロック・明暗・大小だけ残す。視線がまず行く場所が焦点、二番手・三番手の順序が視覚階層。Photoshop / Figma の Gaussian blur で代用可（半径5〜10px）。紙面なら腕を伸ばす／2m離れる／写真撮って縮小。</p>
+
+<!-- ============= 自問リスト ============= -->
+<h2 style="color:var(--accent2)">★ プロの自問リスト（設計中に唱える14の問い）</h2>
+
+<div class="callout q">
+<ol class="q-list">
+<li><b>視線はどこから入ってどこへ抜けるか？</b>（focal point は 1 つに絞れているか）</li>
+<li><b>squint したとき、最重要要素が一番目に見えるか？</b> 二番目・三番目の順序が崩れていないか？</li>
+<li><b>8pt grid から外れた値は 1 つもないか？</b>（11px や 13px が混入していないか）</li>
+<li><b>inter-group spacing は intra-group spacing の 1.5 倍以上あるか？</b></li>
+<li><b>チャンクは 4±1 個以内か？</b>（7 を超えていないか）</li>
+<li><b>このカードは organism として独立して意味が立つか？</b> 切り出して 1 つだけ提示しても情報として完結するか？</li>
+<li><b>枠線を消しても余白だけでグルーピングが伝わるか？</b>（線は最後の手段）</li>
+<li><b>optical center（幾何中心より約 5% 上）に重心が乗っているか？</b></li>
+<li><b>重さは下にあるか上にあるか、それは意図したものか？</b>（floating か grounded か）</li>
+<li><b>vertical 要素が予想外に重く見えていないか？</b>（縦書き＝重く見える補正をしたか）</li>
+<li><b>「呼吸」できているか？</b> 白を「埋めるべき空き」と感じていないか？</li>
+<li><b>8 歳の子に見せて情報順序が分かるか？</b>（hierarchy の素人テスト）</li>
+<li><b>手に取って 30cm 離して読めるか？</b> 視距離での密度は適正か？</li>
+<li><b>次にいじったら「ましになる」か「悪くなる」か？</b>（後者になった瞬間が完了）</li>
+</ol>
+</div>
+
+<h3>「足し算→引き算」の切替タイミング</h3>
+<ul>
+<li><b>"why" テスト:</b> 各要素について why を答えられるか？ 答えられないものは即削除</li>
+<li><b>3 回連続でいじって「ましになった感」が無ければ stop</b>（Christian Beck）</li>
+<li><b>squint test の結果が 2 回連続で変わらなければ stop</b></li>
+<li><b>Designer Daily 警句:</b> "Knowing when to stop is what turns design from activity into decision-making"</li>
+</ul>
+
+<h3>縦型名刺の独自思考</h3>
+<table>
+<tr><th>論点</th><th>判断</th><th>根拠</th></tr>
+<tr><td>視線パターン</td><td>N字（上→中央→下）が支配的。Z字（横長前提）は使えない</td><td>Vignelli "underwear としての grid"</td></tr>
+<tr><td>重心配置</td><td>幾何中心より上に5%、「下重で安定」狙うなら下1/3に dark mass</td><td>古典バランス論</td></tr>
+<tr><td>古典セオリー</td><td>上1/3=ロゴ・氏名（hero）、中央1/3=余白＋肩書、下1/3=連絡先</td><td>OddPlan Business Card Layout Guide</td></tr>
+<tr><td>vertical 要素の重さ補正</td><td>縦書きテキストは横書きより重く見える → 装飾を半分に減らす</td><td>Vanseo "19 Factors"</td></tr>
+<tr><td>中央軸の扱い</td><td>「書く」のではなく「揃える基準」として使う（線そのものは描かない）</td><td>Vignelli "underwear" 原則の縦軸応用</td></tr>
+<tr><td>3列×5〜7行ラフモジュール</td><td>51×89mm に8pt grid → 列数18×行数31 → 実用は3×5〜7ラフ</td><td>Adobe Express Vertical Business Cards</td></tr>
+</table>
+
+<!-- ============= 統合分析 ============= -->
+<h2>統合分析 — プロの思考回路を1つの意思決定フローに統合</h2>
+
+<div class="callout ok">
+<b>名刺デザイン時の意思決定フロー（プロの思考回路）</b>
+<ol>
+<li><b>情報整理:</b> 載せる要素を全列挙 → 優先順位付け → 4±1 個のチャンク（カード）に集約</li>
+<li><b>カード境界決定:</b> Atomic Design 基準で「意味で割れるか」を自問。線は最後の手段、余白で分ける</li>
+<li><b>グリッド設定:</b> 8ptグリッドまたは3列モジュラー。外周マージン基準値（名刺は5mm以上）</li>
+<li><b>比例システム適用:</b> Van de Graaf or タイポスケール ×1.618 を当てる（先行スキャフォールド）</li>
+<li><b>仮配置:</b> 視覚で要素を置く（grid に従いつつ optical balance 優先）</li>
+<li><b>proximity 検査:</b> internal ≤ external、比率1:1.5以上を確認</li>
+<li><b>重心確認:</b> Squint test → 焦点1つ、二番手三番手の順序、optical center（中央+5%上）</li>
+<li><b>診断（破綻チェック）:</b> 黄金比・三分割で計測。ズレ＝整える必要のシグナル（道具運用）</li>
+<li><b>微調整ループ:</b> 0.5mm単位で nudge、光学調整。心理7段階を回す</li>
+<li><b>引き算判断:</b> "why" テスト・3回連続で改善なければ stop</li>
+<li><b>14の自問リスト</b>で最終チェック</li>
+</ol>
+</div>
+
+<h3>本件名刺への適用（マスター発話「カード方式＋余白リサーチ」）</h3>
+<table>
+<tr><th>項目</th><th>適用</th><th>根拠（リサーチ）</th></tr>
+<tr><td>カード分解</td><td>表4枚（氏名／肩書／連絡先／QR）・裏5枚</td><td>Chunking 4±1、Atomic Design organism</td></tr>
+<tr><td>カード境界</td><td>余白のみ（線・背景色なし）</td><td>NN/g Common Region "余白優先"</td></tr>
+<tr><td>外周マージン</td><td>5mm（左右）・3mm（下・安全領域）</td><td>名刺の業界デファクト</td></tr>
+<tr><td>カード間ギャップ</td><td>internal:external = 1:1.5〜1:2 比率で配分</td><td>Cieden 原則</td></tr>
+<tr><td>タイポスケール</td><td>氏名21pt → 肩書 ÷1.618 ≈ 13pt → 連絡先6pt</td><td>×1.618 階段は唯一の確実なφ応用</td></tr>
+<tr><td>重心</td><td>下1/3 に QR（dark mass）= grounded 配置</td><td>古典セオリー</td></tr>
+<tr><td>vertical 要素補正</td><td>縦書き氏名は装飾を抑える</td><td>Vanseo「縦は重い」</td></tr>
+<tr><td>中央軸</td><td>線を描かず、揃え基準として使う</td><td>Vignelli "underwear"</td></tr>
+<tr><td>optical center</td><td>氏名の重心を中央+5%上 → 視覚的に安定</td><td>幾何中心 ≠ 視覚中心</td></tr>
+<tr><td>黄金比/三分割</td><td>診断ツールとして適用、配置強制はしない</td><td>Markowsky「1.6〜1.7 区別不能」</td></tr>
+<tr><td>引き算判定</td><td>14の自問リストで最終チェック</td><td>Designer Daily / Christian Beck</td></tr>
+</table>
+
+<!-- ============= ソース ============= -->
+<h2>ソース一覧（85・重複排除後）</h2>
+
+<h3>軸1: 余白決定の思考回路（30ソース）</h3>
+<ol>
+<li><a href="https://hattool.com/hat810/sagatsukubacknumber/design-margin">適度な余白は何mm — ハットツールデザイン</a></li>
+<li><a href="https://www.rit.edu/vignellicenter/sites/rit.edu.vignellicenter/files/documents/The%20Vignelli%20Canon.pdf">The Vignelli Canon (PDF) — RIT</a></li>
+<li><a href="https://www.creativebloq.com/graphic-design/massimo-vignelli-61411897">Massimo Vignelli — Creative Bloq</a></li>
+<li><a href="https://ia802309.us.archive.org/4/items/GridSystemsInGraphicDesignJosefMullerBrockmann/Grid%20systems%20in%20graphic%20design%20-%20Josef%20Muller-Brockmann.pdf">Grid systems — Müller-Brockmann PDF</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Canons_of_page_construction">Canons of page construction — Wikipedia</a></li>
+<li><a href="https://retinart.net/graphic-design/secret-law-of-page-harmony/">Secret Law of Page Harmony — Retinart</a></li>
+<li><a href="https://www.linkedin.com/advice/0/how-do-you-measure-adjust-white-space-ratio">White Space Ratio — LinkedIn</a></li>
+<li><a href="https://www.rejuvenate.digital/news/designing-rhythm-power-8pt-grid-ui-design">8pt Grid System — rejuvenate.digital (2025)</a></li>
+<li><a href="https://cieden.com/book/sub-atomic/spacing/spacing-best-practices">Spacing best practices — Cieden</a></li>
+<li><a href="https://www.nngroup.com/articles/gestalt-proximity/">Proximity Principle — NN/g</a></li>
+<li><a href="https://www.smashingmagazine.com/2017/02/improving-ui-design-skills-copywork/">Copy If You Can — Smashing (2017)</a></li>
+<li><a href="https://medium.com/@JonathanZWhite/developing-your-eye-for-design-cce944bbeae4">Developing your eye for design — Jonathan Z. White</a></li>
+<li><a href="https://soryacenterpoint.com/mastering-micro-adjustments-for-pixel-perfect-precision-in-digital-design/">Micro-Adjustments — SORYA Center Point</a></li>
+<li><a href="https://marvelapp.com/blog/optical-adjustment-logic-vs-designers/">Optical Adjustment — Marvel Blog</a></li>
+<li><a href="https://www.webdesignerdepot.com/the-7-stages-of-pushing-pixels-from-hope-to-existential-dread/">7 Stages of Pushing Pixels — Web Designer Depot</a></li>
+<li><a href="https://shiftnudge.com/what-is-shift-nudge">Shift Nudge Training</a></li>
+<li><a href="https://medium.com/design-bootcamp/whitespace-isnt-empty-why-breathing-room-is-the-secret-sauce-of-great-ux-5decb5af35ae">Whitespace Isn't Empty — Mageswari</a></li>
+<li><a href="https://www.m-hand.co.jp/blog/design/4952/">雑に見えない余白のルール5つ — エムハンド</a></li>
+<li><a href="https://shinichiro.site/whitespace/">余白｜デザインの呼吸 — SHINICHIRO</a></li>
+<li><a href="https://withcode.tech/media/web_design_multiples_of_8/">8の倍数で簡単に美しく — withcode</a></li>
+<li><a href="https://tech-lab.sios.jp/archives/48562">8の倍数ルール — SIOS Tech Lab</a></li>
+<li><a href="https://cocotiie.com/name-card/">名刺デザインに黄金比 — cocotiie</a></li>
+<li><a href="https://hattan.info/golden-ratio-card/">黄金比で作る名刺デザイン — hattan.info</a></li>
+<li><a href="https://designmentor.jp/knowledgenote/design/designtrace/">デザイントレース — デザインメンター</a></li>
+<li><a href="https://kyoto-itsuki.com/design/logo_trace_100/">ロゴ模写100 — ITSUKI</a></li>
+<li><a href="https://www.socym.co.jp/book/1257">トレース&模写で学ぶデザインのドリル — ソシム</a></li>
+<li><a href="https://sarahafarr.medium.com/analyzing-paula-schers-design-process-9a17cb1bf569">Paula Scher's Design Process — Sarah A. Farr</a></li>
+<li><a href="https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html">WCAG 2.2 Text Spacing</a></li>
+<li><a href="https://ixdf.org/literature/topics/negative-space">Negative Space — IxDF (2026)</a></li>
+<li><a href="https://www.4over4.com/content-hub/stories/what-is-white-space-in-design">White Space — 4over4</a></li>
+</ol>
+
+<h3>軸2: 黄金比の賛否と仮説検証（23ソース）</h3>
+<ol start="31">
+<li><a href="https://www.goldennumber.net/wp-content/uploads/George-Markowsky-Golden-Ratio-Misconceptions-MAA.pdf">Markowsky "Misconceptions about the Golden Ratio" MAA 1992</a></li>
+<li><a href="http://devlinsangle.blogspot.com/2017/04/fibonacci-and-golden-ratio-madness.html">Keith Devlin Fibonacci/Golden Ratio Exposed</a></li>
+<li><a href="https://www.fastcompany.com/3044877/the-golden-ratio-designs-biggest-myth">Brownlee Golden Ratio Biggest Myth — Fast Company 2015</a></li>
+<li><a href="https://www.fastcompany.com/1672682/debunking-the-myth-of-apple-s-golden-ratio">Debunking Apple's Golden Ratio — Fast Company</a></li>
+<li><a href="https://www.insidehook.com/design/why-the-golden-ratio-is-total-nonsense">Golden Ratio Total Nonsense — InsideHook</a></li>
+<li><a href="https://eusci.org.uk/2020/07/29/myth-busting-the-golden-ratio/">Myth-busting Golden Ratio — Edinburgh 2020</a></li>
+<li><a href="https://medium.com/@quick_brown_fox/why-the-golden-ratio-matters-583f6737c10c">Crescenzi Why Golden Ratio Matters — Medium</a></li>
+<li><a href="https://www.colemanprint.com.au/blog/the-golden-ratio-in-logo-design-myth-or-must-have/">Golden Ratio Logo Design — Coleman Print</a></li>
+<li><a href="https://martinforhire.com/blog-post/golden-ratio-in-logo-design-myth-or-truth/">Martin For Hire — Golden Ratio Myth or Truth</a></li>
+<li><a href="https://99designs.com/blog/tips/the-golden-ratio/">99designs Golden Ratio</a></li>
+<li><a href="https://www.figma.com/resource-library/golden-ratio/">Figma Golden Ratio (2026)</a></li>
+<li><a href="https://inkbotdesign.com/golden-ratio/">Inkbot Design Golden Ratio (2026)</a></li>
+<li><a href="https://www.japanprint.com/using-the-golden-ratio-to-design-business-cards/">Japan Print NYC Golden Ratio Business Cards</a></li>
+<li><a href="https://cybernob.com/how-to-design-your-business-cards-using-the-golden-ratio/">Cybernob Golden Ratio Business Cards</a></li>
+<li><a href="https://www.neugraphic.com/muller-brockmann/muller-brockmann-text2.html">Neugraphic Müller-Brockmann Philosophy</a></li>
+<li><a href="https://www.pixartprinting.co.uk/blog/massimo-vignelli/">Pixartprinting Vignelli</a></li>
+<li><a href="https://expertphotography.com/golden-ratio-vs-rule-of-thirds">Golden Ratio vs Rule of Thirds — ExpertPhotography</a></li>
+<li><a href="https://www.cl.cam.ac.uk/~mgk25/iso-paper.html">A4 paper format / ISO 216 — Kuhn Cambridge</a></li>
+<li><a href="https://hiro8japan.com/what-is-japanese-silver-ratio">Silver Ratio of Japan — Hiro8</a></li>
+<li><a href="https://www.webdesignerdepot.com/2017/12/breaking-the-grid-without-breaking-design/">Breaking the Grid — Web Designer Depot 2017</a></li>
+<li><a href="https://www.logodesign.net/blog/optical-adjustments-in-logo-design/">Optical Adjustments — Logo Design.net</a></li>
+<li><a href="https://blog.denniskabui.com/cursor-optical-balance/">Hidden Logic of Visual Balance — Dennis Kabui</a></li>
+</ol>
+
+<h3>軸3: カード×余白統合と自問リスト（31ソース）</h3>
+<ol start="53">
+<li><a href="https://lawsofux.com/chunking/">Chunking — Laws of UX</a></li>
+<li><a href="https://ui-patterns.com/patterns/Chunking">Chunking design pattern — UI-Patterns</a></li>
+<li><a href="https://www.nngroup.com/articles/common-region/">Common Region — NN/g 2020</a></li>
+<li><a href="https://atomicdesign.bradfrost.com/chapter-2/">Atomic Design Ch.2 — Brad Frost</a></li>
+<li><a href="https://bradfrost.com/blog/link/making-sense-of-atomic-design-molecules-and-organisms/">Making sense of atomic design — Brad Frost 2016</a></li>
+<li><a href="https://nthmuchjustnotes.wordpress.com/2018/03/15/the-vignelli-canon/">The Vignelli Canon notes — 2018</a></li>
+<li><a href="https://deckelmoneypenny.com/massimo-grid">Grid is the underwear of the book — Deckel & Moneypenny</a></li>
+<li><a href="https://monoskop.org/images/a/a4/Mueller-Brockmann_Josef_Grid_Systems_in_Graphic_Design_Raster_Systeme_fuer_die_Visuele_Gestaltung_English_German_no_OCR.pdf">Grid Systems — Müller-Brockmann 1968 PDF</a></li>
+<li><a href="https://blog.prototypr.io/the-8pt-grid-consistent-spacing-in-ui-design-with-sketch-577e4f0fd520">8pt Grid — Prototypr</a></li>
+<li><a href="https://blog.designary.com/p/spacing-systems-and-scales-ui-design">Spacing systems — Designary</a></li>
+<li><a href="https://atlassian.design/foundations/spacing">Spacing — Atlassian Design</a></li>
+<li><a href="https://medium.com/@manonpiette.pro/margins-and-padding-e4e9d0efa65d">Margins and padding — Medium</a></li>
+<li><a href="https://design-packs.gitbook.io/docs/fundamentals/global-section-settings/understanding-inner-padding-and-outer-margin-settings">Inner Padding & Outer Margin — Design Packs</a></li>
+<li><a href="https://www.smashingmagazine.com/2014/12/design-principles-visual-weight-direction/">Visual Weight And Direction — Smashing 2014</a></li>
+<li><a href="https://vanseodesign.com/web-design/visual-balance/">19 Factors of Compositional Balance — Vanseo</a></li>
+<li><a href="https://medium.com/@abhimm5/exploring-the-gravity-composition-in-design-playing-with-visual-weight-b5f66c2cf744">Gravity Composition — Medium</a></li>
+<li><a href="https://www.lukew.com/ff/entry.asp?2013=">The Squint Test — LukeW 2013</a></li>
+<li><a href="https://polypane.app/blog/debug-your-visual-hierarchy-with-the-squint-test/">Squint test debug — Polypane</a></li>
+<li><a href="https://www.learnui.design/blog/squint-test-ui-design-case-study.html">Squint Test case study — Learn UI Design</a></li>
+<li><a href="https://99designs.com/blog/tips/visual-hierarchy-landing-page-designs/">F and Z patterns — 99designs</a></li>
+<li><a href="https://medium.com/ux-power-tools/how-to-know-when-to-stop-designing-a2f921d7f071">When to Stop Designing — Christian Beck</a></li>
+<li><a href="https://www.designer-daily.com/when-to-stop-designing-the-art-of-knowing-when-good-is-good-enough-211802">When to Stop Designing — Designer Daily</a></li>
+<li><a href="https://theintearior.substack.com/p/the-discipline-of-less-designing">Discipline of Less — Substack</a></li>
+<li><a href="https://en-academic.com/dic.nsf/enwiki/3439217">Canons of page construction Tschichold</a></li>
+<li><a href="https://retinart.net/artist-profiles/jan-tschichold/">Tschichold — Retinart</a></li>
+<li><a href="https://oddplan.com/blogs/articles/business-card-layout-guide">Business Card Layout Guide — OddPlan</a></li>
+<li><a href="https://note.com/meishiryohin/n/n251aa1b050a6">名刺設計 — 名刺良品</a></li>
+<li><a href="https://hitori-koho.com/businesscard-kihon">名刺デザインの基本 — ひとり広報</a></li>
+<li><a href="https://www.graphic.jp/feature/business_card_direction">縦型横型 — graphic.jp</a></li>
+<li><a href="https://www.adobe.com/express/create/business-card/vertical">Vertical Business Cards — Adobe Express</a></li>
+</ol>
+
+</body>
+</html>

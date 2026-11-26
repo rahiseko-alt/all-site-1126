@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ココナラ出品ハンドブック — 統合版 v1.3</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #666;
+    --border: #ddd;
+    --bg: #fafafa;
+    --bg-alt: #f4f4f4;
+    --accent: #2a5d84;
+    --ng: #b91c1c;
+    --ok: #047857;
+    --warn: #b45309;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Segoe UI", sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 14px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+  }
+  header { border-bottom: 2px solid var(--fg); padding-bottom: 12px; margin-bottom: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: 0.02em; }
+  .subtitle { color: var(--muted); font-size: 12px; }
+  h2 {
+    font-size: 17px;
+    margin: 36px 0 12px;
+    padding: 6px 12px;
+    border-left: 5px solid var(--accent);
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 14px; margin: 20px 0 8px; color: var(--accent); }
+  h4 { font-size: 13px; margin: 14px 0 6px; color: #444; }
+  p { margin: 6px 0; }
+  ul, ol { padding-left: 22px; margin: 6px 0; }
+  li { margin: 3px 0; }
+  code { background: var(--bg-alt); padding: 1px 5px; border-radius: 2px; font-size: 12px; }
+
+  /* TOC */
+  .toc {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 12px 18px;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+  .toc strong { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .toc ol { margin: 0; padding-left: 20px; }
+  .toc a { color: var(--fg); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+    margin: 8px 0 16px;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--bg-alt); font-weight: 600; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Badges */
+  .ng { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #fee2e2; color: var(--ng); border: 1px solid #fecaca; }
+  .ok { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #d1fae5; color: var(--ok); border: 1px solid #a7f3d0; }
+  .warn { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #fef3c7; color: var(--warn); border: 1px solid #fde68a; }
+
+  /* Callouts */
+  .note { background: #fff; border-left: 3px solid var(--accent); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .warn-box { background: #fef9c3; border-left: 3px solid var(--warn); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .critical { background: #fee2e2; border-left: 3px solid var(--ng); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+
+  /* Procedure steps */
+  .proc { background: #fff; border: 1px solid var(--border); padding: 14px 18px; margin: 10px 0 16px; }
+  .proc ol { padding-left: 24px; }
+  .proc li { margin: 6px 0; }
+  .proc li strong { display: inline-block; min-width: 90px; }
+
+  /* Flow diagram */
+  .flow { background: #fff; border: 1px solid var(--border); padding: 14px 16px; margin: 10px 0; font-size: 13px; line-height: 2; }
+  .flow-step { display: inline-block; background: var(--bg-alt); padding: 4px 10px; border-radius: 3px; margin: 2px 4px; font-weight: 600; }
+
+  /* Example box */
+  .ex { background: #f0f9ff; border: 1px solid #bae6fd; padding: 10px 14px; margin: 8px 0; font-size: 12.5px; }
+  .ex::before { content: "例: "; color: #0369a1; font-weight: 700; font-size: 11px; letter-spacing: 0.05em; }
+
+  .src { font-size: 11px; color: var(--muted); margin-top: 20px; padding-top: 10px; border-top: 1px dashed var(--border); }
+  .ver-table th { background: #fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ココナラ出品ハンドブック — 統合版 v1.3</h1>
+  <div class="subtitle">市場調査 / 景品表示法 / 文章構成 の3領域を1ファイルに集約</div>
+  <div class="subtitle">作成日: 2026-04-14 / 正本: <code>docs/standards/coconala-listing-handbook.html</code> / 関連: <code>docs/ops/listing-cycle.md</code></div>
+</header>
+
+<div class="critical">
+<strong>このハンドブックの対象読者:</strong> AIエージェント（Claude Opus / Sonnet / Haiku / Gemini Flash / GPT-OSS 等、全モデル共通）。<br>
+<strong>品質保証原則:</strong> 各章は手順レベルで書かれており、低能モデルでも上位モデルと同等の成果物を出せるよう設計されている。<strong>「判断」を要求する箇所にはすべて判断基準を明示</strong>している。迷ったら基準に戻れ。独自判断で省略するな。
+</div>
+
+<nav class="toc">
+  <strong>目次</strong>
+  <ol>
+    <li><a href="#s1">§1. 市場調査 構成骨格 + 調査手順</a></li>
+    <li><a href="#s2">§2. 景品表示法 チェックリスト + 照合手順</a></li>
+    <li><a href="#s3">§3. 出品文章 8ステップ + 執筆手順</a></li>
+    <li><a href="#s4">§4. 出典・統合履歴・更新ルール</a></li>
+  </ol>
+</nav>
+
+<!-- ========================================= -->
+<h2 id="s1">§1. 市場調査 構成骨格 + 調査手順</h2>
+
+<p>新規出品カテゴリを調査するとき、調査レポートに含める <strong>7ブロック</strong> と、そのブロックを埋めるための <strong>調査手順</strong> を両方規定する。手順に従えば、どのモデルでも同じ粒度の成果物になる。</p>
+
+<h3>1-1. レポートに含める7ブロック</h3>
+<table>
+  <thead>
+    <tr><th style="width:30px;">#</th><th style="width:170px;">ブロック</th><th>含めるべき情報</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>カテゴリ概要</td><td>カテゴリ名 / 親カテゴリ / ID / 総出品数 / カテゴリ累計実績 / サブカテゴリ一覧</td></tr>
+    <tr><td>2</td><td>上位20件一覧（ランキング順）</td><td>タイトル / キャッチコピー / 価格 / レビュー数 / 星評価 / 本文記載の販売実績 / ランク</td></tr>
+    <tr><td>3</td><td>価格帯分布</td><td>中央値・最頻値・上限下限（平均値のみは禁止）/ ヒストグラム / サンプル件数明記</td></tr>
+    <tr><td>4</td><td>訴求パターン分類</td><td>問題提示型 / ROI訴求型 / 技術ロゴ型 / 納品物列挙型 / 価格訴求型 の各割合</td></tr>
+    <tr><td>5</td><td>空白地帯の特定</td><td>他社が埋めていない切り口。例: ROI数値訴求の空白、特定業種特化の空白</td></tr>
+    <tr><td>6</td><td>サムネ構成分析</td><td>要素数（3要素以下の割合）/ 技術ロゴ使用率 / 星評価表示率 / PRバッジ有無</td></tr>
+    <tr><td>7</td><td>総評・空白地帯推奨</td><td>参入するならどの切り口が有利か / 撤退すべきか / 価格戦略（追随/差別化/空白）</td></tr>
+  </tbody>
+</table>
+
+<h3>1-2. 調査手順（ブロック1〜7の埋め方）</h3>
+
+<div class="proc">
+<ol>
+  <li><strong>ステップ1:</strong> 対象カテゴリの公式ページを WebFetch で取得する。URL は <code>https://coconala.com/categories/{id}?sort_by=ranking</code>。HTML 全体を取得してカテゴリ名・総出品数・サブカテゴリをブロック1に記録。</li>
+  <li><strong>ステップ2:</strong> 同ページから上位20件のサービス行を抽出。各行について「タイトル / キャッチ / 価格 / レビュー数 / 星評価 / 出品者ランク」を取得しブロック2に表形式で記録。<strong>本文記載の販売実績は必ず個別ページを開いて本文から採録せよ</strong>（カード上には非表示のため）。</li>
+  <li><strong>ステップ3:</strong> ブロック2で取得した上位20件の価格列を数値で並べ、<strong>中央値・最頻値・最小・最大</strong>を算出しブロック3に記載。「平均値のみ」は禁止。サンプル件数を必ず併記。</li>
+  <li><strong>ステップ4:</strong> 上位20件のタイトルとキャッチコピーを読み、以下の5類型のどれに当てはまるかラベル付けしブロック4に割合で記載: 問題提示型（質問形式）/ ROI訴求型（数値削減強調）/ 技術ロゴ型（ツール名羅列）/ 納品物列挙型（何が届くか箇条書き）/ 価格訴求型（相場より安い主張）。</li>
+  <li><strong>ステップ5:</strong> ブロック4で <strong>割合10%未満の類型</strong> を「空白地帯」としてブロック5に記載。空白の理由（需要なしか、誰もやっていないだけか）も推測で書け。</li>
+  <li><strong>ステップ6:</strong> 上位20件のサムネ画像を Playwright でスクリーンショット or WebFetch で取得し、以下を集計しブロック6に記載: 要素数（文字・ロゴ・アイコン・星評価・PRバッジの個別カウント）/ 3要素以下の割合 / 技術ロゴ使用率 / 星評価表示率。</li>
+  <li><strong>ステップ7:</strong> ブロック1〜6 の結果を踏まえて以下3問に答えブロック7に記載:
+    <ul>
+      <li>参入するならどの切り口が有利か（空白地帯 / 上位追随 / 下位差別化）</li>
+      <li>撤退すべきか（No-Go判定の根拠）</li>
+      <li>推奨価格帯（中央値のN倍 or 最頻値同額 の根拠付き）</li>
+    </ul>
+  </li>
+</ol>
+</div>
+
+<div class="note">
+<strong>収集ツールの使い分け:</strong>
+<ul>
+  <li><code>WebFetch</code> — 上位20-80件の軽量収集（カード情報のみ）。最速。</li>
+  <li><code>Playwright MCP</code> — サムネ画像・本文スクショ・動的レンダリングが必要な場合</li>
+  <li>調査は長時間になりがちのため <code>Agent</code> + <code>run_in_background: true</code> 委譲を原則とする（CLAUDE.md §4.1）</li>
+</ul>
+</div>
+
+<div class="critical">
+<strong>データ粒度の絶対規律:</strong> 価格は <strong>中央値・最頻値の実数</strong>を必ず出すこと。「相場はこれくらい」という曖昧な報告は禁止。サンプル件数を必ず明記する。
+<div class="ex">× 「相場は1万円前後」　→　○ 「中央値 12,500円（40件サンプル）/ 最頻値 10,000円（11件）」</div>
+</div>
+
+<h3>1-3. ABC分析アルゴリズム + ハイブリッド参入戦略</h3>
+
+<p>市場調査の次のステップ。取得した80件データから ABC分析 を実行し、参入戦略を決める。</p>
+
+<h4>ABC分類アルゴリズム（評価数ベース）</h4>
+
+<div class="proc">
+<ol>
+  <li><strong>ステップ1:</strong> 80件のカードデータから <strong>評価数（レビュー件数）</strong>を抽出（ココナラの「実販売数」はカード上に非表示で取得困難。評価数は実販売数の下限で、相対順位はほぼ同じ）</li>
+  <li><strong>ステップ2:</strong> 評価数ゼロの出品は除外（「販売数ゼロは統計から除外」規約）</li>
+  <li><strong>ステップ3:</strong> 残りを評価数降順でソート</li>
+  <li><strong>ステップ4:</strong> 累計評価数の割合を計算（累計% = 上から N 件までの合計 ÷ 全合計 × 100）</li>
+  <li><strong>ステップ5:</strong> 累計% で分類:
+    <ul>
+      <li><strong>A群:</strong> 累計 0 - 80%（市場の寡占層）</li>
+      <li><strong>B群:</strong> 累計 80 - 95%</li>
+      <li><strong>C群:</strong> 累計 95 - 100%</li>
+    </ul>
+  </li>
+  <li><strong>ステップ6:</strong> A群の価格分布を集計（中央値・最頻帯・価格ビン 5,000円刻み）</li>
+  <li><strong>ステップ7:</strong> <strong>空白地帯</strong>を特定。A群の価格帯で件数が少ない帯（例: A群14件中 ¥4,000-¥9,000 帯が3件のみ = 空白地帯）</li>
+</ol>
+</div>
+
+<div class="note">
+<strong>SSoT への書き込み先:</strong> <code>monetization.xlsx</code> の <code>abc-analysis</code> シートにサマリ1行追加（カテゴリ / 取得日 / A群件数 / 占有率 / 中央値 / 空白地帯 等）。raw data 80件は `journal/monetization/drafts/abc-cat{ID}-YYYY-MM-DD.xlsx` に個別インスタンスとして保管。全エージェントはセッション開始時に monetization.xlsx の catalog / abc-analysis / strategy シートを読むこと。
+</div>
+
+<div class="note">
+<strong>旧ツール参照:</strong> <code>docs/standards/templates/abc-analysis-template.xlsx</code>（5シート版）は初期検討時の VEST。現在は monetization.xlsx に統合されているため、新規分析時は monetization.xlsx を優先使用せよ。
+</div>
+
+<h4>ハイブリッド参入戦略（Session 169 確定）</h4>
+
+<div class="critical">
+<strong>原則（Session 169 訂正版）:</strong> Phase 1 の新規参入は以下 <strong>2択のみ</strong>:
+<ol>
+  <li><strong>Route 1: 同価格で圧倒的に機能が上</strong>（A群中央値と同じ価格で、業種特化/納期保証/画面共有/返金保証/ヒアリング型等の差別化軸で勝つ）</li>
+  <li><strong>Route 2: 同機能で圧倒的に安い</strong>（A群と同等の機能を価格破壊で提供）</li>
+</ol>
+<strong>空白地帯で高単価独占は Phase 3 の「成長後戦略」である。</strong>Phase 1 で空白地帯高単価を狙うのは誤り。新規はレビュー0件から始まるため、A群と直接比較される価格帯で勝負するしかない。
+</div>
+
+<table>
+  <thead>
+    <tr><th style="width:80px;">Phase</th><th style="width:120px;">期間</th><th>戦術</th><th>目標</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="center"><strong>Phase 1</strong><br>Route1 or Route2</td>
+      <td class="center">0-3ヶ月</td>
+      <td>A群同価格帯で Route 1（機能上）or Route 2（同機能で安く）で参入。差別化軸必須（業種特化 / 納期保証 / 画面共有サポート / 返金保証 / ヒアリング型カスタム開発 / 「ます抜き」キャッチ）</td>
+      <td>レビュー 20件以上</td>
+    </tr>
+    <tr>
+      <td class="center"><strong>Phase 2</strong><br>A群展開</td>
+      <td class="center">3-6ヶ月</td>
+      <td>Phase 1 で蓄積したレビュー実績を武器に、A群内でのポジション確立（別価格帯サブ出品 or オプション拡充）</td>
+      <td>A群入り</td>
+    </tr>
+    <tr>
+      <td class="center"><strong>Phase 3</strong><br>ブランド化</td>
+      <td class="center">6ヶ月+</td>
+      <td>A群特殊ポジション獲得。業種特化深化 / 技術特化深化 / <strong>空白地帯高単価独占</strong>（ここで初めて成長後戦略として有効）</td>
+      <td>特殊ポジション確立</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>採用しない戦略（理由付き）</h4>
+<ul>
+  <li><strong>❌ 空白地帯で高単価独占（Phase 1 で狙う）:</strong> レビュー0件の新規が空白地帯に入っても客が来ない。これは成長後（Phase 3）の戦略</li>
+  <li><strong>❌ A群完全真似（価格も文章もそのまま）:</strong> A群のレビュー169-992件の複利効果の壁を差別化軸なしでは超えられない</li>
+</ul>
+
+<h4>差別化軸の候補（Phase 1 で必須1つ以上）</h4>
+<ul>
+  <li><strong>業種特化</strong>: 医療事務 / 美容室 / 保育園 / 建設業 / 士業 / 不動産 / 宿泊業 等</li>
+  <li><strong>納期保証</strong>: 48時間納品 / 24時間以内返信</li>
+  <li><strong>画面共有サポート</strong>: Zoom 等で一緒にセットアップ（有料オプション）</li>
+  <li><strong>返金保証</strong>: 動作不良時の条件付き返金</li>
+  <li><strong>ヒアリング型カスタム開発</strong>: 購入後に業務をヒアリングしてからカスタマイズ納品（業務効率化部門の既定モデル）</li>
+  <li><strong>「ます抜き」キャッチの差別化</strong>: タイトルの語感差別化（ココナラは「〜ます」自動付与、§3-1 参照）</li>
+</ul>
+
+<div class="warn-box">
+<strong>AIカテゴリ別に再分析必須:</strong> カテゴリごとに ABC分析 結果（寡占度・空白地帯・価格分布）は異なる。他カテゴリの結論（例: カテゴリ230）を別カテゴリ（例: カテゴリ22 Web制作 / 231 プログラミング）にそのまま適用するな。毎回 80件取得 → ABC分析 → 空白地帯特定 を実施せよ。
+</div>
+
+<!-- ========================================= -->
+<h2 id="s2">§2. 景品表示法 チェックリスト + 照合手順</h2>
+
+<div class="warn-box">
+<strong>なぜ厳格か:</strong> ココナラは出品時に景品表示法準拠の審査を実施する。違反があると出品停止・アカウント制限のリスク。<strong>グレーもアウト。</strong>1つでも該当したら即修正。
+</div>
+
+<h3>2-1. 絶対NG表現（即アウト）</h3>
+<table>
+  <thead><tr><th style="width:200px;">パターン</th><th>具体例</th></tr></thead>
+  <tbody>
+    <tr><td>断定的効果保証</td><td>「元が取れます」「稼げます」「必ず〜」「絶対〜」「確実に〜」</td></tr>
+    <tr><td>収益・黒字の断定</td><td>「〇〇円の黒字が出ます」「購入初月から元が取れます」「高収入」</td></tr>
+    <tr><td>断定的削減表現</td><td>「〇時間が消えます」「〇〇を撲滅」「手作業を排除」</td></tr>
+    <tr><td>根拠なし最上級</td><td>「No.1」「最速」「最短」「ココナラで一番」「これ以上ない」</td></tr>
+    <tr><td>永続効果の断定</td><td>「一生モノ」「永久に続く」「半永久的に」</td></tr>
+    <tr><td>成功率100%系</td><td>「失敗した例はありません」「全員〜できています」「成功率100%」</td></tr>
+    <tr><td>根拠なし限定</td><td>「期間限定価格」「〇件売れたら値上げ」（期間・条件の明示なし）</td></tr>
+  </tbody>
+</table>
+
+<h3>2-2. グレー（言い換え必須）</h3>
+<table>
+  <thead><tr><th style="width:260px;">NG <span class="ng">NG</span></th><th>OK言い換え <span class="ok">OK</span></th></tr></thead>
+  <tbody>
+    <tr><td>「〇時間が消えます」</td><td>「〇時間の削減が見込めます」</td></tr>
+    <tr><td>「元が取れます」</td><td>「元が取れる計算になります（〇時間削減の場合）」</td></tr>
+    <tr><td>「黒字が出ます」</td><td>「費用を上回る削減効果が期待できます」</td></tr>
+    <tr><td>「撲滅」「排除」</td><td>「大幅削減」「削減できます」</td></tr>
+    <tr><td>「〇〇円の黒字が出る計算です」</td><td>「試算上、〇〇円分の削減効果になります」</td></tr>
+    <tr><td>「確認されています」</td><td>「〜と考えられます」「〜が期待できます」</td></tr>
+  </tbody>
+</table>
+
+<h3>2-3. ROI数値を使うときのOK形式</h3>
+<p>数値は出してよい。<strong>断定しなければよい。</strong></p>
+<ul>
+  <li><span class="ok">OK</span> 「月10時間削減の場合、最低賃金換算で月¥11,600分の節約<strong>試算</strong>になります」</li>
+  <li><span class="ok">OK</span> 「試算：月〇時間 × ¥1,160（2026年度最低賃金）= 月¥〇〇の削減効果」</li>
+  <li><span class="ok">OK</span> 「ご利用状況によって効果は異なります」の免責一文を必ず添える</li>
+</ul>
+
+<h3>2-4. 照合手順（文章完成後に必ず実行）</h3>
+<div class="proc">
+<ol>
+  <li><strong>ステップ1:</strong> 書き終わった出品文・タイトル・キャッチ・オプション説明・FAQ・注意事項 を <strong>全文コピー</strong>し、1つのテキストにまとめる。</li>
+  <li><strong>ステップ2:</strong> 2-1 の NGパターン7種類それぞれについて、<strong>全文を検索</strong>する（Ctrl+F 相当）。1つでもヒットしたら該当箇所を即修正。ヒットがゼロになるまで繰り返す。</li>
+  <li><strong>ステップ3:</strong> 2-2 のグレー6パターンそれぞれについて、同様に全文検索。ヒットしたら 2-2 のOK言い換えに置換。</li>
+  <li><strong>ステップ4:</strong> ROI数値を含む文章があれば、2-3 の OK形式（「試算」「見込めます」「参考値」「ご利用状況によって異なります」の4要素）がすべて含まれているか確認。1つでも欠けたら追加。</li>
+  <li><strong>ステップ5:</strong> ここまでで問題なしを確認したら、文章末尾または注意事項内に <strong>「景品表示法チェック済み（YYYY-MM-DD）」</strong> の明示記載を1行入れる。これで完了。</li>
+</ol>
+</div>
+
+<div class="note">
+<strong>セルフチェックでは不十分な場合:</strong> 新しい訴求パターンを使ったとき（例: 「返金保証」「〇日間無料」等）、本ハンドブックの NGパターンに未記載でも景品表示法違反の可能性がある。マスターに判断を仰げ。
+</div>
+
+<!-- ========================================= -->
+<h2 id="s3">§3. 出品文章 8ステップ + 執筆手順</h2>
+
+<p>カテゴリ230（業務自動化・効率化支援）の競合上位から抽出した、販売数上位に共通する文章構成。次の出品を書くときはこの順序で組み立てる。</p>
+
+<h3>3-1. タイトル・キャッチコピーの文字数仕様（重要・勘違い注意）</h3>
+
+<div class="critical">
+<strong>ココナラ独自仕様: タイトルは語尾に自動で「ます」が付与される。</strong><br>
+つまり、マスターが入力する時点では「ます」を含めないで入力する。管理画面上で表示・カウントされる文字数は「ます」抜きでの文字数。
+</div>
+
+<h4>具体例</h4>
+<table>
+  <thead><tr><th style="width:40%;">入力値（管理画面）</th><th style="width:40%;">ページ表示</th><th style="width:20%;">文字数カウント</th></tr></thead>
+  <tbody>
+    <tr><td><code>ExcelマクロVBAで作業を自動化し</code></td><td>ExcelマクロVBAで作業を自動化し<strong>ます</strong></td><td>「ます」抜きで数える</td></tr>
+    <tr><td><code>WebサイトのデータをCSVに自動収集し</code></td><td>WebサイトのデータをCSVに自動収集し<strong>ます</strong></td><td>「ます」抜き</td></tr>
+    <tr><td><code>面倒なPC作業をRPAで自動化し</code></td><td>面倒なPC作業をRPAで自動化し<strong>ます</strong></td><td>「ます」抜き</td></tr>
+  </tbody>
+</table>
+
+<div class="warn-box">
+<strong>やりがちなミス:</strong> 文章内で「〇〇します」とタイトル全体を書くと、ココナラが追加で「ます」を付けて「〇〇しますます」になる。必ず <strong>「ます」抜きで入力</strong> せよ。指定文字数（25字上限など）も「ます」抜きで計算せよ。
+</div>
+
+<h3>3-2. 文章構成 8ステップ</h3>
+
+<div class="flow">
+  <span class="flow-step">① 問題提示</span> →
+  <span class="flow-step">② 共感</span> →
+  <span class="flow-step">③ 解決策提示</span> →
+  <span class="flow-step">④ 納品物の具体説明</span> →
+  <span class="flow-step">⑤ ROI試算</span> →
+  <span class="flow-step">⑥ 購入後ヒアリング</span> →
+  <span class="flow-step">⑦ FAQ</span> →
+  <span class="flow-step">⑧ 購入時お願い（注意事項）</span>
+</div>
+
+<h3>3-3. 執筆手順（各ステップの書き方）</h3>
+
+<div class="proc">
+<ol>
+  <li><strong>ステップ①問題提示:</strong> 質問形式で1行。次に <strong>箇条書き5項目</strong> で「こんな業務していませんか？」を列挙。各項目は具体的な業務シーンを1行で書く（抽象論禁止）。
+    <div class="ex">「毎日同じExcel作業、いつやめられますか？」<br>・Excelで毎日コピペ・貼り付けを繰り返している<br>・帳票を1件ずつ手作りして残業が増えている<br>・リストの重複や表記ゆれを目視でチェックし続けている</div>
+  </li>
+  <li><strong>ステップ②共感:</strong> 1段落2-3文。読み手の挫折経験に寄り添う。「〇〇は難しそう」「何ヶ月も止まっている」等のフレーズを使う。
+    <div class="ex">「こうした繰り返し作業は、一度だけ正しく仕組みを作れば動かせます。自動化にかかるスキルも時間もなくて構いません。」</div>
+  </li>
+  <li><strong>ステップ③解決策提示:</strong> 「何を提供するか」を1段落で宣言。技術ハードルを下げる言葉（「〇〇不要」「ダブルクリックだけ」「コード1行も書かない」）を必ず入れる。
+    <div class="ex">「すぐに動く .bas ファイル（VBAコード）5本 + 自動インストーラーのセットをお届けします。Excelを開いてインストーラーを実行するだけで、その日から使えます。」</div>
+  </li>
+  <li><strong>ステップ④納品物の具体説明:</strong> ①②③④⑤の番号付きで、<strong>何が届くか具体的に列挙</strong>。各項目は「機能名 — 動作説明」の形式。動作環境（OS・Excel版・対応範囲）も最後に明示。
+    <div class="ex">「① データクリーニング — 空白行削除・全角→半角変換・会社名統一を一括実行 / ② シート間転記 — ...」</div>
+  </li>
+  <li><strong>ステップ⑤ROI試算:</strong> 景品表示法 §2-3 の OK形式を厳守。
+    <ul>
+      <li>「月〇時間削減の場合」の前提を書く</li>
+      <li>「最低賃金換算（時給約1,160円、2026年度）」の根拠を書く</li>
+      <li>「月¥〇〇分の節約<strong>試算</strong>」と書く（断定しない）</li>
+      <li>「※実際の削減効果はご利用状況・業務内容によって異なります」の免責を書く</li>
+    </ul>
+  </li>
+  <li><strong>ステップ⑥購入後ヒアリング:</strong> 「購入後のメッセージにて以下をお知らせください」+ <strong>質問3-5項目</strong>。納品の調整余地を示す。
+    <div class="ex">「1. 主に使いたい機能（①〜⑤） / 2. ExcelのバージョンとOS / 3. カスタマイズしたい処理の概要」</div>
+  </li>
+  <li><strong>ステップ⑦FAQ:</strong> 購入前の不安を <strong>3-5問</strong> で解消。必須テーマ: 環境依存（Mac対応・OS版）/ カスタマイズ可否 / 返金条件 / 技術要件（Python不要等）。
+    <div class="ex">「Q. 既存のExcelファイルに組み込めますか？ A. はい。インストーラー実行だけで既存ブックに追加できます。」</div>
+  </li>
+  <li><strong>ステップ⑧購入時お願い（注意事項）:</strong> 箇条書き4-6項目。必須項目: データバックアップ推奨 / 対応範囲外の明示 / 規約違反用途NG / 返金不可 / カスタムオプションは購入前相談。
+  </li>
+</ol>
+</div>
+
+<h3>3-4. 有料オプション 設計パターン</h3>
+<table>
+  <thead><tr><th>オプション名</th><th style="width:100px;">価格例</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>カスタマイズ（小）</td><td class="num">+¥3,000</td><td>1-2箇所の小規模改修（列追加・シート名変更・変換ルール追加）</td></tr>
+    <tr><td>カスタマイズ（中）</td><td class="num">+¥8,000</td><td>複数処理連携・業務フロー特化のロジック追加</td></tr>
+    <tr><td>導入サポート（画面共有30分）</td><td class="num">+¥2,000</td><td>Zoom等でセットアップから動作確認まで</td></tr>
+    <tr><td>定期実行スケジューラ設定</td><td class="num">+¥2,000</td><td>Windowsタスクスケジューラ設定ファイル同梱＋手順説明</td></tr>
+  </tbody>
+</table>
+
+<h3>3-5. 完成文章の最終チェック手順</h3>
+<div class="proc">
+<ol>
+  <li><strong>字数チェック:</strong> タイトルは <strong>「ます」抜きで半角25字以内</strong>、キャッチコピーは <strong>半角30字以内</strong>。管理画面で実測せよ（エディタのカウントは信用するな）。</li>
+  <li><strong>景品表示法チェック:</strong> §2-4 の照合手順5ステップを全部実行。</li>
+  <li><strong>構成欠落チェック:</strong> 3-2 の8ステップ全部が含まれているか目視確認。抜けがあれば追加。</li>
+  <li><strong>価値フレームワーク照合:</strong> <code>docs/ai-chatbot-value-framework.md</code> の訴求禁止領域に引っかかっていないか確認（AIチャットボット出品の場合）。</li>
+  <li><strong>マスター承認:</strong> 上記4点クリア後、マスターに提示して承認を得る。承認なしでココナラ公開するな。</li>
+</ol>
+</div>
+
+<!-- ========================================= -->
+<h2 id="s4">§4. 出典・統合履歴・更新ルール</h2>
+
+<table class="ver-table">
+  <thead><tr><th>バージョン</th><th>日付</th><th>変更内容</th></tr></thead>
+  <tbody>
+    <tr><td>v1.0</td><td>2026-04-14</td><td>Session 169 新設。4資料を1ファイルに統合</td></tr>
+    <tr><td>v1.1</td><td>2026-04-14</td><td>マスター修正指示を反映: ①低能モデル対応手順化 ②広告章削除 ③タイトル「ます」仕様明記</td></tr>
+    <tr><td>v1.2</td><td>2026-04-14</td><td>§1-3 追加: ABC分析アルゴリズム + ハイブリッド参入戦略 3フェーズ（Session 169 戦略確定を反映）</td></tr>
+    <tr><td>v1.3</td><td>2026-04-14</td><td>戦略誤解訂正: Phase 1 は Route1（同価格で機能上）or Route2（同機能で安く）の2択のみ。空白地帯高単価は Phase 3 成長後戦略。+ `monetization.xlsx` SSoT 参照追加</td></tr>
+  </tbody>
+</table>
+
+<h3>4-1. 統合元（v1.0 時点）</h3>
+<ul>
+  <li><code>journal/monetization/drafts/2026-04-14-competitor-research.html</code>（849行）→ §1 構成骨格・調査手順の抽出元</li>
+  <li><code>journal/monetization/drafts/2026-04-13-category-230-research.html</code>（262行）→ §1 確信度ラベル運用の参考</li>
+  <li><code>memory/feedback_coconala-expression-rules.md</code>（auto-memory）→ §2 丸ごと転記</li>
+  <li><code>journal/monetization/drafts/2026-04-14-bizeff-listings-v2.md</code>（380行）→ §3 8ステップ構成・執筆手順の抽出元</li>
+</ul>
+
+<h3>4-2. 関連する SOP・ルール</h3>
+<ul>
+  <li><code>docs/ops/listing-cycle.md</code> — 出品13段階サイクル SOP（本ハンドブックの§1/§2/§3 を参照する）</li>
+  <li><code>.claude/skills/create-image/SKILL.md</code> — サムネ画像生成スキル（Replicate flux 系。生成エンジンは <code>scripts/replicate-generate/generate.py</code>）</li>
+  <li><code>.claude/rules/coconala-listings.md</code> — ココナラ出品資産の保管ルール</li>
+  <li><code>docs/ai-chatbot-value-framework.md</code> — AIチャットボット価値定義・訴求禁止領域</li>
+</ul>
+
+<h3>4-3. 更新ルール</h3>
+<ul>
+  <li>新しい出品カテゴリで調査する際は §1 の骨格に沿って書く。骨格自体に改善点があれば本ファイルを更新（Refactor-on-Write）</li>
+  <li>景品表示法の判例・ココナラ審査事例が追加されたら §2 に追記</li>
+  <li>文章パターンで新しい有効形式が見つかったら §3 に追記</li>
+  <li>ココナラ管理画面 UI が変わりタイトル字数ルール等が変更されたら §3-1 を再検証して更新</li>
+</ul>
+
+<p class="src">作成: vibe-base 司令塔 / 2026-04-14 Session 169 / 正本パス: <code>docs/standards/coconala-listing-handbook.html</code></p>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+/* Glassmorphism Tilt Card — homepage(AI_OFFICER) の capability card を verbatim 抽出
+ * Modified from verbatim: カスタムカーソル(#7)を削除（現行HPに非搭載のため）。
+ *   出典: products/homepage/css/sections.css L100–L258 / css/base.css :root */
+:root {
+    --bg-dark: #07080a;
+    --bg-card: #0d0f14;
+    --accent: #22d3ee;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-color: rgba(255, 255, 255, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: var(--bg-dark); color: var(--text-primary); font-family: 'Outfit', 'Inter', sans-serif; overflow-x: hidden; }
+
+/* === 装飾背景: すりガラスに「下地」を与えるための極薄カラーウォッシュ === */
+/* ライト（光の塊）に見えないよう、低透明度＋大ブラーでぼんやり拡散させる */
+.bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.16; will-change: transform; }
+.orb-1 { width: 520px; height: 520px; background: #2563eb; top: 0%;   left: 4%;  animation: orbFloat 26s ease-in-out infinite; }
+.orb-2 { width: 460px; height: 460px; background: #ec4899; top: 12%;  right: 2%; animation: orbFloat 30s ease-in-out infinite reverse; }
+.orb-3 { width: 500px; height: 500px; background: #8b5cf6; bottom: 8%; left: 14%; animation: orbFloat 28s ease-in-out infinite; }
+.orb-4 { width: 440px; height: 440px; background: #06b6d4; bottom: 2%; right: 12%; animation: orbFloat 32s ease-in-out infinite reverse; }
+@keyframes orbFloat {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(40px, -30px) scale(1.08); }
+    66%  { transform: translate(-30px, 36px) scale(0.95); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+/* 画面端を暗く締めて中央のみ薄く色づく＝ライト感を消す */
+.bg-orbs::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(7,8,10,0) 35%, rgba(7,8,10,0.85) 100%);
+}
+
+/* 前面コンテンツは背景より上に */
+.hero, #capabilities, .end { position: relative; z-index: 1; }
+
+/* --- デモ用 chrome（虎の巻 impl のスクロール検証用・HP本体には無い） --- */
+.hero { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 24px; }
+.eyebrow { font-family: 'Share Tech Mono', monospace; font-size: 13px; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 18px; }
+.hero h1 { font-size: 72px; font-weight: 700; line-height: 1.05; text-transform: uppercase; letter-spacing: -0.02em; }
+.hero-sub { margin-top: 24px; max-width: 540px; color: var(--text-secondary); font-family: 'Inter', sans-serif; line-height: 1.7; }
+#capabilities { padding: 80px 50px 160px; max-width: 1400px; margin: 0 auto; }
+.end { text-align: center; padding: 80px 0 120px; color: var(--text-secondary); font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 0.1em; }
+
+/* === capability grid（verbatim: sections.css L99–L104） === */
+.capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+.capability-card-wrapper {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    width: 100%;
+    height: 100%;
+}
+
+.capability-card {
+    position: relative;
+    height: 100%;
+    border-radius: 16px;
+    transform-style: preserve-3d;
+}
+
+/* === 1. Glassmorphism 基盤（静止層: backdrop-filter + 裏画像 + glow） === */
+.card-glass {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: rgba(13, 15, 20, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    transition: border-color 0.5s ease, background-color 0.5s ease, box-shadow 0.5s ease;
+}
+.capability-card:hover .card-glass {
+    border-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(18, 22, 30, 0.18);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* === 4. 背面ホバー画像パララックス === */
+.card-hover-image-wrapper {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+.capability-card:hover .card-hover-image-wrapper { opacity: 0.4; }
+.card-hover-image {
+    position: absolute;
+    width: 140%; height: 140%;
+    top: -20%; left: -20%;
+    object-fit: cover;
+    filter: grayscale(100%) brightness(120%) contrast(110%);
+    transition: transform 0.2s ease-out;
+}
+
+/* === 2. Stripe風マウス追従スポットライト === */
+.card-bg-glow {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(350px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), var(--glow-color, rgba(34, 211, 238, 0.15)) 0%, rgba(0,0,0,0) 80%);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.capability-card:hover .card-bg-glow { opacity: 1; }
+
+/* === 5. 3D Tilt 層（コンテンツのみ。GSAPでrotateX/Yを適用＝この層が高さを決める） === */
+.card-tilt-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 60px 50px;
+    z-index: 4;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+.card-header { display: flex; justify-content: space-between; align-items: center; transform: translateZ(30px); }
+.card-num { font-family: 'Share Tech Mono', monospace; font-size: 14px; color: var(--text-muted); }
+.card-icon { width: 32px; height: 32px; color: var(--glow-color, var(--accent)); }
+.card-title { font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 500; color: #fff; transform: translateZ(40px); }
+.card-desc { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.6; color: var(--text-secondary); transform: translateZ(20px); }
+
+/* === 3. Vercel風ボーダーグロー（mask xor 合成） === */
+.card-border-glow {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    z-index: 3;
+    padding: 1px;
+    background: radial-gradient(250px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), var(--glow-color, rgba(34, 211, 238, 0.45)) 0%, rgba(255,255,255,0.03) 40%, transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.capability-card:hover .card-border-glow { opacity: 1; }
+
+@media (max-width: 820px) { .capabilities-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 48px; } #capabilities { padding: 60px 20px 120px; } }

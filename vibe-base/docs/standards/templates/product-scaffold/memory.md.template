@@ -1,0 +1,25 @@
+# {{PRODUCT_NAME}} memory.md
+
+> 分散運用 v2.0 β 統合型。P4 はセッション中に読まない（archive ポインタ参照のみ）。行数上限は check-in-verify A-9（110/200 行）。
+
+## 引継ぎレポート（次セッション必読）
+
+> 引継ぎレポート未作成（初回 Check-out 時に該当 @参照が記入される）
+
+## P1: 引継ぎミッション（3 件枠）
+
+> 直近 plan: なし
+
+なし
+
+## P2: ADR 索引
+
+→ `docs/adr/` 参照
+
+## P3: 失敗事例
+
+→ `failures.md` 参照
+
+## P4: 永続教訓
+
+→ `archive/{{PRODUCT_NAME}}-memory-YYYYMM.md` 参照

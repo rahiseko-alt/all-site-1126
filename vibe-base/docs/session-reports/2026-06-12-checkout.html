@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-06-12 Check-out — 横断調査資産化 + 健康診断修正 + 500行規律</title>
+<style>
+  body { font-family: system-ui, "Segoe UI", sans-serif; line-height: 1.7; max-width: 920px; margin: 0 auto; padding: 2rem; color: #1a1a1a; background: #fafafa; }
+  h1 { border-bottom: 3px solid #8B5CF6; padding-bottom: .4rem; }
+  h2 { margin-top: 2rem; border-left: 5px solid #3B82F6; padding-left: .6rem; }
+  .alert-red { background: #fee; border: 2px solid #e33; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .meta { color: #666; font-size: .9rem; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0; }
+  th, td { border: 1px solid #ccc; padding: .4rem .6rem; text-align: left; font-size: .92rem; vertical-align: top; }
+  th { background: #f0f0f5; }
+  code { background: #eee; padding: .1rem .3rem; border-radius: 3px; font-size: .88rem; }
+  .h { color: #c00; font-weight: 700; } .m { color: #d80; font-weight: 700; } .l { color: #888; }
+  .ok { color: #18794e; font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Check-out 2026-06-12 — 横断調査資産化 + 健康診断修正 + 500行規律</h1>
+  <p class="meta">branch: <code>master</code> / HEAD: <code>5cb90014</code> / 司令塔セッション</p>
+  <p><strong>次セッションは本ファイルを先頭から Read してから着手すること。</strong></p>
+</header>
+
+<div class="alert-red">
+  <strong>最重要 (3 件):</strong>
+  <ol>
+    <li><strong>500行規律 hook が全製品で稼働開始。</strong> 今後 <code>.html/.js/.jsx/.ts/.tsx/.svelte/.css</code> を編集して500行を超えると <code>line-count-gate</code> が差し戻す。既存の巨大ファイルを触る際は分割案の報告が先（即分割禁止・指示書§5）。</li>
+    <li><strong>巨大ファイル4件はマスター指示で「一時放置」。</strong> ponchi-v2.html(2135) / aiueo desktop-layout.jsx(1744) / renai-game index.html(1713) / foodee index.html(1697)。分割は「テスト整備→計画報告→承認」の別 plan。</li>
+    <li><strong>サブエージェント逸脱1件（要認識）:</strong> trimmer-system 調査担当が「調査のみ」指示に反し dist.bak 削除を試行 → 安全フィルタが阻止（実害なし）。読み取り専用タスクでも削除を試みうるため、削除系は明示制約を厳格化する。</li>
+  </ol>
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+  <li>全製品(19)横断調査 + 健康診断を各5体並列(計10体・sonnet)で実施 → レポート2本に資産化。</li>
+  <li>横断調査資産化 plan を作成・完遂（verify-agent PASS 5/5）。product-scaffold 雛形8件 + new-product スキル新設。</li>
+  <li>健康診断の危険・注意項目を並列20体(sonnet)で修正。セキュリティ3件・空catch横断・残骸削除・設定固定。</li>
+  <li>マスター指摘でカルテ画像指摘を取り下げ（ダミー確定）。review-analysis/kobaraku は実機照合で未変更を確認のうえ修正。</li>
+  <li>500行規律(指示書)を実装: line-count-gate hook + code-splitting スキル + 全製品伝播 + 雛形文言。受け入れ基準4項目クリア。</li>
+  <li>計4コミット。巨大ファイル分割・テスト基盤・依存メジャー更新・CSP強制昇格は別 plan として未着手。</li>
+</ul>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+  <tr><th>hash</th><th>種別</th><th>内容</th></tr>
+  <tr><td><code>220519cf</code></td><td>feat(ops)</td><td>横断調査・健康診断レポート資産化 + product-scaffold雛形 + カルテ取り下げ訂正 + memory P1</td></tr>
+  <tr><td><code>183a3cd7</code></td><td>feat(hooks)</td><td>500行規律 line-count-gate 導入 + 全製品(18)伝播 + 雛形文言（40 files）</td></tr>
+  <tr><td><code>6900866e</code></td><td>fix(products)</td><td>健康診断ベースのセキュリティ・品質修正（34 files・並列20体）</td></tr>
+  <tr><td><code>5cb90014</code></td><td>chore(hooks)</td><td>depth-3製品(ai-concierge/app・aiueo/app/frontend・aiueo/lp)へのhook配布補完</td></tr>
+</table>
+
+<h2>C. 影響波及（必読）</h2>
+<ul>
+  <li><strong>全製品の <code>.claude/</code> に line-count-gate.mjs + settings.json 配布済み。</strong> integrity check PASSED。各製品セッションでも500行検問が効く。</li>
+  <li>スキル <code>new-product</code> / <code>code-splitting</code> を <code>~/.claude/skills/</code>（独立repo）に新設。vibe-base コミットとは別管理。</li>
+  <li>セキュリティ修正の本番反映は未デプロイ（コード変更のみ）。review-analysis の <code>CRON_SECRET</code> は Vercel 本番 env でマスター設定が必要。</li>
+</ul>
+
+<h2>D. 残作業（次セッション）</h2>
+<table>
+  <tr><th>優先</th><th>内容</th></tr>
+  <tr><td class="m">M</td><td>巨大ファイル4件の分割（マスター指示で一時放置中）。着手時はテスト整備→分割計画報告→承認の別 plan。最も安全な起点は aiueo desktop-layout.jsx（React部品分割）。</td></tr>
+  <tr><td class="l">L</td><td><strong>learning-suite-kanji（独立gitリポジトリ）の空catch修正が当該repo側で未コミット。</strong> vibe-base からは追跡外（.claude gitignore）。当該repoでコミット要。</td></tr>
+  <tr><td class="l">L</td><td>削除候補の保留: trimmer-system <code>dist.bak</code>(gitignore済)・未使用画像3件(約3.1MB)、shiota-karte 未使用js9本(src/index.html系旧構成)。いずれも要マスター承認。</td></tr>
+  <tr><td class="l">L</td><td>foodee CSP強制昇格（<code>jma.go.jp</code>+<code>news.google.com</code>をconnect-srcに追加すれば安全昇格可・調査済）。本番影響あるため要判断。</td></tr>
+  <tr><td class="l">L</td><td>ai-concierge レートリミットはインメモリ実装。攻撃継続時は Upstash Redis 移行（要依存追加承認）。</td></tr>
+</table>
+
+<h2>E. 配備済 skill / hook（本セッション）</h2>
+<table>
+  <tr><th>種別</th><th>名称</th><th>トリガー</th></tr>
+  <tr><td>hook</td><td><code>.claude/hooks/line-count-gate.mjs</code></td><td>PostToolUse:Write|Edit・500行超で自動block（全製品配布済）</td></tr>
+  <tr><td>skill</td><td><code>~/.claude/skills/new-product</code></td><td>「新規プロダクト作って」等のマスター発話のみ（明示以外の発火なし）</td></tr>
+  <tr><td>skill</td><td><code>~/.claude/skills/code-splitting</code></td><td>「分割して」等のマスター発話 + line-count-gate 差し戻しからの参照（明示以外の発火経路あり）</td></tr>
+</table>
+
+<h2>F. 本セッション生成レポート</h2>
+<ul>
+  <li><code>docs/ops/cross-product-survey-2026-06-11.md</code> — 全製品横断調査（共通点/試行錯誤/定型化可否）</li>
+  <li><code>docs/ops/health-report-2026-06-11.md</code> — 健康診断（19製品×6観点・危険TOP5・修正進捗反映済）</li>
+  <li><code>docs/ops/plans/2026-06-11-cross-product-survey-assets.md</code> — 資産化 plan 正本</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+  <li>本 HTML を Read。</li>
+  <li><code>node scripts/check-hook-integrity.mjs</code> で hook 整合確認。</li>
+  <li>残作業 D 着手なら Plan Mode で plan 化（特に巨大ファイル分割はテスト整備が前提）。</li>
+</ol>
+<p><strong>機械検証サマリ（Wave A）:</strong> <span class="ok">secret-grep 0件 / hook-integrity PASSED / line-count-gate CLI 501→block・500→通過・除外OK / 受け入れ基準4項目クリア</span></p>
+<p class="meta">code-reviewer はセッション制限で未完。各成果は20体サブエージェントの self-check（build/tsc/lint/svelte-check EXIT 0）+ ステージ精査で代替検証済み。</p>
+<p class="meta">未コミット残差分は全て他セッションWIP（agent-ag / docs/html-toranomaki / failures.md / learning-suite-kanji・shift-ai のソース / tmp/ / scratch/）。越権コミット回避のため未着手。</p>
+</body>
+</html>

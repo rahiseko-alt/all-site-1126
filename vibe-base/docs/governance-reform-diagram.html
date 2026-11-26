@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ガバナンス改革 Before / After</title>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --card: #ffffff;
+    --text: #2c2417;
+    --muted: #7a7062;
+    --border: #e0dbd3;
+    --red: #d94040;
+    --red-bg: #fef2f2;
+    --green: #2e8b57;
+    --green-bg: #f0fdf4;
+    --blue: #3b72c4;
+    --blue-bg: #eff6ff;
+    --yellow: #c4900b;
+    --yellow-bg: #fffbeb;
+    --gray-bg: #f5f3ef;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: .25rem;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: .85rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Two-column layout */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  @media (max-width: 800px) {
+    .comparison { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+  }
+  .panel.before { border-top: 4px solid var(--red); }
+  .panel.after  { border-top: 4px solid var(--green); }
+
+  .panel-label {
+    display: inline-block;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-bottom: .75rem;
+  }
+  .before .panel-label { background: var(--red-bg); color: var(--red); }
+  .after  .panel-label { background: var(--green-bg); color: var(--green); }
+
+  .panel h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  /* Diagram elements */
+  .diagram {
+    position: relative;
+    min-height: 340px;
+  }
+
+  .node {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: .6rem .8rem;
+    font-size: .78rem;
+    position: absolute;
+    background: var(--card);
+    text-align: center;
+    min-width: 130px;
+  }
+  .node.agent-vb {
+    border-color: var(--blue);
+    background: var(--blue-bg);
+  }
+  .node.agent-prod {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .node.file {
+    border-color: var(--border);
+    background: var(--gray-bg);
+    font-size: .72rem;
+  }
+  .node .label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .node .detail {
+    font-size: .65rem;
+    color: var(--muted);
+  }
+
+  /* Arrows via SVG */
+  .diagram svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .arrow-ok   { stroke: var(--green); fill: var(--green); }
+  .arrow-warn { stroke: var(--yellow); fill: var(--yellow); stroke-dasharray: 6 4; }
+  .arrow-fail { stroke: var(--red); fill: var(--red); stroke-dasharray: 4 4; }
+
+  /* Summary section */
+  .summary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .summary h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .changes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .change-card {
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: .82rem;
+  }
+  .change-card.problem {
+    background: var(--red-bg);
+    border-left: 4px solid var(--red);
+  }
+  .change-card.solution {
+    background: var(--green-bg);
+    border-left: 4px solid var(--green);
+  }
+  .change-card h3 {
+    font-size: .85rem;
+    font-weight: 700;
+    margin-bottom: .4rem;
+  }
+  .change-card .tag {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-bottom: .3rem;
+  }
+  .problem .tag { background: var(--red); color: #fff; }
+  .solution .tag { background: var(--green); color: #fff; }
+
+  /* Matrix table */
+  .matrix-wrap {
+    overflow-x: auto;
+    margin-top: .75rem;
+  }
+  table.matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .75rem;
+  }
+  table.matrix th, table.matrix td {
+    border: 1px solid var(--border);
+    padding: .4rem .6rem;
+    text-align: center;
+  }
+  table.matrix th {
+    background: var(--gray-bg);
+    font-weight: 600;
+  }
+  table.matrix td.ok   { background: var(--green-bg); color: var(--green); font-weight: 700; }
+  table.matrix td.warn { background: var(--yellow-bg); color: var(--yellow); font-weight: 700; }
+  table.matrix td.fail { background: var(--red-bg); color: var(--red); font-weight: 700; }
+  table.matrix td.na   { background: var(--gray-bg); color: var(--muted); }
+  table.matrix td.improved {
+    background: var(--green-bg);
+    color: var(--green);
+    font-weight: 700;
+    position: relative;
+  }
+  table.matrix td.improved::after {
+    content: ' \2190';
+    font-size: .65rem;
+  }
+  table.matrix .row-label { text-align: left; font-weight: 600; white-space: nowrap; }
+
+  .legend {
+    display: flex;
+    gap: 1.2rem;
+    margin-top: .5rem;
+    font-size: .7rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .legend span::before {
+    content: '';
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .legend .l-ok::before   { background: var(--green); }
+  .legend .l-warn::before { background: var(--yellow); }
+  .legend .l-fail::before { background: var(--red); }
+  .legend .l-na::before   { background: var(--border); }
+  .legend .l-new::before  { background: var(--green); opacity: .4; }
+
+  .arrow-label {
+    font-size: .6rem;
+    fill: var(--muted);
+    font-weight: 600;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: .7rem;
+    color: var(--muted);
+    margin-top: 2rem;
+  }
+
+  /* Flow diagram - simplified approach */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    margin-top: .5rem;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .flow-box {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: .5rem .7rem;
+    font-size: .75rem;
+    text-align: center;
+    flex: 1;
+    min-width: 0;
+  }
+  .flow-box.vb {
+    border-color: var(--blue);
+    background: var(--blue-bg);
+  }
+  .flow-box.prod {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .flow-box.file-docs {
+    border-color: var(--yellow);
+    background: var(--yellow-bg);
+  }
+  .flow-box.file-prod {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .flow-box.dead {
+    border-color: var(--red);
+    background: var(--red-bg);
+    text-decoration: line-through;
+    opacity: .7;
+  }
+  .flow-arrow {
+    font-size: .9rem;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .flow-arrow.ok { color: var(--green); }
+  .flow-arrow.warn { color: var(--yellow); }
+  .flow-arrow.fail { color: var(--red); }
+
+  .flow-group {
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: .6rem;
+    margin-top: .25rem;
+  }
+  .flow-group-label {
+    font-size: .65rem;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: .4rem;
+  }
+  .flow-box .sub {
+    font-size: .65rem;
+    color: var(--muted);
+    display: block;
+  }
+  .flow-box b { font-weight: 700; }
+</style>
+</head>
+<body>
+<div style="background:#7f1d1d;color:#fff;padding:12px 16px;font-size:14px;line-height:1.6;border-radius:6px;margin:12px;">⚠️ <strong>歴史資料</strong>: 本資料は Session 295 以前の旧運用（MISSION_LOG / SESSION_JOURNAL 体制）を記述しています。現行の正はセッションライフサイクル（<code style="background:rgba(255,255,255,.18);color:#fff;padding:1px 5px;border-radius:3px;">.claude/rules/session-lifecycle.md</code> → <code style="background:rgba(255,255,255,.18);color:#fff;padding:1px 5px;border-radius:3px;">docs/rules/session-lifecycle-canonical.md</code>）と memory.md 分散運用 v2.0 です。本資料の手順には従わないこと。</div>
+<div class="container">
+
+  <h1>ガバナンス改革 Before / After</h1>
+  <p class="subtitle">Session 28 合意 → Session 31 実施（2026-03-17）</p>
+
+  <!-- ===== Before / After diagrams ===== -->
+  <div class="comparison">
+
+    <!-- BEFORE -->
+    <div class="panel before">
+      <span class="panel-label">Before</span>
+      <h2>PC表が docs/ に集約 — 読み書きの断絶</h2>
+
+      <div class="flow">
+        <div class="flow-group">
+          <div class="flow-group-label">PC表の更新フロー</div>
+          <div class="flow-row">
+            <div class="flow-box prod">
+              <b>製品エージェント</b>
+              <span class="sub">タスクを完了</span>
+            </div>
+            <span class="flow-arrow fail">&#x2718;</span>
+            <div class="flow-box file-docs">
+              <b>docs/aiueo-pc-progress.md</b>
+              <span class="sub">書き込み不可</span>
+            </div>
+          </div>
+          <div class="flow-row">
+            <div class="flow-box vb">
+              <b>vibe-base (Opus)</b>
+              <span class="sub">MISSION_LOG経由で把握</span>
+            </div>
+            <span class="flow-arrow warn">&#x25B6;</span>
+            <div class="flow-box file-docs">
+              <b>docs/aiueo-pc-progress.md</b>
+              <span class="sub">書ける（が読まれない）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-group">
+          <div class="flow-group-label">自治憲法のフェーズ状態</div>
+          <div class="flow-row">
+            <div class="flow-box prod" style="flex: 2">
+              <b>products/*/CLAUDE.md</b>
+              <span class="sub">「P2完了(12/12)」← 自己申告。照合なし</span>
+            </div>
+            <span class="flow-arrow fail" style="font-size:.7rem">乖離</span>
+            <div class="flow-box file-docs" style="flex: 2">
+              <b>docs/*-pc-progress.md</b>
+              <span class="sub">実態: #8×, #9×, #13×</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-group">
+          <div class="flow-group-label">セッション開始時の読み込み</div>
+          <div class="flow-row">
+            <div class="flow-box prod">
+              <b>製品エージェント</b>
+            </div>
+            <span class="flow-arrow warn">?</span>
+            <div class="flow-box dead">
+              <b>MISSION_LOG</b>
+              <span class="sub">読む義務なし</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AFTER -->
+    <div class="panel after">
+      <span class="panel-label">After</span>
+      <h2>PC表が製品内 — 情報を生む者が書く</h2>
+
+      <div class="flow">
+        <div class="flow-group">
+          <div class="flow-group-label">PC表の更新フロー</div>
+          <div class="flow-row">
+            <div class="flow-box prod">
+              <b>製品エージェント</b>
+              <span class="sub">タスクを完了</span>
+            </div>
+            <span class="flow-arrow ok">&#x2714;</span>
+            <div class="flow-box file-prod">
+              <b>products/*/pc-progress.md</b>
+              <span class="sub">直接書き込み可</span>
+            </div>
+          </div>
+          <div class="flow-row">
+            <div class="flow-box vb">
+              <b>vibe-base (Opus)</b>
+              <span class="sub">§5 PC表連動義務</span>
+            </div>
+            <span class="flow-arrow ok">&#x2714;</span>
+            <div class="flow-box file-prod">
+              <b>products/*/pc-progress.md</b>
+              <span class="sub">読み書き両方OK（P3緩和）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-group">
+          <div class="flow-group-label">自治憲法のフェーズ状態</div>
+          <div class="flow-row">
+            <div class="flow-box prod" style="flex: 2">
+              <b>products/*/CLAUDE.md</b>
+              <span class="sub">「→ pc-progress.md」ポインタのみ</span>
+            </div>
+            <span class="flow-arrow ok">&#x2261;</span>
+            <div class="flow-box file-prod" style="flex: 2">
+              <b>products/*/pc-progress.md</b>
+              <span class="sub">唯一の正（Single Source of Truth）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-group">
+          <div class="flow-group-label">セッション開始時の読み込み</div>
+          <div class="flow-row">
+            <div class="flow-box prod">
+              <b>全エージェント</b>
+            </div>
+            <span class="flow-arrow ok">&#x2714;</span>
+            <div class="flow-box file-prod">
+              <b>MISSION_LOG + 自治憲法 + PC表</b>
+              <span class="sub">§5 Check-in義務 + 製品参照義務</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Read/Write Matrix ===== -->
+  <div class="summary">
+    <h2>読み書き確実性マトリクス</h2>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+      <div>
+        <h3 style="font-size:.85rem; text-align:center; margin-bottom:.5rem; color:var(--red);">Before（不確実セル: 4箇所）</h3>
+        <div class="matrix-wrap">
+          <table class="matrix">
+            <tr>
+              <th></th>
+              <th>CLAUDE.md</th>
+              <th>MISSION_LOG</th>
+              <th>PC表<br>(docs/)</th>
+              <th>製品内<br>ファイル</th>
+            </tr>
+            <tr>
+              <td class="row-label">vibe-base 読み</td>
+              <td class="ok">確実</td>
+              <td class="warn">不確実</td>
+              <td class="warn">不確実</td>
+              <td class="na">読まない</td>
+            </tr>
+            <tr>
+              <td class="row-label">vibe-base 書き</td>
+              <td class="ok">確実</td>
+              <td class="ok">確実</td>
+              <td class="ok">確実</td>
+              <td class="na">書かない</td>
+            </tr>
+            <tr>
+              <td class="row-label">製品エージェント 読み</td>
+              <td class="ok">確実</td>
+              <td class="warn">不確実</td>
+              <td class="warn">不確実</td>
+              <td class="ok">確実</td>
+            </tr>
+            <tr>
+              <td class="row-label">製品エージェント 書き</td>
+              <td class="fail">不可</td>
+              <td class="fail">不可</td>
+              <td class="fail">不可</td>
+              <td class="ok">確実</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="font-size:.85rem; text-align:center; margin-bottom:.5rem; color:var(--green);">After（不確実セル: 0箇所）</h3>
+        <div class="matrix-wrap">
+          <table class="matrix">
+            <tr>
+              <th></th>
+              <th>CLAUDE.md</th>
+              <th>MISSION_LOG</th>
+              <th>PC表<br>(products/)</th>
+              <th>製品内<br>ファイル</th>
+            </tr>
+            <tr>
+              <td class="row-label">vibe-base 読み</td>
+              <td class="ok">確実</td>
+              <td class="improved">確実</td>
+              <td class="improved">確実</td>
+              <td class="improved">確実</td>
+            </tr>
+            <tr>
+              <td class="row-label">vibe-base 書き</td>
+              <td class="ok">確実</td>
+              <td class="ok">確実</td>
+              <td class="ok">確実</td>
+              <td class="improved">確実</td>
+            </tr>
+            <tr>
+              <td class="row-label">製品エージェント 読み</td>
+              <td class="ok">確実</td>
+              <td class="improved">確実</td>
+              <td class="improved">確実</td>
+              <td class="ok">確実</td>
+            </tr>
+            <tr>
+              <td class="row-label">製品エージェント 書き</td>
+              <td class="fail">不可</td>
+              <td class="fail">不可</td>
+              <td class="improved">確実</td>
+              <td class="ok">確実</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span class="l-ok">確実</span>
+      <span class="l-warn">不確実（読まれる保証なし）</span>
+      <span class="l-fail">不可</span>
+      <span class="l-na">対象外</span>
+      <span class="l-new">確実 ← 改善箇所</span>
+    </div>
+  </div>
+
+  <!-- ===== 6 Changes ===== -->
+  <div class="summary">
+    <h2>実施した6つの変更</h2>
+    <div class="changes-grid">
+      <div class="change-card problem">
+        <span class="tag">問題</span>
+        <h3>PC表テンプレートが消失</h3>
+        過去作成のテンプレートが未保存。新プロダクト作成時にゼロから作り直し。
+      </div>
+      <div class="change-card solution">
+        <span class="tag">対策 #1</span>
+        <h3>テンプレートをproduct-cycle.mdに同梱</h3>
+        SOPファイルに付録として全フェーズ(P0-P4)のPC表テンプレートを追加。コピーするだけで使える。
+      </div>
+
+      <div class="change-card problem">
+        <span class="tag">問題</span>
+        <h3>PC表がdocs/にあり製品エージェントが書けない</h3>
+        タスクを完了する製品エージェントがPC表を更新できない。vibe-base経由でしか更新されない。
+      </div>
+      <div class="change-card solution">
+        <span class="tag">対策 #2</span>
+        <h3>PC表をproducts/に移動</h3>
+        <code>docs/*-pc-progress.md</code> → <code>products/*/pc-progress.md</code>。情報を生むエージェントが直接書ける場所に配置。
+      </div>
+
+      <div class="change-card problem">
+        <span class="tag">問題</span>
+        <h3>自治憲法の「完了12/12」が虚偽</h3>
+        自治憲法にフェーズ状態を直接記載 → 自己申告で更新 → PC表と乖離。
+      </div>
+      <div class="change-card solution">
+        <span class="tag">対策 #3</span>
+        <h3>フェーズ状態をポインタ化</h3>
+        自治憲法から状態テーブルを削除し「→ pc-progress.md」のポインタのみ記載。Single Source of Truth。
+      </div>
+
+      <div class="change-card problem">
+        <span class="tag">問題</span>
+        <h3>MISSION_LOG・PC表を読む義務がない</h3>
+        CLAUDE.md §5に読み込み義務がないため、エージェントが前回の状態を把握せずに作業開始。
+      </div>
+      <div class="change-card solution">
+        <span class="tag">対策 #4</span>
+        <h3>§5にCheck-in義務 + 製品参照義務 + PC表連動を追加</h3>
+        セッション開始時のMISSION_LOG読み込み、製品作業時の自治憲法+PC表読み込み、タスク変更時のPC表同時更新を義務化。
+      </div>
+
+      <div class="change-card problem">
+        <span class="tag">問題</span>
+        <h3>vibe-baseが製品ファイルを編集できない</h3>
+        MEMORY.md P3の「エージェント配下は直接編集しない」制約で、Opusが製品内PC表を更新できない。
+      </div>
+      <div class="change-card solution">
+        <span class="tag">対策 #5</span>
+        <h3>P3制約を緩和</h3>
+        「PC表・自治憲法はvibe-base(Opus)からも編集可」を追加。司令塔が直接更新可能に。
+      </div>
+
+      <div class="change-card problem">
+        <span class="tag">問題</span>
+        <h3>クチコミ分析AIにPC表が存在しない</h3>
+        Session 28照合で発覚。「P2完了」申告の実態は#8×, #9×, #13×。
+      </div>
+      <div class="change-card solution">
+        <span class="tag">対策 #6</span>
+        <h3>クチコミ用PC表を新規作成</h3>
+        テンプレートから作成し、Session 28の実物確認結果を反映。△/×を正直に記載。
+      </div>
+    </div>
+  </div>
+
+  <p class="footer">Session 31 | 2026-03-17 | ガバナンス改革全6タスク完了</p>
+
+</div>
+</body>
+</html>

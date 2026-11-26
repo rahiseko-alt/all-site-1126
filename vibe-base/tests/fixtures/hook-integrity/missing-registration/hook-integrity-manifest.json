@@ -1,0 +1,1 @@
+{"expected_hooks":[{"name":"dummy-gate","matcher_pattern":"Write","event":"PreToolUse"}],"expected_scripts":["check-secret-patterns.mjs"]}

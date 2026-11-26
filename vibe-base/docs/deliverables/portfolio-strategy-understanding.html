@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ポートフォリオ営業戦略 — 理解と提案</title>
+<style>
+  :root{ --ink:#1a1a1a; --sub:#6b6b6b; --line:#e5e5e5; --link:#0969da; --sel:#f0f6ff;
+    --code-bg:#f6f8fa; --ok:#1a7f37; --warn:#b45309; --danger:#b91c1c; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fbfbfa;color:var(--ink);
+    font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI",sans-serif;line-height:1.85;}
+  .wrap{max-width:820px;margin:0 auto;padding:56px 28px 100px;}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:.01em;}
+  .lead{color:var(--sub);font-size:14px;margin:0 0 40px;}
+  h2{font-size:18px;margin:48px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--ink);}
+  h3{font-size:15px;margin:26px 0 8px;}
+  p,li{font-size:14.5px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin:16px 0;}
+  .concl{background:#f0f6ff;border:1px solid #cfe0ff;border-radius:10px;padding:20px 24px;margin:18px 0;}
+  .concl .big{font-size:16px;font-weight:700;color:#0b3b8c;margin:0 0 8px;}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.8px;}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;}
+  th{background:var(--code-bg);font-weight:600;width:34%;}
+  .num{display:inline-block;min-width:22px;height:22px;line-height:22px;text-align:center;
+    background:var(--ink);color:#fff;border-radius:50%;font-size:12px;font-weight:700;margin-right:8px;}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:20px;vertical-align:middle;}
+  .t-ok{background:#e7f6ec;color:var(--ok);}
+  .t-warn{background:#fef3e2;color:var(--warn);}
+  .t-danger{background:#fde8e8;color:var(--danger);}
+  code{background:var(--code-bg);padding:2px 6px;border-radius:5px;font-family:Consolas,monospace;font-size:12.5px;color:var(--link);}
+  ul{padding-left:22px;} li{margin:4px 0;}
+  .q{background:#fff;border-left:4px solid var(--link);padding:12px 18px;margin:12px 0;border-radius:0 8px 8px 0;}
+  .foot{margin-top:56px;color:var(--sub);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>ポートフォリオ営業戦略 — 私の理解と提案</h1>
+<p class="lead">作成: 2026-07-06 ／ 対象: 明日のシステム開発会社との面談 ／ この文書は「実装に入る前の認識合わせ」です。</p>
+
+<h2>1. あなたの依頼を、私はこう理解しました</h2>
+<div class="card">
+<table>
+  <tr><th>目的</th><td>個人開発者としての「開発力」を対外的に示し、システム開発会社に営業をかけて仕事につなげる。</td></tr>
+  <tr><th>締切</th><td><strong>明日</strong>、システム開発会社と面談。そこで見せる。</td></tr>
+  <tr><th>題材</th><td>開発済み8プロダクト（下表）。</td></tr>
+  <tr><th>あなたの案</th><td>（1）Webサイトで見せる が良いと考えている。</td></tr>
+  <tr><th>私への問い</th><td>(1) Web か (2) PDF/PPT か、プロとしてどちらが営業を成功に導くか。さらに良い魅せ方があれば提案せよ。</td></tr>
+</table>
+</div>
+
+<h3>対象8プロダクトと、掲載上の注意</h3>
+<table>
+  <tr><th>プロダクト</th><td>掲載可否メモ</td></tr>
+  <tr><td>① aiueo（クーポン発券）</td><td><span class="tag t-danger">要マスキング</span> 塩田様・実店舗名が濃密。そのまま出すと危険（後述）。</td></tr>
+  <tr><td>② medguide-rag（医療文書RAG）</td><td><span class="tag t-ok">掲載可</span> 技術的な目玉。既に掲載済み。</td></tr>
+  <tr><td>③ learning-suite-kanji（漢字学習）</td><td><span class="tag t-ok">掲載可</span> 既に掲載済み。</td></tr>
+  <tr><td>④ Excel-OCR</td><td><span class="tag t-ok">掲載可</span> 既に掲載済み。</td></tr>
+  <tr><td>⑤ ai-concierge（AIサポート）</td><td><span class="tag t-ok">掲載可</span> 既に掲載済み。</td></tr>
+  <tr><td>⑥ foodee（情報キュレーション）</td><td><span class="tag t-ok">掲載可</span> 既に掲載済み。</td></tr>
+  <tr><td>⑦ AI開発ガバナンス基盤</td><td><span class="tag t-warn">証拠が必要</span> 掲載済みだが「動く証拠」が現状ゼロ。</td></tr>
+  <tr><td>⑧ 動画編集</td><td><span class="tag t-warn">出し方注意</span> 顧客案件で守秘。既に掲載済み（詳細非公開扱い）。</td></tr>
+</table>
+<p style="font-size:13.5px;color:var(--sub)">※ 現状、正本 <code>docs/deliverables/portfolio.html</code> には②〜⑧の <strong>7項目が実装済み</strong>（GitHub/論文サイト風のライトなWeb・左に題名リスト／右に詳細）。<strong>①aiueoだけ未掲載</strong>で、これが顧客情報の地雷を抱えています。ゼロからではなく「既にある土台を、明日に向けて仕上げる」局面です。</p>
+
+<h2>2. 核心の問い — プロとしての結論</h2>
+<div class="concl">
+  <p class="big">結論：あなたの「(1) Web が良い」は正しい。ただし「(1) か (2) か」ではなく、<u>(1) Webを主役＋PDF1枚を置き土産</u>の二段構えが最適解です。PPTは今回不要。</p>
+  <p style="margin:0;font-size:13.5px">Web単独でもなく、PDF単独でもない。役割が違う2つを組み合わせるのが、システム開発会社相手の営業では勝率が最も高いと判断します。</p>
+</div>
+
+<h3>なぜそう言えるか（判断の根拠）</h3>
+<table>
+  <tr><th>観点</th><td>判断</td></tr>
+  <tr><th>相手は「作る会社」</th>
+      <td>システム開発会社に一番効くのは<strong>動く実物をその場でクリックさせること</strong>。PDFもPPTもこれができない。ここはWebの圧勝。→ (1)が主役で正しい。</td></tr>
+  <tr><th>面談は終点ではない</th>
+      <td>採否を決めるのは<strong>その場にいない人</strong>（社内で回される）。後から転送され、ネット不要で残るのは<strong>PDF1枚</strong>。URLは埋もれ、PDFは回覧される。→ 置き土産が要る。</td></tr>
+  <tr><th>フォーマット自体が作品</th>
+      <td>デプロイ済みの綺麗なサイト＝「ちゃんと公開まで持っていける人」の証明。PPTは「スライドは作れる人」止まりで、作り手の評価では弱い。→ PPTは最下位。</td></tr>
+  <tr><th>その場で事故る</th>
+      <td>面談先のWiFi・プロジェクタ・画面共有はよく落ちる。Web一本足だと表示できず即死。<strong>オフラインで開けるPDF/ローカルコピーが保険</strong>。</td></tr>
+  <tr><th>NDA意識は加点</th>
+      <td>顧客情報を平気で見せる人は「うちの案件も外で喋る人」と映り、<strong>その場で失注し得る</strong>。逆に徹底マスキングはNDA意識の証明＝プラス評価。</td></tr>
+</table>
+
+<h2>3. さらに良い「魅せ方」の提案</h2>
+<div class="card">
+<p><span class="num">1</span><strong>Webはハブにする。</strong> サイト自体を作品（デプロイ実績）にしつつ、各プロダクトの「動く実物 or 短いデモ」への導線を張る。見せる順は相手（システム開発会社）に効く②医療RAG・⑦ガバナンス基盤を先頭に。</p>
+<p><span class="num">2</span><strong>各プロダクトを「課題→実装判断→結果」の3行で語る。</strong> 技術用語の羅列でなく「なぜその設計にしたか」を書くと、作り手の評価が跳ね上がる（前回の面談FBと同じ方向）。</p>
+<p><span class="num">3</span><strong>顧客情報は徹底マスキング＝NDA意識の実演。</strong> ①aiueoは実名・店舗を消し「小売業向けクーポン発券システム」として抽象化。実物は「NDA締結後に個別開示」と書く。これ自体が信頼の証明になる。</p>
+<p><span class="num">4</span><strong>連絡先を必ず載せる。</strong> 現状サイトに連絡導線がゼロ。営業なのに「頼みたい」で連絡できないのは論外。氏名・連絡先の掲載可否は要確認（顧客情報とは別問題）。</p>
+<p><span class="num">5</span><strong>QR付き1枚PDFを手渡す。</strong> 面談中に紙で渡し、後で社内転送される弾にする。WebのURL・QR・要点・連絡先を1枚に凝縮。Web完成物から自動生成できる。</p>
+<p><span class="num">6</span><strong>（できれば）コードの中身を一部見せる。</strong> 公開可能な範囲のコード断片やGitHub。作り手同士には「主張」より「実装の中身」が一番効く。</p>
+</div>
+
+<h2>4. 明日までの現実 — 優先順位</h2>
+<p>締切が明日なので、全部は無理。勝ち筋に絞ります。私の推奨する優先順位：</p>
+<table>
+  <tr><th>優先</th><td>やること</td></tr>
+  <tr><td><span class="tag t-danger">必須</span></td><td>既存7項目のWebを<strong>デプロイして公開URL化</strong>（その場で見せられる状態に）＋<strong>連絡先を追加</strong>。</td></tr>
+  <tr><td><span class="tag t-danger">必須</span></td><td><strong>1枚PDFを生成</strong>（オフライン保険＋置き土産）。</td></tr>
+  <tr><td><span class="tag t-warn">推奨</span></td><td>⑦ガバナンス基盤の<strong>動く証拠スクショ</strong>を添付（現状ゼロ＝最大の弱点）。</td></tr>
+  <tr><td><span class="tag t-warn">推奨</span></td><td>①aiueoを<strong>抽象化して追加</strong>（8項目化）。マスキングが間に合わなければ今回は7項目のまま出す。</td></tr>
+</table>
+
+<h2>5. 着手前に、あなたに確認したいこと</h2>
+<div class="q">① 連絡先（氏名・メール等）をサイトに載せてよいですか。載せる場合、どの情報をどこまで。</div>
+<div class="q">② デプロイ先はVercelでよいですか（私は公開URL化まで実行できます）。それとも面談ではローカル表示で済ませますか。</div>
+<div class="q">③ ①aiueoは、明日に間に合えば抽象化して8項目にします。間に合わなければ7項目で出す、で合意しますか。</div>
+<div class="q">④ ⑧動画編集は、システム開発会社向けだと「システム開発力」の訴求をやや薄めます。今回は載せる／外す、どちらにしますか。</div>
+
+<p style="margin-top:24px">上記の理解と方針でよければ、そのまま実装に入ります。ズレがあれば指摘してください。修正してから着手します。</p>
+
+<div class="foot">
+  正本Web: <code>docs/deliverables/portfolio.html</code>（7項目・実装済）／ 本文書: <code>docs/deliverables/portfolio-strategy-understanding.html</code>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+/* 出典: 15dmpvvfnvsgk.css .RotondeCanvas-module-scss-module__zZrEOW__root */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: #050505;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+#c {
+  touch-action: none;
+  cursor: grab;
+  width: 100%;
+  height: 100dvh;
+  display: block;
+}
+
+#c[data-dragging="true"] {
+  cursor: grabbing;
+}

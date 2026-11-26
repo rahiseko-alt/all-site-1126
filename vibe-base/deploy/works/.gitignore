@@ -1,0 +1,6 @@
+.vercel
+
+# index.html は生成物（正本: docs/deliverables/portfolio.html）。
+# コミットすると正本との二重管理になり、ビルド忘れで本番と乖離する。
+# 生成: node scripts/build-works-portfolio.mjs
+index.html

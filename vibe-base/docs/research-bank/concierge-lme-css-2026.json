@@ -1,0 +1,527 @@
+{
+  "1_html_base_font_size": "16px",
+  "2_font_family": {
+    "h1": {
+      "fontFamily": "游ゴシック体, \"Yu Gothic\"",
+      "fontSize": "38px",
+      "fontWeight": "700",
+      "lineHeight": "49.4px",
+      "letterSpacing": "-0.38px"
+    },
+    "h2": {
+      "fontFamily": "游ゴシック体, \"Yu Gothic\"",
+      "fontSize": "40px",
+      "fontWeight": "700",
+      "lineHeight": "normal",
+      "letterSpacing": "normal"
+    },
+    "h3": {
+      "fontFamily": "游ゴシック体, \"Yu Gothic\"",
+      "fontSize": "40px",
+      "fontWeight": "700",
+      "lineHeight": "normal",
+      "letterSpacing": "normal"
+    },
+    "p": {
+      "fontFamily": "游ゴシック体, \"Yu Gothic\"",
+      "fontSize": "30px",
+      "fontWeight": "700",
+      "lineHeight": "39px",
+      "letterSpacing": "2.4px"
+    },
+    "small": {
+      "fontFamily": "游ゴシック体, \"Yu Gothic\"",
+      "fontSize": "11px",
+      "fontWeight": "500",
+      "lineHeight": "24px",
+      "letterSpacing": "normal"
+    },
+    "nav_a": {
+      "fontFamily": "游ゴシック体, \"Yu Gothic\"",
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "lineHeight": "16px",
+      "letterSpacing": "1.6px"
+    },
+    "button": {
+      "fontFamily": "Arial",
+      "fontSize": "0px",
+      "fontWeight": "400",
+      "lineHeight": "0px",
+      "letterSpacing": "normal"
+    }
+  },
+  "3_font_size": {
+    "h1": "38px",
+    "h2": "40px",
+    "h3": "40px",
+    "p": "30px",
+    "small": "11px",
+    "nav_a": "16px",
+    "button": "0px"
+  },
+  "4_font_weight": {
+    "h1": "700",
+    "h2": "700",
+    "h3": "700",
+    "p": "700",
+    "small": "500",
+    "nav_a": "700",
+    "button": "400"
+  },
+  "5_line_height": {
+    "h1": "49.4px",
+    "h2": "normal",
+    "h3": "normal",
+    "p": "39px",
+    "small": "24px",
+    "nav_a": "16px",
+    "button": "0px"
+  },
+  "6_letter_spacing": {
+    "h1": "-0.38px",
+    "h2": "normal",
+    "h3": "normal",
+    "p": "2.4px",
+    "small": "normal",
+    "nav_a": "1.6px",
+    "button": "normal"
+  },
+  "7_text_colors": {
+    "h1": "rgb(255, 255, 255)",
+    "h2": "rgb(53, 53, 53)",
+    "h3": "rgb(53, 53, 53)",
+    "p": "rgb(255, 255, 255)",
+    "a": "rgb(53, 53, 53)",
+    "button": "rgba(0, 0, 0, 0)",
+    "span": "rgb(244, 67, 54)",
+    "li": "rgb(8, 191, 90)"
+  },
+  "8_bg_colors": {
+    "header": "rgb(255, 255, 255)",
+    "footer": "rgb(8, 191, 90)"
+  },
+  "9_borders": [
+    {
+      "tag": "a",
+      "class": "btn -baseOrange register_member",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "a",
+      "class": "btn -baseGreen -pc",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderColor": "rgb(242, 254, 123)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderColor": "rgb(242, 254, 123)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderColor": "rgb(242, 254, 123)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "a",
+      "class": "btn -baseOrange -balloonBtn register_mem",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "1px"
+    },
+    {
+      "tag": "span",
+      "class": "",
+      "borderColor": "rgb(254, 77, 1)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "ul",
+      "class": "",
+      "borderColor": "rgb(8, 191, 90)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "current -shadow",
+      "borderColor": "rgb(8, 191, 90)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "-shadow",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "-shadow",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "-shadow",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "-shadow",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "li",
+      "class": "-shadow",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "borderWidth": "2px"
+    },
+    {
+      "tag": "span",
+      "class": "",
+      "borderColor": "rgb(217, 217, 217) rgb(53, 53, 53) rgb(53, 53, 53) rgb(217, 217, 217)",
+      "borderWidth": "1px"
+    }
+  ],
+  "10_padding": [
+    {
+      "tag": "div",
+      "class": "adlpC-header_logo",
+      "padding": "10px 0px 9px"
+    },
+    {
+      "tag": "div",
+      "class": "header_btnWrapper",
+      "padding": "10px 0px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "adlpC-header_menu_inner_list",
+      "padding": "7px 0px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "fv_achievements",
+      "padding": "34px 0px 0px"
+    },
+    {
+      "tag": "section",
+      "class": "what",
+      "padding": "80px 0px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "solution",
+      "padding": "20px 0px 60px"
+    },
+    {
+      "tag": "section",
+      "class": "introductionRecord",
+      "padding": "80px 0px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "slick-list draggable",
+      "padding": "10px 554.25px"
+    },
+    {
+      "tag": "div",
+      "class": "media",
+      "padding": "60px 0px"
+    },
+    {
+      "tag": "section",
+      "class": "features",
+      "padding": "70px 0px 170px"
+    },
+    {
+      "tag": "section",
+      "class": "function",
+      "padding": "90px 0px 0px"
+    },
+    {
+      "tag": "section",
+      "class": "pricePlan",
+      "padding": "50px 0px 75px"
+    },
+    {
+      "tag": "div",
+      "class": "pricePlan_tableWrap -shadow",
+      "padding": "20px 20px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "",
+      "padding": "10px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "",
+      "padding": "10px 0px"
+    }
+  ],
+  "12_gap": [
+    {
+      "tag": "div",
+      "class": "header_btnWrapper",
+      "gap": "10px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "adlpC-header_menu_inner_list",
+      "gap": "40px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_list",
+      "gap": "18px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_list",
+      "gap": "10px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_icon",
+      "gap": "23px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_category",
+      "gap": "25px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_content_list",
+      "gap": "30px 20px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_content_list",
+      "gap": "30px 20px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_content_list",
+      "gap": "30px 20px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_content_list",
+      "gap": "30px 20px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_content_list",
+      "gap": "30px 20px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "function_content_list",
+      "gap": "30px 20px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "why_reason",
+      "gap": "46px",
+      "display": "flex"
+    },
+    {
+      "tag": "ul",
+      "class": "step_merit",
+      "gap": "18px",
+      "display": "flex"
+    },
+    {
+      "tag": "div",
+      "class": "step_buttonWrap",
+      "gap": "55px 47px",
+      "display": "flex"
+    }
+  ],
+  "14_heights": {
+    "header": "96px",
+    "footer": "392px",
+    "button": "20px",
+    "h1": "231.078125px",
+    "h2": "96px",
+    "h3": "106px"
+  },
+  "15_border_radius": [
+    {
+      "tag": "label",
+      "class": "wm-modal-label",
+      "borderRadius": "50%"
+    },
+    {
+      "tag": "div",
+      "class": "wm-modal-body-content",
+      "borderRadius": "3px"
+    },
+    {
+      "tag": "div",
+      "class": "countdown_wrap",
+      "borderRadius": "3px 3px 0px 0px"
+    },
+    {
+      "tag": "label",
+      "class": "wm-modal-label",
+      "borderRadius": "50%"
+    },
+    {
+      "tag": "div",
+      "class": "wm-modal-body-content",
+      "borderRadius": "3px"
+    },
+    {
+      "tag": "div",
+      "class": "countdown_wrap",
+      "borderRadius": "3px 3px 0px 0px"
+    },
+    {
+      "tag": "a",
+      "class": "btn -baseOrange register_member",
+      "borderRadius": "160px"
+    },
+    {
+      "tag": "a",
+      "class": "btn -baseGreen -pc",
+      "borderRadius": "160px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderRadius": "20px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderRadius": "20px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderRadius": "20px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderRadius": "20px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderRadius": "20px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderRadius": "20px"
+    },
+    {
+      "tag": "li",
+      "class": "",
+      "borderRadius": "6px"
+    }
+  ],
+  "16_box_shadow": [
+    {
+      "tag": "div",
+      "class": "wm-modal-body-content",
+      "boxShadow": "rgba(0, 0, 0, 0.2) 0px 2px 10px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "wm-modal-body-content",
+      "boxShadow": "rgba(0, 0, 0, 0.2) 0px 2px 10px 0px"
+    },
+    {
+      "tag": "div",
+      "class": "adlpC-headerInner",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 6px 0px"
+    },
+    {
+      "tag": "ul",
+      "class": "worries -shadow",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide slick-cl",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide slick-cl",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide slick-cu",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide slick-cl",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide slick-cl",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide slick-cl",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    },
+    {
+      "tag": "li",
+      "class": "slider_item -shadow slick-slide slick-cl",
+      "boxShadow": "rgba(0, 0, 0, 0.15) 0px 2px 8px 0px"
+    }
+  ]
+}

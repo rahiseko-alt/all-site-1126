@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>n8n Check-out 2026-05-27</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; color: #202124; }
+    h1, h2 { line-height: 1.25; }
+    code { background: #f1f3f4; padding: 2px 4px; border-radius: 4px; }
+    .alert { border-left: 6px solid #c5221f; background: #fce8e6; padding: 12px 16px; }
+    .box { border-left: 4px solid #1a73e8; background: #e8f0fe; padding: 10px 14px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #dadce0; padding: 8px; vertical-align: top; }
+    th { background: #f8fafd; }
+  </style>
+</head>
+<body>
+  <h1>n8n Check-out: 2026-05-27</h1>
+  <p><strong>branch:</strong> current workspace branch</p>
+  <p><strong>次セッションで本ファイル先頭から Read 必須。</strong></p>
+
+  <div class="alert">
+    <strong>最重要:</strong> n8n は Docker 起動済み。API は未承認のため触っていない。次は API なしでできるローカル完結ラインを実ノード化する。
+  </div>
+
+  <h2>A. 本セッション TL;DR</h2>
+  <ul>
+    <li>Docker Desktop 起動後、n8n コンテナ <code>n8n</code> を起動。</li>
+    <li><code>http://localhost:5678</code> の 200 OK を確認。</li>
+    <li>master が n8n 初期アカウントを作成済み。</li>
+    <li><code>video_generation_api_pending</code> と <code>auto_posting_api_pending</code> の 2 ワークフローを n8n にインポート。</li>
+    <li>両ワークフローは Manual Trigger + NoOp placeholder のみ。外部 API・認証情報・課金 API は未使用。</li>
+    <li><code>AGENTS.md</code> を AI エージェント共通ルールへ修正。</li>
+    <li>Claude Code 側のローカル skills / commands / agents / rules を Codex 側 <code>C:\Users\user\.codex\skills</code> へ同期。</li>
+    <li><code>checkout</code> スキル本体を Claude Code / Codex 両方へ同一 hash で配置。</li>
+  </ul>
+
+  <h2>B. 完了 commit 一覧</h2>
+  <p>本 Check-out 実行時点で commit 作成前。commit hash は Check-out 完了後の最終報告を正とする。</p>
+
+  <h2>C. 影響波及</h2>
+  <table>
+    <tr><th>領域</th><th>内容</th></tr>
+    <tr><td>n8n</td><td>Docker self-host 構成、workflow JSON、承認待ちメモを配置済み。</td></tr>
+    <tr><td>AI 共通運用</td><td><code>AGENTS.md</code> を Codex 専用から全 AI 共通へ変更。</td></tr>
+    <tr><td>Codex skills</td><td>Claude Code ローカルスキル 36 件 + wrapper 42 件相当を Codex 側へ登録。次 Codex セッションで自動認識される見込み。</td></tr>
+  </table>
+
+  <h2>D. 残作業</h2>
+  <ul>
+    <li><strong>H:</strong> API なしでできるローカル完結ラインを n8n 実ノードへ差し替える。</li>
+    <li><strong>M:</strong> API/外部サービス接続が必要な境界を master と再確認する。</li>
+    <li><strong>M:</strong> 別 Codex チャットで <code>/pc-checkin</code> / <code>/checkout</code> の発火を確認する。</li>
+    <li><strong>L:</strong> n8n_data のバックアップ方針を決める。</li>
+  </ul>
+
+  <h2>E. 配備済 subagent / skill / hook</h2>
+  <ul>
+    <li>Codex skill sync manifest: <code>C:\Users\user\.codex\skills\claude-skill-sync-manifest.json</code></li>
+    <li>Checkout skill: <code>C:\Users\user\.claude\skills\checkout\SKILL.md</code> と <code>C:\Users\user\.codex\skills\checkout\SKILL.md</code> が同一 SHA256。</li>
+    <li>n8n product hooks/settings は既に git 管理下。</li>
+  </ul>
+
+  <h2>F. 本セッション生成レポート</h2>
+  <ul>
+    <li><code>products/n8n/n8n-workspace/docs/approval-pending.md</code></li>
+    <li><code>products/n8n/n8n-workspace/workflows/video-generation.workflow.json</code></li>
+    <li><code>products/n8n/n8n-workspace/workflows/auto-posting.workflow.json</code></li>
+  </ul>
+
+  <h2>G. 次セッション初手 (recommended)</h2>
+  <ol>
+    <li><code>products/n8n/memory.md</code> 冒頭の本レポートを読む。</li>
+    <li>n8n が起動中か <code>docker compose ps</code> で確認。</li>
+    <li>API なしで作る最初のラインを master に 1 つ選ばせる。</li>
+    <li>選ばれたラインを Set / Code / If / Wait 等でローカル完結実装する。</li>
+    <li>外部接続が必要になった時点で止め、承認待ちへ戻す。</li>
+  </ol>
+</body>
+</html>

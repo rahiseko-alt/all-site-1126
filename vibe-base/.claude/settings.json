@@ -1,0 +1,417 @@
+{
+  "showClearContextOnPlanAccept": true,
+  "permissions": {
+    "defaultMode": "plan",
+    "plansDirectory": "./docs/ops/plans",
+    "allow": [
+      "Agent",
+      "Read",
+      "Grep",
+      "Glob",
+      "Bash(npm test:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run build)",
+      "Bash(npm run typecheck)",
+      "Bash(git add:*)",
+      "Bash(git diff:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(test -f:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(git:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(gh:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(echo:*)",
+      "Bash(vercel:*)",
+      "Bash(npx vercel:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsc:*)",
+      "Read(//c/Users/user/Desktop/ClaudeCode/vibe-base/**)",
+      "Bash(sleep:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(test:*)",
+      "Bash(date)",
+      "Bash(date:*)",
+      "Bash(pwd)",
+      "Bash(pwd:*)",
+      "Bash(printf:*)",
+      "Bash(which:*)",
+      "Bash(notepad:*)",
+      "Bash(notepad.exe:*)",
+      "WebFetch(domain:kouheikosehira.com)",
+      "WebFetch(domain:*.kouheikosehira.com)",
+      "WebFetch(domain:hnrss.org)",
+      "WebFetch(domain:openai.com)",
+      "WebFetch(domain:zenn.dev)",
+      "WebFetch(domain:rss.itmedia.co.jp)",
+      "WebFetch(domain:goworkship.com)",
+      "WebFetch(domain:www.nippon.com)",
+      "WebFetch(domain:www.technologyreview.jp)",
+      "WebFetch(domain:gsap.com)",
+      "WebFetch(domain:prtimes.jp)",
+      "WebFetch(domain:note.com)",
+      "WebFetch(domain:www.anthropic.com)",
+      "Bash(export PATH=$PATH:*)"
+    ],
+    "deny": [
+      "Bash(env)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Write(.env)",
+      "Write(**/.env)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)",
+      "Edit(**/secrets/**)",
+      "Write(**/secrets/**)",
+      "Edit(.git/**)",
+      "Write(.git/**)",
+      "Bash(rm -rf:*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git branch -D*)",
+      "Bash(git clean -fd*)",
+      "Bash(git stash drop*)",
+      "Bash(git stash clear*)",
+      "Bash(git restore .)",
+      "Bash(git checkout -- .)",
+      "Bash(git remote set-url*)",
+      "Bash(git commit --amend*)",
+      "Bash(gh repo fork*)",
+      "Bash(gh auth:*)",
+      "Bash(git config user.*)",
+      "Bash(git config --global user.*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ],
+    "ask": [
+      "Bash(node -e *)",
+      "Bash(node --eval*)",
+      "Bash(node -p *)",
+      "Bash(node --input-type=*)",
+      "Bash(npm install *)",
+      "Bash(npx --yes*)",
+      "Bash(docker:*)",
+      "Bash(kubectl:*)",
+      "Bash(terraform:*)",
+      "Bash(aws:*)",
+      "Bash(gcloud:*)",
+      "Bash(vercel --prod*)",
+      "Bash(npx vercel --prod*)",
+      "Bash(vercel deploy --prod*)",
+      "Bash(npm publish:*)",
+      "Bash(cmd:*)",
+      "Bash(cmd.exe *)",
+      "Bash(powershell:*)",
+      "Bash(powershell.exe *)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(Stop-Process *)",
+      "Bash(find:*)",
+      "Bash(bash:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=post-bash -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-bash.js"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=post-write -- bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-write.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=rules-coverage-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/rules-coverage-gate.mjs",
+            "statusMessage": "ルールカバレッジ検証中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=ac-keyword-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/ac-keyword-gate.mjs",
+            "statusMessage": "受入条件 keyword 検証中 (Stage 2)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=line-count-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/line-count-gate.mjs",
+            "statusMessage": "500行規律検証中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=root-config-propagate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/root-config-propagate.mjs",
+            "statusMessage": "root config 変更の product 伝播中..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=pre-edit -- bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=area-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/area-gate.mjs",
+            "statusMessage": "運用エリアゲート検証中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=pre-bash-destructive -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-bash-destructive.mjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=allow-marker-guard -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/allow-marker-guard.mjs",
+            "statusMessage": ".allow-* バイパスマーカーの自己発行チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=pre-git-staging-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-git-staging-gate.mjs",
+            "statusMessage": "git 無差別 stage（index sweep）防止チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=secret-write-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/secret-write-gate.mjs",
+            "statusMessage": "settings.local.json シークレット混入チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=portfolio-pii-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/portfolio-pii-gate.mjs",
+            "statusMessage": "docs/deliverables/ の顧客PII混入チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=outside-vibe-base-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/outside-vibe-base-gate.mjs",
+            "statusMessage": "vibe-base 外フォルダ編集チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=memory-observation-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/memory-observation-gate.mjs",
+            "statusMessage": "memory.md 継続観察パターン検証中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=portfolio-generated-guard -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/portfolio-generated-guard.mjs",
+            "statusMessage": "portfolio 生成物 leak 封鎖チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=toranomaki-generated-guard -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/toranomaki-generated-guard.mjs",
+            "statusMessage": "虎の巻 canonical 直書き封鎖チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=memory-size-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/memory-size-gate.mjs",
+            "statusMessage": "memory 系ファイル byte 上限チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=portfolio-deploy-build-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/portfolio-deploy-build-gate.mjs",
+            "statusMessage": "portfolio デプロイ前 build+verify 強制中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=serena-suggest-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/serena-suggest-gate.mjs",
+            "statusMessage": "Serena 適用機会チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=job-application-write-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/job-application-write-gate.mjs",
+            "statusMessage": "応募文の書き込み経路チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=plan-daigi-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/plan-daigi-gate.mjs",
+            "statusMessage": "plan の大義照合中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=roadmap-state-write-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/roadmap-state-write-gate.mjs",
+            "statusMessage": "現在地(roadmap-state.json)の書込検査中..."
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-tool-use-failure-triage.mjs",
+            "statusMessage": "微細エラー判定支援中（要検証・claude --debugで発火確認前）..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=session-start-handover-inject -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start-handover-inject.mjs",
+            "statusMessage": "前回引継ぎレポート強制注入中..."
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=session-start-toranomaki -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start-toranomaki.mjs",
+            "statusMessage": "虎の巻 outbox 取込チェック中..."
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=session-start-vault-reflection-check -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start-vault-reflection-check.mjs",
+            "statusMessage": "vault 反映の滞留チェック中..."
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=session-start-automation-warn -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start-automation-warn.mjs",
+            "statusMessage": "自動実行 job の異常/滞留チェック中..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-runner.mjs --hook=job-application-agent-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/job-application-agent-gate.mjs",
+            "statusMessage": "応募文サブへの委譲チェック中..."
+          }
+        ]
+      }
+    ]
+  }
+}

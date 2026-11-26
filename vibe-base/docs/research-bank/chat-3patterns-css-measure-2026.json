@@ -1,0 +1,73 @@
+{
+  "source": "file:///C:/Users/user/Desktop/vibe-base/products/ai-concierge/tmp/screenshot-chat-3patterns.html",
+  "measured_at": "2026-04-05",
+  "viewport": "1440x900",
+  "1_html_base_font_size": "16px",
+  "2-6_font_metrics": {
+    "body": { "fontFamily": "Noto Sans JP", "fontSize": "16px", "fontWeight": "400", "lineHeight": "normal", "letterSpacing": "normal", "color": "rgb(0, 0, 0)" },
+    "feature-label": { "fontFamily": "Noto Sans JP", "fontSize": "12px", "fontWeight": "600", "lineHeight": "normal", "letterSpacing": "0.48px", "color": "rgb(255, 255, 255)" },
+    "header-bar": { "fontFamily": "Noto Sans JP", "fontSize": "12px", "fontWeight": "600", "lineHeight": "normal", "color": "rgb(255, 255, 255)" },
+    "msg_bot": { "fontFamily": "Noto Sans JP", "fontSize": "12px", "fontWeight": "400", "lineHeight": "18px", "color": "rgb(30, 41, 59)" },
+    "msg_user": { "fontFamily": "Noto Sans JP", "fontSize": "12px", "fontWeight": "400", "lineHeight": "18px", "color": "rgb(255, 255, 255)" },
+    "input": { "fontFamily": "Noto Sans JP", "fontSize": "11px", "fontWeight": "400", "color": "rgb(0, 0, 0)" },
+    "button": { "fontFamily": "Arial", "fontSize": "11px", "fontWeight": "500", "color": "rgb(255, 255, 255)" },
+    "escalation-card_p": { "fontFamily": "Noto Sans JP", "fontSize": "11px", "fontWeight": "400", "lineHeight": "16.5px", "color": "rgb(146, 64, 14)" },
+    "escalation-card_a": { "fontFamily": "Noto Sans JP", "fontSize": "11px", "fontWeight": "600", "color": "rgb(255, 255, 255)" },
+    "pii-warn_p": { "fontFamily": "Noto Sans JP", "fontSize": "11px", "fontWeight": "400", "lineHeight": "16.5px", "color": "rgb(153, 27, 27)" }
+  },
+  "8_background_colors": {
+    "body": "rgb(240, 240, 240)",
+    ".panel": "rgb(255, 255, 255)",
+    ".header-bar": "rgb(37, 99, 235)",
+    ".escalation-card": "rgb(255, 251, 235)",
+    ".pii-warn": "rgb(254, 242, 242)"
+  },
+  "9_borders": {
+    ".panel": { "borderWidth": "1px", "borderColor": "rgba(0, 0, 0, 0.08)" },
+    ".escalation-card": { "borderWidth": "1px", "borderColor": "rgb(251, 191, 36)" },
+    ".pii-warn": { "borderWidth": "1px", "borderColor": "rgb(252, 165, 165)" },
+    ".input-area input": { "borderWidth": "1px", "borderColor": "rgb(226, 232, 240)" }
+  },
+  "10_padding": {
+    ".header-bar": "10px 12px",
+    ".messages": "10px",
+    ".msg": "7px 10px",
+    ".input-area": "8px",
+    ".input-area input": "6px 8px",
+    ".input-area button": "6px 12px",
+    ".escalation-card": "8px 12px",
+    ".pii-warn": "8px 12px",
+    ".feature-label": "6px 16px"
+  },
+  "12_gap": {
+    ".panels": "20px",
+    ".panel-wrap": "12px",
+    ".messages": "5px",
+    ".input-area": "5px"
+  },
+  "13_max_width": { ".msg": "85%" },
+  "14_panel_dimensions": [
+    { "panel": 1, "width": "280px", "height": "321px" },
+    { "panel": 2, "width": "280px", "height": "336.5px" },
+    { "panel": 3, "width": "280px", "height": "286px" }
+  ],
+  "15_border_radius": {
+    ".panel": "10px",
+    ".msg.bot": "12px 12px 12px 4px",
+    ".msg.user": "12px 12px 4px 12px",
+    ".input-area input": "7px",
+    ".input-area button": "7px",
+    ".escalation-card": "8px",
+    ".escalation-card a": "6px",
+    ".pii-warn": "8px",
+    ".feature-label": "7px"
+  },
+  "16_box_shadow": {
+    ".panel": "rgba(0,0,0,0.04) 0px 2px 4px, rgba(0,0,0,0.12) 0px 8px 24px, rgba(0,0,0,0.08) 0px 20px 48px"
+  },
+  "17_opacity": { ".close-btn": "0.8" },
+  "links": {
+    "dead": ["<a href='#'> メールで問い合わせる (モック用)"],
+    "buttons": ["×(close-btn) x3", "送信 x3"]
+  }
+}

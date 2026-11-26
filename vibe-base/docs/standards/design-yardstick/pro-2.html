@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>障害者雇用の記録と配慮、自社で回せる仕組みに｜小さな会社のDX屋さん</title>
+<meta name="description" content="2026年7月施行・法定雇用率2.7%。障害者雇用の記録・合理的配慮・勤怠を、代行に頼らず自社で回せる仕組みに。名古屋の小さなDX屋が1万円から構築・納品、導入後も伴走します。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────── */
+:root {
+  --void:    #050c14;
+  --deep:    #091827;
+  --navy:    #0f2d4a;
+  --teal:    #00c896;
+  --teal-d:  #009e78;
+  --teal-dim:#005a45;
+  --amber:   #ffd24d;
+  --cta:     #ff6a3d;
+  --cta-d:   #e8501f;
+  --ink:     #1a2433;
+  --sub:     #566677;
+  --bg:      #f4f8fb;
+  --line:    #dce8f0;
+  --white:   #ffffff;
+  --warn:    #fff4ee;
+  --grid-clr: rgba(0,200,150,.18);
+  --grid-clr-strong: rgba(0,200,150,.45);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Noto Sans JP',sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  line-height:1.8;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:68px;
+}
+
+/* ─────────────────────────────────────────
+   LAYOUT UTILS
+───────────────────────────────────────── */
+.wrap { width:100%; max-width:680px; margin:0 auto; padding:0 20px; }
+section { padding:56px 0; }
+.lead { color:var(--teal-d); font-weight:700; font-size:.88rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+h2 { font-size:1.55rem; font-weight:900; line-height:1.45; letter-spacing:.01em; }
+.muted { color:var(--sub); font-size:.84rem; line-height:1.7; }
+
+/* ─────────────────────────────────────────
+   STICKY CTA BAR
+───────────────────────────────────────── */
+.sticky-bar {
+  position:fixed; left:0; right:0; bottom:0; z-index:100;
+  background:rgba(5,12,20,.94);
+  backdrop-filter:blur(8px);
+  border-top:1px solid rgba(0,200,150,.3);
+  padding:9px 14px;
+  display:flex; gap:8px;
+}
+.sticky-bar a {
+  flex:1; text-decoration:none; text-align:center;
+  border-radius:10px; font-weight:700; padding:13px 6px; font-size:.9rem;
+}
+.s-tel { background:rgba(255,255,255,.08); color:#c8dce8; border:1px solid rgba(255,255,255,.12); }
+.s-form { background:var(--cta); color:#fff; box-shadow:0 4px 14px rgba(255,106,61,.4); }
+
+/* ─────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────── */
+.btn {
+  display:block; width:100%;
+  background:var(--cta); color:#fff; text-decoration:none;
+  text-align:center; font-weight:700; font-size:1.1rem;
+  padding:18px 16px; border-radius:14px;
+  box-shadow:0 8px 24px rgba(255,106,61,.35);
+  transition:transform .15s, box-shadow .15s;
+  border:none; cursor:pointer;
+}
+.btn:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(255,106,61,.45); }
+.btn:active { transform:translateY(1px); }
+.btn small { display:block; font-weight:500; font-size:.76rem; opacity:.88; margin-top:3px; }
+.btn-navy { background:var(--navy); box-shadow:0 8px 20px rgba(15,45,74,.4); }
+.btn-navy:hover { box-shadow:0 12px 28px rgba(15,45,74,.5); }
+.cta-note { text-align:center; color:var(--sub); font-size:.78rem; margin-top:10px; }
+
+/* ─────────────────────────────────────────
+   HERO — WebGL layer
+───────────────────────────────────────── */
+.hero {
+  position:relative;
+  min-height:100svh; min-height:100vh;
+  display:flex; align-items:center;
+  overflow:hidden;
+  background:var(--void);
+}
+#hero-canvas {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  pointer-events:none;
+}
+/* Fallback background when WebGL unavailable */
+.hero-fallback {
+  position:absolute; inset:0;
+  background: linear-gradient(160deg, var(--void) 0%, #0a1f35 40%, #0f2d20 100%);
+  display:none;
+}
+.no-webgl .hero-fallback { display:block; }
+.no-webgl #hero-canvas { display:none; }
+
+/* Overlay vignette */
+.hero::after {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 85% 75% at 50% 110%, transparent 30%, rgba(5,12,20,.7) 100%);
+  z-index:1;
+}
+
+.hero-content {
+  position:relative; z-index:2;
+  padding:100px 0 56px;
+  width:100%;
+}
+.hero .badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,210,77,.15);
+  border:1px solid rgba(255,210,77,.5);
+  color:var(--amber);
+  font-weight:700; font-size:.78rem;
+  padding:6px 13px; border-radius:999px;
+  margin-bottom:20px; letter-spacing:.03em;
+  animation:badge-pulse 3s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,210,77,.3); }
+  50%      { box-shadow: 0 0 0 6px rgba(255,210,77,0); }
+}
+.hero h1 {
+  font-size:1.78rem; font-weight:900; line-height:1.45;
+  color:#e8f4ff; letter-spacing:.01em;
+}
+.hero h1 .hl { color:var(--teal); }
+.hero .sub {
+  margin:18px 0 28px; font-size:1.02rem;
+  color:rgba(200,220,235,.85); line-height:1.75;
+}
+.hero .sub b { color:#fff; }
+.hero .trust-row {
+  display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;
+}
+.hero .trust-row span {
+  font-size:.8rem; color:rgba(180,210,230,.8);
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:999px; padding:5px 11px;
+}
+
+/* convergence hint label */
+.hint-label {
+  position:absolute; bottom:22px; left:50%; transform:translateX(-50%);
+  z-index:3; display:flex; flex-direction:column; align-items:center; gap:6px;
+  color:rgba(0,200,150,.6); font-size:.72rem; letter-spacing:.12em;
+  animation:float-hint 2.4s ease-in-out infinite;
+  white-space:nowrap;
+}
+@keyframes float-hint {
+  0%,100% { opacity:.6; transform:translateX(-50%) translateY(0); }
+  50%      { opacity:.9; transform:translateX(-50%) translateY(-5px); }
+}
+.hint-arrow { width:1px; height:28px; background:linear-gradient(to bottom, rgba(0,200,150,.6), transparent); }
+
+/* ─────────────────────────────────────────
+   SECTION BRIDGE — grid fade down
+───────────────────────────────────────── */
+.section-bridge {
+  height:56px;
+  background:linear-gradient(to bottom, var(--void), var(--white));
+}
+
+/* ─────────────────────────────────────────
+   SECTION REVEAL ANIMATION
+───────────────────────────────────────── */
+.reveal {
+  opacity:0; transform:translateY(28px);
+  transition:opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1);
+}
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-delay-1 { transition-delay:.1s; }
+.reveal-delay-2 { transition-delay:.2s; }
+.reveal-delay-3 { transition-delay:.3s; }
+.reveal-delay-4 { transition-delay:.4s; }
+
+/* ─────────────────────────────────────────
+   COUNTDOWN STRIP
+───────────────────────────────────────── */
+.countdown-strip {
+  background:linear-gradient(90deg, var(--deep), #0f2d1e);
+  border-top:1px solid rgba(0,200,150,.25);
+  border-bottom:1px solid rgba(0,200,150,.25);
+  padding:14px 0; text-align:center;
+}
+.countdown-strip .inner {
+  display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+  font-size:.88rem; color:#a8c8bc; font-weight:500;
+}
+.countdown-strip strong { color:var(--teal); font-size:1.05rem; }
+.cd-num {
+  display:inline-flex; flex-direction:column; align-items:center;
+  background:rgba(0,200,150,.1); border:1px solid rgba(0,200,150,.3);
+  border-radius:8px; padding:4px 11px; line-height:1.2;
+}
+.cd-num b { font-size:1.5rem; font-weight:900; color:var(--teal); }
+.cd-num small { font-size:.65rem; color:rgba(0,200,150,.7); letter-spacing:.06em; }
+
+/* ─────────────────────────────────────────
+   PROBLEM SECTION
+───────────────────────────────────────── */
+.prob { background:var(--white); }
+.stat-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px; margin-top:22px;
+}
+.stat-card {
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:14px; padding:16px 14px;
+  position:relative; overflow:hidden;
+}
+.stat-card::before {
+  content:""; position:absolute; top:0; left:0;
+  width:3px; height:100%; background:var(--cta);
+}
+.stat-card .pct {
+  font-size:1.9rem; font-weight:900; color:var(--cta);
+  line-height:1.1; margin-bottom:5px;
+}
+.stat-card p { font-size:.82rem; line-height:1.5; color:var(--sub); }
+.stat-card p b { color:var(--ink); }
+.stat-card.wide { grid-column:span 2; }
+.stat-card.wide::before { background:var(--teal-d); }
+.stat-card.wide .pct { color:var(--teal-d); }
+
+.pain-box {
+  margin-top:22px;
+  background:var(--navy);
+  color:#e0edf5;
+  border-radius:16px; padding:22px 20px;
+  font-size:.96rem; line-height:1.8;
+}
+.pain-box .hl { color:var(--amber); font-weight:700; }
+.pain-box .deadline { color:var(--cta); font-weight:900; font-size:1.1rem; }
+
+/* ─────────────────────────────────────────
+   SOLUTION SECTION
+───────────────────────────────────────── */
+.sol { background:linear-gradient(180deg, #eef5f3 0%, var(--bg) 100%); }
+
+.steps { margin-top:24px; display:flex; flex-direction:column; gap:0; }
+.step-item {
+  display:flex; gap:0;
+  position:relative;
+}
+.step-item:not(:last-child)::after {
+  content:""; position:absolute;
+  left:27px; top:56px; bottom:-1px;
+  width:2px;
+  background:linear-gradient(to bottom, var(--teal-dim), transparent);
+}
+.step-num {
+  flex:none; width:54px;
+  display:flex; flex-direction:column; align-items:center; padding-top:4px;
+}
+.step-circle {
+  width:38px; height:38px; border-radius:50%;
+  background:linear-gradient(135deg, var(--teal), var(--teal-d));
+  color:#fff; font-weight:900; font-size:.82rem;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 14px rgba(0,200,150,.3);
+  flex-shrink:0;
+}
+.step-body {
+  flex:1; background:#fff; border-radius:14px;
+  border:1px solid var(--line);
+  padding:16px 16px 18px;
+  margin-bottom:12px;
+}
+.step-body h3 { font-size:1.05rem; font-weight:700; margin-bottom:6px; }
+.step-body p { font-size:.9rem; color:var(--sub); line-height:1.65; }
+
+/* compare table */
+.cmp { margin-top:28px; background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+.cmp table { width:100%; border-collapse:collapse; font-size:.79rem; }
+.cmp th, .cmp td { padding:11px 8px; text-align:center; border-bottom:1px solid var(--line); }
+.cmp thead th { background:var(--navy); color:#fff; font-weight:700; font-size:.76rem; }
+.cmp thead th.us { background:var(--teal-d); }
+.cmp td.lbl { text-align:left; font-weight:700; background:var(--bg); font-size:.78rem; padding-left:12px; }
+.cmp td.us { background:#edfaf5; font-weight:700; color:var(--teal-d); }
+.cmp .o { color:var(--teal-d); font-weight:900; }
+.cmp .x { color:#c0392b; font-weight:900; }
+
+/* ─────────────────────────────────────────
+   TRUST SECTION
+───────────────────────────────────────── */
+.trust { background:var(--white); }
+.who-card {
+  display:flex; gap:16px; align-items:center;
+  background:linear-gradient(135deg, var(--deep), var(--navy));
+  border-radius:16px; padding:20px;
+  margin-top:20px; color:#e0edf5;
+}
+.avatar {
+  flex:none; width:58px; height:58px; border-radius:50%;
+  background:linear-gradient(135deg, var(--teal), var(--teal-d));
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:1.3rem;
+  box-shadow:0 4px 14px rgba(0,200,150,.35);
+}
+.who-card b { color:#fff; font-size:1rem; }
+.who-card small { color:#8aacbc; font-size:.83rem; }
+
+.trust-list {
+  margin-top:18px; display:flex; flex-direction:column; gap:10px;
+}
+.trust-list li {
+  list-style:none; padding:12px 14px 12px 46px;
+  position:relative;
+  background:var(--bg); border-radius:12px;
+  font-size:.92rem;
+  border:1px solid var(--line);
+}
+.trust-list li::before {
+  content:"✓"; position:absolute; left:14px; top:11px;
+  color:var(--teal); font-weight:900; font-size:1rem;
+}
+
+.honest-box {
+  margin-top:18px;
+  background:var(--warn);
+  border-left:4px solid var(--cta);
+  border-radius:0 12px 12px 0;
+  padding:16px 16px;
+  font-size:.9rem; line-height:1.75; color:var(--ink);
+}
+.honest-box strong { display:block; margin-bottom:6px; font-size:.96rem; }
+
+/* ─────────────────────────────────────────
+   OFFER SECTION
+───────────────────────────────────────── */
+.offer {
+  background:linear-gradient(160deg, var(--void) 0%, var(--deep) 50%, #0a2616 100%);
+  color:#e0edf5; overflow:hidden; position:relative;
+}
+.offer::before {
+  content:""; position:absolute; right:-60px; top:-60px;
+  width:280px; height:280px;
+  background:radial-gradient(circle, rgba(0,200,150,.12) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.price-card {
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(0,200,150,.3);
+  border-radius:20px; padding:28px 22px;
+  margin-top:24px; text-align:center;
+  backdrop-filter:blur(4px);
+  position:relative; overflow:hidden;
+}
+.price-card::after {
+  content:""; position:absolute; top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg, transparent, var(--teal), transparent);
+}
+.price-tag { color:var(--teal); font-weight:700; font-size:.85rem; letter-spacing:.06em; }
+.price-num {
+  font-size:3rem; font-weight:900; color:#fff;
+  line-height:1.1; margin:8px 0 4px;
+}
+.price-num small { font-size:1.1rem; color:rgba(255,255,255,.6); }
+.price-note { color:rgba(200,220,230,.7); font-size:.8rem; margin-bottom:16px; }
+.price-includes {
+  text-align:left; margin:0;
+  border-top:1px solid rgba(255,255,255,.1);
+  padding-top:16px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.price-includes li {
+  list-style:none; padding-left:24px; position:relative;
+  font-size:.88rem; color:rgba(200,220,235,.85);
+}
+.price-includes li::before {
+  content:"✓"; position:absolute; left:0; color:var(--teal); font-weight:900;
+}
+
+.scarcity-box {
+  margin-top:18px;
+  background:rgba(255,106,61,.12);
+  border:1px solid rgba(255,106,61,.4);
+  border-radius:12px; padding:16px;
+  font-size:.9rem; line-height:1.75; color:rgba(255,220,210,.9);
+}
+.scarcity-box strong { color:#ffb39b; }
+
+.anchor-note {
+  margin-top:14px; font-size:.82rem; color:rgba(170,195,215,.7); text-align:center; line-height:1.6;
+}
+
+/* ─────────────────────────────────────────
+   FAQ SECTION
+───────────────────────────────────────── */
+.faq { background:var(--white); }
+details {
+  background:var(--bg); border:1px solid var(--line);
+  border-radius:12px; margin-top:10px; overflow:hidden;
+}
+summary {
+  cursor:pointer; list-style:none;
+  padding:15px 46px 15px 16px;
+  font-weight:700; font-size:.94rem;
+  position:relative; -webkit-user-select:none; user-select:none;
+}
+summary::-webkit-details-marker { display:none; }
+summary::after {
+  content:"+"; position:absolute; right:15px; top:50%;
+  transform:translateY(-50%);
+  font-size:1.3rem; color:var(--teal); font-weight:700;
+  transition:transform .2s;
+}
+details[open] summary::after { content:"−"; }
+.ans { padding:0 16px 16px; color:var(--sub); font-size:.9rem; line-height:1.75; }
+
+/* ─────────────────────────────────────────
+   FINAL CTA
+───────────────────────────────────────── */
+.final {
+  background:linear-gradient(160deg, var(--teal-d) 0%, #006b50 100%);
+  color:#fff; text-align:center;
+  position:relative; overflow:hidden;
+}
+.final::before {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 100% 80% at 50% -20%, rgba(255,255,255,.06) 0%, transparent 60%);
+}
+.final > .wrap { position:relative; z-index:1; }
+.final h2 { color:#fff; font-size:1.75rem; }
+.final p.f { margin:14px 0 26px; font-size:1rem; color:rgba(220,245,238,.9); line-height:1.75; }
+.contact-pair { display:flex; flex-direction:column; gap:12px; }
+
+/* ─────────────────────────────────────────
+   MID-CTA SECTION
+───────────────────────────────────────── */
+.mid-cta { background:var(--bg); padding:36px 0; }
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+footer {
+  background:var(--void);
+  color:#708898; padding:32px 0 44px;
+  text-align:center; font-size:.84rem;
+}
+footer b { color:#c8dce8; font-size:.98rem; }
+footer a { color:var(--teal); text-decoration:none; }
+footer .sub-line { margin-top:8px; }
+footer .copy { margin-top:18px; font-size:.72rem; color:#3a5060; }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (min-width:700px) {
+  .hero h1 { font-size:2.3rem; }
+  h2 { font-size:1.85rem; }
+  .stat-grid { grid-template-columns:1fr 1fr 1fr 1fr; }
+  .stat-card.wide { grid-column:span 2; }
+  .sticky-bar { display:none; }
+  body { padding-bottom:0; }
+  .contact-pair { flex-direction:row; }
+}
+
+/* ─────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────── */
+@media (prefers-reduced-motion:reduce) {
+  .reveal { opacity:1; transform:none; transition:none; }
+  .badge { animation:none; }
+  .hint-label { animation:none; }
+  #hero-canvas { display:none; }
+  .hero-fallback { display:block !important; }
+}
+
+/* ─────────────────────────────────────────
+   GRID DECORATION (static SVG fallback lines)
+───────────────────────────────────────── */
+.hero-fallback-svg {
+  position:absolute; inset:0; opacity:.25; pointer-events:none;
+  display:none;
+}
+.no-webgl .hero-fallback-svg { display:block; }
+@media (prefers-reduced-motion:reduce) {
+  .hero-fallback-svg { display:block; }
+}
+
+/* ─────────────────────────────────────────
+   PROGRESS BAR (scroll)
+───────────────────────────────────────── */
+#progress-bar {
+  position:fixed; top:0; left:0; height:2px; z-index:200;
+  background:var(--teal);
+  width:0; transition:width .1s linear;
+  box-shadow:0 0 6px rgba(0,200,150,.6);
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div id="progress-bar" role="progressbar" aria-label="ページ読み込み進捗"></div>
+
+<!-- Sticky CTA bar (mobile) -->
+<nav class="sticky-bar" aria-label="クイックコンタクト">
+  <a href="tel:09074379549" class="s-tel">📞 090-7437-9549</a>
+  <a href="#form" class="s-form">無料で相談する</a>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     1. HERO
+════════════════════════════════════════ -->
+<section class="hero" aria-label="ヒーローセクション">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-fallback" aria-hidden="true"></div>
+  <!-- Fallback grid SVG -->
+  <svg class="hero-fallback-svg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,200,150,.6)" stroke-width=".8"/>
+      </pattern>
+    </defs>
+    <rect width="400" height="600" fill="url(#grid)"/>
+    <circle cx="200" cy="300" r="120" fill="none" stroke="rgba(0,200,150,.4)" stroke-width=".6"/>
+    <circle cx="200" cy="300" r="60" fill="none" stroke="rgba(0,200,150,.5)" stroke-width=".5"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="wrap">
+      <div class="badge" aria-label="施行情報">
+        ⚠️ 2026年7月施行・法定雇用率 2.7%
+      </div>
+      <h1>
+        障害者雇用の<span class="hl">記録と配慮</span>、<br>
+        まだ紙とExcelの<br>ままですか？
+      </h1>
+      <p class="sub">
+        代行に頼らず、<b>自社で回せる</b>記録の仕組みを。<br>
+        名古屋の小さなDX屋が、<b>1万円から</b>構築して<br>お渡しします。導入後も、となりで伴走します。
+      </p>
+      <a href="#form" class="btn">
+        無料で相談する
+        <small>ご相談だけでも歓迎・しつこい営業はしません</small>
+      </a>
+      <div class="trust-row" aria-label="信頼ポイント">
+        <span>📍 名古屋拠点・直接会えます</span>
+        <span>💴 買い切り・月額なし</span>
+        <span>🤝 導入後も伴走</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint-label" aria-hidden="true">
+    SCROLL
+    <div class="hint-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     COUNTDOWN STRIP
+════════════════════════════════════════ -->
+<div class="countdown-strip" aria-label="施行まであと">
+  <div class="inner wrap">
+    <strong>2026年7月施行まで</strong>
+    <div class="cd-num" id="cd-days"><b>--</b><small>日</small></div>
+    <span>を切りました。記録の仕組みはありますか？</span>
+  </div>
+</div>
+
+<div class="section-bridge" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════════════════
+     2. PROBLEM
+════════════════════════════════════════ -->
+<section class="prob" id="problem">
+  <div class="wrap">
+    <p class="lead reveal">こんなお悩み、ありませんか</p>
+    <h2 class="reveal reveal-delay-1">「義務は分かった。<br>でも、何から手をつければ…」</h2>
+
+    <div class="stat-grid" role="list" aria-label="中小企業の障害者雇用の課題">
+      <div class="stat-card reveal reveal-delay-1" role="listitem">
+        <div class="pct">37.3%</div>
+        <p>が「<b>業務の切り出し</b>が難しい」と回答</p>
+      </div>
+      <div class="stat-card reveal reveal-delay-2" role="listitem">
+        <div class="pct">35.1%</div>
+        <p>が「<b>ノウハウが不足</b>している」と回答</p>
+      </div>
+      <div class="stat-card reveal reveal-delay-3" role="listitem">
+        <div class="pct">28.3%</div>
+        <p>が「<b>専任担当者を置く</b>余裕がない」と回答</p>
+      </div>
+      <div class="stat-card wide reveal reveal-delay-4" role="listitem">
+        <div class="pct">40.4%</div>
+        <p>しか新基準で必要な採用数を<b>正確に把握</b>できていない</p>
+      </div>
+    </div>
+
+    <div class="pain-box reveal">
+      <p>
+        そのうえで、雇用カウント・勤怠・<span class="hl">合理的配慮の記録</span>は<br>
+        紙とExcelで二重管理。担当者しか分からず、<br>
+        行政に提出するたびに集計し直し——<br><br>
+        <span class="deadline">この状態で、7月を迎えて大丈夫ですか。</span>
+      </p>
+    </div>
+    <p class="muted reveal" style="margin-top:12px">
+      ※ 数値は中小企業を対象とした調査（ITmedia ビジネスオンライン 2026/6/2 報道）に基づきます。
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     3. SOLUTION
+════════════════════════════════════════ -->
+<section class="sol" id="solution">
+  <div class="wrap">
+    <p class="lead reveal">わたしたちの解決策</p>
+    <h2 class="reveal reveal-delay-1">「記録の仕組み」を、<br>御社専用につくってお渡しします。</h2>
+    <p class="reveal reveal-delay-2" style="margin-top:14px;color:var(--sub)">
+      高い専門ソフトも、毎月の利用料も不要です。<br>
+      お使いの Google スプレッドシート／Excel の上で動く、<br>シンプルな記録の仕組みを構築・納品します。
+    </p>
+
+    <div class="steps" role="list" aria-label="サービス提供ステップ">
+      <div class="step-item reveal reveal-delay-1" role="listitem">
+        <div class="step-num">
+          <div class="step-circle">1</div>
+        </div>
+        <div class="step-body">
+          <h3>ヒアリング（無料）</h3>
+          <p>御社の人数・業務・今の記録方法をお聞きします。制度で「やるべきこと」も出典に沿って一緒に整理します。</p>
+        </div>
+      </div>
+      <div class="step-item reveal reveal-delay-2" role="listitem">
+        <div class="step-num">
+          <div class="step-circle">2</div>
+        </div>
+        <div class="step-body">
+          <h3>御社専用に構築・納品</h3>
+          <p>雇用カウント・勤怠・合理的配慮の記録を<b>入力1か所</b>にまとめるスプレッドシート＋かんたん入力フォームを作成してお渡しします。</p>
+        </div>
+      </div>
+      <div class="step-item reveal reveal-delay-3" role="listitem">
+        <div class="step-num">
+          <div class="step-circle">3</div>
+        </div>
+        <div class="step-body">
+          <h3>使い方レクチャー＋伴走</h3>
+          <p>担当の方が迷わず使えるまでレクチャー。納品後も、つまずいたら気軽に相談できる距離でサポートします。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="cmp reveal" role="region" aria-label="サービス比較表">
+      <table>
+        <caption class="muted" style="padding:10px 12px;text-align:left;font-weight:700;background:var(--bg)">3つの選択肢を比べると</caption>
+        <thead>
+          <tr>
+            <th scope="col">　</th>
+            <th scope="col">代行<br>(農園/サテライト)</th>
+            <th scope="col">月額<br>クラウド</th>
+            <th scope="col" class="us">当社の<br>テンプレ納品</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="lbl" scope="row">毎月の費用</td>
+            <td>かかる</td>
+            <td>かかる</td>
+            <td class="us">なし（買い切り）</td>
+          </tr>
+          <tr>
+            <td class="lbl" scope="row">記録の在りか</td>
+            <td class="x">社外</td>
+            <td>システム内</td>
+            <td class="us">自社の手元</td>
+          </tr>
+          <tr>
+            <td class="lbl" scope="row">自社で回せる</td>
+            <td class="x">×</td>
+            <td>△</td>
+            <td class="us o">○</td>
+          </tr>
+          <tr>
+            <td class="lbl" scope="row">導入後の相談</td>
+            <td>契約次第</td>
+            <td>チャット等</td>
+            <td class="us">直接・伴走</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted reveal" style="margin-top:10px">※ 代行・クラウドは月額の継続費用がかかるのが一般的。費用・内容はサービスにより異なります。</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     4. TRUST
+════════════════════════════════════════ -->
+<section class="trust" id="trust">
+  <div class="wrap">
+    <p class="lead reveal">わたしについて</p>
+    <h2 class="reveal reveal-delay-1">名古屋の、<br>「顔の見える」DX屋です。</h2>
+
+    <div class="who-card reveal reveal-delay-2">
+      <div class="avatar" aria-hidden="true">小</div>
+      <div>
+        <b>小齊平 恒平（こせひら こうへい）</b><br>
+        <small>小さな会社のDX屋さん／名古屋</small>
+      </div>
+    </div>
+
+    <ul class="trust-list" aria-label="サービスの特徴">
+      <li class="reveal reveal-delay-1">ホームページ・PC業務・アプリ制作で、中小企業と個人事業のDXを支援しています。</li>
+      <li class="reveal reveal-delay-2">大きな会社や遠い窓口ではなく、<b>直接お会いして</b>、御社の現場に合わせてつくります。</li>
+      <li class="reveal reveal-delay-3">制度の確認は、厚生労働省など<b>一次情報の出典に基づいて</b>正確にご案内します。</li>
+      <li class="reveal reveal-delay-4">納品して終わりにしません。<b>導入後も、となりで伴走</b>します。</li>
+    </ul>
+
+    <div class="honest-box reveal">
+      <strong>正直にお伝えします。</strong>
+      障害者雇用の記録支援は、当社の<b>新しいサービス</b>です。導入実績の「数」はまだありません。だからこそ、最初にお声がけいただく数社には特に丁寧に、御社にぴったり合う形を一緒につくらせてください。
+    </div>
+  </div>
+</section>
+
+<!-- MID CTA -->
+<section class="mid-cta">
+  <div class="wrap">
+    <a href="#form" class="btn reveal">
+      まずは無料で相談する
+      <small>制度の確認だけでもOK・お見積もりは無料です</small>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     5. OFFER
+════════════════════════════════════════ -->
+<section class="offer" id="offer">
+  <div class="wrap">
+    <p class="lead reveal" style="color:rgba(0,200,150,.8)">料金</p>
+    <h2 class="reveal reveal-delay-1" style="color:#e8f4ff">「小さく始められる」<br>買い切りの仕組みです。</h2>
+
+    <div class="price-card reveal reveal-delay-2">
+      <div class="price-tag">テンプレ納品プラン</div>
+      <div class="price-num">1万円 <small>〜</small></div>
+      <div class="price-note">（会社の規模・記録する項目数で変動します。お見積もりは無料）</div>
+      <ul class="price-includes">
+        <li>無料ヒアリング＋制度の整理</li>
+        <li>御社専用の記録スプレッドシート構築</li>
+        <li>かんたん入力フォームの作成</li>
+        <li>使い方レクチャー</li>
+        <li>納品後の初期サポート</li>
+      </ul>
+    </div>
+
+    <div class="scarcity-box reveal">
+      <strong>7月施行まで、時間は限られています。</strong><br>
+      1社ずつ丁寧に向き合うため、同じ時期にお受けできる数には限りがあります。気になった今、まずはご相談ください。
+    </div>
+
+    <div class="anchor-note reveal">
+      代行・クラウドは月額の継続費用がかかるのが一般的です。<br>当社は<strong style="color:var(--teal)">買い切り</strong>で、記録の仕組みが御社の資産になります。
+    </div>
+
+    <a href="#form" class="btn reveal" style="margin-top:20px">
+      無料で相談・見積もりを依頼する
+      <small>隠れた追加費用はありません</small>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     6. FAQ
+════════════════════════════════════════ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <p class="lead reveal">よくあるご質問</p>
+    <h2 class="reveal reveal-delay-1">不安なところ、<br>先にお答えします。</h2>
+
+    <details class="reveal reveal-delay-1">
+      <summary>ITに詳しくないのですが、使えますか？</summary>
+      <div class="ans">はい。入力はフォームに沿って打つだけです。使い方のレクチャーが込みですので、担当の方が迷わず使えるところまでお手伝いします。</div>
+    </details>
+
+    <details class="reveal reveal-delay-2">
+      <summary>専用ソフトの月額費用はかかりますか？</summary>
+      <div class="ans">かかりません。お使いの Google スプレッドシート／Excel の上で動く「買い切り」です。毎月の利用料は不要で、御社の資産として手元に残ります。</div>
+    </details>
+
+    <details class="reveal reveal-delay-3">
+      <summary>代行サービスとは何が違うのですか？</summary>
+      <div class="ans">代行（農園型・サテライトオフィス型）は、働く場所や日常サポートを社外が担います。当社は<strong>雇用も記録も御社の手元</strong>に残す仕組みづくりなので、ノウハウが社内に蓄積していきます。</div>
+    </details>
+
+    <details class="reveal reveal-delay-1">
+      <summary>制度のことがよく分かっていません。</summary>
+      <div class="ans">無料相談で、制度の確認から一緒に進めます。厚生労働省など一次情報の出典に基づいて、御社が「やるべきこと」を整理してご案内します。</div>
+    </details>
+
+    <details class="reveal reveal-delay-2">
+      <summary>名古屋以外でも対応できますか？</summary>
+      <div class="ans">オンラインで全国対応します。名古屋・愛知近郊であれば、直接お伺いしての打ち合わせも可能です。</div>
+    </details>
+
+    <details class="reveal reveal-delay-3">
+      <summary>導入実績はありますか？</summary>
+      <div class="ans">正直にお伝えすると、この記録支援サービスは新しく始めたばかりで、実績の「数」はまだありません。その分、初期のお客様には特に丁寧に、御社に合わせて作り込みます。</div>
+    </details>
+
+    <details class="reveal reveal-delay-4">
+      <summary>本当に1万円からですか？</summary>
+      <div class="ans">会社の規模や記録する項目数によって変わります。無料相談のうえで、金額をはっきり提示してから進めます。見えない追加費用はありません。</div>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     7. FINAL CTA
+════════════════════════════════════════ -->
+<section class="final" id="form" aria-label="お問い合わせ">
+  <div class="wrap">
+    <p class="lead reveal" style="color:rgba(200,255,240,.7)">お問い合わせ</p>
+    <h2 class="reveal reveal-delay-1">7月は、待ってくれません。</h2>
+    <p class="f reveal reveal-delay-2">
+      まずは無料相談で、<br>
+      「今やるべきこと」を一緒に整理しませんか。
+    </p>
+    <div class="contact-pair reveal reveal-delay-3">
+      <a href="tel:09074379549" class="btn btn-navy">
+        📞 電話で相談する
+        <small>090-7437-9549（平日 9:00〜18:00）</small>
+      </a>
+      <a href="mailto:info@kouheikosehira.com?subject=障害者雇用の記録について相談" class="btn">
+        ✉️ メールで相談する
+        <small>info@kouheikosehira.com</small>
+      </a>
+    </div>
+    <p class="cta-note reveal reveal-delay-4" style="color:rgba(210,240,230,.7)">
+      ご相談・お見積もりは無料です。しつこい営業はいたしません。
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <b>小さな会社のDX屋さん</b><br>
+    小齊平 恒平（こせひら こうへい）
+    <div class="sub-line">
+      ✉️ <a href="mailto:info@kouheikosehira.com">info@kouheikosehira.com</a>
+      📞 <a href="tel:09074379549">090-7437-9549</a>
+    </div>
+    <div class="copy">ホームページ・PC業務・アプリ制作｜小さな投資で、業績に直結する改善を。</div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════ -->
+
+<!-- Three.js UMD r160 -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script>
+/* ─────────────────────────────────────────
+   UTILITY: Days until 2026-07-01
+───────────────────────────────────────── */
+(function() {
+  var target = new Date('2026-07-01T00:00:00+09:00');
+  var now = new Date();
+  var diff = Math.max(0, Math.ceil((target - now) / 86400000));
+  var el = document.getElementById('cd-days');
+  if (el) el.querySelector('b').textContent = diff;
+})();
+
+/* ─────────────────────────────────────────
+   SCROLL PROGRESS BAR
+───────────────────────────────────────── */
+(function() {
+  var bar = document.getElementById('progress-bar');
+  function update() {
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var docH = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (docH > 0 ? (scrollTop / docH * 100) : 0) + '%';
+  }
+  window.addEventListener('scroll', update, { passive: true });
+})();
+
+/* ─────────────────────────────────────────
+   INTERSECTION OBSERVER — reveal
+───────────────────────────────────────── */
+(function() {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
+})();
+
+/* ─────────────────────────────────────────
+   WEBGL PARTICLE SYSTEM
+   混沌(散乱) → 秩序(格子)
+───────────────────────────────────────── */
+(function() {
+  'use strict';
+
+  /* --- Reduced motion / WebGL capability check --- */
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+
+  /* Test WebGL support */
+  function isWebGLSupported() {
+    try {
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      return !!(ctx);
+    } catch(e) { return false; }
+  }
+
+  if (!isWebGLSupported()) {
+    document.body.classList.add('no-webgl');
+    return;
+  }
+
+  /* Wait for Three.js to load */
+  function waitThree(cb, tries) {
+    tries = tries || 0;
+    if (window.THREE) { cb(); return; }
+    if (tries > 60) { document.body.classList.add('no-webgl'); return; }
+    setTimeout(function() { waitThree(cb, tries + 1); }, 100);
+  }
+
+  waitThree(function() {
+    var THREE = window.THREE;
+    var canvas = document.getElementById('hero-canvas');
+    var heroEl = canvas.parentElement;
+
+    /* Renderer */
+    var renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      antialias: false,
+      alpha: true,
+      powerPreference: 'low-power'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setClearColor(0x000000, 0);
+
+    /* Scene & Camera */
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, 1, 0.1, 200);
+    camera.position.set(0, 0, 30);
+
+    /* --- Particle count by device --- */
+    var isMobile = window.innerWidth < 700;
+    var COUNT = isMobile ? 900 : 2200;
+
+    /* --- Grid target positions --- */
+    var GRID_COLS = isMobile ? 22 : 40;
+    var GRID_ROWS = isMobile ? 16 : 28;
+    var GRID_W = 28;
+    var GRID_H = 18;
+    var gridPositions = [];
+    for (var r = 0; r < GRID_ROWS; r++) {
+      for (var c = 0; c < GRID_COLS; c++) {
+        if (gridPositions.length >= COUNT) break;
+        gridPositions.push(
+          (c / (GRID_COLS - 1) - 0.5) * GRID_W,
+          (r / (GRID_ROWS - 1) - 0.5) * GRID_H,
+          0
+        );
+      }
+    }
+    /* Fill remainder randomly on the grid plane */
+    while (gridPositions.length < COUNT * 3) {
+      gridPositions.push(
+        (Math.random() - 0.5) * GRID_W,
+        (Math.random() - 0.5) * GRID_H,
+        0
+      );
+    }
+
+    /* --- Initial positions (chaos cloud) --- */
+    var initPos = new Float32Array(COUNT * 3);
+    var targets = new Float32Array(COUNT * 3);
+    for (var i = 0; i < COUNT * 3; i += 3) {
+      var theta = Math.random() * Math.PI * 2;
+      var phi   = Math.acos(2 * Math.random() - 1);
+      var r2    = 20 + Math.random() * 20;
+      initPos[i]   = r2 * Math.sin(phi) * Math.cos(theta);
+      initPos[i+1] = r2 * Math.sin(phi) * Math.sin(theta);
+      initPos[i+2] = (Math.random() - 0.5) * 12;
+
+      targets[i]   = gridPositions[i];
+      targets[i+1] = gridPositions[i+1];
+      targets[i+2] = gridPositions[i+2];
+    }
+
+    /* --- Geometry --- */
+    var geometry = new THREE.BufferGeometry();
+    var positions = new Float32Array(COUNT * 3);
+    var colors    = new Float32Array(COUNT * 3);
+    var sizes     = new Float32Array(COUNT);
+    var phases    = new Float32Array(COUNT);
+
+    for (var j = 0; j < COUNT; j++) {
+      positions[j*3]   = initPos[j*3];
+      positions[j*3+1] = initPos[j*3+1];
+      positions[j*3+2] = initPos[j*3+2];
+
+      /* Base random hue variation per particle: chaos = orange-warm, order = cool teal */
+      var rnd = Math.random();
+      colors[j*3]   = 0.15 + rnd * 0.25;   /* r: some warmth in chaos */
+      colors[j*3+1] = 0.6  + Math.random() * 0.35;
+      colors[j*3+2] = 0.4  + Math.random() * 0.45;
+
+      sizes[j]  = 1.2 + Math.random() * 2.2;
+      phases[j] = Math.random() * Math.PI * 2;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
+
+    /* --- Shader Material --- */
+    var mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime:     { value: 0 },
+        uConv:     { value: 0 },    /* 0=chaos, 1=grid */
+        uMouse:    { value: new THREE.Vector2(0, 0) },
+        uScroll:   { value: 0 }
+      },
+      vertexShader: `
+        uniform float uTime;
+        uniform float uConv;
+        uniform vec2  uMouse;
+        uniform float uScroll;
+        attribute vec3 color;
+        attribute float size;
+        varying vec3 vColor;
+        varying float vAlpha;
+        varying float vConv;
+
+        void main() {
+          vec3 pos = position;
+
+          /* mouse repulsion in chaos phase */
+          vec2 toMouse = pos.xy - uMouse * 16.0;
+          float dist = length(toMouse);
+          float repel = smoothstep(0.0, 4.5, dist);
+          pos.xy += normalize(toMouse + vec2(0.001)) * (1.0 - repel) * 2.2 * (1.0 - uConv);
+
+          /* organic float when chaotic */
+          float chaos = 1.0 - uConv;
+          pos.x += sin(uTime * 0.38 + pos.y * 0.28 + color.r * 6.0) * 0.55 * chaos;
+          pos.y += cos(uTime * 0.32 + pos.x * 0.22 + color.g * 5.0) * 0.45 * chaos;
+          pos.z += sin(uTime * 0.25 + color.b * 4.0) * 1.2 * chaos;
+
+          /* subtle breathing when ordered */
+          pos.z += sin(uTime * 0.8 + color.r * 3.14) * 0.12 * uConv;
+
+          /* scroll parallax */
+          pos.y += uScroll * 2.5;
+
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+
+          /* size: smaller when chaotic, crisp when ordered */
+          float sz = size * (0.55 + uConv * 0.7);
+          gl_PointSize = sz * (32.0 / max(-gl_Position.z, 0.1));
+
+          /* Color transition: warm-mix → pure teal */
+          vec3 chaosColor = color;                              /* original per-particle warm mix */
+          vec3 orderColor = vec3(0.0, 0.85 + color.g * 0.15, 0.65 + color.b * 0.2); /* crisp teal */
+          vColor = mix(chaosColor, orderColor, uConv);
+
+          /* alpha: dim in chaos, bright in order */
+          vAlpha = mix(0.28 + color.r * 0.15, 0.82, uConv * uConv);
+          vConv = uConv;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vAlpha;
+        varying float vConv;
+        void main() {
+          vec2 uv = gl_PointCoord - 0.5;
+          float d = length(uv);
+          if (d > 0.5) discard;
+          /* Soft circle in chaos, sharp glowing dot in order */
+          float softness = mix(0.45, 0.18, vConv);
+          float alpha = smoothstep(0.5, softness, d) * vAlpha;
+          /* Glow ring at outer edge when ordered */
+          float ring = smoothstep(0.48, 0.44, d) * smoothstep(0.36, 0.42, d) * vConv * 0.4;
+          gl_FragColor = vec4(vColor + ring * 0.3, alpha + ring);
+        }
+      `,
+      transparent: true,
+      vertexColors: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+
+    var points = new THREE.Points(geometry, mat);
+    scene.add(points);
+
+    /* --- Grid line overlay (converged state) --- */
+    var gridLineMat = new THREE.LineBasicMaterial({
+      color: 0x00c896, transparent: true, opacity: 0, linewidth: 1
+    });
+    var gridLineGeo = new THREE.BufferGeometry();
+    var lineVerts = [];
+    var step = GRID_W / (GRID_COLS - 1);
+    var stepY = GRID_H / (GRID_ROWS - 1);
+    for (var row = 0; row < GRID_ROWS; row++) {
+      var y = (row / (GRID_ROWS - 1) - 0.5) * GRID_H;
+      lineVerts.push(-GRID_W / 2, y, 0.1);
+      lineVerts.push( GRID_W / 2, y, 0.1);
+    }
+    for (var col = 0; col < GRID_COLS; col++) {
+      var x = (col / (GRID_COLS - 1) - 0.5) * GRID_W;
+      lineVerts.push(x, -GRID_H / 2, 0.1);
+      lineVerts.push(x,  GRID_H / 2, 0.1);
+    }
+    gridLineGeo.setAttribute('position', new THREE.Float32BufferAttribute(lineVerts, 3));
+    var gridLines = new THREE.LineSegments(gridLineGeo, gridLineMat);
+    scene.add(gridLines);
+
+    /* --- State --- */
+    var convTarget = 0;
+    var convCurrent = 0;
+    var mouseNorm = { x: 0, y: 0 };
+    var scrollOffset = 0;
+    var time = 0;
+    var heroH = heroEl.offsetHeight;
+
+    /* Current particle positions (float toward target/init) */
+    var curPositions = new Float32Array(COUNT * 3);
+    for (var k = 0; k < COUNT * 3; k++) curPositions[k] = initPos[k];
+
+    /* Resize */
+    function resize() {
+      var w = heroEl.clientWidth;
+      var h = heroEl.clientHeight;
+      heroH = h;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    /* Mouse / touch */
+    heroEl.addEventListener('mousemove', function(e) {
+      var rect = heroEl.getBoundingClientRect();
+      mouseNorm.x = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
+      mouseNorm.y = -((e.clientY - rect.top)  / rect.height - 0.5) * 2;
+    }, { passive: true });
+    heroEl.addEventListener('touchmove', function(e) {
+      var t = e.touches[0];
+      var rect = heroEl.getBoundingClientRect();
+      mouseNorm.x = ((t.clientX - rect.left) / rect.width  - 0.5) * 2;
+      mouseNorm.y = -((t.clientY - rect.top)  / rect.height - 0.5) * 2;
+    }, { passive: true });
+
+    /* Scroll-driven convergence */
+    window.addEventListener('scroll', function() {
+      var sy = window.scrollY;
+      /* Converge at 20-80% of hero height */
+      var start = heroH * 0.2;
+      var end   = heroH * 0.8;
+      convTarget = Math.max(0, Math.min(1, (sy - start) / (end - start)));
+      scrollOffset = sy / heroH;
+    }, { passive: true });
+
+    /* RAF loop */
+    var rafId;
+    var isVisible = true;
+
+    document.addEventListener('visibilitychange', function() {
+      isVisible = !document.hidden;
+      if (isVisible) raf();
+    });
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function raf() {
+      if (!isVisible) return;
+      rafId = requestAnimationFrame(raf);
+      time += 0.016;
+
+      convCurrent = lerp(convCurrent, convTarget, 0.035);
+
+      /* Update particle positions */
+      var posAttr = geometry.attributes.position;
+      for (var p = 0; p < COUNT; p++) {
+        var pi = p * 3;
+        var targetX = lerp(initPos[pi],   targets[pi],   convCurrent);
+        var targetY = lerp(initPos[pi+1], targets[pi+1], convCurrent);
+        var targetZ = lerp(initPos[pi+2], targets[pi+2], convCurrent);
+        curPositions[pi]   = lerp(curPositions[pi],   targetX, 0.04);
+        curPositions[pi+1] = lerp(curPositions[pi+1], targetY, 0.04);
+        curPositions[pi+2] = lerp(curPositions[pi+2], targetZ, 0.04);
+        posAttr.setXYZ(p, curPositions[pi], curPositions[pi+1], curPositions[pi+2]);
+      }
+      posAttr.needsUpdate = true;
+
+      /* Grid lines fade in when converged */
+      gridLineMat.opacity = Math.max(0, (convCurrent - 0.5) * 2 * 0.22);
+
+      mat.uniforms.uTime.value   = time;
+      mat.uniforms.uConv.value   = convCurrent;
+      mat.uniforms.uMouse.value.set(mouseNorm.x, mouseNorm.y);
+      mat.uniforms.uScroll.value = scrollOffset;
+
+      renderer.render(scene, camera);
+    }
+    raf();
+
+    /* Auto-demo: gently pulse convergence when user hasn't scrolled */
+    var hasScrolled = false;
+    window.addEventListener('scroll', function() { hasScrolled = true; }, { once: true, passive: true });
+    setTimeout(function() {
+      if (!hasScrolled) {
+        /* Animate convergence demo */
+        var demoTime = 0;
+        var demoId = setInterval(function() {
+          demoTime += 0.012;
+          if (demoTime > 1) demoTime = 1;
+          convTarget = Math.sin(demoTime * Math.PI * 0.5);
+          if (demoTime >= 1 || hasScrolled) clearInterval(demoId);
+        }, 16);
+      }
+    }, 1800);
+  });
+})();
+</script>
+</body>
+</html>

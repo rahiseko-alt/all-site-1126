@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphism Tilt Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css?v=3">
+</head>
+<body>
+    <!-- 装飾背景: backdrop-filter のすりガラスが映えるよう背面に被写体を置く -->
+    <div class="bg-orbs" aria-hidden="true">
+        <span class="orb orb-1"></span>
+        <span class="orb orb-2"></span>
+        <span class="orb orb-3"></span>
+        <span class="orb orb-4"></span>
+    </div>
+
+    <header class="hero">
+        <p class="eyebrow">[ GLASSMORPHISM // 3D TILT ]</p>
+        <h1>COGNITIVE<br>MATRIX</h1>
+        <p class="hero-sub">下へスクロール。各カードはすりガラス＋マウス追従スポットライト＋背面パララックス画像＋3D Tilt で構成。</p>
+    </header>
+
+    <section id="capabilities">
+        <div class="capabilities-grid">
+            <!-- Card 1 -->
+            <div class="capability-card-wrapper">
+                <div class="capability-card tilt-card">
+                    <div class="card-glass">
+                        <div class="card-bg-glow"></div>
+                        <div class="card-hover-image-wrapper">
+                            <img class="card-hover-image" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" alt="">
+                        </div>
+                        <div class="card-border-glow"></div>
+                    </div>
+                    <div class="card-tilt-content">
+                        <div class="card-header"><span class="card-num">01 //</span><i data-lucide="brain-circuit" class="card-icon"></i></div>
+                        <h3 class="card-title">Strategy Synthesis</h3>
+                        <p class="card-desc">数十億の市場パターンを同時シミュレートし、現場で使える戦略を描く。</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="capability-card-wrapper">
+                <div class="capability-card tilt-card">
+                    <div class="card-glass">
+                        <div class="card-bg-glow"></div>
+                        <div class="card-hover-image-wrapper">
+                            <img class="card-hover-image" src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=400&q=80" alt="">
+                        </div>
+                        <div class="card-border-glow"></div>
+                    </div>
+                    <div class="card-tilt-content">
+                        <div class="card-header"><span class="card-num">02 //</span><i data-lucide="shield-alert" class="card-icon"></i></div>
+                        <h3 class="card-title">Dynamic Risk Control</h3>
+                        <p class="card-desc">資産・契約・供給網を常時監査し、自動で対策を実行する。</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="capability-card-wrapper">
+                <div class="capability-card tilt-card">
+                    <div class="card-glass">
+                        <div class="card-bg-glow"></div>
+                        <div class="card-hover-image-wrapper">
+                            <img class="card-hover-image" src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80" alt="">
+                        </div>
+                        <div class="card-border-glow"></div>
+                    </div>
+                    <div class="card-tilt-content">
+                        <div class="card-header"><span class="card-num">03 //</span><i data-lucide="cpu" class="card-icon"></i></div>
+                        <h3 class="card-title">Autonomous Action</h3>
+                        <p class="card-desc">エージェント群がリソース配分・最適化を人手なしで処理する。</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="capability-card-wrapper">
+                <div class="capability-card tilt-card">
+                    <div class="card-glass">
+                        <div class="card-bg-glow"></div>
+                        <div class="card-hover-image-wrapper">
+                            <img class="card-hover-image" src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=400&q=80" alt="">
+                        </div>
+                        <div class="card-border-glow"></div>
+                    </div>
+                    <div class="card-tilt-content">
+                        <div class="card-header"><span class="card-num">04 //</span><i data-lucide="workflow" class="card-icon"></i></div>
+                        <h3 class="card-title">Synergetic Interface</h3>
+                        <p class="card-desc">経営の意図と技術実装の橋渡しを、専門用語なしで行う。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="end">— scroll up / down to see fade —</footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+    <script src="js/app.js?v=3"></script>
+</body>
+</html>

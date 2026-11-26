@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Check-out 2026-06-04 (3) — Claude Code 運用近代化 診断</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:900px;margin:0 auto;padding:20px;line-height:1.7;color:#1a1a1a}
+h1{font-size:20px;border-bottom:3px solid #222;padding-bottom:8px}
+h2{font-size:16px;margin-top:24px;background:#222;color:#fff;padding:6px 10px;border-radius:4px}
+.alert{background:#fff0f0;border-left:5px solid #c00;padding:10px 14px;margin:12px 0;border-radius:4px}
+.muted{color:#666;font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}
+th,td{border:1px solid #ccc;padding:5px 8px;text-align:left}
+th{background:#f0f0f0}
+code{background:#f4f4f4;padding:1px 5px;border-radius:3px;font-size:12px}
+.H{color:#c00;font-weight:bold}.M{color:#c80;font-weight:bold}.L{color:#888}
+</style></head><body>
+
+<h1>Check-out 2026-06-04 (3) — Claude Code 運用近代化 診断セッション</h1>
+<p class="muted">branch: master / <b>次セッションは本ファイル先頭から Read 必須</b>。ただし実行計画の正本は <code>operation-modernization-handover.md</code>（@注入 1件目）。</p>
+
+<div class="alert">
+<b>最重要 1 件</b>: 次セッションは <code>docs/session-reports/2026-06-04-operation-modernization-handover.md</code> を最初に Read し、<b>Phase 1-1（27 rules を基幹/作業限定に分類）</b>から着手。ゴール=「規律を軽いロード方式で効かせる・規律内容は不変」。<b>二次の数値（Skills20件キャップ等）を是正根拠に使うな</b>（公式に数値基準なし）。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li>Notion MCP コネクタ「要認証」警告の原因特定（claude.ai config scope）。<b>CLI削除不可</b>と確定 → web手動切断手順を提示（マスター作業待ち・未実施）。</li>
+<li>Claude Code 運用の<b>公式整合性診断</b>を5体並列リサーチで実施（公式docs+GitHub一次+識者二次）。</li>
+<li>vibe-base 現状を実測（CLAUDE.md56行/rules27本1165行/hooks16本/skills28/agents9/auto-memory MEMORY.md121行+153ファイル/settings.local 53KB401件/products17）。</li>
+<li>最新運用 vs 現運用 比較評価表を作成 → マスター指摘で<b>公式/二次を出典階層分離して再評価</b>（前回の二次依存判定を訂正）。</li>
+<li>診断書を<b>Gmail下書き保存</b>（rahiseko宛・件名「【診断書】vibe-base 運用 …」）。</li>
+<li>診断資料+実行計画 一体の<b>引継ぎファイル作成</b> → session-reports配置 + memory.md冒頭 @注入 + P1#1登録。</li>
+<li>過剰ガバナンス実例を発見・記録: 診断ファイルを <code>docs/ops/plans/</code> に置いた瞬間 rules-coverage-gate が SOP3点セット要求 → 診断結論を自己実証 → session-reports へ移設。</li>
+</ol>
+
+<h2>B. 完了 commit 一覧</h2>
+<table><tr><th>hash</th><th>種別</th><th>内容</th></tr>
+<tr><td><code>c4bdc8a4</code></td><td>docs(ops)</td><td>運用近代化 診断書+実行計画を引継ぎ化（@注入記録）。2 files +139/-3</td></tr></table>
+<p class="muted">※ Notion調査タスクは investigation+手動手順提示のみでコミットなし。</p>
+
+<h2>C. 影響波及</h2>
+<p><b>memory.md 冒頭 @注入を 2 段化</b>: ①<code>operation-modernization-handover.md</code>（最優先・実行計画） ②本 checkout-3.html（セッション総括）。P1 は 4 件（#1=運用近代化が新規最上位）。</p>
+
+<h2>D. 残作業</h2>
+<table><tr><th>優先</th><th>項目</th></tr>
+<tr><td class="H">H</td><td>運用近代化 Phase 1-1（27 rules 分類 → マスター承認 → paths:化 → product CLAUDE.md の常時@import削減）</td></tr>
+<tr><td class="H">H</td><td>Notion コネクタ web 切断（マスター手動: claude.ai/settings/connectors → Disconnect）→ 切断後 <code>claude mcp list</code> で消失確認</td></tr>
+<tr><td class="M">M</td><td>design ガバナンス運用化（judge を実案件でマスター判定と突合・75-90%一致で運用化）</td></tr>
+<tr><td class="M">M</td><td>フリノバLP 本体セクション設計（ヒーロー確定済）+ shift-ai 配下正式配置</td></tr>
+<tr><td class="L">L</td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否の決定</td></tr>
+</table>
+
+<h2>E. 配備済 subagent / skill / hook</h2>
+<p>本セッション新規配備なし（既存 research-analyst 5体並列起動のみ）。</p>
+
+<h2>F. 本セッション生成レポート</h2>
+<ul>
+<li><code>docs/session-reports/2026-06-04-operation-modernization-handover.md</code> — 診断資料+実行計画（git tracked・commit済）</li>
+<li>Gmail 下書き（外部）— 診断書メール版</li>
+<li>tmp/ への新規生成なし（注: tmp/ に <code>blender-4.5.10-windows-x64.zip</code> 398MB が前セッション残置・棚卸し候補だが司令塔判断外）</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li><code>operation-modernization-handover.md</code> を Read（@注入で自動ロード）。</li>
+<li>Phase 1-1: 27 rules を「基幹(常時)/作業限定(path-scoped)」に分類 → 分類表をマスター提示 → 承認後 1-2 へ。</li>
+<li>機械検証サマリ（本 Check-out）: シークレット <b>0件</b> / コードレビュー <b>N/A（純docs）</b> / 残差分は全て他product領域（非mine・触るな）。</li>
+</ol>
+
+</body></html>

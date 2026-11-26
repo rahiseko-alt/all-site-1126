@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Style Foundation Slide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+  body {
+    --x: 50%;
+    --y: 50%;
+    --red: #ff2d2d;
+    background: #000;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Hiragino Sans", "Yu Gothic", sans-serif;
+  }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+    background:
+      conic-gradient(from 220deg at 50% 86%, transparent 0deg, rgba(255,255,255,0.12) 48deg, transparent 98deg),
+      radial-gradient(circle at 50% 86%, rgba(255, 255, 255, 0.07), transparent 25rem),
+      #000;
+  }
+
+  .trace {
+    position: fixed;
+    left: var(--x);
+    top: var(--y);
+    width: 130px;
+    height: 130px;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255,255,255,0.2), rgba(255,255,255,0.08) 34%, transparent 66%);
+    filter: blur(14px);
+    mix-blend-mode: screen;
+    opacity: 0.46;
+    z-index: 2;
+  }
+
+  .card-wrap {
+    position: relative;
+    width: min(72vw, 920px);
+    max-width: none;
+    min-height: min(54vh, 520px);
+    display: grid;
+    place-items: center;
+    padding: clamp(36px, 6vw, 80px);
+  }
+
+  .card-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 14% 10% -12% 10%;
+    background:
+      conic-gradient(from 220deg at 50% 128%, transparent 0deg, rgba(255,255,255,0.3) 48deg, transparent 98deg),
+      radial-gradient(circle at 50% 118%, rgba(255,255,255,0.16), rgba(255,255,255,0.04) 30%, transparent 60%);
+    filter: blur(48px);
+    opacity: 0.7;
+    transform: translateY(58px);
+    z-index: -2;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    min-height: 500px;
+    display: grid;
+    grid-template-rows: minmax(150px, 0.46fr) minmax(180px, 0.54fr);
+    gap: clamp(18px, 3vh, 34px);
+    padding: clamp(40px, 5.5vw, 80px);
+    border: 1.5px solid #39ff14;
+    border-radius: 22px;
+    background:
+      linear-gradient(0deg, rgba(255,255,255,0.08), rgba(255,255,255,0.022) 48%, rgba(255,255,255,0.045)),
+      linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025)),
+      rgba(255,255,255,0.028);
+    box-shadow:
+      0 44px 120px rgba(0,0,0,0.72),
+      inset 0 0 18px rgba(57,255,20,0.22),
+      0 0 2px  #fff,
+      0 0 6px  #39ff14,
+      0 0 22px rgba(57,255,20,0.95),
+      0 0 70px rgba(57,255,20,0.7),
+      0 0 140px rgba(57,255,20,0.4),
+      0 0 240px rgba(57,255,20,0.18);
+    backdrop-filter: blur(24px) saturate(140%);
+    overflow: hidden;
+  }
+
+  .card.transitioning .theme-block,
+  .card.transitioning .message-block {
+    transition: opacity 900ms ease;
+  }
+
+  .message-block.sequence-fading {
+    opacity: 0;
+    transition: opacity 440ms ease;
+  }
+
+  .card.pixel-out .theme-block,
+  .card.pixel-out .message-block {
+    opacity: 0;
+  }
+
+  .card.pixel-in .theme-block,
+  .card.pixel-in .message-block {
+    opacity: 0;
+  }
+
+  .slide-number {
+    position: fixed;
+    top: 28px;
+    left: 28px;
+    z-index: 4;
+    margin: 0;
+    color: rgba(255,255,255,0.36);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    transition: opacity 520ms ease;
+  }
+
+  .slide-number.fade { opacity: 0; }
+
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    z-index: 4;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 14px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #ff2d2d;
+    border-radius: 12px;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,0.16), rgba(255,255,255,0.045)),
+      rgba(255,255,255,0.055);
+    color: #fff;
+    cursor: pointer;
+    backdrop-filter: blur(22px) saturate(140%);
+    box-shadow:
+      0 18px 56px rgba(0,0,0,0.62),
+      inset 0 0 10px rgba(255,45,45,0.18),
+      0 0 2px  #fff,
+      0 0 6px  #ff2d2d,
+      0 0 18px rgba(255,45,45,0.9),
+      0 0 50px rgba(255,45,45,0.55),
+      0 0 100px rgba(255,45,45,0.25);
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+  }
+
+  .nav:hover {
+    border-color: rgba(255,255,255,0.34);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06)),
+      rgba(255,255,255,0.075);
+  }
+
+  .nav:active {
+    transform: translateY(1px) scale(0.99);
+    border-color: rgba(255,255,255,0.2);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.025)),
+      rgba(255,255,255,0.045);
+    box-shadow:
+      0 14px 42px rgba(0,0,0,0.66),
+      inset 0 1px 5px rgba(0,0,0,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.14);
+  }
+
+  .nav svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+  }
+
+  .nav-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .nav.back, .nav.home, .nav.prev { position: static; }
+  .nav.next { right: 28px; }
+
+  .nav-cluster {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    z-index: 4;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* ── per-button neon colors ── */
+  .nav.back {
+    border-color: #ff2d2d;
+    box-shadow:
+      0 18px 56px rgba(0,0,0,0.62),
+      inset 0 0 12px rgba(255,45,45,0.22),
+      0 0 2px #fff,
+      0 0 6px #ff2d2d,
+      0 0 20px rgba(255,45,45,0.95),
+      0 0 55px rgba(255,45,45,0.6),
+      0 0 110px rgba(255,45,45,0.28);
+  }
+  .nav.home {
+    border-color: #0080ff;
+    box-shadow:
+      0 18px 56px rgba(0,0,0,0.62),
+      inset 0 0 12px rgba(0,128,255,0.22),
+      0 0 2px #fff,
+      0 0 6px #0080ff,
+      0 0 20px rgba(0,128,255,0.95),
+      0 0 55px rgba(0,128,255,0.6),
+      0 0 110px rgba(0,128,255,0.28);
+  }
+  .nav.prev {
+    border-color: #ff00cc;
+    box-shadow:
+      0 18px 56px rgba(0,0,0,0.62),
+      inset 0 0 12px rgba(255,0,204,0.22),
+      0 0 2px #fff,
+      0 0 6px #ff00cc,
+      0 0 20px rgba(255,0,204,0.95),
+      0 0 55px rgba(255,0,204,0.6),
+      0 0 110px rgba(255,0,204,0.28);
+  }
+  .nav.next {
+    border-color: #ffffff;
+    box-shadow:
+      0 18px 56px rgba(0,0,0,0.62),
+      inset 0 0 12px rgba(255,255,255,0.25),
+      0 0 2px #fff,
+      0 0 8px #fff,
+      0 0 22px rgba(255,255,255,0.95),
+      0 0 60px rgba(255,255,255,0.55),
+      0 0 120px rgba(255,255,255,0.28);
+  }
+
+  /* ── graffiti background ── */
+  .graffiti {
+    position: absolute;
+    inset: -20%;
+    z-index: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Reggae One', 'Hiragino Sans', sans-serif;
+    font-size: clamp(154px, 29.4vw, 420px);
+    gap: 0.1em;
+    font-weight: 400;
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+    text-align: center;
+    transform: rotate(-10deg) skewX(-3deg);
+    -webkit-text-fill-color: #ffffff;
+    filter: drop-shadow(0 0 40px rgba(255,255,255,0.9))
+            drop-shadow(0 0 100px rgba(200,100,255,0.7));
+    opacity: 0.30;
+  }
+  .graffiti span {
+    display: block;
+    white-space: nowrap;
+  }
+  .graffiti span:first-child {
+    transform: translateY(-10%);
+  }
+
+  .side-card {
+    position: fixed;
+    top: var(--card-top, 120px);
+    right: 34px;
+    z-index: 3;
+    width: min(28vw, 360px);
+    height: var(--card-height, 520px);
+    padding: 34px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 22px;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.035)),
+      rgba(255,255,255,0.045);
+    box-shadow:
+      0 44px 120px rgba(0,0,0,0.72),
+      inset 0 1px 0 rgba(255,255,255,0.22),
+      inset 0 -1px 0 rgba(255,255,255,0.08);
+    backdrop-filter: blur(24px) saturate(140%);
+    transform: translateX(calc(100% + 54px));
+    opacity: 0;
+    transition: transform 520ms cubic-bezier(.19,1,.22,1), opacity 260ms ease;
+    overflow: hidden;
+  }
+
+  .side-card.open {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .side-card h2 {
+    margin: 0;
+    color: rgba(255,255,255,0.9);
+    font-size: 24px;
+    line-height: 1.1;
+    font-weight: 760;
+    letter-spacing: 0;
+  }
+
+  .side-card p {
+    margin: 18px 0 0;
+    color: rgba(255,255,255,0.58);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .side-view {
+    position: absolute;
+    inset: 34px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 360ms ease;
+  }
+
+  .side-view.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .source-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .source-link {
+    display: block;
+    padding: 12px 13px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.045);
+    color: rgba(255,255,255,0.76);
+    font-size: 13px;
+    line-height: 1.35;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .source-empty {
+    margin-top: 22px;
+    color: rgba(255,255,255,0.42);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .edit-tools {
+    margin-top: auto;
+    display: grid;
+    gap: 10px;
+  }
+
+  .edit-row {
+    display: grid;
+    gap: 7px;
+  }
+
+  .edit-row label {
+    color: rgba(255,255,255,0.54);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .edit-row input[type="range"] {
+    width: 100%;
+    accent-color: #fff;
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .swatch {
+    height: 38px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .swatch.white { background: #fff; }
+  .swatch.red { background: var(--red); }
+  .swatch.active { outline: 2px solid rgba(255,255,255,0.7); outline-offset: 2px; }
+
+  .tool-button {
+    width: 100%;
+    height: 46px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  }
+
+  .side-bottom {
+    margin-top: auto;
+  }
+
+  .tool-button:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.28); }
+  .tool-button:active { transform: translateY(1px) scale(0.99); }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background:
+      linear-gradient(120deg, transparent 18%, rgba(255,255,255,0.13), transparent 54%);
+    opacity: 0.82;
+    pointer-events: none;
+  }
+
+  .theme-block,
+  .message-block {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .theme-block::before,
+  .message-block::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.16) 0 10px, rgba(255,255,255,0.02) 10px 20px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0 10px, transparent 10px 20px);
+    mix-blend-mode: screen;
+  }
+
+  .theme-block {
+    align-self: start;
+    display: grid;
+    align-content: start;
+    margin-top: -42px;
+    padding-top: 42px;
+  }
+
+  body.debug-blocks .theme-block,
+  body.debug-blocks .message-block {
+    outline: 1px solid rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.035);
+  }
+
+  body.debug-blocks .theme-block {
+    outline: 0;
+    border-right: 1px solid rgba(255,255,255,0.55);
+    border-bottom: 1px solid rgba(255,255,255,0.55);
+    border-left: 1px solid rgba(255,255,255,0.55);
+  }
+
+  body.debug-blocks .theme-block::after,
+  body.debug-blocks .message-block::after {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  body.debug-blocks .theme-block::after { content: "THEME"; }
+  body.debug-blocks .message-block::after { content: "MESSAGE"; }
+
+  .message-block {
+    display: grid;
+    align-content: start;
+    margin-top: -64px;
+    padding-top: 64px;
+    padding-bottom: 18px;
+    transition: opacity 440ms ease;
+  }
+
+  .media-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .media-item {
+    position: absolute;
+    left: 0;
+    top: 0;
+    max-width: none;
+    user-select: none;
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  .media-item img,
+  .media-item video {
+    display: block;
+    width: min(320px, 48vw);
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 12px;
+  }
+
+  body.edit-mode .theme-block,
+  body.edit-mode .message-block {
+    outline: 1px solid rgba(255,255,255,0.34);
+    background: rgba(255,255,255,0.025);
+  }
+
+  body.edit-mode .theme-block.selected,
+  body.edit-mode .message-block.selected {
+    outline-color: rgba(255,255,255,0.72);
+  }
+
+  body.edit-mode .theme-block h1,
+  body.edit-mode .message-block p {
+    cursor: text;
+  }
+
+  body.edit-mode .theme-block h1 span,
+  body.edit-mode .message-block p span {
+    display: inline;
+  }
+
+  body.edit-mode .message-block {
+    cursor: copy;
+  }
+
+  body.edit-mode .media-layer {
+    pointer-events: auto;
+  }
+
+  body.edit-mode .media-item {
+    cursor: grab;
+  }
+
+  body.edit-mode .media-item:active {
+    cursor: grabbing;
+  }
+
+  body.edit-mode .media-item.selected::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border: 1px solid rgba(255,255,255,0.56);
+    border-radius: 16px;
+    pointer-events: none;
+  }
+
+  .theme-block h1,
+  .message-block p {
+    margin: 0;
+    letter-spacing: 0;
+  }
+
+  .theme-block h1 {
+    max-width: 840px;
+    font-size: clamp(40px, 5.4vw, 76px);
+    line-height: 0.96;
+    font-weight: 800;
+  }
+
+  .compact-title {
+    display: inline-block;
+    font-size: 0.74em;
+    white-space: nowrap;
+  }
+
+  .agent-title {
+    display: inline-block;
+    font-size: 0.58em;
+    white-space: nowrap;
+  }
+
+  .supercar-title {
+    display: inline-block;
+    font-size: 0.62em;
+    white-space: nowrap;
+  }
+
+  .leak-title {
+    display: inline-block;
+    font-size: 0.56em;
+    white-space: nowrap;
+  }
+
+  .protect-title {
+    display: inline-block;
+    font-size: 0.66em;
+    white-space: nowrap;
+  }
+
+  .message-block p {
+    max-width: 760px;
+    color: var(--red);
+    font-size: clamp(50px, 6.5vw, 92px);
+    line-height: 0.96;
+    font-weight: 800;
+  }
+
+  .message-block p:has(.slide-visual) {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+
+  .slide-visual {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+  }
+
+  .slide-visual img {
+    display: block;
+    width: min(100%, 860px);
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 14px;
+    box-shadow: 0 22px 70px rgba(0,0,0,0.42);
+  }
+
+  .message-block p:has(.point-list) {
+    width: 100%;
+    max-width: none;
+  }
+
+  .point-list {
+    display: grid;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .point-item {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    align-items: baseline;
+    column-gap: 18px;
+    color: rgba(255,255,255,0.94);
+    font-size: clamp(28px, 3.6vw, 50px);
+    line-height: 1.08;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 900ms ease, transform 900ms ease;
+  }
+
+  .point-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .point-number {
+    color: var(--red);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .message-block p:has(.work-list),
+  .message-block p:has(.section-list),
+  .message-block p:has(.agent-list),
+  .message-block p:has(.supercar-line),
+  .message-block p:has(.minimum-list),
+  .message-block p:has(.sequence-line),
+  .message-block p:has(.secret-leak-line),
+  .message-block p:has(.trust-line),
+  .message-block p:has(.git-line),
+  .message-block p:has(.why-git-line),
+  .message-block p:has(.summary-line),
+  .message-block p:has(.closing-line),
+  .message-block p:has(.output-line),
+  .message-block p:has(.procedure-line) {
+    width: 100%;
+    max-width: none;
+  }
+
+  .work-list,
+  .section-list,
+  .agent-list {
+    display: grid;
+    gap: 16px;
+    margin-top: -24px;
+  }
+
+  .work-item,
+  .section-item,
+  .agent-item {
+    display: block;
+    max-width: 720px;
+    color: rgba(255,255,255,0.94);
+    font-size: clamp(30px, 3.9vw, 48px);
+    line-height: 1.08;
+    font-weight: 800;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 900ms ease, transform 900ms ease;
+  }
+
+  .work-item.accent {
+    color: var(--red);
+    font-size: clamp(24px, 2.8vw, 34px);
+  }
+
+  .section-list {
+    gap: 22px;
+  }
+
+  .section-item {
+    max-width: 760px;
+    font-size: clamp(30px, 3.7vw, 48px);
+  }
+
+  .section-item.accent {
+    color: var(--red);
+    font-size: clamp(24px, 2.8vw, 34px);
+  }
+
+  .agent-list {
+    gap: 12px;
+    margin-top: -50px;
+    margin-left: clamp(58px, 8vw, 96px);
+  }
+
+  .agent-item {
+    max-width: 760px;
+    font-size: clamp(24px, 2.85vw, 34px);
+  }
+
+  .agent-item.accent {
+    color: var(--red);
+    font-size: clamp(20px, 2.25vw, 28px);
+    line-height: 1.05;
+  }
+
+  .supercar-line {
+    display: block;
+    max-width: 780px;
+    margin-top: -22px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(28px, 3.45vw, 46px);
+    line-height: 1.12;
+  }
+
+  .supercar-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .minimum-list {
+    display: grid;
+    gap: 22px;
+    margin: -16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .minimum-item {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    align-items: baseline;
+    column-gap: 18px;
+    color: rgba(255,255,255,0.96);
+    font-size: clamp(34px, 4.5vw, 62px);
+    line-height: 1;
+    font-weight: 800;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 900ms ease, transform 900ms ease;
+  }
+
+  .minimum-number {
+    color: var(--red);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sequence-line {
+    display: block;
+    max-width: 780px;
+    margin-top: -18px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(32px, 4.05vw, 56px);
+    line-height: 1.08;
+    font-weight: 800;
+  }
+
+  .sequence-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .secret-leak-line {
+    display: block;
+    max-width: 780px;
+    margin-top: -12px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(32px, 4.05vw, 56px);
+    line-height: 1.08;
+    font-weight: 800;
+  }
+
+  .secret-leak-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .trust-line {
+    display: block;
+    max-width: 780px;
+    margin-top: 4px;
+    color: var(--red);
+    font-size: clamp(38px, 5vw, 68px);
+    line-height: 1.02;
+    font-weight: 800;
+  }
+
+  .git-line {
+    display: block;
+    max-width: 780px;
+    margin-top: -10px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(36px, 4.6vw, 62px);
+    line-height: 1.05;
+    font-weight: 800;
+  }
+
+  .git-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .why-git-line {
+    display: block;
+    max-width: 790px;
+    margin-top: -22px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(30px, 3.65vw, 48px);
+    line-height: 1.08;
+    font-weight: 800;
+  }
+
+  .why-git-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .summary-line {
+    display: block;
+    max-width: 780px;
+    margin-top: -4px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(38px, 4.8vw, 66px);
+    line-height: 1.04;
+    font-weight: 800;
+  }
+
+  .summary-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .closing-line {
+    display: block;
+    max-width: 780px;
+    margin-top: -6px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(40px, 5.1vw, 70px);
+    line-height: 1.02;
+    font-weight: 800;
+  }
+
+  .closing-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .output-line {
+    display: block;
+    max-width: 790px;
+    margin-top: -18px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(31px, 3.9vw, 52px);
+    line-height: 1.1;
+    font-weight: 800;
+  }
+
+  .output-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .procedure-line {
+    display: block;
+    max-width: 790px;
+    margin-top: -24px;
+    color: rgba(255,255,255,0.95);
+    font-size: clamp(28px, 3.55vw, 46px);
+    line-height: 1.1;
+    font-weight: 800;
+  }
+
+  .procedure-line strong {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .reveal-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 720px) {
+    .card-wrap { width: 92vw; padding: 20px; }
+    .card { min-height: 62vh; border-radius: 18px; grid-template-rows: auto 1fr; }
+    .trace { width: 100px; height: 100px; }
+    .side-card { width: calc(100vw - 40px); right: 20px; padding: 28px; }
+  }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="graffiti" aria-hidden="true"><span>ゆるっと</span><span>作業会岐阜</span></div>
+  <div class="trace"></div>
+  <p class="slide-number">01</p>
+  <div class="nav-cluster">
+    <button class="nav back" type="button" aria-label="Back slide">
+      <span class="nav-label">Back</span>
+    </button>
+    <button class="nav home" type="button" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+        <path d="M4 11.5 12 5l8 6.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6.5 10.5V19h11v-8.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="nav prev" type="button" aria-label="Next slide">
+      <span class="nav-label">Next</span>
+    </button>
+  </div>
+  <button class="nav next" type="button" aria-label="Open detail panel" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <path d="M9 18h6" stroke-linecap="round"/>
+      <path d="M10 21h4" stroke-linecap="round"/>
+      <path d="M8.5 14.5c0-1.8-2-3.1-2-5.7A5.5 5.5 0 0 1 12 3.3a5.5 5.5 0 0 1 5.5 5.5c0 2.6-2 3.9-2 5.7 0 .9-.7 1.5-1.6 1.5h-3.8c-.9 0-1.6-.6-1.6-1.5Z" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <aside class="side-card" aria-hidden="true">
+    <div class="side-view source-view active">
+      <h2>ソース一覧</h2>
+      <div class="source-list"></div>
+      <p class="source-empty">このページの参照URLはまだありません。</p>
+      <div class="side-bottom">
+        <button class="tool-button open-edit" type="button">Edit</button>
+      </div>
+    </div>
+    <div class="side-view edit-view">
+      <h2>Edit</h2>
+      <p>テキストは選択範囲ごとに調整できます。画像や動画はメッセージブロックへドロップ。</p>
+      <div class="edit-tools">
+        <button class="tool-button edit-toggle" type="button">Done</button>
+        <div class="edit-row">
+          <label for="fontSize">Selection size</label>
+          <input id="fontSize" class="font-size" type="range" min="36" max="116" value="76">
+        </div>
+        <div class="edit-row">
+          <label>Color</label>
+          <div class="swatches">
+            <button class="swatch white" type="button" data-color="#ffffff" aria-label="White"></button>
+            <button class="swatch red" type="button" data-color="#ff2d2d" aria-label="Red"></button>
+          </div>
+        </div>
+        <button class="tool-button reset-edits" type="button">Reset edits</button>
+      </div>
+    </div>
+  </aside>
+  <section class="card-wrap">
+    <article class="card">
+      <div class="theme-block">
+        <h1></h1>
+      </div>
+      <div class="message-block">
+        <p></p>
+        <div class="media-layer" aria-hidden="true"></div>
+      </div>
+    </article>
+  </section>
+</main>
+<script>
+  const root = document.body;
+  const card = document.querySelector(".card");
+  const slideNumber = document.querySelector(".slide-number");
+  const backButton = document.querySelector(".nav.back");
+  const homeButton = document.querySelector(".nav.home");
+  const slideNextButton = document.querySelector(".nav.prev");
+  const panelButton = document.querySelector(".nav.next");
+  const sideCard = document.querySelector(".side-card");
+  const sourceView = document.querySelector(".source-view");
+  const editView = document.querySelector(".edit-view");
+  const sourceList = document.querySelector(".source-list");
+  const sourceEmpty = document.querySelector(".source-empty");
+  const openEdit = document.querySelector(".open-edit");
+  const editToggle = document.querySelector(".edit-toggle");
+  const resetEdits = document.querySelector(".reset-edits");
+  const themeText = document.querySelector(".theme-block h1");
+  const themeBlock = document.querySelector(".theme-block");
+  const messageBlock = document.querySelector(".message-block");
+  const messageText = document.querySelector(".message-block p");
+  const mediaLayer = document.querySelector(".media-layer");
+  const fontSize = document.querySelector(".font-size");
+  const swatches = [...document.querySelectorAll(".swatch")];
+  const storageKey = "apple-slide-01";
+  const slides = [
+    { number: "01", theme: "", message: "", sources: [] },
+    { number: "02", theme: "", message: "", sources: [] },
+    { number: "03", theme: "", message: "", sources: [] },
+  ];
+  let slideIndex = 0;
+  const requestedSlide = Number(new URLSearchParams(location.search).get("slide"));
+  if (Number.isInteger(requestedSlide) && requestedSlide >= 1 && requestedSlide <= slides.length) {
+    slideIndex = requestedSlide - 1;
+  }
+  const params = new URLSearchParams(location.search);
+  const requestedStep = Number(params.get("step"));
+  let selectedText = messageText;
+  let selectedRange = null;
+  let selectedMedia = null;
+  let dragState = null;
+  function getRevealStart(index) {
+    return slides[index]?.initialReveal || 0;
+  }
+
+  let revealIndex = getRevealStart(slideIndex);
+  if (params.has("step") && Number.isInteger(requestedStep) && requestedStep >= 0) {
+    revealIndex = requestedStep;
+  }
+  let tx = innerWidth / 2;
+  let ty = innerHeight / 2;
+  let x = tx;
+  let y = ty;
+  let sequenceBusy = false;
+
+  addEventListener("pointermove", (event) => {
+    tx = event.clientX;
+    ty = event.clientY;
+    if (!dragState) return;
+    const item = dragState.item;
+    const nx = dragState.startX + event.clientX - dragState.pointerX;
+    const ny = dragState.startY + event.clientY - dragState.pointerY;
+    item.dataset.x = String(nx);
+    item.dataset.y = String(ny);
+    applyMediaTransform(item);
+  });
+
+  addEventListener("pointerup", () => {
+    if (!dragState) return;
+    dragState.item.releasePointerCapture?.(dragState.pointerId);
+    dragState = null;
+    saveState();
+  });
+
+  addEventListener("keydown", (event) => {
+    if (!root.classList.contains("edit-mode")) return;
+    if (!selectedMedia) return;
+    if (event.key !== "Delete" && event.key !== "Backspace") return;
+    event.preventDefault();
+    selectedMedia.remove();
+    selectedMedia = null;
+    saveState();
+  });
+
+  function syncSideCard() {
+    const rect = card.getBoundingClientRect();
+    root.style.setProperty("--card-top", rect.top + "px");
+    root.style.setProperty("--card-height", rect.height + "px");
+  }
+
+  panelButton.addEventListener("click", () => {
+    const open = !sideCard.classList.contains("open");
+    sideCard.classList.toggle("open", open);
+    sideCard.setAttribute("aria-hidden", String(!open));
+    panelButton.setAttribute("aria-expanded", String(open));
+  });
+
+  if (new URLSearchParams(location.search).get("panel") === "open") {
+    sideCard.classList.add("open");
+    sideCard.setAttribute("aria-hidden", "false");
+    panelButton.setAttribute("aria-expanded", "true");
+  }
+
+  addEventListener("resize", syncSideCard);
+  syncSideCard();
+
+  if (new URLSearchParams(location.search).get("debug") === "blocks") {
+    root.classList.add("debug-blocks");
+  }
+
+  function loadState() {
+    if (slideIndex !== 0) return;
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    const legacyDefaultMessage = "HTMLでスライド資料を作ろう";
+    if (saved.theme) themeText.innerHTML = saved.theme;
+    if (saved.message && saved.message !== legacyDefaultMessage) messageText.innerHTML = saved.message;
+    if (saved.themeStyle) applyTextStyle(themeText, saved.themeStyle);
+    if (saved.messageStyle) applyTextStyle(messageText, saved.messageStyle);
+    if (Array.isArray(saved.media)) {
+      saved.media.forEach((item) => {
+        if (item.type === "image" && item.src) addMediaItem(item.src, "image", item);
+      });
+    }
+  }
+
+  function saveState() {
+    if (slideIndex !== 0) return;
+    const media = [...mediaLayer.querySelectorAll(".media-item")].map((item) => ({
+      type: item.dataset.type,
+      src: item.dataset.persist === "true" ? item.dataset.src : "",
+      x: Number(item.dataset.x || 0),
+      y: Number(item.dataset.y || 0),
+      scale: Number(item.dataset.scale || 1)
+    })).filter((item) => item.type === "image" && item.src);
+    localStorage.setItem(storageKey, JSON.stringify({
+      theme: themeText.innerHTML,
+      message: messageText.innerHTML,
+      themeStyle: getTextStyle(themeText),
+      messageStyle: getTextStyle(messageText),
+      media
+    }));
+  }
+
+  function restoreSelection() {
+    const saved = selectedRange;
+    if (!saved) return false;
+    const selection = getSelection();
+    selection.removeAllRanges();
+    selection.addRange(saved);
+    return true;
+  }
+
+  function setEditMode(on) {
+    root.classList.toggle("edit-mode", on);
+    themeText.contentEditable = String(on);
+    messageText.contentEditable = String(on);
+    editToggle.textContent = on ? "Done" : "Back to sources";
+    if (!on) {
+      selectedMedia?.classList.remove("selected");
+      selectedMedia = null;
+      saveState();
+    }
+  }
+
+  function showSideView(mode) {
+    const editing = mode === "edit";
+    sourceView.classList.toggle("active", !editing);
+    editView.classList.toggle("active", editing);
+    setEditMode(editing);
+  }
+
+  function renderCurrentSlide() {
+    themeText.innerHTML = slides[slideIndex].theme;
+    messageText.innerHTML = getCurrentMessage();
+    mediaLayer.innerHTML = "";
+    slideNumber.textContent = slides[slideIndex].number;
+    applyRevealState();
+  }
+
+  function getCurrentMessage() {
+    const slide = slides[slideIndex];
+    if (!slide.sequence) return slide.message;
+    const index = Math.max(0, Math.min(revealIndex, slide.sequence.length - 1));
+    return slide.sequence[index];
+  }
+
+  function applyRevealState() {
+    const items = [...messageText.querySelectorAll(".reveal-item")];
+    items.forEach((item, index) => {
+      item.classList.toggle("visible", index < revealIndex);
+    });
+  }
+
+  async function revealNextPoint() {
+    const items = [...messageText.querySelectorAll(".reveal-item")];
+    if (!items.length || revealIndex >= items.length) return false;
+    revealIndex += 1;
+    applyRevealState();
+    return true;
+  }
+
+  async function stepSequence(direction) {
+    const slide = slides[slideIndex];
+    if (!slide.sequence || sequenceBusy) return false;
+    const nextIndex = revealIndex + direction;
+    if (nextIndex < 0 || nextIndex >= slide.sequence.length) return false;
+    sequenceBusy = true;
+    messageBlock.classList.add("sequence-fading");
+    await wait(460);
+    revealIndex = nextIndex;
+    messageText.innerHTML = getCurrentMessage();
+    messageBlock.classList.remove("sequence-fading");
+    await wait(460);
+    sequenceBusy = false;
+    return true;
+  }
+
+  function renderSources() {
+    const sources = slides[slideIndex].sources || [];
+    sourceList.innerHTML = "";
+    sourceEmpty.hidden = sources.length > 0;
+    for (const source of sources) {
+      const link = document.createElement("a");
+      link.className = "source-link";
+      link.href = source.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = source.label || source.url;
+      sourceList.appendChild(link);
+    }
+  }
+
+  function getTextStyle(el) {
+    return {
+      fontSize: el.style.fontSize || "",
+      color: el.style.color || ""
+    };
+  }
+
+  function applyTextStyle(el, style) {
+    if (style.fontSize) el.style.fontSize = style.fontSize;
+    if (style.color) el.style.color = style.color;
+  }
+
+  function selectText(el) {
+    selectedText = el;
+    themeBlock.classList.toggle("selected", el === themeText);
+    messageBlock.classList.toggle("selected", el === messageText);
+    const computed = getComputedStyle(el);
+    fontSize.value = String(Math.round(parseFloat(computed.fontSize)));
+    swatches.forEach((button) => {
+      const isRed = computed.color === "rgb(255, 45, 45)";
+      button.classList.toggle("active", isRed ? button.dataset.color === "#ff2d2d" : button.dataset.color === "#ffffff");
+    });
+  }
+
+  function selectionInsideEditable() {
+    const selection = getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+    const range = selection.getRangeAt(0);
+    if (!selectedText.contains(range.commonAncestorContainer)) return null;
+    return range;
+  }
+
+  function applyToSelection(style) {
+    if (!restoreSelection()) return;
+    const range = selectionInsideEditable();
+    if (!range) {
+      if (style.fontSize) selectedText.style.fontSize = style.fontSize;
+      if (style.color) selectedText.style.color = style.color;
+      saveState();
+      return;
+    }
+    const span = document.createElement("span");
+    Object.assign(span.style, style);
+    span.appendChild(range.extractContents());
+    range.insertNode(span);
+    const selection = getSelection();
+    selection.removeAllRanges();
+    const nextRange = document.createRange();
+    nextRange.selectNodeContents(span);
+    selection.addRange(nextRange);
+    selectedRange = nextRange.cloneRange();
+    saveState();
+  }
+
+  function applyMediaTransform(item) {
+    item.style.transform = `translate(${item.dataset.x || 0}px, ${item.dataset.y || 0}px) scale(${item.dataset.scale || 1})`;
+  }
+
+  function addMediaItem(src, type, state = {}) {
+    const item = document.createElement("div");
+    item.className = "media-item";
+    item.dataset.type = type;
+    item.dataset.src = src;
+    item.dataset.persist = type === "image" ? "true" : "false";
+    item.dataset.x = String(state.x ?? 40);
+    item.dataset.y = String(state.y ?? 40);
+    item.dataset.scale = String(state.scale ?? 1);
+
+    const media = document.createElement(type === "video" ? "video" : "img");
+    media.src = src;
+    if (type === "video") {
+      media.controls = true;
+      media.loop = true;
+      media.muted = true;
+      media.playsInline = true;
+    }
+    item.appendChild(media);
+    mediaLayer.appendChild(item);
+    applyMediaTransform(item);
+
+    item.addEventListener("pointerdown", (event) => {
+      if (!root.classList.contains("edit-mode")) return;
+      event.preventDefault();
+      selectedMedia?.classList.remove("selected");
+      selectedMedia = item;
+      item.classList.add("selected");
+      item.setPointerCapture(event.pointerId);
+      dragState = {
+        item,
+        pointerId: event.pointerId,
+        pointerX: event.clientX,
+        pointerY: event.clientY,
+        startX: Number(item.dataset.x || 0),
+        startY: Number(item.dataset.y || 0)
+      };
+    });
+
+    item.addEventListener("wheel", (event) => {
+      if (!root.classList.contains("edit-mode")) return;
+      event.preventDefault();
+      selectedMedia?.classList.remove("selected");
+      selectedMedia = item;
+      item.classList.add("selected");
+      const next = Math.max(0.18, Math.min(4, Number(item.dataset.scale || 1) + (event.deltaY < 0 ? 0.08 : -0.08)));
+      item.dataset.scale = String(next);
+      applyMediaTransform(item);
+      saveState();
+    }, { passive: false });
+  }
+
+  function handleDrop(event) {
+    if (!root.classList.contains("edit-mode")) return;
+    event.preventDefault();
+    const file = event.dataTransfer.files?.[0];
+    if (!file || (!file.type.startsWith("image/") && !file.type.startsWith("video/"))) return;
+    const rect = messageBlock.getBoundingClientRect();
+    const type = file.type.startsWith("video/") ? "video" : "image";
+    const reader = new FileReader();
+    reader.onload = () => {
+      addMediaItem(reader.result, type, {
+        x: event.clientX - rect.left - 120,
+        y: event.clientY - rect.top - 80,
+        scale: 1
+      });
+      saveState();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  openEdit.addEventListener("click", () => showSideView("edit"));
+  editToggle.addEventListener("click", () => showSideView("source"));
+  resetEdits.addEventListener("click", () => {
+    localStorage.removeItem(storageKey);
+    location.reload();
+  });
+  backButton.addEventListener("click", () => {
+    if (slides[slideIndex].sequence && revealIndex > 0) {
+      stepSequence(-1);
+      return;
+    }
+    if (slides[slideIndex].reveal && revealIndex > getRevealStart(slideIndex)) {
+      revealIndex -= 1;
+      applyRevealState();
+      return;
+    }
+    goSlide(-1);
+  });
+  slideNextButton.addEventListener("click", async () => {
+    if (slides[slideIndex].sequence && await stepSequence(1)) return;
+    if (slides[slideIndex].reveal && await revealNextPoint()) return;
+    goSlide(1);
+  });
+  homeButton.addEventListener("click", () => {
+    location.href = "../number-octahedron.html";
+  });
+  themeText.addEventListener("input", saveState);
+  messageText.addEventListener("input", saveState);
+  document.addEventListener("selectionchange", () => {
+    const selection = getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
+    const range = selection.getRangeAt(0);
+    if (themeText.contains(range.commonAncestorContainer)) {
+      selectText(themeText);
+      selectedRange = range.cloneRange();
+    }
+    if (messageText.contains(range.commonAncestorContainer)) {
+      selectText(messageText);
+      selectedRange = range.cloneRange();
+    }
+  });
+  themeBlock.addEventListener("pointerdown", () => selectText(themeText));
+  messageBlock.addEventListener("pointerdown", (event) => {
+    if (!event.target.closest(".media-item")) selectText(messageText);
+  });
+  fontSize.addEventListener("input", () => {
+    applyToSelection({ fontSize: fontSize.value + "px" });
+  });
+  swatches.forEach((button) => {
+    button.addEventListener("click", () => {
+      applyToSelection({ color: button.dataset.color });
+      selectText(selectedText);
+    });
+  });
+  messageBlock.addEventListener("dragover", (event) => {
+    if (root.classList.contains("edit-mode")) event.preventDefault();
+  });
+  messageBlock.addEventListener("drop", handleDrop);
+  renderCurrentSlide();
+  loadState();
+  renderSources();
+  selectText(messageText);
+
+  function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function goSlide(direction) {
+    if (card.classList.contains("transitioning")) return;
+    const next = (slideIndex + direction + slides.length) % slides.length;
+    card.classList.add("transitioning", "pixel-out");
+    slideNumber.classList.add("fade");
+    await wait(920);
+    slideIndex = next;
+    revealIndex = getRevealStart(slideIndex);
+    renderCurrentSlide();
+    renderSources();
+    showSideView("source");
+    card.classList.remove("pixel-out");
+    card.classList.add("pixel-in");
+    await wait(80);
+    slideNumber.classList.remove("fade");
+    card.classList.remove("pixel-in");
+    await wait(1040);
+    card.classList.remove("transitioning");
+  }
+
+  function frame() {
+    x += (tx - x) * 0.12;
+    y += (ty - y) * 0.12;
+    root.style.setProperty("--x", x + "px");
+    root.style.setProperty("--y", y + "px");
+    requestAnimationFrame(frame);
+  }
+  frame();
+</script>
+</body>
+</html>

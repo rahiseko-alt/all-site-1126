@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canva エディタ UI/操作モデル — Research Bank</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e4e7;--text2:#9ca3af;--accent:#6366f1;--accent2:#818cf8;--ok:#10b981;--warn:#f59e0b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;max-width:1080px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+h1{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em;}
+h1 span{color:var(--accent2);}
+h2{font-size:1.2rem;margin:2.5rem 0 1rem;padding-bottom:0.4rem;border-bottom:2px solid var(--accent);color:var(--accent2);}
+h3{font-size:1rem;margin:1.5rem 0 0.6rem;}
+p{margin:0.6rem 0;}
+a{color:var(--accent2);word-break:break-all;}
+.meta{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0 1.5rem;font-size:0.85rem;color:var(--text2);display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.4rem 1.5rem;}
+.meta b{color:var(--text);}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:0.82rem;background:var(--surface);border-radius:8px;overflow:hidden;}
+th{background:var(--surface2);color:var(--accent2);padding:0.6rem 0.7rem;text-align:left;font-weight:600;}
+td{padding:0.55rem 0.7rem;border-top:1px solid var(--border);vertical-align:top;}
+ul,ol{margin:0.6rem 0 0.6rem 1.4rem;}
+li{margin:0.35rem 0;}
+.callout{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:0.9rem 1.1rem;margin:1rem 0;}
+.callout.ok{border-left-color:var(--ok);}
+.callout.warn{border-left-color:var(--warn);}
+.tag{display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.7rem;font-weight:600;background:rgba(129,140,248,0.15);color:var(--accent2);}
+.c-hi{color:var(--ok);font-weight:600;} .c-mid{color:var(--warn);font-weight:600;}
+.note{font-size:0.78rem;color:var(--text2);margin-top:0.4rem;}
+</style>
+</head>
+<body>
+
+<h1>Canva <span>エディタ UI/操作モデル</span> 調査</h1>
+<p class="note">スマホ PWA 名刺メーカー設計のための「オブジェクト指向編集」作法。Canva 主・Adobe Express / ラクスル比較</p>
+
+<div class="meta">
+  <div><b>調査日:</b> 2026-06-21</div>
+  <div><b>調査軸:</b> UI/操作モデル</div>
+  <div><b>対象:</b> Canva（主）/ Adobe Express / ラクスル</div>
+  <div><b>タグ:</b> <span class="tag">ui</span> <span class="tag">editor</span></div>
+  <div><b>関連プロダクト:</b> meishi-maker</div>
+  <div style="grid-column:1/-1"><b>再利用:</b> キャンバス系エディタUI設計 / オブジェクト選択・ドラッグ・スナップ / 文脈ツールバー / タッチ編集</div>
+</div>
+
+<div class="callout ok">
+<b>結論:</b> Canva の核心は「全要素がオブジェクトで、<b>選択→ドラッグ移動→隅ハンドルでリサイズ→スマートガイドでスナップ</b>」＋「<b>選択対象で中身が変わる文脈ツールバー</b>」。名刺は要素が少ない（テキスト数個＋画像1＋QR3）ので、この核心だけ取り込めば素人体験は跳ねる。フル Canva は過大。
+</div>
+
+<h2>A. 画面構成（3領域＋文脈ツールバー）<span class="c-hi">確信度 高</span></h2>
+<ul>
+<li><b>左パネル</b>（モバイルは下部フッター）= タブ式ツールボックス: テンプレ / 素材(Elements) / アップロード / テキスト / 写真</li>
+<li><b>中央 = キャンバス</b>（作業領域）</li>
+<li><b>上ツールバー = 文脈依存</b>: 選択対象で中身が変わる（テキスト→フォント/サイズ/色/間隔/配置、画像→画像操作、背景→背景）</li>
+<li>選択要素の直上に<b>フローティングツールバー</b>（複製/削除/ロック/Position 等）</li>
+</ul>
+
+<h2>B. 要素操作モデル（オブジェクト指向）<span class="c-hi">確信度 高</span></h2>
+<ul>
+<li>全要素が「オブジェクト」: タップ/クリックで<b>選択</b>、ドラッグで<b>移動</b></li>
+<li><b>リサイズ</b>: 四隅ハンドルをドラッグ（等比）。テキストは「隅ドラッグ=フォントサイズ」「左右ピルハンドル=ボックス幅」</li>
+<li><b>回転</b>: 回転ハンドル</li>
+<li><b>テキスト編集</b>: ダブルクリック/ダブルタップで編集モード</li>
+<li><b>スマートガイド</b>: 紫の点線で整列を可視化し<b>スナップ</b>。Ctrl 押下で一時無効</li>
+</ul>
+
+<h2>C. 整列・重なり・グループ（Position）<span class="c-hi">確信度 高</span></h2>
+<ul>
+<li><b>Position</b>: 重ね順（前面/背面）、ページ整列、複数選択時の要素間整列・<b>等間隔分配</b></li>
+<li><b>レイヤーパネル</b>: ドラッグで重ね順変更</li>
+<li><b>グループ</b>: Shift 複数選択 → Group（Ctrl+G）でまとめて操作</li>
+<li><b>ロック</b>: 位置ロック（サイズ/色は編集可）</li>
+</ul>
+
+<h2>D. テンプレート起点 <span class="c-hi">確信度 高</span></h2>
+<p>白紙でなくテンプレ選択から開始し、テキスト差し替え・画像配置で完成。ラクスルも同型（テンプレ→編集→「仕上がり確認」→入稿/購入の一本道）。</p>
+
+<h2>E. モバイル/タッチ（本製品の本命）<span class="c-mid">確信度 中〜高</span></h2>
+<ul>
+<li>タップ選択＋ドラッグ移動、<b>隅ドラッグで等比リサイズ</b></li>
+<li>操作系は<b>下部ツールバー（フッター）に集約</b>（position/arrange 等）</li>
+<li>ピンチズーム（キャンバス拡大）</li>
+<li>ダブルタップによるテキスト編集の公式明記は<b>未確認</b>（出典未確定）</li>
+</ul>
+
+<h2>F. Adobe Express 比較 <span class="c-mid">確信度 中</span></h2>
+<p>よりクリーンで雑然としない UI、ワンクリック「クイックアクション」、レイヤー対応、1 テキストボックス内で複数フォントスタイル。Canva は「直感的・ドラッグ＆ドロップ」が代名詞。</p>
+
+<h2>So-What（meishi-maker への適用）</h2>
+<ol>
+<li><b>オブジェクト選択モデル</b>（キャンバス要素をタップ選択）</li>
+<li><b>選択要素の文脈ツールバー</b>（サイズ/色/フォント/整列）</li>
+<li><b>ドラッグ移動＋スマートガイド/スナップ</b>（塗り足し・セーフエリアへスナップ＝入稿品質に直結）</li>
+<li><b>タッチ最適化</b>（下部ツールバー・ピンチ）</li>
+</ol>
+<div class="callout warn">
+現プロトタイプは「固定グリッドにフォーム入力を流し込む」型で、上記核心（選択して直接操作）が欠落。要素数が少ない名刺なら<b>限定オブジェクト編集</b>（選択・ドラッグ・スナップ・文脈ツールバー）で十分。追加/削除/回転は当面入れない。
+</div>
+
+<h2>ソース</h2>
+<ol>
+<li>Canva Help「Group, layer, and align elements」 <a href="https://www.canva.com/help/layer-group-align/">canva.com</a></li>
+<li>Canva Help「Move elements」 <a href="https://www.canva.com/help/moving-elements/">canva.com</a></li>
+<li>Canva Help「Resize and crop elements precisely」 <a href="https://www.canva.com/help/resize-and-crop/">canva.com</a></li>
+<li>Canva Help「Lock and unlock elements」 <a href="https://www.canva.com/help/lock-and-unlock-elements/">canva.com</a></li>
+<li>Canva Side Panel 解説 <a href="https://www.c-sharpcorner.com/article/canva-sidebar-and-its-tabs-learn-canva/">c-sharpcorner.com</a></li>
+<li>Canva Menubar/Toolbar 解説 <a href="https://www.c-sharpcorner.com/article/exploring-canvas-menubar-and-toolbar/">c-sharpcorner.com</a></li>
+<li>ラクスル オンラインデザイン基本操作 <a href="https://raksul.com/guide/design/online-design/guide-basic/">raksul.com</a></li>
+<li>ラクスル 画像/図形の操作 <a href="https://raksul.com/guide/design/online-design/guide-image/">raksul.com</a></li>
+<li>Adobe Express vs Canva <a href="https://www.stylefactoryproductions.com/blog/adobe-express-vs-canva">stylefactoryproductions.com</a></li>
+<li>Canva mobile 編集（タッチ） <a href="https://support.canva.com/android/objects-android/resize-rotate-element-android">support.canva.com</a></li>
+</ol>
+
+<p class="note" style="margin-top:1.5rem">※ 確信度: 高=複数の公式/解説で一致 / 中=単数ソースまたは間接。タッチ詳細（ダブルタップ編集等）は公式明記未確認のため中。</p>
+
+</body>
+</html>

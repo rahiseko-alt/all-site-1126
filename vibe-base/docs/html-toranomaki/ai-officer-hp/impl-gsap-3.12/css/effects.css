@@ -1,0 +1,232 @@
+/* ----------------------------------------------------
+   9. Connect Section & CTA
+---------------------------------------------------- */
+.connect-inner {
+    background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08) 0%, rgba(0,0,0,0) 60%), var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 120px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.connect-glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(37,99,235,0) 0%, rgba(37,99,235,0.8) 50%, rgba(37,99,235,0) 100%);
+}
+
+.connect-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+.connect-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 50px auto;
+}
+
+.cta-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-giant {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.1s ease-out; /* Magnet transition */
+}
+
+.btn-giant-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.3);
+    transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1), background-color 0.3s;
+}
+
+.btn-giant:hover .btn-giant-bg {
+    transform: scale(1.15);
+    background-color: #1d4ed8;
+}
+
+.btn-giant-text {
+    position: relative;
+    z-index: 2;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: #fff;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* ----------------------------------------------------
+   10. Footer
+---------------------------------------------------- */
+footer {
+    border-top: 1px solid var(--border-color);
+    padding: 60px 0;
+    background-color: var(--bg-dark);
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-small {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.2em;
+    color: #fff;
+}
+
+.copyright {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 10px;
+}
+
+.footer-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.footer-link {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
+.footer-link:hover {
+    color: #fff;
+}
+
+/* ----------------------------------------------------
+   11. Reveal & Animation Utilities
+---------------------------------------------------- */
+/* text reveals will be driven by GSAP */
+.reveal-text {
+    overflow: hidden;
+}
+
+.reveal-text span {
+    display: inline-block;
+    transform: translateY(100%);
+}
+
+.reveal-words {
+    opacity: 0;
+}
+
+.reveal-item {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+/* ----------------------------------------------------
+   12. Responsive Design
+---------------------------------------------------- */
+@media (max-width: 1024px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
+
+    .sticky-title {
+        position: relative;
+        top: 0;
+    }
+
+    .hero-title {
+        font-size: 60px;
+    }
+
+    .capabilities-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 20px;
+    }
+
+    .nav-links {
+        display: none; /* Hide simple nav on mobile for minimalism */
+    }
+
+    .container {
+        padding: 0 20px;
+    }
+
+    .section-padding {
+        padding: 80px 0;
+    }
+
+    .hero-title {
+        font-size: 44px;
+    }
+
+    .text-large {
+        font-size: 20px;
+    }
+
+    .identity-stats {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .connect-inner {
+        padding: 60px 20px;
+    }
+
+    .connect-title {
+        font-size: 36px;
+    }
+
+    .footer-container {
+        flex-direction: column;
+        gap: 30px;
+        text-align: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+    }
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hover Color Buttons</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="stage">
+        <p class="eyebrow">[ HOVER TO REVEAL COLOR ]</p>
+        <h1 class="title">Hover Color<br>Buttons</h1>
+        <p class="lead">各ボタンはホバーで別々のブランド色に点灯する。色は項目ごとに割り当て、Single Source は CSS 変数。</p>
+
+        <!-- ナビ pill: nth-child ごとに別色 -->
+        <nav class="pill-nav" aria-label="demo navigation">
+            <a href="#" class="pill">Identity</a>
+            <a href="#" class="pill">Capabilities</a>
+            <a href="#" class="pill">Interface</a>
+            <a href="#" class="pill pill-cta">Connect</a>
+        </nav>
+
+        <!-- 反転ボタン: 既定アウトライン → ホバーで塗り -->
+        <div class="btn-row">
+            <button class="btn" style="--c:#22d3ee">Workflow</button>
+            <button class="btn" style="--c:#8b5cf6">Backoffice</button>
+            <button class="btn" style="--c:#ec4899">Training</button>
+            <button class="btn" style="--c:#22c55e">Operations</button>
+        </div>
+    </main>
+    <script src="js/app.js"></script>
+</body>
+</html>

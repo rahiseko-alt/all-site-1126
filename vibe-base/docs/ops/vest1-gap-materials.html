@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vest1 ギャップ — ひな形材料一覧</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--text:#1a1a2e;--sub:#64748b;--border:#e2e8f0;
+--green:#166534;--green-bg:#dcfce7;--red:#991b1b;--red-bg:#fee2e2;--blue:#1e40af;--blue-bg:#dbeafe;--yellow:#854d0e;--yellow-bg:#fef9c3;--gray:#94a3b8;--gray-bg:#f1f5f9}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);padding:32px 24px;line-height:1.7}
+.container{max-width:1200px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;margin-bottom:4px}
+.meta{font-size:.85rem;color:var(--sub);margin-bottom:24px}
+.gap-section{background:var(--card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:28px;overflow:hidden}
+.gap-header{padding:14px 24px;font-weight:700;font-size:1.05rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.gap-header.has-material{background:var(--green-bg);color:var(--green);border-left:4px solid var(--green)}
+.gap-header.no-material{background:var(--red-bg);color:var(--red);border-left:4px solid #ef4444}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.73rem;font-weight:700;white-space:nowrap}
+.b-found{background:var(--green-bg);color:var(--green)}
+.b-none{background:var(--red-bg);color:var(--red)}
+.b-file{background:var(--blue-bg);color:var(--blue)}
+.b-partial{background:var(--yellow-bg);color:var(--yellow)}
+.material{padding:16px 24px;border-bottom:1px solid var(--border)}
+.material:last-child{border-bottom:none}
+.material-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.material-path{font-size:.82rem;color:var(--blue);font-family:monospace;word-break:break-all}
+.material-desc{font-size:.85rem;color:var(--sub);margin-bottom:10px}
+.excerpt{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:.8rem;font-family:'Cascadia Code','Consolas',monospace;white-space:pre-wrap;overflow-x:auto;max-height:400px;overflow-y:auto;line-height:1.5}
+.excerpt-label{font-size:.75rem;color:var(--sub);margin-bottom:4px;font-weight:600}
+.summary-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:24px}
+.summary-table th{background:#f8fafc;padding:10px 12px;text-align:left;font-weight:600;color:#475569;border-bottom:2px solid var(--border)}
+.summary-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.note{padding:10px 24px;font-size:.83rem;color:var(--sub);background:#f8fafc}
+@media(max-width:768px){body{padding:16px 8px}.excerpt{font-size:.74rem}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>vest1 ギャップ — ひな形材料一覧</h1>
+<p class="meta">既存プロダクトから見つかった材料。vest1化の素材として使える。 | 2026-04-02</p>
+
+<table class="summary-table">
+<thead><tr><th>#</th><th>ギャップ</th><th>材料</th><th>出典</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>収益モデル+損益計算</td><td><span class="badge b-found">発見</span></td><td>design-seed p0-results.md</td></tr>
+<tr><td>2</td><td>CSS計測表</td><td><span class="badge b-found">発見</span></td><td>foodee css-values.md + design-seed 計測戦略</td></tr>
+<tr><td>3</td><td>即死仮説 検証記録</td><td><span class="badge b-partial">近似</span></td><td>design-seed cl3-failure-scenarios.md</td></tr>
+<tr><td>4</td><td>ログ・監視設計</td><td><span class="badge b-none">なし</span></td><td>—</td></tr>
+<tr><td>5</td><td>性能ベースライン計測</td><td><span class="badge b-none">なし</span></td><td>—</td></tr>
+<tr><td>6</td><td>SEO設定チェックリスト</td><td><span class="badge b-none">なし</span></td><td>—</td></tr>
+<tr><td>7</td><td>免責/利用規約/プライバシー</td><td><span class="badge b-found">発見</span></td><td>ai-concierge terms.html</td></tr>
+<tr><td>8</td><td>集客施策管理表</td><td><span class="badge b-found">発見</span></td><td>design-seed channel-strategy.md</td></tr>
+<tr><td>9</td><td>P4計測ダッシュボード</td><td><span class="badge b-partial">近似</span></td><td>review-analysis CLAUDE.md §KPI</td></tr>
+<tr><td>CL</td><td>CL結果記録テンプレ</td><td><span class="badge b-found">発見</span></td><td>design-seed cl10-security-review.md</td></tr>
+</tbody>
+</table>
+
+<!-- ==================== Gap 1: 収益モデル ==================== -->
+<div class="gap-section">
+<div class="gap-header has-material">
+  <span>Gap 1: 収益モデル+損益計算テンプレ（P0#14-15）</span>
+  <span class="badge b-found">材料あり</span>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典</span><span class="material-path">products/design-seed/p0-results.md — S5: 収益モデル</span></div>
+  <div class="material-desc">3段階課金モデル + 損益分岐点テーブル + 原価率。vest1化する場合、固有名詞を{{}}に置換する。</div>
+  <div class="excerpt-label">抜粋: 課金モデル + 損益分岐点</div>
+  <div class="excerpt">課金モデル
+────────
+無料: プレビューまで（DL不可）
+  → 「これが自分のページになる」を体験させてから課金
+
+クレジットパック（一般ユーザー向け）
+  3回パック:  ¥1,500（¥500/回）
+  10回パック: ¥3,000（¥300/回）
+
+BASEプラン（ECオーナー向け・月額）
+  ¥980/月: 無制限生成
+
+────────
+損益分岐点
+
+| シナリオ | 月間生成数 | 月間売上   | API原価  | 粗利      |
+|----------|-----------|-----------|---------|----------|
+| 最小     | 100回     | ¥15,000  | ¥3,000  | ¥12,000  |
+| 中間     | 500回     | ¥75,000  | ¥15,000 | ¥60,000  |
+| 成長     | 2,000回   | ¥300,000 | ¥63,000 | ¥237,000 |
+
+原価率20%。粗利率80%。
+API従量課金のためユーザーゼロならコストもゼロ。</div>
+</div>
+</div>
+
+<!-- ==================== Gap 2: CSS計測表 ==================== -->
+<div class="gap-section">
+<div class="gap-header has-material">
+  <span>Gap 2: CSS計測表（P1#6a）</span>
+  <span class="badge b-found">材料あり</span>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典1</span><span class="material-path">products/foodee/tmp/clone/css-values.md — SmartNewsモバイルUI模写</span></div>
+  <div class="material-desc">17項目全部が記入済みの実例。これを空欄テンプレに変換すればvest1になる。</div>
+  <div class="excerpt-label">抜粋: 17項目の記入済み例（一部）</div>
+  <div class="excerpt">## 1. html base font-size
+- 16px（ブラウザデフォルト）
+
+## 2. font-family
+- "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Helvetica Neue", Arial, sans-serif
+
+## 3. font-size
+| 要素             | サイズ |
+|------------------|--------|
+| ヘッダーロゴ      | 18px   |
+| タブテキスト      | 13px   |
+| 天気日付数字      | 28px   |
+| 記事タイトル      | 15px   |
+| 記事ソース名      | 11px   |
+
+## 7. 色（テキスト）
+| 用途           | 値       |
+|----------------|----------|
+| ヘッダーロゴ    | #333333  |
+| 記事タイトル    | #222222  |
+| ソース名        | #999999  |
+
+## 10. padding
+| 要素           | 値          |
+|----------------|-------------|
+| ヘッダー内      | 0 12px     |
+| タブバー        | 8px 12px   |
+| 記事アイテム    | 12px 14px  |
+
+… 全17項目 + サムネイルサイズ</div>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典2</span><span class="material-path">products/design-seed/docs/css-measurement-strategy.md — 17項目の定義表</span></div>
+  <div class="material-desc">17項目のチェックリスト（項目名+注意点）。vest1の骨格そのもの。</div>
+  <div class="excerpt-label">抜粋: 17項目定義</div>
+  <div class="excerpt">| #  | 項目              | 注意点                         |
+|----|-------------------|-------------------------------|
+| 1  | html base font-size | rem計算の基準                  |
+| 2  | font-family       | システム/Google/独自の区別       |
+| 3  | font-size         | 要素ごとに個別計測              |
+| 4  | font-weight       | 300-900、要素ごと              |
+| 5  | line-height       | px/rem/%/無単位                |
+| 6  | letter-spacing    | px/em、見出しの詰め             |
+| 7  | 色（テキスト）     | primary/secondary/muted/accent |
+| 8  | 色（背景）         | セクションごと                  |
+| 9  | 色（ボーダー）     | rgba半透明に注意                |
+| 10 | padding           | セクション/カード/ナビ/ボタン    |
+| 11 | margin            | セクション間/カード間/テキスト間 |
+| 12 | gap               | flex/gridのgap値               |
+| 13 | max-width         | コンテナ幅                     |
+| 14 | height            | ナビ/ボタン/カード/ヒーロー     |
+| 15 | border-radius     | 8pxと6pxは見た目が違う         |
+| 16 | box-shadow        | 影の有無と値                   |
+| 17 | opacity           | テキストや画像                  |</div>
+</div>
+</div>
+
+<!-- ==================== Gap 3: 即死仮説検証 ==================== -->
+<div class="gap-section">
+<div class="gap-header has-material">
+  <span>Gap 3: 即死仮説 検証記録テンプレ（P1#9a）</span>
+  <span class="badge b-partial">近似材料</span>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典</span><span class="material-path">products/design-seed/docs/cl3-failure-scenarios.md</span></div>
+  <div class="material-desc">障害シナリオの構造（シナリオ×発生条件×影響×対応×修正状況）は近い。ただし「仮説ID×基準値×実測値×合否」の形式ではない。</div>
+  <div class="excerpt-label">抜粋: 障害シナリオ構造（Gap3に転用可能な部分）</div>
+  <div class="excerpt">## 3. 外部API系 — Gemini
+
+| # | シナリオ      | 発生条件                | ユーザー影響            | 現行対応                  | 追加対応     |
+|---|--------------|------------------------|------------------------|--------------------------|-------------|
+| 3-1 | APIキー未設定 | Vercel環境変数漏れ       | 解析・生成が全て失敗     | try/catch→500→日本語msg  | 問題なし     |
+| 3-2 | RPM超過      | 同時アクセスが無料枠超過  | 429エラー               | 最大3回リトライ実装済み    | 修正済み     |
+| 3-3 | JSONパース失敗 | Geminiが不正JSON返却    | エラー表示              | JSON.parse try/catch済み  | 問題なし     |
+
+優先度サマリ
+| 優先度 | # | シナリオ     | 対応状況                                |
+|--------|---|------------|----------------------------------------|
+| 中     | 2-2 | DB 500MB超過 | generated_html 10KB制限済。P2で定期削除  |
+| 中     | 4-2 | Webhook未到達 | 冪等性チェック実装済。P2でログ監視追加    |
+
+→ vest1化のポイント: 「仮説ID | 計測項目 | 基準値 | 実測値 | 合否」列を追加すれば
+  即死仮説の定量検証記録テンプレになる</div>
+</div>
+</div>
+
+<!-- ==================== Gap 4: ログ・監視設計 ==================== -->
+<div class="gap-section">
+<div class="gap-header no-material">
+  <span>Gap 4: ログ・監視設計テンプレ（P1#9b）</span>
+  <span class="badge b-none">材料なし</span>
+</div>
+<div class="note">既存プロダクトにログ・監視の設計書はなし。v9.0で新設されたタスク。ゼロから作成が必要。</div>
+</div>
+
+<!-- ==================== Gap 5: 性能ベースライン ==================== -->
+<div class="gap-section">
+<div class="gap-header no-material">
+  <span>Gap 5: 性能ベースライン計測表（P1#9c）</span>
+  <span class="badge b-none">材料なし</span>
+</div>
+<div class="note">応答時間・Core Web Vitals等の計測記録は既存プロダクトに存在しない。ゼロから作成が必要。</div>
+</div>
+
+<!-- ==================== Gap 6: SEOチェックリスト ==================== -->
+<div class="gap-section">
+<div class="gap-header no-material">
+  <span>Gap 6: SEO設定チェックリスト（P2#5-8）</span>
+  <span class="badge b-none">材料なし</span>
+</div>
+<div class="note">SEO設定の専用チェックリストは既存プロダクトに存在しない。ゼロから作成が必要。</div>
+</div>
+
+<!-- ==================== Gap 7: 免責/利用規約 ==================== -->
+<div class="gap-section">
+<div class="gap-header has-material">
+  <span>Gap 7: 免責/利用規約/プライバシー テンプレ（P2#13）</span>
+  <span class="badge b-found">材料あり</span>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典</span><span class="material-path">products/ai-concierge/app/public/terms.html — 本番稼働中の法令3部構成</span></div>
+  <div class="material-desc">利用規約(9条) + プライバシーポリシー(5条) + 免責事項。完全な穴埋め式に変換可能。</div>
+  <div class="excerpt-label">抜粋: 3部構成の骨格</div>
+  <div class="excerpt">第1部 — 利用規約
+━━━━━━━━━━
+第1条（サービスの内容）    ← {{サービス説明}}
+第2条（利用プラン）        ← {{プラン一覧: 無料/サブスク/顧客管理型/ソース納品}}
+第3条（アカウントと管理責任）
+第4条（禁止事項）          ← 5項目（法令違反/権利侵害/過負荷/再販売/不正アクセス）
+第5条（サービスの変更・停止・終了）
+第6条（解約）              ← {{解約方法: メール/管理画面}}
+第7条（損害賠償の制限）    ← 過去12ヶ月支払額上限
+第8条（準拠法・管轄裁判所）← 東京地裁
+第9条（規約の変更）
+
+第2部 — プライバシーポリシー
+━━━━━━━━━━━━━━
+第10条（収集する情報）
+  | 情報の種類              | 収集目的         | 保存場所         |
+  | {{メールアドレス}}      | アカウント管理   | {{Supabase(米国)}} |
+  | {{パスワード(ハッシュ)}} | ログイン認証    | {{同上}}          |
+  ...
+
+第11条（情報の利用目的）   ← 4項目
+第12条（第三者提供・外部サービス）
+  | サービス名 | 提供元       | 利用目的        |
+  | {{DB}}    | {{Supabase}} | データベース・認証 |
+  | {{AI}}    | {{Google}}   | AI応答の生成     |
+  ...
+
+第13条（データの保護）     ← ハッシュ化/RLS/SSL
+第14条（データの削除）
+
+第3部 — 免責事項
+━━━━━━━━
+・AI応答の正確性は保証しない
+・外部サービス障害は免責
+・顧客管理型のAPI費用は顧客負担</div>
+</div>
+</div>
+
+<!-- ==================== Gap 8: 集客施策管理表 ==================== -->
+<div class="gap-section">
+<div class="gap-header has-material">
+  <span>Gap 8: 集客施策管理表（P3#1,3）</span>
+  <span class="badge b-found">材料あり</span>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典</span><span class="material-path">products/design-seed/channel-strategy.md</span></div>
+  <div class="material-desc">チャネル選定表（5チャネル×優先度×理由×コスト）+ 施策管理表（5施策×状態）+ 導線設計図 + KPI。vest1化する場合、固有名詞を{{}}に変換。</div>
+  <div class="excerpt-label">抜粋: チャネル選定 + 施策管理</div>
+  <div class="excerpt">## チャネル選定
+| # | チャネル          | 優先度 | 理由                                    | コスト | 初期アクション          |
+|---|------------------|--------|----------------------------------------|--------|----------------------|
+| 1 | Instagram Reels  | ★★★  | ターゲットの利用率最高。入口動画→LP      | 無料   | 入口動画→Reels投稿    |
+| 2 | X (旧Twitter)    | ★★☆  | 既存導線あり。「ノーコード」文脈の投稿→LP | 無料   | 投稿3-5本/週          |
+| 3 | SEO（ブログ/LP）  | ★★☆  | ロングテール。中長期で安定流入            | 無料   | LP公開後にmeta最適化   |
+
+## 施策管理
+| # | 施策                  | チャネル    | 内容                  | 状態       |
+|---|----------------------|------------|----------------------|-----------|
+| A | 入口動画Reels投稿     | Instagram  | 15秒動画→プロフ→LP   | 動画未制作  |
+| B | X投稿シリーズ         | X          | 共感投稿5本           | 下書き未作成 |
+| C | lit.linkに追加        | X→lit.link | UTM付きリンク追加      | 未実施     |
+
+## 導線設計
+Instagram Reels → プロフ → lit.link → LP（UTM: ig_reels）
+X投稿 → Xプロフ → lit.link → LP（UTM: x_organic）
+Google検索 → LP直接（GA4でorganic判定）
+
+## KPI（P4で計測）
+| 指標      | 目標（3ヶ月） | 計測方法           |
+|-----------|-------------|-------------------|
+| LP流入    | 月間500     | GA4               |
+| 登録数    | 200人       | Supabase Auth     |
+| CV率      | 5%          | GA4イベント        |</div>
+</div>
+</div>
+
+<!-- ==================== Gap 9: P4計測ダッシュボード ==================== -->
+<div class="gap-section">
+<div class="gap-header has-material">
+  <span>Gap 9: P4計測ダッシュボード（P4#1-2）</span>
+  <span class="badge b-partial">近似材料</span>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典</span><span class="material-path">products/review-analysis/CLAUDE.md — §KPIセクション</span></div>
+  <div class="material-desc">ステージ別KPI + Go/No-Go基準。計測値の「記録表」ではなく「目標定義」。記録テンプレとしてはGap8のKPI表の方が近い。</div>
+  <div class="excerpt-label">抜粋: ステージ別KPI定義</div>
+  <div class="excerpt">Stage 1: Waitlist >= 100件/月
+Stage 2: WAU >= 30
+Stage 3: MRR >= ¥100K
+
+Go/No-Go: 上記未達ならPivotまたはRetire検討
+
+→ vest1化のポイント: KPI「目標値」と「実測値」を並べる表にする
+  | 指標 | 目標 | 実測(月1) | 実測(月2) | 実測(月3) | 判定 |</div>
+</div>
+</div>
+
+<!-- ==================== Bonus: CL結果記録 ==================== -->
+<div class="gap-section">
+<div class="gap-header has-material">
+  <span>Bonus: CL結果記録テンプレ（全CL共通）</span>
+  <span class="badge b-found">材料あり</span>
+</div>
+<div class="material">
+  <div class="material-header"><span class="badge b-file">出典</span><span class="material-path">products/design-seed/docs/cl10-security-review.md</span></div>
+  <div class="material-desc">CL-10の7項目×結果×検証方法×詳細 + 修正内容（問題/修正/証跡）。CL結果記録のベストプラクティス。</div>
+  <div class="excerpt-label">全文: 検査結果テーブル + 修正記録</div>
+  <div class="excerpt">## 検査結果
+
+| # | チェック項目                     | 結果     | 検証方法                          | 詳細                              |
+|---|--------------------------------|---------|----------------------------------|----------------------------------|
+| 1 | ユーザー入力サニタイズ           | PASS    | Edge ヘッドレス実テスト(4項目全PASS) | URL: new URL()+protocol check    |
+| 2 | APIキー・シークレット露出        | PASS    | ビルド済みバンドルをgrep            | sk_test_, STRIPE_SECRET: 0件     |
+| 3 | 認証・認可                      | 修正済み | コードレビュー                     | AuthorizationヘッダーからJWT検証に変更 |
+| 4 | 外部API通信HTTPS               | PASS    | ソースコード確認                   | 全SDK: HTTPS内部処理              |
+| 5 | CORSポリシー                   | PASS    | 5つのAPI関数をgrep                 | CORS関連設定: 0件                 |
+| 6 | 決済金額改ざん防止              | PASS    | ソースコード確認                   | 金額はサーバー側PLANS辞書で決定    |
+| 7 | npm audit脆弱性                | PASS    | npm audit実行                     | 0 vulnerabilities                |
+
+## 修正内容
+
+### #3 認証バイパス修正（重大）
+問題: download.js が req.body.userId を信頼していた
+修正: Authorization: Bearer &lt;JWT&gt; → supabase.auth.getUser(token) でサーバー側検証
+証跡: download.js / checkout.js / api.js / App.jsx / PricingModal.jsx 変更
+
+### #7 未使用脆弱パッケージ削除
+削除: chromium, puppeteer, puppeteer-core, pg
+結果: 2 low severity → 0 vulnerabilities</div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dify.ai コスト構造 詳細調査レポート（2026年4月）</title>
+<style>
+  :root { --bg: #f8f9fa; --card: #fff; --border: #dee2e6; --primary: #2563eb; --danger: #dc2626; --success: #16a34a; --warn: #d97706; --text: #1e293b; --muted: #64748b; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; border-bottom: 3px solid var(--primary); padding-bottom: 8px; margin-bottom: 6px; }
+  .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+  h2 { font-size: 1.25rem; margin: 32px 0 12px; padding: 6px 12px; background: var(--primary); color: #fff; border-radius: 4px; }
+  h3 { font-size: 1.05rem; margin: 20px 0 8px; color: var(--primary); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; white-space: nowrap; }
+  .highlight { background: #fef3c7; }
+  .danger { background: #fef2f2; }
+  .success { background: #f0fdf4; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 6px; }
+  .tag-fact { background: #dbeafe; color: #1d4ed8; }
+  .tag-estimate { background: #fef3c7; color: #92400e; }
+  .tag-risk { background: #fecaca; color: #991b1b; }
+  .callout { padding: 12px 16px; border-left: 4px solid; border-radius: 0 4px 4px 0; margin: 12px 0; }
+  .callout-warn { border-color: var(--warn); background: #fffbeb; }
+  .callout-danger { border-color: var(--danger); background: #fef2f2; }
+  .callout-success { border-color: var(--success); background: #f0fdf4; }
+  .callout-info { border-color: var(--primary); background: #eff6ff; }
+  ul, ol { padding-left: 20px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  .scenario { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .scenario > div { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .scenario h4 { font-size: 0.95rem; margin-bottom: 8px; }
+  .price { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+  .sources { font-size: 0.8rem; color: var(--muted); margin-top: 32px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .sources a { color: var(--primary); }
+  .label-legend { display: flex; gap: 12px; margin: 8px 0 16px; flex-wrap: wrap; }
+  @media (max-width: 768px) { .scenario { grid-template-columns: 1fr; } body { padding: 12px; } }
+</style>
+</head>
+<body>
+
+<h1>Dify.ai コスト構造 詳細調査レポート</h1>
+<p class="meta">調査日: 2026-04-03 ｜ 目的: ココナラ Dify構築代行サービス出品に向けたコスト構造把握 ｜ 最大懸念: 試作段階での無料枠枯渇リスク</p>
+
+<div class="label-legend">
+  <span class="tag tag-fact">実データ</span> 公式サイト・ドキュメントから確認した数値
+  <span class="tag tag-estimate">推測</span> 複数ソースからの推定値
+  <span class="tag tag-risk">リスク</span> 要注意事項
+</div>
+
+<!-- ============================================ -->
+<h2>1. Dify Cloud 料金プラン比較</h2>
+<!-- ============================================ -->
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>Sandbox（無料）</th>
+      <th>Professional</th>
+      <th>Team</th>
+      <th>Enterprise</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>月額料金</strong></td>
+      <td>$0</td>
+      <td><strong>$59/月</strong>（年払い $49/月）</td>
+      <td><strong>$159/月</strong>（年払い $132/月）</td>
+      <td>要問合せ</td>
+    </tr>
+    <tr class="highlight">
+      <td><strong>メッセージクレジット</strong></td>
+      <td>200回（一括付与）<br><small>※毎月リセット説あり（後述）</small></td>
+      <td>5,000/月</td>
+      <td>10,000/月</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>アプリ数上限</strong></td>
+      <td>5</td>
+      <td>50</td>
+      <td>200</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>チームメンバー</strong></td>
+      <td>1名</td>
+      <td>3名</td>
+      <td>50名</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>ナレッジベース文書数</strong></td>
+      <td>50件</td>
+      <td>500件</td>
+      <td>1,000件</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>ナレッジベース容量</strong></td>
+      <td>50MB</td>
+      <td>5GB</td>
+      <td>20GB</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>ナレッジベースリクエスト</strong></td>
+      <td>10回/分</td>
+      <td>100回/分</td>
+      <td>1,000回/分</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>トリガーイベント</strong></td>
+      <td>3,000</td>
+      <td>20,000/月</td>
+      <td>無制限</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>ワークフロー内トリガー</strong></td>
+      <td>2つまで</td>
+      <td>無制限</td>
+      <td>無制限</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>アノテーション</strong></td>
+      <td>10件</td>
+      <td>2,000件</td>
+      <td>5,000件</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>ログ履歴</strong></td>
+      <td>30日</td>
+      <td>無制限</td>
+      <td>無制限</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>APIレート制限</strong></td>
+      <td>5,000回/月</td>
+      <td>無制限</td>
+      <td>無制限</td>
+      <td>無制限</td>
+    </tr>
+    <tr>
+      <td><strong>ドキュメント処理</strong></td>
+      <td>Standard</td>
+      <td>Priority</td>
+      <td>Top Priority</td>
+      <td>Top Priority</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout-warn">
+  <strong>メッセージクレジットの仕組み（要注意）</strong><span class="tag tag-fact">実データ</span><br>
+  <ul>
+    <li>Sandboxの200クレジットは「one-time（一括付与）」と公式に記載</li>
+    <li>一方、Difyコミュニティフォーラムでは「毎月カレンダー月でリセットされる」との回答もある</li>
+    <li><strong>自分のAPIキーを接続すれば、クレジットを消費せずにLLMを使用可能</strong>（OpenAI等のアカウントに直接課金される）</li>
+    <li>つまり、無料枠のクレジット = Difyが提供するOpenAI試用枠。自前APIキーなら実質無関係</li>
+  </ul>
+</div>
+
+<div class="callout callout-success">
+  <strong>最重要発見: 自前APIキーでクレジット制限を回避可能</strong><span class="tag tag-fact">実データ</span><br>
+  Sandboxプランでも自分のOpenAI/Anthropic APIキーを接続すれば、200クレジット制限はLLM呼び出しに対しては実質的に無効化される。
+  ただし、<strong>アプリ数5個・ナレッジベース50件50MB・チーム1名</strong>等の構造的制限は残る。
+</div>
+
+<!-- ============================================ -->
+<h2>2. セルフホスト（Docker/Kubernetes）</h2>
+<!-- ============================================ -->
+
+<div class="card">
+  <h3>ライセンスと制限 <span class="tag tag-fact">実データ</span></h3>
+  <ul>
+    <li><strong>完全無料</strong>（MIT + Apache 2.0 ライセンス）</li>
+    <li>Community Edition で全コア機能が使用可能（ワークフロー、RAG、エージェント、API）</li>
+    <li><strong>メッセージクレジット制限なし</strong>（使用量上限はインフラ性能のみ）</li>
+    <li><strong>アプリ数・ナレッジベース・チームメンバー数に制限なし</strong></li>
+    <li>LLM APIキーは別途必要（OpenAI / Anthropic / Google等から自分で取得）</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>最低インフラ要件 <span class="tag tag-fact">実データ</span></h3>
+  <table>
+    <tr><th>スペック</th><th>最低要件</th><th>本番推奨</th></tr>
+    <tr><td>CPU</td><td>2 vCPU</td><td>4 vCPU</td></tr>
+    <tr><td>RAM</td><td>4GB</td><td>8-16GB</td></tr>
+    <tr><td>ストレージ</td><td>50GB SSD</td><td>100GB+ SSD</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>VPS月額コスト目安 <span class="tag tag-fact">実データ</span></h3>
+  <table>
+    <tr><th>プロバイダー</th><th>スペック</th><th>月額</th><th>備考</th></tr>
+    <tr><td>Hetzner (EU)</td><td>2vCPU / 4GB / 40GB NVMe</td><td><strong>約 &euro;3.79（~&yen;600）</strong></td><td>最安。EU拠点</td></tr>
+    <tr><td>Hetzner (EU)</td><td>4vCPU / 8GB / 80GB NVMe</td><td><strong>約 &euro;5.59（~&yen;900）</strong></td><td>本番推奨スペック</td></tr>
+    <tr><td>Kamatera</td><td>2vCPU / 4GB / 20GB</td><td><strong>約 $12（~&yen;1,800）</strong></td><td></td></tr>
+    <tr><td>ConoHa (JP)</td><td>2vCPU / 4GB</td><td><strong>約 &yen;2,000-3,000</strong></td><td>日本リージョン <span class="tag tag-estimate">推測</span></td></tr>
+    <tr><td>AWS Lightsail</td><td>2vCPU / 4GB</td><td><strong>$24（~&yen;3,600）</strong></td><td></td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>LLM API月額コスト目安（2026年4月時点） <span class="tag tag-fact">実データ</span></h3>
+  <table>
+    <tr><th>モデル</th><th>入力単価（/100万トークン）</th><th>出力単価（/100万トークン）</th><th>用途</th></tr>
+    <tr><td>GPT-4o</td><td>$2.50</td><td>$10.00</td><td>高品質応答</td></tr>
+    <tr><td>GPT-4o-mini</td><td>$0.15</td><td>$0.60</td><td>コスト重視・軽量タスク</td></tr>
+    <tr><td>Claude 3.5 Sonnet</td><td>$3.00</td><td>$15.00</td><td>高品質応答</td></tr>
+    <tr><td>Claude 3.5 Haiku</td><td>$0.80</td><td>$4.00</td><td>コスト重視</td></tr>
+  </table>
+  <p style="margin-top:8px; font-size:0.85rem; color:var(--muted);">
+    参考: 一般的なチャットボットの1回の応答 = 入力500-2,000トークン + 出力200-800トークン程度。
+    GPT-4o-miniなら<strong>1回あたり約 $0.0005（約0.08円）</strong>。月1,000回でも約80円。
+  </p>
+</div>
+
+<!-- ============================================ -->
+<h2>3. DSLエクスポート/インポート</h2>
+<!-- ============================================ -->
+
+<div class="card">
+  <h3>DSLに含まれるもの <span class="tag tag-fact">実データ</span></h3>
+  <ul>
+    <li>アプリ設定・メタデータ</li>
+    <li>ワークフローのオーケストレーション・ノード設定</li>
+    <li>モデルパラメータ・プロンプトテンプレート</li>
+    <li>ナレッジベースへの<strong>接続設定</strong>（参照先のみ）</li>
+  </ul>
+  <p>ファイル形式: <strong>YAML</strong>（DSL v0.6+）</p>
+</div>
+
+<div class="card danger">
+  <h3>DSLに含まれないもの <span class="tag tag-risk">リスク</span></h3>
+  <ul>
+    <li><strong>ナレッジベースのデータ本体</strong>（文書・ベクトルデータ） -- 最大の落とし穴</li>
+    <li>サードパーティツールのAPIキー（セキュリティ上、除外）</li>
+    <li>利用ログ・分析データ</li>
+    <li>Secret型の環境変数（エクスポート時に確認ダイアログが出る）</li>
+  </ul>
+</div>
+
+<div class="callout callout-danger">
+  <strong>ナレッジベースのエクスポート機能は未実装</strong><span class="tag tag-fact">実データ</span><br>
+  2026年4月時点で、ナレッジベースの公式エクスポート/インポート機能は存在しない。
+  GitHub Issue #4385 で要望が出ているが、Discussionに転送されたまま未実装。
+  ワークアラウンドとしてAPI経由でデータを取得するスクリプトを自作する必要がある。
+  <br><br>
+  <strong>納品への影響:</strong> DSLファイルだけではナレッジベースを再現できない。
+  納品時はナレッジベースの元データ（PDF/テキスト等）を別途提供し、顧客環境で再インデックスする手順が必要。
+</div>
+
+<div class="card">
+  <h3>プラン別の利用可否 <span class="tag tag-estimate">推測</span></h3>
+  <p>公式ドキュメントにプラン別の制限記載なし。DSLエクスポート/インポートは<strong>Sandboxを含む全プランで利用可能</strong>と推定される（アプリ管理機能の一部であり、有料機能として明示されていない）。</p>
+</div>
+
+<!-- ============================================ -->
+<h2>4. コスト計算シナリオ</h2>
+<!-- ============================================ -->
+
+<h3>4-A. 開発フェーズ（1案件の試作）</h3>
+
+<div class="scenario">
+  <div>
+    <h4>パターンA: Sandbox + 自前APIキー</h4>
+    <p class="price">&yen;0 + API代</p>
+    <ul>
+      <li>Dify Cloud Sandbox: $0</li>
+      <li>自前のOpenAI APIキーを接続</li>
+      <li>試作中のLLM呼び出し: 推定200-500回</li>
+      <li>GPT-4o-miniの場合: <strong>約 $0.10-0.25（~&yen;15-40）</strong></li>
+      <li>GPT-4oの場合: <strong>約 $1-3（~&yen;150-450）</strong></li>
+    </ul>
+    <div class="callout callout-warn" style="margin-top:8px;">
+      <strong>制約:</strong> アプリ5個まで。並行して複数案件を持つ場合は不足。
+      ナレッジベース50MB / 50件の制限あり。
+    </div>
+  </div>
+  <div>
+    <h4>パターンB: セルフホスト</h4>
+    <p class="price">&yen;600-3,600/月 + API代</p>
+    <ul>
+      <li>VPS: &yen;600-3,600/月</li>
+      <li>制限なし（アプリ数・ナレッジベース無制限）</li>
+      <li>複数案件を同時に開発可能</li>
+      <li>初期構築: Docker Compose で30分-1時間</li>
+    </ul>
+    <div class="callout callout-success" style="margin-top:8px;">
+      <strong>推奨:</strong> 構築代行を本業にするならセルフホスト一択。
+      月&yen;600-900で全制限なし。
+    </div>
+  </div>
+  <div>
+    <h4>パターンC: Professional</h4>
+    <p class="price">&yen;8,850/月 + API代</p>
+    <ul>
+      <li>$59/月（~&yen;8,850）</li>
+      <li>5,000クレジット/月</li>
+      <li>アプリ50個 / チーム3名</li>
+      <li>ナレッジベース500件 / 5GB</li>
+    </ul>
+    <div class="callout callout-info" style="margin-top:8px;">
+      試作目的には割高。
+      クライアントのCloud環境を使うなら不要。
+    </div>
+  </div>
+</div>
+
+<div class="callout callout-success">
+  <strong>試作段階での無料枠枯渇リスク: 低い（条件付き）</strong><br>
+  <ul>
+    <li>自前APIキーを使えば、200クレジット制限は実質的にLLM呼び出しには影響しない</li>
+    <li>ただし<strong>アプリ5個制限</strong>が真の制約。案件が増えると枯渇する</li>
+    <li>ナレッジベース50MB / 50件も、RAG重視の案件では不足する可能性あり</li>
+    <li><strong>対策: 開発用にセルフホスト環境を1つ持つ（月&yen;600-900）</strong></li>
+  </ul>
+</div>
+
+<h3>4-B. 販売フェーズ（納品方法別コスト）</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>納品方法</th>
+      <th>販売者コスト</th>
+      <th>顧客コスト</th>
+      <th>メリット</th>
+      <th>デメリット</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>DSL納品</strong><br>（顧客のCloud環境にインポート）</td>
+      <td>$0（開発はセルフホスト）</td>
+      <td>$0〜$59/月（プラン選択次第）<br>+ LLM API代</td>
+      <td>
+        ・顧客がCloud管理<br>
+        ・販売者にインフラ保守責任なし<br>
+        ・最もシンプル
+      </td>
+      <td>
+        ・ナレッジベースは別途手動セットアップ必要<br>
+        ・Sandbox制限に顧客がはまる可能性
+      </td>
+    </tr>
+    <tr>
+      <td><strong>顧客のCloud環境で直接構築</strong></td>
+      <td>$0</td>
+      <td>$0〜$159/月<br>+ LLM API代</td>
+      <td>
+        ・ナレッジベースも含めて完全納品<br>
+        ・顧客が直接管理可能
+      </td>
+      <td>
+        ・顧客のアカウントにログインが必要<br>
+        ・チームメンバー枠の制限
+      </td>
+    </tr>
+    <tr class="success">
+      <td><strong>セルフホスト構築</strong><br>（顧客のVPSにDocker構築）</td>
+      <td>$0（工賃のみ）</td>
+      <td>VPS &yen;600-3,600/月<br>+ LLM API代</td>
+      <td>
+        ・全機能制限なし<br>
+        ・データプライバシー<br>
+        ・<strong>保守契約の口実になる</strong>
+      </td>
+      <td>
+        ・構築工数が増える<br>
+        ・顧客にVPS管理能力が必要<br>
+        ・アップデート対応
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>4-C. 保守フェーズ（顧客の月額ランニングコスト）</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>Sandbox利用</th>
+      <th>Professional利用</th>
+      <th>セルフホスト</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Difyプラットフォーム</td>
+      <td><strong>&yen;0</strong></td>
+      <td><strong>~&yen;8,850/月</strong></td>
+      <td><strong>&yen;0</strong></td>
+    </tr>
+    <tr>
+      <td>VPS/インフラ</td>
+      <td>&yen;0</td>
+      <td>&yen;0</td>
+      <td><strong>&yen;600-3,600/月</strong></td>
+    </tr>
+    <tr>
+      <td>LLM API（月1,000回想定）<br><small>GPT-4o-mini</small></td>
+      <td colspan="3" style="text-align:center;"><strong>~&yen;80/月</strong></td>
+    </tr>
+    <tr>
+      <td>LLM API（月1,000回想定）<br><small>GPT-4o</small></td>
+      <td colspan="3" style="text-align:center;"><strong>~&yen;900/月</strong></td>
+    </tr>
+    <tr>
+      <td>LLM API（月10,000回想定）<br><small>GPT-4o-mini</small></td>
+      <td colspan="3" style="text-align:center;"><strong>~&yen;800/月</strong></td>
+    </tr>
+    <tr>
+      <td>LLM API（月10,000回想定）<br><small>GPT-4o</small></td>
+      <td colspan="3" style="text-align:center;"><strong>~&yen;9,000/月</strong></td>
+    </tr>
+    <tr class="highlight">
+      <td><strong>合計（月1,000回・4o-mini）</strong></td>
+      <td><strong>&yen;80/月</strong></td>
+      <td><strong>~&yen;8,930/月</strong></td>
+      <td><strong>&yen;680-3,680/月</strong></td>
+    </tr>
+    <tr class="highlight">
+      <td><strong>合計（月10,000回・4o）</strong></td>
+      <td><strong>&yen;9,000/月</strong></td>
+      <td><strong>~&yen;17,850/月</strong></td>
+      <td><strong>&yen;9,600-12,600/月</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="font-size:0.85rem; color:var(--muted); margin-top:4px;">
+  ※ 為替 $1 = &yen;150 で計算。LLM API代は1回あたり入力1,000トークン+出力500トークンで試算。
+</p>
+
+<!-- ============================================ -->
+<h2>5. ココナラ出品に向けた戦略的示唆</h2>
+<!-- ============================================ -->
+
+<div class="card">
+  <h3>推奨する開発・納品体制</h3>
+  <ol>
+    <li><strong>開発環境:</strong> Hetzner VPS（&euro;3.79-5.59/月）にDifyセルフホスト → 全制限なし・複数案件並行可能</li>
+    <li><strong>納品方法:</strong> DSLファイル + ナレッジベース元データ + セットアップ手順書 → 顧客のDify Cloud or セルフホスト環境にインポート</li>
+    <li><strong>保守契約:</strong> セルフホスト構築案件なら月額保守（&yen;3,000-10,000/月）が自然に成立</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>価格設計の参考コスト内訳 <span class="tag tag-estimate">推測</span></h3>
+  <table>
+    <tr><th>フェーズ</th><th>販売者の実コスト</th><th>備考</th></tr>
+    <tr><td>開発（1案件）</td><td>&yen;15-500（LLM API代のみ）</td><td>セルフホスト開発環境の場合。VPS月額は複数案件で按分</td></tr>
+    <tr><td>納品（DSL方式）</td><td>ほぼ &yen;0</td><td>YAMLファイル+手順書の受け渡し</td></tr>
+    <tr><td>納品（セルフホスト構築）</td><td>&yen;0（工数のみ）</td><td>顧客のVPSにDocker構築。1-2時間</td></tr>
+    <tr><td>保守（月額）</td><td>&yen;0-500/月</td><td>監視・アップデート対応の工数のみ</td></tr>
+  </table>
+</div>
+
+<div class="callout callout-info">
+  <strong>原価率まとめ</strong><br>
+  Dify構築代行の原価は極めて低い。LLM API代は1案件あたり数十円〜数百円。
+  セルフホスト開発環境は月&yen;600-900で複数案件を並行開発可能。
+  <strong>コストのほぼ100%が「知識・スキル・工数」= 純粋な労働集約型サービス</strong>であり、
+  原材料費がほぼゼロに近い構造は、ココナラでのサービス出品に極めて有利。
+</div>
+
+<!-- ============================================ -->
+<h2>6. リスクと注意事項</h2>
+<!-- ============================================ -->
+
+<div class="card danger">
+  <h3>リスク一覧</h3>
+  <table>
+    <tr><th>#</th><th>リスク</th><th>深刻度</th><th>対策</th></tr>
+    <tr>
+      <td>1</td>
+      <td class="danger"><strong>ナレッジベースの移行不可</strong><br>DSLにナレッジベースデータが含まれない</td>
+      <td><span style="color:var(--danger); font-weight:600;">高</span></td>
+      <td>元データ（PDF等）を必ず保持。納品時に再インデックス手順を提供。APIスクリプトでの移行手順も準備</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Sandbox制限の誤認</strong><br>顧客がSandboxで運用しようとしてアプリ5個制限に達する</td>
+      <td><span style="color:var(--warn); font-weight:600;">中</span></td>
+      <td>納品時にプラン要件を明示。Professionalへのアップグレードガイドを添付</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>LLM API料金の顧客負担</strong><br>「月額無料」と思っていた顧客がAPI代に驚く</td>
+      <td><span style="color:var(--warn); font-weight:600;">中</span></td>
+      <td>見積段階でLLM API代の月額目安を明示。GPT-4o-miniなら月&yen;100以下であることを説明</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>Difyのバージョンアップによる互換性問題</strong><br>DSLバージョン不一致でインポート失敗</td>
+      <td><span style="color:var(--muted); font-weight:600;">低</span></td>
+      <td>Cloud利用なら常に最新。セルフホストは定期アップデートを保守に含める</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>セルフホストの保守責任</strong><br>Docker/VPSの知識がない顧客</td>
+      <td><span style="color:var(--warn); font-weight:600;">中</span></td>
+      <td>Cloud納品をデフォルトにし、セルフホストはオプション（保守契約必須）</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============================================ -->
+<h2>7. 調査の限界と未確認事項</h2>
+<!-- ============================================ -->
+
+<div class="card">
+  <ul>
+    <li><strong>メッセージクレジットの正確な消費ルール:</strong> 1クレジット = 1 LLM呼び出しが基本だが、GPT-4系で20クレジット消費との情報もある。モデルごとの消費レートは公式に明確な一覧表がない <span class="tag tag-risk">リスク</span></li>
+    <li><strong>Sandboxクレジットのリセット:</strong> 公式は「one-time」と記載するが、フォーラムでは「毎月リセット」との回答。自前APIキーを使うなら実質無関係だが、矛盾は未解決 <span class="tag tag-estimate">推測</span></li>
+    <li><strong>ココナラでのDify構築代行の相場:</strong> 日本語検索では具体的な出品価格データを取得できず。別途ココナラ直接調査が必要</li>
+    <li><strong>Enterprise料金:</strong> 要問合せのため未確認</li>
+    <li><strong>トリガーイベントの定義:</strong> ワークフローのトリガー（Webhook/スケジュール等）の具体的な消費ルールは未確認</li>
+  </ul>
+</div>
+
+<!-- ============================================ -->
+<div class="sources">
+  <strong>Sources:</strong>
+  <ul>
+    <li><a href="https://dify.ai/pricing" target="_blank">Dify: Plans &amp; Pricing（公式）</a></li>
+    <li><a href="https://docs.dify.ai/en/use-dify/workspace/app-management" target="_blank">Dify Docs: Manage Apps（DSLエクスポート詳細）</a></li>
+    <li><a href="https://docs.dify.ai/en/guides/management/subscription-management" target="_blank">Dify Docs: Subscription Management</a></li>
+    <li><a href="https://forum.dify.ai/t/i-ve-used-up-all-my-credits-in-dify-will-the-credits-reset-automatically/97" target="_blank">Dify Community: Credit Reset FAQ</a></li>
+    <li><a href="https://github.com/langgenius/dify/issues/4385" target="_blank">GitHub Issue #4385: Knowledge Base Export/Import Request</a></li>
+    <li><a href="https://www.architjn.com/blog/dify-cloud-pricing-plans-free-tier-when-to-self-host" target="_blank">Dify Cloud Pricing: Plans, Free Tier, and When to Self-Host</a></li>
+    <li><a href="https://miichisoft.com/en/dify-chatbot-pricing-guide-from-implementation/" target="_blank">Dify Chatbot Pricing: Complete Guide For Business 2026</a></li>
+    <li><a href="https://dify-hosting.com/en/best-dify-hosting/" target="_blank">Best Dify Hosting Providers 2026</a></li>
+    <li><a href="https://github.com/langgenius/dify" target="_blank">GitHub: langgenius/dify（公式リポジトリ）</a></li>
+    <li><a href="https://developers.openai.com/api/docs/pricing" target="_blank">OpenAI API Pricing（2026年4月時点）</a></li>
+  </ul>
+</div>
+
+</body>
+</html>

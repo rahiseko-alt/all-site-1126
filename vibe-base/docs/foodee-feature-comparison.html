@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>foodee 機能別競合比較表</title>
+<style>
+  body { font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; margin: 20px; background: #f8f9fa; color: #1e293b; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  p.sub { color: #666; font-size: 13px; margin-top: 0; }
+
+  /* --- 比較表 --- */
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); font-size: 14px; }
+  th, td { border: 1px solid #d0d0d0; padding: 7px 10px; text-align: left; }
+  th { background: #2c3e50; color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 2; }
+  th.ours { background: #dc2626; }
+  tr.cat td { background: #34495e; color: #fff; font-weight: 700; font-size: 14px; }
+  tr:nth-child(even):not(.cat) { background: #f4f6f8; }
+  tr:hover:not(.cat) { background: #eaf0f6; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .partial { color: #d97706; font-weight: 700; }
+  .unique { background: #ecfdf5; }
+  .gap { background: #fef2f2; }
+  .num { text-align: center; width: 30px; color: #888; }
+  .comp { text-align: center; width: 70px; font-size: 15px; }
+  .dev { text-align: center; width: 50px; }
+  .dev input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
+  .prog { text-align: center; width: 80px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .prog-live { color: #16a34a; }
+  .prog-new { color: #2563eb; background: #dbeafe; }
+  .prog-fix { color: #7c3aed; background: #ede9fe; }
+  .prog-wip { color: #d97706; background: #FFF3E0; }
+  .prog-skip { color: #6b7280; background: #f3f4f6; }
+  .prog-no { color: #bbb; }
+  .note { font-size: 12px; color: #666; min-width: 140px; cursor: text; }
+  .note:empty::before { content: 'メモ...'; color: #ccc; font-style: italic; }
+  .note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+  .mono-note { font-size: 12px; color: #444; min-width: 100px; cursor: text; text-align: left; }
+  .mono-note:empty::before { content: '記入...'; color: #ccc; font-style: italic; }
+  .mono-note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+
+  /* --- 凡例 --- */
+  .legend { margin: 12px 0 16px; font-size: 13px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+  /* --- ツールバー --- */
+  .toolbar { margin: 16px 0; display: flex; gap: 12px; align-items: center; }
+  .toolbar button { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .toolbar button:hover { background: #1d4ed8; }
+  .toolbar .btn-cluster { background: #7c3aed; }
+  .toolbar .btn-cluster:hover { background: #6d28d9; }
+  .toolbar .status { font-size: 13px; color: #16a34a; font-weight: 600; display: none; }
+  .toolbar .export-link { font-size: 12px; color: #64748b; cursor: pointer; text-decoration: underline; margin-left: 8px; }
+  .toolbar .export-link:hover { color: #2563eb; }
+
+  /* --- クラスタリング結果 --- */
+  .cluster-result { background: #fff; border: 2px solid #7c3aed; border-radius: 8px; padding: 20px; margin: 16px 0; display: none; }
+  .cluster-result h3 { margin: 0 0 12px; color: #7c3aed; }
+  .cluster-group { margin: 8px 0; padding: 10px; background: #f8f7ff; border-radius: 6px; }
+  .cluster-group strong { font-size: 14px; }
+  .cluster-group .items { font-size: 12px; color: #555; margin-top: 4px; }
+  .cluster-group .var-tag { font-size: 11px; color: #7c3aed; margin-left: 8px; }
+  .cluster-actions { margin-top: 12px; display: flex; gap: 8px; }
+  .cluster-actions button { padding: 8px 20px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .cluster-actions .btn-apply { background: #7c3aed; color: #fff; }
+  .cluster-actions .btn-cancel { background: #e2e8f0; color: #475569; }
+
+  /* --- プロダクト定義 --- */
+  .product-def { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .product-def h2 { margin: 0 0 12px; font-size: 16px; }
+  .def-table { width: 100%; border-collapse: collapse; box-shadow: none; }
+  .def-table th { background: #f1f5f9; color: #334155; width: 30px; text-align: center; font-size: 16px; padding: 10px; }
+  .def-table td:nth-child(2) { width: 220px; font-weight: 600; font-size: 13px; padding: 10px; }
+  .def-table td:nth-child(3) { font-size: 13px; padding: 10px; cursor: text; }
+  .def-table td:nth-child(3):empty::before { content: 'クリックして入力...'; color: #ccc; font-style: italic; }
+  .def-table td:nth-child(3):focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+
+  /* --- スコア集計 --- */
+  .score-table { margin-top: 20px; width: auto; font-size: 14px; }
+  .score-table th { background: #2c3e50; color: #fff; padding: 6px 16px; }
+  .score-table td { padding: 6px 16px; text-align: center; }
+
+  /* --- ポジショニング勢力図 --- */
+  .pos-section { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; margin: 24px 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .pos-section h2 { margin: 0 0 8px; }
+  .pos-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; font-size: 13px; flex-wrap: wrap; }
+  .pos-controls select { padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+  .pos-controls .auto-tag { background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .pos-empty { color: #94a3b8; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
+  .pos-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 12px; }
+  .pos-legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .pos-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  /* --- サマリー --- */
+  .summary { margin-top: 24px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .summary-box { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; flex: 1; min-width: 220px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .summary-box h3 { margin: 0 0 8px; font-size: 15px; }
+  .summary-box ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; }
+
+  /* --- タブ --- */
+  .tabs { display: flex; gap: 0; margin-bottom: 0; }
+  .tab { padding: 10px 24px; cursor: pointer; font-weight: 600; font-size: 14px; border: 1px solid #d0d0d0; border-bottom: none; border-radius: 8px 8px 0 0; background: #e2e8f0; color: #64748b; }
+  .tab.active { background: #fff; color: #1e293b; border-bottom: 1px solid #fff; margin-bottom: -1px; z-index: 1; }
+  .tab-content { display: none; border: 1px solid #d0d0d0; border-radius: 0 8px 8px 8px; padding: 20px; background: #fff; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<h1>foodee 機能別 競合比較表</h1>
+<p class="sub">2026-03-21 作成 | 競合: 飲食店ドットコム ジャーナル / 月刊食堂 / 近代食堂 / hibana / フーズチャネル</p>
+
+<!-- ===== タブ ===== -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('s3')">S3: 機能比較</div>
+  <div class="tab" onclick="switchTab('s4')">S4: 実現性検証</div>
+</div>
+
+<!-- ===== S3タブ ===== -->
+<div class="tab-content active" id="tab-s3">
+
+<!-- ===== 開発の方向性（3指標） ===== -->
+<div class="product-def">
+  <h2>開発の方向性</h2>
+  <table class="def-table">
+    <tr>
+      <th>①</th>
+      <td>一言でどんな情報プラットフォームか？</td>
+      <td contenteditable="true" data-def="def1">飲食業界特化のAIニュースアグリゲーター。RSS+YouTube+noteを一元化し、AI要約で専門誌並みの深さをタイムリーに届ける</td>
+    </tr>
+    <tr>
+      <th>②</th>
+      <td>狙うポジション</td>
+      <td contenteditable="true" data-def="def2">月刊誌の深さ × Webメディアの速さ × AIのパーソナライズ。既存競合が全て欠いている「AI+パーソナライズ+アグリゲーション」の空白地帯</td>
+    </tr>
+    <tr>
+      <th>③</th>
+      <td>①②の意図 vs 実装計画の過不足</td>
+      <td contenteditable="true" data-def="def3">P0段階。MVPはRSSアグリゲーション+Gemini要約+トピック選択。YouTube/note連携はMVP後。専門誌の深さはAI要約の品質次第（H3で検証）</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ===== ポジショニング勢力図 ===== -->
+<div class="pos-section">
+  <h2>ポジショニング勢力図</h2>
+  <p style="font-size:12px;color:#64748b;margin:0 0 8px;">
+    カテゴリ別スコアの分散が大きい＝各社が戦略的に差をつけている軸。自動で上位2軸を選出。
+  </p>
+  <div class="pos-controls">
+    <label>X軸: <select id="axisX"></select></label>
+    <label>Y軸: <select id="axisY"></select></label>
+    <span class="auto-tag" id="autoTag">自動選出</span>
+  </div>
+  <div id="posChartArea">
+    <p class="pos-empty">機能表にデータを入力すると自動生成されます</p>
+  </div>
+  <div class="pos-legend" id="posLegend"></div>
+</div>
+
+<!-- ===== ツールバー ===== -->
+<div class="toolbar">
+  <button onclick="save()">保存</button>
+  <button class="btn-cluster" onclick="runClustering()">カテゴリ自動分類</button>
+  <span class="status" id="saveStatus">保存しました</span>
+  <span class="export-link" onclick="exportMd()">Markdown書出</span>
+</div>
+<div class="cluster-result" id="clusterResult"></div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#16a34a"></span> ○ 対応</span>
+  <span><span class="dot" style="background:#d97706"></span> △ 部分対応</span>
+  <span><span class="dot" style="background:#dc2626"></span> × 未対応</span>
+  <span><span class="dot" style="background:#ecfdf5;border:1px solid #a7f3d0"></span> 自社独自</span>
+  <span><span class="dot" style="background:#fef2f2;border:1px solid #fca5a5"></span> 致命的ギャップ</span>
+</div>
+
+<!-- ===== 機能比較表 ===== -->
+<table id="compTable">
+<thead>
+  <tr>
+    <th style="width:30px">#</th>
+    <th>機能</th>
+    <th class="comp ours">foodee</th>
+    <th class="comp">飲食店.com</th>
+    <th class="comp">月刊食堂</th>
+    <th class="comp">近代食堂</th>
+    <th class="comp">hibana</th>
+    <th class="comp">フーズCH</th>
+    <th class="dev">開発</th>
+    <th>進捗</th>
+    <th>備考</th>
+  </tr>
+</thead>
+<tbody>
+
+<!-- ニュース・情報収集 -->
+<tr class="cat"><td colspan="11">ニュース・情報収集</td></tr>
+<tr>
+  <td class="num">1</td>
+  <td>飲食業界ニュース配信</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="1"></td>
+  <td class="prog prog-wip">途中</td>
+  <td class="note" contenteditable="true">全社の基本機能。prototype.jsxにモックUI実装済み（API未接続）</td>
+</tr>
+<tr class="unique">
+  <td class="num">2</td>
+  <td>ニュースアグリゲーション（複数ソース一元化）</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="dev"><input type="checkbox" data-id="2"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">フーズCHはPR TIMES連携のみ。foodeeはGoogleアラートRSS+note+YouTube統合</td>
+</tr>
+<tr class="unique">
+  <td class="num">3</td>
+  <td>RSS購読管理（ユーザーがフィード追加/削除）</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="3"></td>
+  <td class="prog prog-wip">途中</td>
+  <td class="note" contenteditable="true">prototype.jsxに設定画面実装済み（フィード追加/削除/種類選択UI）。window.storage→localStorage置換要</td>
+</tr>
+<tr class="unique">
+  <td class="num">4</td>
+  <td>AI要約（記事の自動要約）</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="4"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">Gemini 2.5 Flash-Lite。競合にAI機能はゼロ</td>
+</tr>
+<tr class="unique">
+  <td class="num">5</td>
+  <td>トピックパーソナライズ（ユーザーが関心領域を選択）</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="5"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">「自分でトピックを選べる」がマスター定義の差別化ポイント</td>
+</tr>
+<tr class="unique">
+  <td class="num">6</td>
+  <td>地域フィルター</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="6"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">GoogleアラートRSSの地域キーワードで実現</td>
+</tr>
+<tr>
+  <td class="num">7</td>
+  <td>タグ分類（人材不足/行政支援/DX等）</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="dev"><input type="checkbox" data-id="7"></td>
+  <td class="prog prog-wip">途中</td>
+  <td class="note" contenteditable="true">prototype.jsxにタグカラー実装済み（人材不足/行政支援/採用/DX/倒産）。AI自動タグ付けは未実装</td>
+</tr>
+
+<!-- コンテンツ深度 -->
+<tr class="cat"><td colspan="11">コンテンツ深度</td></tr>
+<tr class="gap">
+  <td class="num">8</td>
+  <td>専門家コラム/インタビュー記事</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="8"></td>
+  <td class="prog prog-skip">除外</td>
+  <td class="note" contenteditable="true">自社制作コンテンツは持たない。note連携で代替</td>
+</tr>
+<tr class="gap">
+  <td class="num">9</td>
+  <td>経営ノウハウ記事（自社制作）</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="dev"><input type="checkbox" data-id="9"></td>
+  <td class="prog prog-skip">除外</td>
+  <td class="note" contenteditable="true">アグリゲーション型のため自社制作なし。外部ソースのAI要約で深さを担保</td>
+</tr>
+<tr>
+  <td class="num">10</td>
+  <td>法改正・行政支援情報</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="comp partial">△</td>
+  <td class="dev"><input type="checkbox" data-id="10"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">GoogleアラートRSSで行政情報を自動収集</td>
+</tr>
+<tr>
+  <td class="num">11</td>
+  <td>データ/統計レポート</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="dev"><input type="checkbox" data-id="11"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">自社制作なし。外部統計記事のAI要約で部分対応</td>
+</tr>
+<tr class="unique">
+  <td class="num">12</td>
+  <td>週次AI要約レポート</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="12"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">有料機能候補。1週間のニュースをAIが要約</td>
+</tr>
+
+<!-- 動画・外部連携 -->
+<tr class="cat"><td colspan="11">動画・外部連携</td></tr>
+<tr class="unique">
+  <td class="num">13</td>
+  <td>YouTube動画キュレーション</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="13"></td>
+  <td class="prog prog-wip">途中</td>
+  <td class="note" contenteditable="true">prototype.jsxにYouTubeタブ実装済み（モックデータ。API未接続）。hibanaは自社動画制作のみ</td>
+</tr>
+<tr class="unique">
+  <td class="num">14</td>
+  <td>note記事連携/検索</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="14"></td>
+  <td class="prog prog-wip">途中</td>
+  <td class="note" contenteditable="true">prototype.jsxにnoteタブ実装済み（AIキーワード6個+noteリンク）。RSS連携は未実装</td>
+</tr>
+<tr>
+  <td class="num">15</td>
+  <td>SNS連携/シェア</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="15"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">MVP後。OGP対応でシェア可能にする程度</td>
+</tr>
+
+<!-- ユーザー体験 -->
+<tr class="cat"><td colspan="11">ユーザー体験</td></tr>
+<tr>
+  <td class="num">16</td>
+  <td>モバイル最適化</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="16"></td>
+  <td class="prog prog-wip">途中</td>
+  <td class="note" contenteditable="true">prototype.jsxはモバイルファーストUI（maxWidth:640px）。月刊誌はアプリあるが紙の電子版</td>
+</tr>
+<tr>
+  <td class="num">17</td>
+  <td>ブックマーク/お気に入り</td>
+  <td class="comp yes">○</td>
+  <td class="comp partial">△</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="17"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">localStorage保存</td>
+</tr>
+<tr>
+  <td class="num">18</td>
+  <td>検索機能</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="18"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">19</td>
+  <td>プッシュ通知/メールアラート</td>
+  <td class="comp partial">△</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="19"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">MVP後検討。飲食店.comはメルマガあり</td>
+</tr>
+
+<!-- 付加サービス -->
+<tr class="cat"><td colspan="11">付加サービス</td></tr>
+<tr>
+  <td class="num">20</td>
+  <td>物件検索</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="20"></td>
+  <td class="prog prog-skip">除外</td>
+  <td class="note" contenteditable="true">スコープ外。飲食店.com固有</td>
+</tr>
+<tr>
+  <td class="num">21</td>
+  <td>求人掲載</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="21"></td>
+  <td class="prog prog-skip">除外</td>
+  <td class="note" contenteditable="true">スコープ外。飲食店.comの主力サービス</td>
+</tr>
+<tr>
+  <td class="num">22</td>
+  <td>仕入れ/発注ツール</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp partial">△</td>
+  <td class="dev"><input type="checkbox" data-id="22"></td>
+  <td class="prog prog-skip">除外</td>
+  <td class="note" contenteditable="true">スコープ外。インフォマートはBtoBプラットフォーム本業</td>
+</tr>
+<tr>
+  <td class="num">23</td>
+  <td>PR/広告掲載サービス</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="23"></td>
+  <td class="prog prog-skip">除外</td>
+  <td class="note" contenteditable="true">将来の収益源候補だが現段階はスコープ外</td>
+</tr>
+<tr class="unique">
+  <td class="num">24</td>
+  <td>YouTube記事化（動画→テキスト変換）</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="24"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">有料機能候補。Geminiで動画内容をテキスト記事化</td>
+</tr>
+<tr class="unique">
+  <td class="num">25</td>
+  <td>データエクスポート</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="25"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true">有料機能候補</td>
+</tr>
+
+<!-- 料金詳細（実数値） -->
+<tr class="cat"><td colspan="11">料金詳細（実数値）</td></tr>
+<tr>
+  <td class="num">26</td>
+  <td>月額料金（個人利用）</td>
+  <td class="comp">¥0(基本)</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥1,650</td>
+  <td class="comp">¥1,518</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥0</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">月刊誌は紙版定価。foodee有料プランは未定</td>
+</tr>
+<tr>
+  <td class="num">27</td>
+  <td>月額料金（有料プラン）</td>
+  <td class="comp">未定</td>
+  <td class="comp">—</td>
+  <td class="comp">¥1,400</td>
+  <td class="comp">—</td>
+  <td class="comp">—</td>
+  <td class="comp">—</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">月刊食堂アプリ版=¥1,400/月</td>
+</tr>
+<tr>
+  <td class="num">28</td>
+  <td>月商500万飲食店の想定コスト</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥1,650</td>
+  <td class="comp">¥1,518</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥0</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true">情報閲覧のみの場合。飲食店.comの求人利用は別途¥19,800~/月</td>
+</tr>
+
+<!-- マネタイズ動線（競合の実態） -->
+<tr class="cat"><td colspan="11">マネタイズ動線（競合の実態）</td></tr>
+<tr>
+  <td class="num">29</td>
+  <td>無料プランの範囲（何が無料か）</td>
+  <td class="mono-note" contenteditable="true">ニュース閲覧/note検索/基本フィルター</td>
+  <td class="mono-note" contenteditable="true">全記事無料閲覧。メディアは集客ファネル</td>
+  <td class="mono-note" contenteditable="true">なし（有料のみ）</td>
+  <td class="mono-note" contenteditable="true">なし（有料のみ）</td>
+  <td class="mono-note" contenteditable="true">全コンテンツ無料</td>
+  <td class="mono-note" contenteditable="true">全コンテンツ無料</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">30</td>
+  <td>有料化トリガー（何で制限/飢えさせるか）</td>
+  <td class="mono-note" contenteditable="true">AI要約/週次レポート/YouTube記事化/エクスポート</td>
+  <td class="mono-note" contenteditable="true">求人・物件・仕入れなどSaaSサービスへの誘導</td>
+  <td class="mono-note" contenteditable="true">購読のみ。デジタルなし</td>
+  <td class="mono-note" contenteditable="true">購読のみ</td>
+  <td class="mono-note" contenteditable="true">PR記事掲載（飲食店向けではなくメーカー向け）</td>
+  <td class="mono-note" contenteditable="true">広告収入+インフォマートBtoBプラットフォームへの誘導</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">31</td>
+  <td>課金ゲート種別（機能/容量/店舗数/期間）</td>
+  <td class="mono-note" contenteditable="true">機能ゲート（AI系機能を有料化）</td>
+  <td class="mono-note" contenteditable="true">サービス種別ゲート</td>
+  <td class="mono-note" contenteditable="true">コンテンツ全量ゲート</td>
+  <td class="mono-note" contenteditable="true">コンテンツ全量ゲート</td>
+  <td class="mono-note" contenteditable="true">BtoB広告（読者には課金なし）</td>
+  <td class="mono-note" contenteditable="true">BtoB広告（読者には課金なし）</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+
+</tbody>
+</table>
+
+<!-- スコア集計（JS自動計算） -->
+<table class="score-table" id="scoreTable">
+<thead>
+  <tr><th></th><th>○ 対応</th><th>△ 部分</th><th>× 未対応</th><th>対応率</th></tr>
+</thead>
+<tbody id="scoreBody">
+</tbody>
+</table>
+
+<!-- サマリー3種 -->
+<div class="summary">
+  <div class="summary-box" style="border-left: 4px solid #dc2626;">
+    <h3>致命的ギャップ（競合全社にあり/自社にない）</h3>
+    <ul id="gapList">
+      <li>#8 専門家コラム/インタビュー記事 — アグリゲーション型のため自社制作コンテンツなし。note連携で代替</li>
+      <li>#9 経営ノウハウ記事 — 同上。AI要約の品質で深さを担保する方針</li>
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #16a34a;">
+    <h3>自社独自の武器（競合全社にない）</h3>
+    <ul id="uniqueList">
+      <li>#2 ニュースアグリゲーション — 複数ソース一元化は競合ゼロ</li>
+      <li>#3 RSS購読管理 — ユーザーがフィード自由に追加/削除</li>
+      <li>#4 AI要約 — 飲食業界メディアでAI機能は皆無</li>
+      <li>#5 トピックパーソナライズ — パーソナライズ配信は競合ゼロ</li>
+      <li>#6 地域フィルター — 全国→地域絞り込み</li>
+      <li>#12 週次AI要約レポート — 有料機能候補</li>
+      <li>#13 YouTube動画キュレーション</li>
+      <li>#14 note記事連携/検索</li>
+      <li>#24 YouTube記事化 — 有料機能候補</li>
+      <li>#25 データエクスポート — 有料機能候補</li>
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #2563eb;">
+    <h3>差別化機会</h3>
+    <ul id="oppList">
+      <li>AI+パーソナライズの空白地帯は完全に未開拓。競合6社中AI機能を持つサービスはゼロ</li>
+      <li>月刊誌（食堂/近代食堂）は深いが遅い。Webメディア（飲食店.com/hibana/フーズCH）は速いが浅い。foodeeは「深い×速い」を狙える</li>
+      <li>飲食店.comは総合プラットフォーム。情報メディアは集客ファネルに過ぎず、情報品質に本気投資していない</li>
+      <li>月刊誌の読者はデジタル移行の潜在需要あり（月刊食堂アプリ版が存在する=需要の証拠）</li>
+      <li><strong>競合メディア自体をRSSソースとして取り込む戦略（H8）。</strong>飲食店.com/hibana/フーズCH/テンポスのRSSをfoodeeに集約すれば、競合がfoodeeのコンテンツ供給源になる。ユーザーは個別メディアを知らなくてもfoodeeだけで済む構造</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /tab-s3 -->
+
+<!-- ===== S4タブ ===== -->
+<div class="tab-content" id="tab-s4">
+
+<h2>S4: 実現性検証</h2>
+
+<!-- 外部連携洗い出し (#7) -->
+<h2>外部連携洗い出し</h2>
+<table>
+<thead>
+  <tr><th>#</th><th>カテゴリ</th><th>用途</th><th>現採用</th><th>必須度</th><th>備考</th></tr>
+</thead>
+<tbody>
+  <tr><td class="num">1</td><td>ニュースソース</td><td>RSSフィード取得</td><td>GoogleアラートRSS</td><td>必須</td><td class="note" contenteditable="true">飲食関連キーワードで自動配信</td></tr>
+  <tr><td class="num">2</td><td>ニュースソース</td><td>クリエイター記事</td><td>note RSS</td><td>必須</td><td class="note" contenteditable="true">飲食系note著者のRSS</td></tr>
+  <tr><td class="num">3</td><td>動画</td><td>飲食系YouTube検索</td><td>YouTube Data API v3</td><td>高</td><td class="note" contenteditable="true">無料枠10,000ユニット/日</td></tr>
+  <tr><td class="num">4</td><td>AI</td><td>記事要約/タグ付け</td><td>Gemini 2.5 Flash-Lite</td><td>必須</td><td class="note" contenteditable="true">無料枠1,000RPD/15RPM</td></tr>
+  <tr><td class="num">5</td><td>ホスティング</td><td>静的サイト+Functions</td><td>Vercel</td><td>必須</td><td class="note" contenteditable="true">無料枠: 100GB帯域/月</td></tr>
+  <tr><td class="num">6</td><td>RSSプロキシ</td><td>CORS回避</td><td>Vercel Functions</td><td>必須</td><td class="note" contenteditable="true">Serverless Functions無料枠内</td></tr>
+  <tr><td class="num">7</td><td>DB</td><td>ユーザー設定保存</td><td>localStorage</td><td>必須</td><td class="note" contenteditable="true">MVP段階。将来Supabase検討</td></tr>
+  <tr><td class="num">8</td><td>cron</td><td>定期RSS取得</td><td>Vercel Cron Jobs</td><td>高</td><td class="note" contenteditable="true">無料枠: 1日1回</td></tr>
+  <tr><td class="num">9</td><td>決済</td><td>有料プラン課金</td><td>未定</td><td>低（MVP後）</td><td class="note" contenteditable="true">Stripe候補。P2.5で検討</td></tr>
+</tbody>
+</table>
+
+<!-- 競合技術スタック比較 (#8) -->
+<h2>競合技術スタック比較</h2>
+<table>
+<thead>
+  <tr><th>カテゴリ</th><th>foodee</th><th>飲食店.com</th><th>月刊食堂</th><th>近代食堂</th><th>hibana</th><th>フーズCH</th></tr>
+</thead>
+<tbody>
+  <tr><td>フロントエンド</td><td>React</td><td>非公開（独自CMS推定）</td><td>アプリ(iOS)</td><td>非公開</td><td>WordPress推定</td><td>非公開（Kuroco CMS推定）</td></tr>
+  <tr><td>ホスティング</td><td>Vercel</td><td>非公開</td><td>非公開</td><td>非公開</td><td>非公開</td><td>非公開</td></tr>
+  <tr><td>AI</td><td>Gemini 2.5 Flash-Lite</td><td>なし</td><td>なし</td><td>なし</td><td>なし</td><td>なし</td></tr>
+  <tr><td>DB</td><td>localStorage→Supabase</td><td>非公開</td><td>非公開</td><td>非公開</td><td>非公開</td><td>非公開</td></tr>
+  <tr><td>出典</td><td class="note" contenteditable="true">自治憲法</td><td class="note" contenteditable="true">推定</td><td class="note" contenteditable="true">App Store</td><td class="note" contenteditable="true">—</td><td class="note" contenteditable="true">BuiltWith推定</td><td class="note" contenteditable="true">広告資料PDF内にKurocoの記載</td></tr>
+</tbody>
+</table>
+
+<!-- カテゴリ別候補比較 (#9) -->
+<h2>カテゴリ別候補比較</h2>
+<table>
+<thead>
+  <tr><th>カテゴリ</th><th>候補1（採用）</th><th>候補2</th><th>選定理由</th></tr>
+</thead>
+<tbody>
+  <tr><td>AI要約</td><td><strong>Gemini 2.5 Flash-Lite</strong><br>無料1,000RPD</td><td>OpenAI GPT-4o-mini<br>有料のみ</td><td>無料枠が大きい。飲食ニュース要約の品質はFlash-Liteで十分</td></tr>
+  <tr><td>ホスティング</td><td><strong>Vercel</strong><br>無料100GB/月</td><td>Cloudflare Pages<br>無料帯域無制限</td><td>React+Functionsの統合が簡単。Cron Jobs対応</td></tr>
+  <tr><td>動画API</td><td><strong>YouTube Data API v3</strong><br>無料10,000ユニット/日</td><td>なし（独占）</td><td>飲食系動画はYouTubeに集中。代替なし</td></tr>
+  <tr><td>DB（将来）</td><td><strong>Supabase</strong><br>無料500MB</td><td>PlanetScale<br>無料枠廃止</td><td>無料枠あり。PlanetScaleは無料枠廃止で却下（マスター承認済み）</td></tr>
+  <tr><td>RSSプロキシ</td><td><strong>Vercel Functions</strong></td><td>Cloudflare Workers</td><td>ホスティングと同一プラットフォームで管理が楽</td></tr>
+</tbody>
+</table>
+
+<!-- フィルタ6項目評価 (#10) -->
+<h2>フィルタ6項目評価</h2>
+<table>
+<thead>
+  <tr><th>サービス</th><th>①端末互換</th><th>②日本語/JP</th><th>③無料枠充足</th><th>④障害時影響</th><th>⑤代替手段</th><th>⑥利用規約</th></tr>
+</thead>
+<tbody>
+  <tr><td><strong>Gemini Flash-Lite</strong></td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td></tr>
+  <tr><td><strong>Vercel</strong></td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="yes">○</td><td class="yes">○</td></tr>
+  <tr><td><strong>YouTube Data API</strong></td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="yes">○</td></tr>
+  <tr><td><strong>GoogleアラートRSS</strong></td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="partial">△</td><td class="partial">△</td><td class="yes">○</td></tr>
+  <tr><td><strong>note RSS</strong></td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="no">×</td><td class="yes">○</td></tr>
+  <tr><td><strong>localStorage</strong></td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td><td class="yes">○</td></tr>
+</tbody>
+</table>
+<p style="font-size:12px;color:#666;margin-top:8px;">
+  ③Gemini △: 1,000RPD/15RPMはMVPには十分だがスケール時に有料化必須（H6で検証）<br>
+  ④Gemini △: 停止時はAI要約なしで生ニュースのみ表示（グレースフルデグレード）<br>
+  ④Vercel △: 停止時は全サービス停止。ただしVercelのSLA実績は99.99%<br>
+  ④GoogleアラートRSS △: Googleのサービス終了リスク。過去にReader終了の前例<br>
+  ⑤YouTube △: 飲食動画はYouTubeに集中。代替プラットフォームなし<br>
+  ⑤note △: 飲食系クリエイター記事はnoteに集中。代替なし
+</p>
+
+<!-- 採用決定+Kill判定 (#12) -->
+<h2>採用決定 + Kill判定</h2>
+<table>
+<thead>
+  <tr><th>カテゴリ</th><th>採用サービス</th><th>選定理由</th><th>移行トリガー</th></tr>
+</thead>
+<tbody>
+  <tr><td>AI</td><td><strong>Gemini 2.5 Flash-Lite</strong></td><td>無料枠最大。品質十分</td><td>無料枠超過時 → Gemini有料 or OpenAI</td></tr>
+  <tr><td>ホスティング</td><td><strong>Vercel</strong></td><td>React+Functions統合。Cron対応</td><td>帯域超過時 → Cloudflare Pages</td></tr>
+  <tr><td>動画</td><td><strong>YouTube Data API v3</strong></td><td>独占。代替なし</td><td>—</td></tr>
+  <tr><td>ニュースソース</td><td><strong>GoogleアラートRSS + note RSS</strong></td><td>無料。正規ルート</td><td>Google終了時 → 独自クローラー検討（要マスター承認）</td></tr>
+  <tr><td>DB</td><td><strong>localStorage（MVP）</strong></td><td>インフラ0円</td><td>ユーザー認証必要時 → Supabase</td></tr>
+</tbody>
+</table>
+
+<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:8px;padding:16px;margin-top:20px;">
+  <h3 style="margin:0 0 8px;color:#166534;">Kill判定: PASS</h3>
+  <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
+    <li>全カテゴリで採用候補あり。フィルタ落ちゼロ</li>
+    <li>全て無料枠内で構築可能（H6の前提を支持）</li>
+    <li>客の環境（スマホブラウザ）で動作可能</li>
+    <li>注意: Gemini無料枠（1,000RPD）はスケール時のボトルネック。H3/H6で継続検証</li>
+  </ul>
+</div>
+
+</div><!-- /tab-s4 -->
+
+<script>
+const PRODUCT_KEY = 'foodee';
+const SK = PRODUCT_KEY + '-state';
+const COMP_COLORS = ['#dc2626','#3b82f6','#16a34a','#8b5cf6','#ec4899','#64748b','#f59e0b','#06b6d4'];
+
+// ========== タブ切り替え ==========
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelector(`.tab[onclick="switchTab('${id}')"]`).classList.add('active');
+  history.replaceState(null, '', '#' + id);
+}
+if (location.hash === '#s4') switchTab('s4');
+
+// ========== 保存・復元 ==========
+function gatherState() {
+  const checks = {}, notes = {}, defs = {};
+  document.querySelectorAll('input[data-id]').forEach(cb => { checks[cb.dataset.id] = cb.checked; });
+  document.querySelectorAll('.note[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) notes[i] = el.textContent.trim(); });
+  document.querySelectorAll('.mono-note[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) notes['m'+i] = el.textContent.trim(); });
+  document.querySelectorAll('[data-def]').forEach(el => { defs[el.dataset.def] = el.textContent.trim(); });
+  return { checks, notes, defs, axisX: document.getElementById('axisX').value, axisY: document.getElementById('axisY').value };
+}
+function applyState(state) {
+  if (!state) return;
+  if (state.checks) Object.entries(state.checks).forEach(([id, v]) => { const cb = document.querySelector(`input[data-id="${id}"]`); if (cb) cb.checked = v; });
+  if (state.notes) { const els = document.querySelectorAll('.note[contenteditable]'); const mels = document.querySelectorAll('.mono-note[contenteditable]'); Object.entries(state.notes).forEach(([i, text]) => { if (i.startsWith('m')) { if (mels[+i.slice(1)]) mels[+i.slice(1)].textContent = text; } else { if (els[+i]) els[+i].textContent = text; } }); }
+  if (state.defs) Object.entries(state.defs).forEach(([key, text]) => { const el = document.querySelector(`[data-def="${key}"]`); if (el) el.textContent = text; });
+}
+function save() { localStorage.setItem(SK, JSON.stringify(gatherState())); const el = document.getElementById('saveStatus'); el.style.display = 'inline'; setTimeout(() => el.style.display = 'none', 2500); }
+function loadState() { try { applyState(JSON.parse(localStorage.getItem(SK))); } catch(e) {} }
+function autoSave() { localStorage.setItem(SK, JSON.stringify(gatherState())); }
+document.querySelectorAll('input[data-id]').forEach(cb => cb.addEventListener('change', autoSave));
+document.querySelectorAll('.note[contenteditable], .mono-note[contenteditable], [data-def]').forEach(el => el.addEventListener('blur', autoSave));
+
+// ========== スコア集計 ==========
+function getCompHeaders() { return Array.from(document.querySelectorAll('#compTable thead th.comp')); }
+function isFuncRow(cells) { let ok = false; cells.forEach(c => { if ('○△×'.includes(c.textContent.trim())) ok = true; }); return ok; }
+
+function calcScores() {
+  const headers = getCompHeaders();
+  const scores = {};
+  headers.forEach(th => { scores[th.textContent.trim()] = { yes:0, partial:0, no:0 }; });
+  document.querySelectorAll('#compTable tbody tr:not(.cat)').forEach(row => {
+    const cells = row.querySelectorAll('.comp');
+    if (!cells.length || !isFuncRow(cells)) return;
+    cells.forEach((cell, i) => {
+      const name = headers[i]?.textContent?.trim();
+      if (!name || !scores[name]) return;
+      const t = cell.textContent.trim();
+      if (t === '○') scores[name].yes++; else if (t === '△') scores[name].partial++; else if (t === '×') scores[name].no++;
+    });
+  });
+  const tbody = document.getElementById('scoreBody');
+  tbody.innerHTML = '';
+  Object.entries(scores).forEach(([name, s]) => {
+    const total = s.yes + s.partial + s.no;
+    const rate = total ? Math.round((s.yes + s.partial * 0.5) / total * 100) + '%' : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><strong>${name}</strong></td><td class="yes">${s.yes}</td><td class="partial">${s.partial}</td><td class="no">${s.no}</td><td style="font-weight:700">${rate}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ========== ポジショニング勢力図 ==========
+function getCategoryScores() {
+  const headers = getCompHeaders();
+  const compNames = headers.map(th => th.textContent.trim());
+  const compCount = compNames.length;
+  const rawCats = [];
+  let currentCat = null, catRows = [];
+
+  document.querySelectorAll('#compTable tbody tr').forEach(row => {
+    if (row.classList.contains('cat')) {
+      if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+      currentCat = row.textContent.trim();
+      catRows = [];
+    } else {
+      const cells = row.querySelectorAll('.comp');
+      if (cells.length && isFuncRow(cells)) catRows.push(cells);
+    }
+  });
+  if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+
+  const categories = rawCats.map(cat => {
+    const n = cat.rows.length;
+    const scores = [];
+    for (let ci = 0; ci < compCount; ci++) {
+      let sum = 0;
+      cat.rows.forEach(cells => { const t = cells[ci]?.textContent?.trim(); if (t === '○') sum += 1; else if (t === '△') sum += 0.5; });
+      scores.push(sum);
+    }
+    const normed = scores.map(s => n ? s / n : 0);
+    const mean = normed.reduce((a, b) => a + b, 0) / normed.length;
+    const variance = normed.reduce((a, b) => a + (b - mean) ** 2, 0) / normed.length;
+    return { name: cat.name, scores, maxScore: n, variance };
+  });
+
+  const overallScores = [];
+  for (let ci = 0; ci < compCount; ci++) {
+    let sum = 0;
+    rawCats.forEach(cat => { cat.rows.forEach(cells => { const t = cells[ci]?.textContent?.trim(); if (t === '○') sum += 1; else if (t === '△') sum += 0.5; }); });
+    overallScores.push(sum);
+  }
+  const totalFeatures = rawCats.reduce((a, c) => a + c.rows.length, 0);
+  return { compNames, categories, overallScores, totalFeatures };
+}
+
+function populateAxisSelectors(catData) {
+  const selX = document.getElementById('axisX'), selY = document.getElementById('axisY');
+  selX.innerHTML = ''; selY.innerHTML = '';
+  const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+  sorted.forEach(cat => {
+    const label = `${cat.name} (${cat.maxScore}項目)`;
+    selX.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+    selY.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+  });
+  if (sorted.length >= 2) { selX.value = sorted[0].name; selY.value = sorted[1].name; }
+  try { const state = JSON.parse(localStorage.getItem(SK)); if (state?.axisX && sorted.find(c => c.name === state.axisX)) selX.value = state.axisX; if (state?.axisY && sorted.find(c => c.name === state.axisY)) selY.value = state.axisY; } catch(e) {}
+}
+
+function renderChart(catData) {
+  const area = document.getElementById('posChartArea');
+  const legendEl = document.getElementById('posLegend');
+  const autoTag = document.getElementById('autoTag');
+  if (!catData.categories.length) { area.innerHTML = '<p class="pos-empty">データなし</p>'; return; }
+
+  const axisXName = document.getElementById('axisX').value;
+  const axisYName = document.getElementById('axisY').value;
+  const catX = catData.categories.find(c => c.name === axisXName);
+  const catY = catData.categories.find(c => c.name === axisYName);
+  if (!catX || !catY) return;
+
+  const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+  autoTag.style.display = (sorted.length >= 2 && axisXName === sorted[0].name && axisYName === sorted[1].name) ? 'inline' : 'none';
+
+  const W = 600, H = 440, PAD = 70;
+  const cW = W - PAD * 2, cH = H - PAD * 2;
+  const maxX = catX.maxScore || 1, maxY = catY.maxScore || 1;
+  let svg = `<svg width="${W}" height="${H}" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;">`;
+
+  for (let v = 0; v <= maxX; v++) { const x = PAD + (v / maxX) * cW; svg += `<line x1="${x}" y1="${PAD}" x2="${x}" y2="${PAD+cH}" stroke="${v===0?'#cbd5e1':'#f1f5f9'}"/><text x="${x}" y="${PAD+cH+16}" text-anchor="middle" font-size="10" fill="#94a3b8">${v}</text>`; }
+  for (let v = 0; v <= maxY; v++) { const y = PAD + ((maxY - v) / maxY) * cH; svg += `<line x1="${PAD}" y1="${y}" x2="${PAD+cW}" y2="${y}" stroke="${v===0?'#cbd5e1':'#f1f5f9'}"/><text x="${PAD-8}" y="${y+4}" text-anchor="end" font-size="10" fill="#94a3b8">${v}</text>`; }
+  svg += `<rect x="${PAD}" y="${PAD}" width="${cW}" height="${cH}" fill="none" stroke="#cbd5e1"/>`;
+  svg += `<text x="${PAD+cW/2}" y="${H-8}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">${axisXName}</text>`;
+  svg += `<text x="16" y="${PAD+cH/2}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569" transform="rotate(-90,16,${PAD+cH/2})">${axisYName}</text>`;
+
+  const oS = catData.overallScores;
+  const total = catData.totalFeatures || 1;
+  const minO = Math.min(...oS), maxO = Math.max(...oS), oRange = maxO - minO || 1;
+  const bubbleR = oS.map(s => 14 + ((s - minO) / oRange) * 28);
+  const order = catData.compNames.map((_, i) => i).sort((a, b) => bubbleR[b] - bubbleR[a]);
+
+  order.forEach(i => {
+    const vx = catX.scores[i], vy = catY.scores[i];
+    const cx = PAD + (vx / maxX) * cW, cy = PAD + ((maxY - vy) / maxY) * cH;
+    const color = COMP_COLORS[i % COMP_COLORS.length], r = bubbleR[i], isOurs = i === 0;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="${isOurs ? 3 : 1.5}"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}"/>`;
+    const lx = cx + r + 5, ly = cy - 4;
+    svg += `<text x="${lx}" y="${ly}" font-size="11" font-weight="${isOurs ? '700' : '500'}" fill="${color}">${catData.compNames[i]}</text>`;
+    svg += `<text x="${lx}" y="${ly + 13}" font-size="9" fill="#94a3b8">${oS[i]}/${total}項目</text>`;
+  });
+  svg += '</svg>';
+  area.innerHTML = svg;
+
+  let legHtml = catData.compNames.map((n, i) => `<span><span class="pos-dot" style="background:${COMP_COLORS[i%COMP_COLORS.length]}"></span>${n} (${oS[i]}/${total})</span>`).join('');
+  legHtml += '<span style="color:#94a3b8;margin-left:12px;">○=1点 △=0.5点 | バブル大＝総合実装数が多い</span>';
+  legendEl.innerHTML = legHtml;
+}
+
+function updateMap() { const d = getCategoryScores(); if (d.categories.length >= 2) { populateAxisSelectors(d); renderChart(d); } }
+document.getElementById('axisX').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+document.getElementById('axisY').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+
+// ========== カテゴリ自動分類 ==========
+function runClustering() {
+  const headers = getCompHeaders();
+  const compCount = headers.length;
+  if (compCount < 2) { alert('競合が2社以上必要です'); return; }
+  const items = [];
+  document.querySelectorAll('#compTable tbody tr:not(.cat)').forEach(row => {
+    const cells = row.querySelectorAll('.comp');
+    if (!cells.length || !isFuncRow(cells)) return;
+    const numCell = row.querySelector('.num, td:first-child');
+    const nameCell = row.children[1];
+    const id = numCell?.textContent?.trim() || String(items.length + 1);
+    const name = nameCell?.textContent?.trim() || '?';
+    const vals = [];
+    for (let ci = 0; ci < compCount; ci++) {
+      const t = cells[ci]?.textContent?.trim();
+      vals.push(t === '○' ? 1 : t === '△' ? 0.5 : 0);
+    }
+    items.push({ id, name, vals, row });
+  });
+  if (items.length < 4) { alert('4項目以上必要です'); return; }
+  function pearson(a, b) {
+    const n = a.length, ma = a.reduce((s,v) => s+v, 0)/n, mb = b.reduce((s,v) => s+v, 0)/n;
+    let num = 0, da = 0, db = 0;
+    for (let i = 0; i < n; i++) { num += (a[i]-ma)*(b[i]-mb); da += (a[i]-ma)**2; db += (b[i]-mb)**2; }
+    da = Math.sqrt(da); db = Math.sqrt(db);
+    return (da && db) ? num / (da * db) : 0;
+  }
+  const corr = {};
+  items.forEach((a, i) => items.forEach((b, j) => { corr[i+','+j] = pearson(a.vals, b.vals); }));
+  let clusters = {};
+  items.forEach((_, i) => { clusters[i] = [i]; });
+  function cdist(c1, c2) { let t = 0, n = 0; c1.forEach(i => c2.forEach(j => { t += corr[i+','+j]; n++; })); return n ? t / n : 0; }
+  const target = Math.max(5, Math.min(10, Math.round(items.length / 5)));
+  while (Object.keys(clusters).length > target) {
+    let best = null, bsim = -999;
+    const keys = Object.keys(clusters);
+    for (let a = 0; a < keys.length; a++) { for (let b = a + 1; b < keys.length; b++) { const s = cdist(clusters[keys[a]], clusters[keys[b]]); if (s > bsim) { bsim = s; best = [keys[a], keys[b]]; } } }
+    clusters[best[0]] = clusters[best[0]].concat(clusters[best[1]]);
+    delete clusters[best[1]];
+  }
+  const container = document.getElementById('clusterResult');
+  let html = '<h3>カテゴリ自動分類の結果</h3>';
+  const groups = Object.values(clusters).map(members => {
+    members.sort((a, b) => a - b);
+    const avg = new Array(compCount).fill(0);
+    members.forEach(idx => { items[idx].vals.forEach((v, ci) => { avg[ci] += v; }); });
+    avg.forEach((_, ci) => { avg[ci] /= members.length; });
+    const mean = avg.reduce((s,v) => s+v, 0) / avg.length;
+    const variance = avg.reduce((s,v) => s + (v - mean) ** 2, 0) / avg.length;
+    return { members, variance };
+  });
+  groups.sort((a, b) => a.members[0] - b.members[0]);
+  groups.forEach((g, gi) => {
+    const itemList = g.members.map(idx => `#${items[idx].id} ${items[idx].name}`).join('、');
+    html += `<div class="cluster-group"><strong>グループ${gi+1}</strong> <span class="var-tag">分散: ${g.variance.toFixed(3)}</span><div class="items">${itemList}</div></div>`;
+  });
+  html += '<div class="cluster-actions"><button class="btn-apply" onclick="applyClustering()">適用</button><button class="btn-cancel" onclick="document.getElementById(\'clusterResult\').style.display=\'none\'">キャンセル</button></div>';
+  container.innerHTML = html;
+  container.style.display = 'block';
+  container._groups = groups;
+  container._items = items;
+}
+
+function applyClustering() {
+  const container = document.getElementById('clusterResult');
+  const groups = container._groups;
+  const items = container._items;
+  if (!groups || !items) return;
+  const tbody = document.querySelector('#compTable tbody');
+  tbody.querySelectorAll('.cat').forEach(el => el.remove());
+  groups.forEach((g, gi) => {
+    const catRow = document.createElement('tr');
+    catRow.className = 'cat';
+    const colSpan = document.querySelector('#compTable thead tr').children.length;
+    catRow.innerHTML = `<td colspan="${colSpan}">グループ${gi+1}（${g.members.length}項目）</td>`;
+    tbody.appendChild(catRow);
+    g.members.forEach(idx => { tbody.appendChild(items[idx].row); });
+  });
+  container.style.display = 'none';
+  calcScores();
+  updateMap();
+  autoSave();
+}
+
+// ========== Markdown書出 ==========
+function exportMd() {
+  let md = `# ${PRODUCT_KEY} 開発指示チェックリスト\n\n> ${new Date().toISOString().slice(0,19).replace('T',' ')}\n\n`;
+  const d1 = document.querySelector('[data-def="def1"]')?.textContent?.trim();
+  const d2 = document.querySelector('[data-def="def2"]')?.textContent?.trim();
+  const d3 = document.querySelector('[data-def="def3"]')?.textContent?.trim();
+  if (d1||d2||d3) { md += '## 開発の方向性\n\n'; if(d1) md += `1. **一言定義:** ${d1}\n`; if(d2) md += `2. **狙うポジション:** ${d2}\n`; if(d3) md += `3. **意図 vs 実装:** ${d3}\n`; md += '\n'; }
+  md += '## チェック済み（開発対象）\n\n'; let unc = '\n## 未チェック\n\n';
+  document.querySelectorAll('input[data-id]').forEach(cb => {
+    const row = cb.closest('tr'), cells = row.children, id = cb.dataset.id;
+    const name = cells[1]?.textContent, self = cells[2]?.textContent?.trim();
+    const note = cells[cells.length-1]?.textContent?.trim()||'';
+    const icon = self==='○'?'(済)':self==='△'?'(部分)':'(未)';
+    const line = `- [${cb.checked?'x':' '}] #${id} ${name} ${icon}${note?' — '+note:''}\n`;
+    if (cb.checked) md += line; else if (self==='×'||self==='△') unc += line;
+  });
+  const blob = new Blob([md+unc], {type:'text/markdown'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = PRODUCT_KEY + '-dev-checklist.md'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ========== 初期化 ==========
+loadState();
+calcScores();
+updateMap();
+</script>
+
+</body>
+</html>

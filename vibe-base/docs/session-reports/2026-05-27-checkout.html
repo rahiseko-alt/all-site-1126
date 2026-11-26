@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Check-out 2026-05-27 — vibe-base 司令塔セッション引継ぎ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Kaku Gothic ProN','Yu Gothic','Meiryo',sans-serif; background:#f5f5f7; color:#1a1a2e; font-size:15px; line-height:1.7; padding:24px 16px 64px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { background:#1a1a2e; color:#fff; padding:32px 28px; border-radius:14px; margin-bottom:28px; }
+  header h1 { font-size:24px; font-weight:800; margin-bottom:8px; line-height:1.3; }
+  header .meta { font-size:13px; opacity:0.7; margin-top:8px; }
+  .alert-red { background:#fee; border-left:5px solid #c00; padding:18px 22px; border-radius:8px; margin-bottom:24px; }
+  .alert-red h2 { color:#c00; font-size:18px; margin-bottom:8px; }
+  .alert-green { background:#e8f5e9; border-left:5px solid #2e7d32; padding:14px 18px; border-radius:8px; margin-bottom:20px; font-size:14px; }
+  section { background:#fff; border-radius:12px; padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  section h2 { font-size:20px; color:#1a1a2e; margin-bottom:14px; border-bottom:2px solid #e0e0e8; padding-bottom:8px; }
+  section h3 { font-size:16px; color:#3a3a5e; margin:18px 0 10px; }
+  ul, ol { padding-left:22px; }
+  li { margin-bottom:6px; }
+  code { background:#f0f0f5; padding:2px 6px; border-radius:4px; font-family:'Consolas',monospace; font-size:13px; color:#c0392b; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { padding:8px 12px; text-align:left; border-bottom:1px solid #e0e0e8; vertical-align:top; }
+  th { background:#f0f0f5; font-weight:700; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; margin-right:4px; }
+  .badge-h { background:#fee; color:#c00; }
+  .badge-m { background:#fff3e0; color:#e65100; }
+  .badge-l { background:#e8f0fe; color:#1565c0; }
+  .badge-done { background:#e8f5e9; color:#2e7d32; }
+  .badge-pending { background:#fff8e1; color:#f57f17; }
+  .commit { font-family:'Consolas',monospace; background:#f0f0f5; padding:1px 6px; border-radius:3px; font-size:12px; color:#1565c0; }
+  .toc { background:#f0f5fa; border-left:4px solid #1976d2; padding:16px 20px; border-radius:0 8px 8px 0; }
+  .toc h3 { margin-bottom:8px; color:#1976d2; }
+  .toc a { color:#1976d2; text-decoration:none; font-size:14px; }
+  .toc a:hover { text-decoration:underline; }
+  footer { text-align:center; padding:24px; color:#666; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Session Check-out 2026-05-27</h1>
+  <div>vibe-base 司令塔セッション・引継ぎレポート</div>
+  <div class="meta">Branch: plan-mode-redesign · 10 commit landed · 次セッションで本ファイルを必ず先頭から Read してから着手</div>
+</header>
+
+<div class="alert-red">
+  <h2>⚠️ 最重要: memory.md P4 [2026-05-26] HARD BLOCK 解釈の重大訂正</h2>
+  <p>旧理解「<code>.claude/hooks/*.mjs</code> 編集は Self-Modification HARD BLOCK で user authorization でも解除不可」は <strong>不正確</strong>。<br>
+  Track K (research-analyst・8 ソース調査) で公式 docs 確定: <code>.claude/hooks/</code> + <code>.claude/settings.json</code> は <strong>CC Protected Path = PROMPT</strong> (承認 1 回で通過可)・DENY ではない。<br>
+  vibe-base 独自 <code>pre-edit.sh</code> の HARD BLOCK (exit 2) は <code>.claude/agents|skills|commands/</code> のみ対象・<code>.claude/hooks/</code> は対象外。<br>
+  <strong>本セッションで実証:</strong> commit <code class="commit">113ce7c</code> で Edit + 承認 1 回経路で secret-write-gate fail-closed + area-gate stderr 追加を完遂。</p>
+</div>
+
+<div class="alert-green">
+  <strong>受け入れ基準精度担保 4 段深層防御アーキテクチャ Stage 1-3 配備完了</strong> (commit <code class="commit">cd3761e</code>)。Stage 4 (Worker/Evaluator 統合) は次セッション Opus フェーズで完遂予定。
+</div>
+
+<section class="toc">
+  <h3>📑 目次</h3>
+  <ul style="list-style:none; padding-left:0;">
+    <li><a href="#summary">A. 本セッション TL;DR</a></li>
+    <li><a href="#commits">B. 完了 commit 一覧 (10 件)</a></li>
+    <li><a href="#waves">C. Wave 構成と完遂 Track</a></li>
+    <li><a href="#pending">D. 残作業（次セッション着手対象・優先度別）</a></li>
+    <li><a href="#agents">E. 配備済 hook / skill / slash command</a></li>
+    <li><a href="#lessons">F. 永続教訓 (P4 追加 4 件)</a></li>
+    <li><a href="#nextstep">G. 次セッション初手 (recommended)</a></li>
+  </ul>
+</section>
+
+<section id="summary">
+  <h2>A. 本セッション TL;DR</h2>
+  <ul>
+    <li><strong>HARD BLOCK 解釈訂正</strong> (Track K)・hooks/settings.json は PROMPT で master 手動メモ帳ナビ不要 → Edit + 承認 1 回経路に縮退</li>
+    <li><strong>受け入れ基準 4 段深層防御 Stage 1-3 配備</strong> (Track L-1/2/3)・案 1-4 を異なるゲートポイントに責務分離・dogfooding self-verify PASS</li>
+    <li><strong>10 commit landed</strong>・Wave 1 (5 agent 並列) + Wave 2 (5 subagent + orchestrator 直 Track) 完遂</li>
+    <li><strong>vibe-governance dead-link 46 件除去</strong> + rules 4 ファイル + CLAUDE.md L62 訂正 (Track A)</li>
+    <li><strong>11 product PC 表 P4#0 status × → ○</strong>・runbook 整合補正 (Track D-W2)</li>
+    <li><strong>4 product memory.md P3 → failures.md 移管完了</strong> (Track E)・前セッション残対応</li>
+    <li><strong>aiueo 5 utils テスト 70 件 PASS</strong> + 配備 (Track J・<code class="commit">a35645b</code>)</li>
+    <li><strong>軸 8 シミュレーション手法リサーチ HTML 永続化</strong> (18 ソース) → <code>products/code-review-skills/research/axis8-simulation.html</code></li>
+    <li><strong>/checkout slash command</strong> 14 location (vibe-base + 13 product) 配備 (Track I Step 1+3)・Step 2 は次セッション <code>--add-dir</code> で master 手動配置</li>
+    <li><strong>Plan Mode 再入 1 回</strong>・Wave 1 完了後に master 指示で計画修正検討 → Wave 3 を Wave 2 に統合縮退</li>
+  </ul>
+</section>
+
+<section id="commits">
+  <h2>B. 完了 commit 一覧 (10 件・本セッション)</h2>
+  <table>
+    <thead><tr><th>hash</th><th>種別</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code class="commit">f311469</code></td><td>feat(skills)</td><td>checkout SKILL 下書き + /checkout slash command 14 location + 軸 8 リサーチ HTML</td></tr>
+      <tr><td><code class="commit">cc44b2e</code></td><td>chore(failures)</td><td>4 product memory.md P3 → failures.md 移管 (Track E)</td></tr>
+      <tr><td><code class="commit">a842878</code></td><td>chore(pc)</td><td>11 product P4#0 Runbook 整合補正 + status × → ○ (Track D-W2)</td></tr>
+      <tr><td><code class="commit">cd3761e</code></td><td>feat(hooks)</td><td>受け入れ基準精度担保 4 段深層防御 Stage 1-3 配備 (Track L-1/2/3)</td></tr>
+      <tr><td><code class="commit">113ce7c</code></td><td>fix(hooks)</td><td>secret-write-gate fail-closed 化 + area-gate catch stderr 追加 (Track F+G)</td></tr>
+      <tr><td><code class="commit">a35645b</code></td><td>test(aiueo)</td><td>5 utils テストカバレッジ追加 (tax / csv / menu / receipt / role) 70 tests PASS</td></tr>
+      <tr><td><code class="commit">2f76730</code></td><td>chore(governance)</td><td>vibe-governance dead-link 46 件除去 + rules 4 ファイル更新 + CLAUDE.md L62 修正 (Track A)</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:12px"><strong>未 push:</strong> local plan-mode-redesign は origin より <strong>+25 commit 程度先行</strong>。push 判断はマスター。</p>
+</section>
+
+<section id="waves">
+  <h2>C. Wave 構成と完遂 Track</h2>
+
+  <h3>Wave 1 (即時並列起動・5 agent 同時) [Opus フェーズ]</h3>
+  <table>
+    <thead><tr><th>Track</th><th>状態</th><th>主要結果</th></tr></thead>
+    <tbody>
+      <tr><td>A Governance 修正</td><td><span class="badge badge-done">✅ 完了</span></td><td>46 dead-link → 0 / rules 4 ファイル更新 / CLAUDE.md L62 訂正</td></tr>
+      <tr><td>B-W1 軸 8 リサーチ</td><td><span class="badge badge-done">✅ 完了</span></td><td>18 ソース (H:9 / M:9) / 既存 7 軸重複 0 件 / 4 兄弟統合案 4 件</td></tr>
+      <tr><td>D-W1 PC 表 P4#0 11 product 調査</td><td><span class="badge badge-done">✅ 完了</span></td><td>11/11 全 P4#0 status × / 既存 runbook 全件存在</td></tr>
+      <tr><td>G area-gate.mjs 原因調査</td><td><span class="badge badge-done">✅ 完了</span></td><td>既修復済 (4d1adc4)・修正案 = catch stderr 追加</td></tr>
+      <tr><td>K HARD BLOCK 調査</td><td><span class="badge badge-done">✅ 完了</span></td><td>memory P4 訂正 (HARD BLOCK = PROMPT) / 8 ソース / Track F/G/I 全て代替経路あり</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Wave 2 (Wave 1 完了後・並列 + orchestrator 直) [Sonnet]</h3>
+  <table>
+    <thead><tr><th>Track</th><th>状態</th><th>主要結果</th></tr></thead>
+    <tbody>
+      <tr><td>B-W2 SKILL.md 配置</td><td><span class="badge badge-pending">⚠️ 実質スキップ</span></td><td>既存 4 兄弟 SKILL.md + spec.md は完成度高 (マスター承認待ち状態)・軸 8 HTML のみ保存</td></tr>
+      <tr><td>D-W2 runbook 整合補正</td><td><span class="badge badge-done">✅ 完了</span></td><td>11 product 整合補正 (3 件追記 + 8 件無修正) + PC 表 P4#0 status × → ○</td></tr>
+      <tr><td>E failures.md 移管</td><td><span class="badge badge-done">✅ 完了</span></td><td>4 product (LSKF / ymm-shorts / LSK / GSD) 合計 13 entries 移管</td></tr>
+      <tr><td>F secret-write-gate fail-closed</td><td><span class="badge badge-done">✅ 完了</span></td><td>orchestrator Edit + 承認 1 回 (Track K 訂正経路) + 16 product propagate</td></tr>
+      <tr><td>G area-gate.mjs catch stderr</td><td><span class="badge badge-done">✅ 完了</span></td><td>同上・1 行追加で機能停止隠蔽防止</td></tr>
+      <tr><td>I Step 1+3 checkout</td><td><span class="badge badge-done">✅ 完了</span></td><td>SKILL.md 下書き (tmp/) + slash command 14 location 配備</td></tr>
+      <tr><td>J aiueo 5 utils テスト</td><td><span class="badge badge-done">✅ 完了</span></td><td>70 tests PASS / commit a35645b</td></tr>
+      <tr><td>L-1/2/3 受入条件 hook + slash</td><td><span class="badge badge-done">✅ 完了</span></td><td>4 hook + 8 fixture + slash command 拡張 + 32 propagate</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Wave 3 → 廃止 (Track K 反映で Wave 2 に統合)</h3>
+  <p>Track F/G/I が master 手動メモ帳ナビ不要と判明・orchestrator 直 Edit + 承認 1 回で完遂可能になったため Wave 3 を Wave 2 に統合。残 Wave 3 候補 (Track C / H / I-Step2 / L-4 / M) は次セッション。</p>
+</section>
+
+<section id="pending">
+  <h2>D. 残作業（次セッション着手対象）</h2>
+
+  <h3><span class="badge badge-h">H 優先</span>Track L-4 — Stage 4 Worker/Evaluator 統合 (🔴 Opus 推奨)</h3>
+  <ol>
+    <li><code>.claude/agents/verify-agent.md</code> description 拡張: 「受入基準内の検証 keyword を全実行して PASS/FAIL 表を返す + transcript ベース意味判定 (Worker/Evaluator 分離)」</li>
+    <li><code>docs/standards/plan-mode.md</code> canonical に Stage 4 統合仕様追記 + 公式 4 思想 (証拠ベース / 評価者分離 / EARS / hooks 決定論) 統合</li>
+    <li>option: <code>.claude/skills/goal-verify/SKILL.md</code> ヘルパー</li>
+    <li>受け入れ条件: verify-agent 単体起動で本計画書受け入れ基準 12 項目の合否表返却 + dummy plan (PASS/FAIL 混在) で正しく分離判定</li>
+    <li>引用元: <code>~/.claude/plans/pure-meandering-dove.md</code> Track L-4 セクション + Anthropic <code>/goal</code> 公式仕様</li>
+  </ol>
+
+  <h3><span class="badge badge-h">H 優先</span>code-review-skills マスター承認</h3>
+  <p>4 兄弟 SKILL.md + spec.md + 軸 8 リサーチ HTML 全配置済。CLAUDE.md §4 完成判定 #1-#4 PASS・残 = #5 マスター承認。CLAUDE.md §5 path 誤記 (<code>docs/research-bank/code-review-philosophy-2026.html</code> は履歴に不在) も別途訂正候補。</p>
+
+  <h3><span class="badge badge-m">M 優先</span>Track M — CLAUDE.md スリム化 65→≤60 行</h3>
+  <ol>
+    <li><code>rules-coverage-gate</code> hook warning 解消</li>
+    <li>§5.2 / §5.3 / §5.4 重複説明を rules pointer に圧縮</li>
+    <li>§7 plan-mode 詳細を <code>docs/standards/plan-mode.md</code> pointer に圧縮</li>
+    <li>主要規律削除禁止 (rules 参照置換のみ・master 承認要)</li>
+  </ol>
+
+  <h3><span class="badge badge-m">M 優先</span>Track I Step 2 (~/.claude/skills/checkout/ 配置・master 手動 step)</h3>
+  <ol>
+    <li>新セッション起動: <code>claude --add-dir ~/.claude/skills</code></li>
+    <li>orchestrator 直 Write で <code>~/.claude/skills/checkout/SKILL.md</code> 配置 (下書き = <code>tmp/checkout-skill-md.md</code>)</li>
+    <li>vibe-governance への手動バックアップ検討 (~/.claude/ は git 管理外)</li>
+  </ol>
+
+  <h3><span class="badge badge-m">M 優先</span>Track C — google-system-dev §1-§5 確定 (master nlm login 後)</h3>
+  <p>NotebookLM 認証切れ → <code>nlm login</code> 再認証 → <code>agent-brief.md</code> を役割定義に google-system-dev エージェント起動 → 仕様書を正本に CLAUDE.md §1-§5 記入。詳細 <code>products/google-system-dev/memory.md</code> P1#1。</p>
+
+  <h3><span class="badge badge-l">L 優先</span>Track H — hook-errors.jsonl logger bug</h3>
+  <p>malformed record 34 件の原因調査 + logger 修正。Track G で原因究明済の延長作業。</p>
+
+  <h3><span class="badge badge-l">L 優先</span>その他</h3>
+  <ol>
+    <li><strong>本セッション範囲外 staged 候補:</strong> <code>*-v2.mjs</code> 群 (17 location 各 2) / <code>.allow-destructive</code> / <code>aiueo/app/frontend/scripts/check-*</code> / <code>scripts/fix-hooks-write.mjs</code> — 前セッション残骸の整理 (削除 or commit 判断要)</li>
+    <li><strong>LSKF 並行作業 status:</strong> 漢字 batch import (svg/ 約 100 件 + kanji data 約 50 件 + 関連 scripts) 大量変更・LSKF agent 領域 (CLAUDE.md §0「1 フォルダ = 1 エージェント」)・vibe-base 司令塔は関与しない</li>
+    <li>CLAUDE.md §5 path 誤記訂正 (<code>docs/research-bank/code-review-philosophy-2026.html</code> → 実体不在)</li>
+  </ol>
+</section>
+
+<section id="agents">
+  <h2>E. 配備済 hook / skill / slash command (本セッション)</h2>
+
+  <h3>新規 hook (4 件・各 17 location propagate 済)</h3>
+  <ul>
+    <li><code>.claude/hooks/plan-schema-gate.mjs</code> (Track L-1・PreToolUse・plan schema 検証)</li>
+    <li><code>.claude/hooks/ac-keyword-gate.mjs</code> (Track L-2・PostToolUse・受入基準 keyword gate)</li>
+    <li><code>.claude/hooks/secret-write-gate.mjs</code> 更新 (Track F・fail-closed 化)</li>
+    <li><code>.claude/hooks/area-gate.mjs</code> 更新 (Track G・catch stderr 追加)</li>
+  </ul>
+
+  <h3>新規 slash command (1 件・14 location 配備)</h3>
+  <ul>
+    <li><code>/checkout</code> (Track I Step 3・vibe-base + 13 product = 14 location・SKILL.md 本体は次セッション master 手動配置)</li>
+  </ul>
+
+  <h3>新規 fixture (3 系統・10 ファイル)</h3>
+  <ul>
+    <li><code>tests/fixtures/plan-schema/{ok,missing-h2,placeholder-zan,template-violation}/</code> (Stage 1 検証)</li>
+    <li><code>tests/fixtures/ac-keyword/{ok,missing-keyword,keyword-in-other-section,no-acceptance-section}/</code> (Stage 2 検証)</li>
+    <li><code>tests/fixtures/plan-finalize-test/{complete,partial}/</code> (Stage 3 検証)</li>
+    <li><code>tests/fixtures/area-gate-repro/</code> (Track G 産物・4 ケース + runner)</li>
+  </ul>
+
+  <h3>slash command 拡張</h3>
+  <ul>
+    <li><code>.claude/commands/plan-finalize.md</code> に Stage 0 完全性確認セクション prepend (Track L-3)</li>
+  </ul>
+</section>
+
+<section id="lessons">
+  <h2>F. 永続教訓 (P4 追加 4 件)</h2>
+  <ol>
+    <li><strong>HARD BLOCK = PROMPT (公式仕様確定):</strong> <code>.claude/hooks/</code> + <code>.claude/settings.json</code> は CC Protected Path・承認 1 回で通過可・DENY ではない。pre-edit.sh の HARD BLOCK (exit 2) は <code>.claude/agents|skills|commands/</code> のみ対象</li>
+    <li><strong>受け入れ基準精度担保 4 段深層防御:</strong> Stage 1-3 配備 + dogfooding self-verify PASS。Stage 4 (Worker/Evaluator 統合) は L-4 で完遂予定</li>
+    <li><strong>background subagent Write 実行不可シャドウ報告:</strong> Plan Mode 中の subagent が Write 成功報告 (実体は未実行) のリスク。orchestrator が <code>ls</code> / <code>test -f</code> で実体検証する規律</li>
+    <li><strong>orchestrator 指示書 vs 既存資産確認漏れ:</strong> Track B-W2 で指示書と既存実体に 4 件乖離・agent 着手前停止判断は推奨パターン</li>
+  </ol>
+</section>
+
+<section id="nextstep">
+  <h2>G. 次セッション初手 (recommended)</h2>
+  <ol>
+    <li><strong>本ファイル全文を Read</strong> (memory.md 冒頭の @ 参照経由)</li>
+    <li><code>vibe-base/failures.md</code> + <code>vibe-base/memory.md</code> P1 / P4 を Read</li>
+    <li><code>git log --oneline -15</code> で本セッションの commit 列を確認</li>
+    <li>P1 #1 (Track L-4) を Opus フェーズで着手推奨・Stage 4 完遂で 4 段深層防御完成</li>
+    <li>並行: P1 #2 (code-review-skills マスター承認) を master に問う・前提条件は揃っている</li>
+    <li>git status の本セッション範囲外項目 (前セッション残骸 + LSKF 並行作業) を整理 (削除 or commit 判断)</li>
+  </ol>
+  <p style="margin-top:14px; padding:12px; background:#fff8e1; border-left:3px solid #f57f17;">
+    <strong>注意:</strong> Plan Mode が <code>defaultMode: "plan"</code> で恒常化済。新セッションは Plan Mode で起動する。実装着手前に <code>ExitPlanMode</code> で承認後モードに切り替える。
+  </p>
+</section>
+
+<footer>
+  Generated 2026-05-27 · vibe-base session checkout report · 10 commit landed · 次セッションで先頭から Read 必須
+</footer>
+
+</div>
+</body>
+</html>

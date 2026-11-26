@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Check-out 2026-05-27 (Session 2) — vibe-base 司令塔セッション引継ぎ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Kaku Gothic ProN','Yu Gothic','Meiryo',sans-serif; background:#f5f5f7; color:#1a1a2e; font-size:15px; line-height:1.7; padding:24px 16px 64px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { background:#1a1a2e; color:#fff; padding:32px 28px; border-radius:14px; margin-bottom:28px; }
+  header h1 { font-size:24px; font-weight:800; margin-bottom:8px; line-height:1.3; }
+  header .meta { font-size:13px; opacity:0.7; margin-top:8px; }
+  .alert-red { background:#fee; border-left:5px solid #c00; padding:18px 22px; border-radius:8px; margin-bottom:24px; }
+  .alert-red h2 { color:#c00; font-size:18px; margin-bottom:8px; }
+  .alert-green { background:#e8f5e9; border-left:5px solid #2e7d32; padding:14px 18px; border-radius:8px; margin-bottom:20px; font-size:14px; }
+  section { background:#fff; border-radius:12px; padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  section h2 { font-size:20px; color:#1a1a2e; margin-bottom:14px; border-bottom:2px solid #e0e0e8; padding-bottom:8px; }
+  section h3 { font-size:16px; color:#3a3a5e; margin:18px 0 10px; }
+  ul, ol { padding-left:22px; }
+  li { margin-bottom:6px; }
+  code { background:#f0f0f5; padding:2px 6px; border-radius:4px; font-family:'Consolas',monospace; font-size:13px; color:#c0392b; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { padding:8px 12px; text-align:left; border-bottom:1px solid #e0e0e8; vertical-align:top; }
+  th { background:#f0f0f5; font-weight:700; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; margin-right:4px; }
+  .badge-h { background:#fee; color:#c00; }
+  .badge-m { background:#fff3e0; color:#e65100; }
+  .badge-l { background:#e8f0fe; color:#1565c0; }
+  .badge-done { background:#e8f5e9; color:#2e7d32; }
+  .badge-pending { background:#fff8e1; color:#f57f17; }
+  .badge-pause { background:#eceff1; color:#455a64; }
+  .commit { font-family:'Consolas',monospace; background:#f0f0f5; padding:1px 6px; border-radius:3px; font-size:12px; color:#1565c0; }
+  .toc { background:#f0f5fa; border-left:4px solid #1976d2; padding:16px 20px; border-radius:0 8px 8px 0; }
+  .toc h3 { margin-bottom:8px; color:#1976d2; }
+  .toc a { color:#1976d2; text-decoration:none; font-size:14px; }
+  .toc a:hover { text-decoration:underline; }
+  footer { text-align:center; padding:24px; color:#666; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Session Check-out 2026-05-27 (Session 2)</h1>
+  <div>vibe-base 司令塔セッション・引継ぎレポート</div>
+  <div class="meta">Branch: plan-mode-redesign · 本セッション 5 commit landed · 次セッションで本ファイルを必ず先頭から Read してから着手</div>
+</header>
+
+<div class="alert-red">
+  <h2>⚠️ 重大訂正: 前任 Check-out HTML A 章「10 commit landed」誤情報を継承した過失</h2>
+  <p>前回レポート <code>docs/session-reports/2026-05-27-checkout.html</code> A 章 / footer に「10 commit landed」と記載 → 実際の前任セッション commit 数は <strong>8 件</strong> (table も 7 件しか掲載しておらず自己矛盾)。本セッション orchestrator がこの数字を未検算のまま引き継ぎ参照・進行ナラティブに組み込んでいた。<br>
+  <strong>原因:</strong> 「タグ ≠ 中身」型過失。前任 HTML 記載値を <code>git log --oneline</code> 直接カウントで検証せず受け入れた。<br>
+  <strong>是正:</strong> 以降の Check-out HTML 作成時は冒頭で必ず <code>git log --oneline {session-start-sha}..HEAD | wc -l</code> を実行し、本文記載 commit 数と <strong>機械検証一致</strong>させてから記述する。本セッション = <strong>5 commit</strong> (下記 B 章で git log 直接照合済)。</p>
+</div>
+
+<div class="alert-green">
+  <strong>主要達成: Plan Mode 4 段深層防御アーキテクチャ完成 (Stage 1-4 全配備)</strong>。本セッション Track L-4 完遂 (commit <code class="commit">fc1fc9a</code> + <code class="commit">4369047</code>) で <code>~/.claude/agents/verify-agent.md</code> Stage 4 (Worker/Evaluator 分離) 配備完了・前セッション Stage 1-3 と統合され受け入れ基準精度担保 4 段が揃った。
+</div>
+
+<section class="toc">
+  <h3>📑 目次</h3>
+  <ul style="list-style:none; padding-left:0;">
+    <li><a href="#summary">A. 本セッション TL;DR</a></li>
+    <li><a href="#commits">B. 完了 commit 一覧 (5 件)</a></li>
+    <li><a href="#tracks">C. canonical plan 完遂状況 (全 19 Track)</a></li>
+    <li><a href="#pending">D. 残作業（次セッション着手対象・優先度別）</a></li>
+    <li><a href="#agents">E. 配備済 hook / skill / agent</a></li>
+    <li><a href="#lessons">F. 永続教訓 (P4 追加候補 3 件)</a></li>
+    <li><a href="#nextstep">G. 次セッション初手 (recommended)</a></li>
+  </ul>
+</section>
+
+<section id="summary">
+  <h2>A. 本セッション TL;DR</h2>
+  <ul>
+    <li><strong>Track L-4 完遂</strong> — Stage 4 <code>verify-agent.md</code> (Worker/Evaluator 分離) 配備 + <code>docs/standards/plan-mode.md</code> に 4 段深層防御セクション統合 (commit <code class="commit">fc1fc9a</code>)</li>
+    <li><strong>Track L-4 C-1 fix</strong> — dogfooding self-verify で発見された不整合修正 + Track M / Track A 残作業同梱 (commit <code class="commit">4369047</code>)</li>
+    <li><strong>Track M (CLAUDE.md 65→56 行スリム化)</strong> — rules pointer 圧縮 + <code>rules-coverage-gate</code> hook warning 解消</li>
+    <li><strong>Track A 残</strong> — vibe-governance 参照 0 件化 (残存リンク棚卸し完遂)</li>
+    <li><strong>Track H (hook-runner.mjs malformed record ガード)</strong> — root + 16 product = <strong>17 location</strong> propagate (commit <code class="commit">69c794b</code>)</li>
+    <li><strong>plan 正本化</strong> — <code>~/.claude/plans/pure-meandering-dove.md</code> → <code>docs/ops/plans/2026-05-27-multi-track.md</code> へ git-tracked 化 (commit <code class="commit">edca06a</code>)</li>
+    <li><strong>Track B-W2 マスター承認受領</strong> — code-review-skills 4 兄弟 SKILL.md + spec.md 配備完了 (前セッション残)</li>
+    <li><strong>backup-agents.mjs 副作用検知</strong> — 一方向 mirror 動作確認中に正本不在 4 件をバックアップから検出・削除 (commit <code class="commit">cf08321</code>)</li>
+    <li><strong>Track C 中断</strong> — google-system-dev NotebookLM 仕様書がマスター作成待ちで未着手。<code>products/google-system-dev/memory.md</code> P1#1 に明記済</li>
+    <li><strong>Track I Step 2 待機継続</strong> — <code>~/.claude/skills/checkout/</code> 配置は <code>--add-dir</code> 起動の新セッションが必要・本セッションでは着手不可</li>
+    <li><strong>feed-check skill background 実行中</strong> — XML/HTML feed 取得 + Obsidian vault 反映 (Check-out 時点で未完了・次セッション冒頭で完了確認)</li>
+  </ul>
+</section>
+
+<section id="commits">
+  <h2>B. 完了 commit 一覧 (5 件・本セッション)</h2>
+  <table>
+    <thead><tr><th>hash</th><th>種別</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code class="commit">edca06a</code></td><td>chore(plans)</td><td>pure-meandering-dove を canonical 化 (<code>docs/ops/plans/2026-05-27-multi-track.md</code>)・git-tracked 化</td></tr>
+      <tr><td><code class="commit">cf08321</code></td><td>chore(agents)</td><td>backup-agents.mjs 一方向 mirror で正本不在 4 件をバックアップから削除 (副作用検知)</td></tr>
+      <tr><td><code class="commit">fc1fc9a</code></td><td>feat(plan-mode)</td><td>Track L-4 完遂 — Stage 4 verify-agent (Worker/Evaluator 分離) + plan-mode.md 4 段深層防御セクション統合</td></tr>
+      <tr><td><code class="commit">4369047</code></td><td>feat(plan-mode)</td><td>Track L-4 C-1 fix (dogfooding 不整合) + Track M スリム化 + Track A 残修正</td></tr>
+      <tr><td><code class="commit">69c794b</code></td><td>fix(hooks)</td><td>Track H — hook-runner.mjs malformed record 防止ガード追加 (root + 16 product propagate)</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:12px"><strong>機械検証:</strong> <code>git log --oneline</code> 直接カウントで本セッション = 5 件確定 (前任「10 commit」誤継承の再発防止)。push 判断はマスター。</p>
+</section>
+
+<section id="tracks">
+  <h2>C. canonical plan 完遂状況 (全 19 Track 最終判定)</h2>
+  <p style="margin-bottom:10px"><strong>正本:</strong> <code>docs/ops/plans/2026-05-27-multi-track.md</code> (本セッションで <code>~/.claude/plans/pure-meandering-dove.md</code> から git-tracked 化)</p>
+  <table>
+    <thead><tr><th>Track</th><th>状態</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td>A Governance 修正</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション + 本セッション残処理で vibe-governance 参照 0 件化</td></tr>
+      <tr><td>B-W1 軸 8 リサーチ</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション 18 ソース調査済</td></tr>
+      <tr><td>B-W2 SKILL.md 配置</td><td><span class="badge badge-done">✅ マスター承認</span></td><td>本セッションでマスター承認受領 (4 兄弟 SKILL.md + spec.md)</td></tr>
+      <tr><td>C google-system-dev §1-§5</td><td><span class="badge badge-pause">⏸ 中断</span></td><td>NotebookLM 仕様書マスター作成待ち</td></tr>
+      <tr><td>D-W1 PC 表 P4#0 11 product 調査</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>D-W2 runbook 整合補正</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>E failures.md 移管</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション (4 product 13 entries)</td></tr>
+      <tr><td>F secret-write-gate fail-closed</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>G area-gate.mjs catch stderr</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>H hook-errors.jsonl logger bug</td><td><span class="badge badge-done">✅ 完遂</span></td><td>本セッション (commit 69c794b・17 location propagate)</td></tr>
+      <tr><td>I Step 1 SKILL.md 下書き</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション (tmp/ 配置)</td></tr>
+      <tr><td>I Step 2 ~/.claude/skills/ 配置</td><td><span class="badge badge-pause">⏸ 中断</span></td><td><code>--add-dir</code> 新セッション必要</td></tr>
+      <tr><td>I Step 3 slash command 14 location</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>J aiueo 5 utils テスト</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション (70 tests PASS)</td></tr>
+      <tr><td>K HARD BLOCK 公式仕様調査</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>L-1 plan-schema-gate hook</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>L-2 ac-keyword-gate hook</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>L-3 plan-finalize Stage 0</td><td><span class="badge badge-done">✅ 完遂</span></td><td>前セッション</td></tr>
+      <tr><td>L-4 Stage 4 Worker/Evaluator</td><td><span class="badge badge-done">✅ 完遂</span></td><td>本セッション (commit fc1fc9a + 4369047)</td></tr>
+      <tr><td>M CLAUDE.md スリム化</td><td><span class="badge badge-done">✅ 完遂</span></td><td>本セッション (65→56 行・rules pointer 圧縮)</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:14px; padding:12px; background:#e8f5e9; border-left:4px solid #2e7d32; border-radius:0 6px 6px 0;">
+    <strong>完遂判定:</strong> 17/19 (89.5%) ・主要目的 <strong>受け入れ基準精度担保 4 段深層防御アーキテクチャ全配備</strong> 達成。残 2 Track (C / I Step 2) は外部依存 (マスター仕様書 / 新セッション起動) で本セッション着手不可。
+  </p>
+</section>
+
+<section id="pending">
+  <h2>D. 残作業（次セッション着手対象）</h2>
+
+  <h3><span class="badge badge-h">H 優先</span>なし</h3>
+  <p>本セッションで Track L-4 完遂し、優先 H タスクは消化済。</p>
+
+  <h3><span class="badge badge-m">M 優先</span>Track C — google-system-dev §1-§5 確定 (master 仕様書作成後)</h3>
+  <ol>
+    <li>マスターから NotebookLM 仕様書配置の報告を受領</li>
+    <li><code>products/google-system-dev/</code> 配下に仕様書 path 確認</li>
+    <li><code>nlm login</code> 再認証 → google-system-dev エージェント起動</li>
+    <li>仕様書を正本に <code>products/google-system-dev/CLAUDE.md</code> §1-§5 記入</li>
+    <li>詳細 → <code>products/google-system-dev/memory.md</code> P1#1</li>
+  </ol>
+
+  <h3><span class="badge badge-m">M 優先</span>Track I Step 2 — ~/.claude/skills/checkout/ 配置 (新セッション必要)</h3>
+  <ol>
+    <li>新セッション起動: <code>claude --add-dir ~/.claude/skills</code></li>
+    <li>orchestrator 直 Write で <code>~/.claude/skills/checkout/SKILL.md</code> 配置 (下書き = <code>tmp/checkout-skill-md.md</code>)</li>
+    <li>vibe-governance 手動バックアップ検討 (~/.claude/ は git 管理外)</li>
+  </ol>
+
+  <h3><span class="badge badge-l">L 優先</span>NotebookLM MCP 0.5.25 → 0.6.12 アップデート (任意)</h3>
+  <p>本セッションで NotebookLM MCP 現行 0.5.25・新 0.6.12 確認済。Track C 着手前にアップデートするとよい (新規 nlm login フローも確認推奨)。</p>
+
+  <h3><span class="badge badge-l">L 優先</span>その他</h3>
+  <ol>
+    <li><strong>本セッション範囲外 staged 候補</strong> (前セッションから継続): <code>*-v2.mjs</code> 群 (17 location 各 2) / <code>.allow-destructive</code> / <code>aiueo/app/frontend/scripts/check-*</code> / <code>scripts/fix-hooks-write.mjs</code> — 整理 (削除 or commit) 判断要</li>
+    <li><strong>LSKF 並行作業 status:</strong> 漢字 batch import 大量変更継続中 (LSKF agent 領域・vibe-base 司令塔は関与しない)</li>
+    <li>feed-check skill background 完了状態確認 (Obsidian vault 反映済か)</li>
+  </ol>
+</section>
+
+<section id="agents">
+  <h2>E. 配備済 hook / skill / agent (本セッション)</h2>
+
+  <h3>新規 agent (1 件・user-level 単一正本)</h3>
+  <ul>
+    <li><code>~/.claude/agents/verify-agent.md</code> (Track L-4・Stage 4 Worker/Evaluator 分離・受入基準 transcript ベース意味判定 + PASS/FAIL 表返却)</li>
+  </ul>
+
+  <h3>hook 修正 (1 件・17 location propagate 済)</h3>
+  <ul>
+    <li><code>.claude/hooks/hook-runner.mjs</code> malformed record 防止ガード追加 (Track H・root + 16 product = 17 location)</li>
+  </ul>
+
+  <h3>canonical 仕様書統合</h3>
+  <ul>
+    <li><code>docs/standards/plan-mode.md</code> に 4 段深層防御セクション統合 (Stage 1-4 全体仕様・dogfooding 結果含む)</li>
+    <li><code>docs/ops/plans/2026-05-27-multi-track.md</code> 新規 (旧 <code>~/.claude/plans/pure-meandering-dove.md</code> を canonical 化)</li>
+  </ul>
+
+  <h3>backup-agents.mjs 副作用検知</h3>
+  <ul>
+    <li>一方向 mirror 動作で <code>~/.claude/agents/</code> 不在の 4 件を vibe-base バックアップ側から削除 (commit cf08321)</li>
+    <li><strong>教訓:</strong> backup スクリプトは一方向 mirror であるため正本不在 = バックアップ削除。逆方向上書きが必要な場合は手動 cp で復旧</li>
+  </ul>
+</section>
+
+<section id="lessons">
+  <h2>F. 永続教訓 (P4 追加候補 3 件)</h2>
+  <ol>
+    <li><strong>「タグ ≠ 中身」型再発 — 前任 HTML の「10 commit landed」誤情報を継承した過失:</strong> 前セッション Check-out HTML A 章 / footer に「10 commit landed」と記載されていたが table 内訳は 7 件・実 git log は 8 件で 3 値が食い違っていた。orchestrator はこの数字を未検算で受け入れ進行ナラティブに組み込んだ。今後の Check-out HTML 作成では冒頭で必ず <code>git log --oneline | wc -l</code> による機械検証一致を実施する</li>
+    <li><strong>verify-agent 自己認識欠如:</strong> Track L-4 完遂後の dogfooding 検証で、verify-agent 自身が「本計画書」の受け入れ基準項目を「対象外・未実行」と判定する不整合が発生 (Stage 4 配備後の自己検証で initial run が自分の存在を認識しなかった)。C-1 fix で <code>~/.claude/agents/verify-agent.md</code> description / instruction を更新し、self-evaluation でも全 keyword 走査するよう修正。完遂報告前の dogfooding ステップは必須</li>
+    <li><strong>subagent 副作用検知の重要性:</strong> <code>backup-agents.mjs</code> 一方向 mirror 実行で正本 (<code>~/.claude/agents/</code>) 不在の 4 件がバックアップ側から削除された。これは仕様通りだが「正本側で削除された agent はバックアップからも自動消える = 復旧不可」を意味する。重要 agent の削除前には backup-agents.mjs を実行しない or 別経路で snapshot を取る規律が必要</li>
+  </ol>
+</section>
+
+<section id="nextstep">
+  <h2>G. 次セッション初手 (recommended)</h2>
+  <ol>
+    <li><strong>本ファイル全文を Read</strong> (<code>docs/session-reports/2026-05-27-checkout-2.html</code>)</li>
+    <li><code>vibe-base/failures.md</code> + <code>vibe-base/memory.md</code> P1 / P4 を Read</li>
+    <li><code>git log --oneline -10</code> で本セッション commit 列を確認 (本セッション = <strong>5 commit</strong>・前任「10 commit」誤情報の継承を防ぐため再強調)</li>
+    <li><strong>Track C 仕様書配置確認</strong> — マスターから google-system-dev 仕様書配置の報告を受けたか確認・配置済なら Track C 着手</li>
+    <li><strong>feed-check 完了状態確認</strong> — 本セッションで background 実行した feed-check skill の Obsidian vault 反映を確認</li>
+    <li>余裕があれば Track I Step 2 を <code>--add-dir</code> 新セッション起動で完遂</li>
+  </ol>
+  <p style="margin-top:14px; padding:12px; background:#fff8e1; border-left:3px solid #f57f17;">
+    <strong>注意:</strong> Plan Mode が <code>defaultMode: "plan"</code> で恒常化済。新セッションは Plan Mode で起動する。実装着手前に <code>ExitPlanMode</code> で承認後モードに切り替える。4 段深層防御 Stage 1-4 全配備済のため、新規計画は <code>/plan-template</code> → <code>/plan-finalize</code> 経路で自動検証される。
+  </p>
+</section>
+
+<footer>
+  Generated 2026-05-27 (Session 2) · vibe-base session checkout report · 5 commit landed · 次セッションで先頭から Read 必須
+</footer>
+
+</div>
+</body>
+</html>

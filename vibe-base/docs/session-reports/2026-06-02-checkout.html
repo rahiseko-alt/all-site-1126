@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-02 — フリノバLP探索 + shiftAI新設</title>
+<style>
+  body{font-family:'Segoe UI','Yu Gothic',sans-serif;max-width:920px;margin:0 auto;padding:24px;background:#0d0d0d;color:#e0e0e0;line-height:1.7}
+  h1{color:#fff;border-bottom:2px solid #333;padding-bottom:8px}
+  h2{color:#7eb8f7;margin-top:30px}
+  h3{color:#aaa}
+  .alert-red{background:#3a0a0a;border-left:4px solid #e53935;padding:12px 16px;border-radius:4px;margin:16px 0}
+  .star{background:#102015;border:1px solid #4caf50;padding:14px 18px;border-radius:6px;margin:18px 0}
+  code{background:#1e1e1e;padding:2px 6px;border-radius:3px;font-size:13px}
+  table{border-collapse:collapse;width:100%;margin:10px 0}
+  th,td{border:1px solid #333;padding:7px 10px;text-align:left;font-size:14px;vertical-align:top}
+  th{background:#1a1a1a;color:#aaa}
+  .h{color:#ef5350;font-weight:bold}.m{color:#ffa726;font-weight:bold}.l{color:#66bb6a}
+  .must{background:#1a2a1a;border:1px solid #66bb6a;padding:12px;border-radius:4px}
+  ol li,ul li{margin:4px 0}
+</style>
+</head>
+<body>
+<h1>📋 Check-out — 2026-06-02</h1>
+<p>branch: <code>master</code></p>
+<div class="must"><strong>🔴 次セッション必読:</strong> 本ファイルを冒頭で Read。特に下部の <strong>★ デザイン品質の思想</strong>（再現手順）を読むこと。</div>
+
+<div class="alert-red">
+<strong>⚠️ 最重要3件</strong><br>
+1. <strong>フリノバLP は探索中・採用未確定</strong>。次の一手＝<code>tmp/fn-hero2/</code> の <code>hero-pro-1/2/3.html</code>（GSAP可変フォント / Three.js 3D / SVG歪み）から<strong>採用1本を選定→仕上げ</strong>。<br>
+2. <strong>design品質の教訓</strong>: 金太郎飴の正体は「骨格（縦スクロール）が毎回同じ」。品質＝<strong>形式・次元・操作の発明</strong>＋思想。フォント色は最後の味付け。（★参照）<br>
+3. <code>products/trimmer-system/</code> の ponchi-v2.html 変更・icon png は<strong>他AI領域＝コミットしていない</strong>。触らない。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li><strong>pc-checkin</strong>。MCP 一部削除（notion/stitch/notebooklm を <code>claude mcp remove -s user</code>）。claude.ai 系5件は CLI 削除不可（アカウント連携）。<code>claude mcp disable</code> は存在しないと判明。</li>
+<li><strong>/feed-check 実行</strong>。デフォルト7経路・新着約63件 → 事業関連8件保存（軸7外国人3件が最価値）。分析レポート＋Gmail下書き（件名 Vibe-base-news）生成。</li>
+<li><strong>軸7 ICT 3記事を foreign 製品の市場ノートに反映</strong>（サブ）→ <code>products/learning-suite-kanji-foreign/docs/research/market-tailwind-ict-foreign-children-2026-06-02.md</code>。</li>
+<li><strong>shiftAI/ 新設 + 八面体データ移動</strong>（<code>git mv</code> で履歴保持）→ <code>shiftAI/octahedron/</code>。今後の複数開発の親フォルダ。</li>
+<li><strong>フリノバLP ヒーロー探索</strong>: 0からリサーチ（サブ4体・出典/数字付き）→ concept=<strong>仲間</strong>確立 → design思想/設計フロー確立 → b4b.co.jp 構造解析（Playwright・13フェーズ）→ ヒーロー実装（3カードせり上がり→各ブロック個別フリップ a→b →前面/背面の二層逆スクロール＋隙間透過→中央で「フリノバ」通り抜け）→ 通常5変種(hero-a〜e)＋最新技術PRO3変種。</li>
+</ol>
+
+<h2>B. 完了 commit</h2>
+<table><tr><th>種別</th><th>内容</th></tr>
+<tr><td>chore</td><td>本Check-out: shiftAI新設+octahedron移動(git mv) / foreign市場ノート / memory.md+引継ぎHTML</td></tr></table>
+<p style="font-size:13px;color:#888">※ フリノバLP実装は全て <code>tmp/fn-hero2/</code>（gitignore・スクラッチ）。採用確定後に正式配置。</p>
+
+<h2>C. 影響波及</h2>
+<ul>
+<li><strong>shiftAI/</strong> をルート直下に新設。マスターの「複数開発を増やす親フォルダ」。octahedron が第1住人。フリノバLP もここへ移設候補。</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table><tr><th>優先</th><th>内容</th></tr>
+<tr><td><span class="h">H</span></td><td>フリノバLP: <code>tmp/fn-hero2/hero-pro-1/2/3.html</code> から採用1本選定 → 仕上げ（組合せ可）</td></tr>
+<tr><td><span class="m">M</span></td><td>フリノバLP の動画/画像を<strong>実フリノバ映像</strong>に差替（現状 a1-b3 はプレースホルダ）。LP を shiftAI/ へ移設検討</td></tr>
+<tr><td><span class="m">M</span></td><td><code>tmp/fn-hero2</code> 255MB（v1-3.mp4 が主因）の掃除要否</td></tr>
+<tr><td><span class="l">L</span></td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否の決定（実害なし温存中）</td></tr>
+</table>
+
+<h2>E. 配備済 subagent/skill/hook（本セッション）</h2>
+<p>なし（スキル/hook 追加せず。サブは frontend-engineer-agent / research-analyst / general-purpose / Explore を多用したのみ）。</p>
+
+<h2>F. tmp/ 生成物（次セッション参照可）</h2>
+<ul>
+<li><code>tmp/fn-hero2/</code> — フリノバLP ヒーロー: <code>hero.html</code>(静止画ベース) / <code>hero-a〜e.html</code>(通常5変種) / <code>hero-pro-1〜3.html</code>(最新技術版) / 素材 a1-a3,b1-b3 .jpg/.mp4 / v1-3.mp4（255MB）</li>
+<li><code>tmp/b4b/</code> — b4b.co.jp 解析: phase-01〜13.png(スクショ) / analysis.json / analyze.mjs</li>
+<li><code>tmp/fn-hero/index.html</code> — 初期Canvas案（不採用・参考）</li>
+<li><code>tmp/coffee-lp/index.html</code> — 0点だったコーヒーLP（金太郎飴の反面教師）</li>
+</ul>
+
+<div class="star">
+<h2 style="margin-top:0">★ デザイン品質の思想（最重要・次回の design 作業で必ず適用）</h2>
+<p><strong>マスターから叩き込まれた核心。フォント/配色をいじる前に骨格と思想を発明せよ。</strong></p>
+<ul>
+<li><strong>金太郎飴の正体</strong> = 見た目でなく<strong>骨格</strong>が毎回同じ（hero→section→footer の縦スクロール）。AIは統計平均（Inter/紫青グラデ/中央3カード/均一余白）に逃げる。</li>
+<li><strong>品質＝発明の階層</strong>: ①訴求の本質を一言 → ②ユーザーに何を感じさせるか → ③<strong>到達2秒以内に、文字でなく"感覚"で</strong>伝える → ④見たことないが理解しやすい表現 → ⑤実装。形式/次元/操作で発明し、フォント色は最後の味付け。</li>
+<li><strong>参照実物を必ず自分の目で確認</strong>してから作る（b4bを"見ずに当てた"のは失敗。八面体＝マスターの正解見本＝"ページでなく触れる体験"）。</li>
+<li><strong>最新技術を使え</strong>（可変フォント/font-variation kinetic・GSAP・Three.js/WebGL・SVG歪み）。素CSSだけは品質頭打ち。</li>
+<li><strong>サブを使え（最大5体・裏で）</strong>。実装系は背景でも Write 通った（テキスト返却fallbackも用意済）。</li>
+</ul>
+<p><strong>フリノバの確定コンセプト＝「仲間」</strong>。卒業しない"居場所"（入会金一回で一生＝関係を切らせない料金設計が証拠）。案件はランサーズで足りる＝コアでない。市場根拠: フリーランス1,303万人/孤独40.7%/相談相手なし64.3%/案件の74%が人脈経由（[出典は feed/research ログ]）。冒頭2秒で文字ゼロで「ここに来れば仲間ができる」を感覚で伝えるのがヒーローの使命。</p>
+</div>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本HTML（特に★）を Read。</li>
+<li><code>tmp/fn-hero2/hero-pro-1.html</code>(GSAP+可変フォント)・<code>hero-pro-2.html</code>(Three.js 3D)・<code>hero-pro-3.html</code>(SVG歪み) をブラウザで開いて採用1本を選定。</li>
+<li>採用後、実フリノバ映像への差替・shiftAI/ への正式配置を検討。</li>
+<li>機械検証: シークレット混入 0件 PASS（本セッション）。コードレビュー: 該当コード差分なし（octahedron は移動のみ）。</li>
+</ol>
+</body>
+</html>

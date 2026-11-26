@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-06-10 Check-out — 虎の巻×ポートフォリオ統合</title>
+<style>
+  body { font-family: system-ui, "Segoe UI", sans-serif; line-height: 1.7; max-width: 900px; margin: 0 auto; padding: 2rem; color: #1a1a1a; background: #fafafa; }
+  h1 { border-bottom: 3px solid #8B5CF6; padding-bottom: .4rem; }
+  h2 { margin-top: 2rem; border-left: 5px solid #3B82F6; padding-left: .6rem; }
+  .alert-red { background: #fee; border: 2px solid #e33; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .meta { color: #666; font-size: .9rem; }
+  table { border-collapse: collapse; width: 100%; margin: .8rem 0; }
+  th, td { border: 1px solid #ccc; padding: .4rem .6rem; text-align: left; font-size: .92rem; vertical-align: top; }
+  th { background: #f0f0f5; }
+  code { background: #eee; padding: .1rem .3rem; border-radius: 3px; font-size: .88rem; }
+  .h { color: #c00; font-weight: 700; } .m { color: #d80; font-weight: 700; } .l { color: #888; }
+  .ok { color: #18794e; font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Check-out 2026-06-10 — 虎の巻×ポートフォリオ統合</h1>
+  <p class="meta">branch: <code>master</code> / HEAD: <code>3729d258</code> / 司令塔セッション（同日2セッション目）</p>
+  <p><strong>次セッションは本ファイルを先頭から Read してから着手すること。</strong>（同日の memory改革セッションは <code>2026-06-10-checkout.html</code> 参照）</p>
+</header>
+
+<div class="alert-red">
+  <strong>最重要 (3 件):</strong>
+  <ol>
+    <li><strong>SessionStart hook は次セッション起動から有効</strong>。<code>settings.json</code> は起動時読込のため本セッション中は未発火。次回起動時に <code>session-start-toranomaki</code> が pending outbox を検出・通知する。</li>
+    <li><strong>公開ビュー <code>agent-ag/</code> は <code>.gitignore:153</code> で除外</strong>＝ビルド成果物。ポータル反映はデプロイ前に <code>node scripts/build-portfolio.mjs</code> を走らせること（git には入らない）。</li>
+    <li>working tree に既存の無関係差分 28 件残置（renai-game / shift-ai / ocean / spatial-dive 等）。<strong>本セッション未編集</strong>＝各担当作業なので越権コミット禁止。</li>
+  </ol>
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+  <li>plan「虎の巻×ポートフォリオ統合（registry単一正本・2ビュー生成）」全 9 ステップ完遂・コミット。</li>
+  <li>単一正本メタ層 <code>docs/html-toranomaki/registry.json</code> 新設（slug/portfolio/order/codeVisible）。</li>
+  <li><code>build-portfolio.mjs</code>: registry→公開ポータル生成。<strong>知識層 <code>*.md</code> 非コピー</strong>＝公開ビルドで知識層秘匿（実行JSは可視＝現実解）。</li>
+  <li><code>toranomaki-intake.mjs</code>: product outbox 回収。json-canary 保護・blindtest 後 registry更新・<strong>unstaged終了（auto-commit禁止）</strong>。</li>
+  <li><code>session-start-toranomaki.mjs</code> hook（read-only・司令塔/product分岐）＋ manifest＋ settings登録＋ 全 product 伝播。</li>
+  <li><code>webgl-fluid-autoplay</code> → <code>webgl-dye-flow</code> リネーム（出典/H1/title整合・blindtest EXIT0・残存参照0）。</li>
+  <li>RULES.md §8 新設（registry / portfolio 3状態 / intake経路 / 知識層秘匿 / AUTO区画）。</li>
+  <li>スキル <code>html-toranomaki-add</code>（registry/portfolio/outbox/昇格）・<code>-use</code>（order解決）を <code>~/.claude/skills/</code> で拡張。</li>
+  <li>マスター指示で <code>animejs-add-items</code> / <code>animejs-shuffle-items</code> テーマ＋backup原本を中身確認の上 同コミットに追加。</li>
+</ul>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+  <tr><th>hash</th><th>種別</th><th>内容</th></tr>
+  <tr><td><code>3729d258</code></td><td>feat(toranomaki)</td><td>registry単一正本×2ビュー生成（70 files / +5828）。成果物15＋product伝播42＋animejsテーマ13。</td></tr>
+</table>
+<p class="meta">※ 当初 PowerShell here-string（<code>@'...'@</code>）を Bash で誤用しメッセージ先頭/末尾に <code>@</code> 混入 → 未push のため <code>--amend -F</code> でクリーン修正済。</p>
+
+<h2>C. 影響波及（必読）</h2>
+<ul>
+  <li><strong>全 product の <code>settings.json</code> に SessionStart hook 同期</strong>（propagate-hooks）。product セッションでは通知のみ・無書込（registry不在で判定）。</li>
+  <li>hook 整合性: <code>check-hook-integrity.mjs</code> PASSED。manifest に <code>session-start-toranomaki</code>（event:SessionStart）追記済。</li>
+</ul>
+
+<h2>D. 残作業（次セッション）</h2>
+<table>
+  <tr><th>優先</th><th>内容</th></tr>
+  <tr><td class="m">M</td><td>既存ポータル他4デモ（Three.js Constellations / 3D CSS Solar System / Anime.js×2）の registry 正本化（今回は webgl-dye-flow 1件のみ E2E）。各 impl を <code>docs/html-toranomaki/</code> 正本化→registry portfolio:true 登録→build。</td></tr>
+  <tr><td class="l">L</td><td>次セッション起動時、SessionStart hook 発火の目視確認（pending無なら無通知が正常）。</td></tr>
+  <tr><td class="l">L</td><td>デプロイ運用: <code>build-portfolio.mjs</code> を vercel デプロイ前に組込むか検討（後続）。</td></tr>
+</table>
+
+<h2>E. 配備済 skill / hook / script（本セッション）</h2>
+<ul>
+  <li>hook: <code>.claude/hooks/session-start-toranomaki.mjs</code>（SessionStart・read-only）— 全 product 伝播済。</li>
+  <li>skill: <code>html-toranomaki-add</code> / <code>html-toranomaki-use</code> 拡張（<code>~/.claude/skills/</code>・独立 repo・vibe-base コミットとは別管理）。</li>
+  <li>script: <code>build-portfolio.mjs</code> / <code>toranomaki-intake.mjs</code> / <code>_fixtures/registry-fixture.json</code>。</li>
+</ul>
+
+<h2>F. 本セッション生成物</h2>
+<ul>
+  <li>plan 正本: <code>docs/ops/plans/2026-06-10-toranomaki-portfolio-integration.md</code></li>
+  <li>ポータル検証スクショ: <code>test-results/portal-shot.png</code>（未コミット・全5カード描画確認）</li>
+  <li>撮影スクリプト: <code>scratch/shot-portal.mjs</code>（未コミット・scratch）</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+  <li>本 HTML を Read。</li>
+  <li><code>node scripts/check-hook-integrity.mjs</code> で hook 整合確認。</li>
+  <li>残作業 D の M（他4デモ registry 正本化）着手なら Plan Mode で plan 化。</li>
+</ol>
+<p><strong>機械検証サマリ（成果物）:</strong> <span class="ok">blindtest EXIT0 / build EXIT0（md非コピー確認）/ intake --dry-run（canary PASS・本番未変更）/ hook 4分岐 EXIT0・無書込 / check-hook-integrity PASSED / ポータル playwright 全5カード描画 / secret-scan 0件</span></p>
+<p class="meta">コードレビュー: 対象 diff は既存ノイズのみのため subagent レビュー skip（成果物は上記機械検証で代替）。</p>
+<p class="meta">既知（本plan無関係）: <code>check-in-verify.sh</code> EXIT1 は product memory 行数ゲート（new-trimmer 19行 / renai-game 37行）の既存問題。</p>
+</body>
+</html>

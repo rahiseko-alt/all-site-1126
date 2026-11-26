@@ -1,0 +1,97 @@
+{
+  "expected_hooks": [
+    {
+      "name": "ac-keyword-gate",
+      "matcher_pattern": "Write|Edit",
+      "event": "PostToolUse"
+    },
+    {
+      "name": "allow-marker-guard",
+      "matcher_pattern": "Bash|Write|Edit|MultiEdit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "area-gate",
+      "matcher_pattern": "Write|Edit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "job-application-agent-gate",
+      "matcher_pattern": "(none)",
+      "event": "UserPromptSubmit"
+    },
+    {
+      "name": "job-application-write-gate",
+      "matcher_pattern": "Write|Edit|MultiEdit|Bash",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "line-count-gate",
+      "matcher_pattern": "Write|Edit",
+      "event": "PostToolUse"
+    },
+    {
+      "name": "memory-observation-gate",
+      "matcher_pattern": "Write|Edit|MultiEdit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "memory-size-gate",
+      "matcher_pattern": "Write|Edit|MultiEdit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "outside-vibe-base-gate",
+      "matcher_pattern": "Write|Edit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "plan-daigi-gate",
+      "matcher_pattern": "ExitPlanMode",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "post-tool-use-failure-triage",
+      "matcher_pattern": "Bash",
+      "event": "PostToolUseFailure"
+    },
+    {
+      "name": "pre-bash-destructive",
+      "matcher_pattern": "Bash",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "pre-git-staging-gate",
+      "matcher_pattern": "Bash",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "roadmap-state-write-gate",
+      "matcher_pattern": "Write|Edit|MultiEdit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "rules-coverage-gate",
+      "matcher_pattern": "Write|Edit",
+      "event": "PostToolUse"
+    },
+    {
+      "name": "secret-write-gate",
+      "matcher_pattern": "Write|Edit|MultiEdit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "serena-suggest-gate",
+      "matcher_pattern": "Read|Edit",
+      "event": "PreToolUse"
+    },
+    {
+      "name": "session-start-handover-inject",
+      "matcher_pattern": "(none)",
+      "event": "SessionStart"
+    }
+  ],
+  "expected_scripts": [
+    "check-secret-patterns.mjs"
+  ]
+}

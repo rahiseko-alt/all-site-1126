@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>タテ型名刺の余白・黄金比 デザイン定石 — Research Bank</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #242836;
+  --border: #2e3348;
+  --text: #e4e4e7;
+  --text2: #9ca3af;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --ok: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter','Noto Sans JP',system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+h1 { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.02em; }
+h1 span { color: var(--accent2); }
+h2 { font-size: 1.2rem; margin: 2.5rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--accent); color: var(--accent2); }
+h3 { font-size: 1rem; margin: 1.5rem 0 0.6rem; color: var(--text); }
+p { margin: 0.6rem 0; color: var(--text); }
+a { color: var(--accent2); word-break: break-all; }
+.meta { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0 1.5rem; font-size: 0.85rem; color: var(--text2); display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 0.4rem 1.5rem; }
+.meta b { color: var(--text); }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.82rem; background: var(--surface); border-radius: 8px; overflow: hidden; }
+th { background: var(--surface2); color: var(--accent2); padding: 0.6rem 0.7rem; text-align: left; font-weight: 600; }
+td { padding: 0.55rem 0.7rem; border-top: 1px solid var(--border); vertical-align: top; }
+tr:hover td { background: var(--surface2); }
+.tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.7rem; font-weight: 600; background: rgba(244,114,182,0.15); color: #f472b6; }
+ul,ol { margin: 0.6rem 0 0.6rem 1.4rem; }
+li { margin: 0.35rem 0; }
+.callout { background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+.callout.ok { border-left-color: var(--ok); }
+.callout.warn { border-left-color: var(--warn); }
+.num { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent2); }
+code { background: var(--surface2); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+.note { font-size: 0.78rem; color: var(--text2); margin-top: 0.4rem; }
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1rem 0; display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+.card-fig { position: relative; width: 165px; height: 273px; background: #fff; border-radius: 2px; flex-shrink: 0; }
+.card-fig .bleed { position: absolute; inset: -9px; border: 1.5px dashed var(--danger); border-radius: 4px; }
+.card-fig .safe { position: absolute; inset: 9px; border: 1.5px dashed var(--ok); }
+.card-fig .gl1 { position: absolute; left: 0; right: 0; top: 38.2%; border-top: 1px solid var(--accent); }
+.card-fig .gl2 { position: absolute; left: 0; right: 0; top: 61.8%; border-top: 1px solid var(--accent); }
+.card-fig .lbl { position: absolute; font-size: 8px; color: #444; }
+.legend { font-size: 0.78rem; color: var(--text2); }
+.legend span { display: inline-block; width: 11px; height: 0; border-top: 2px; margin-right: 5px; vertical-align: middle; }
+.legend .l-bleed { border-top: 2px dashed var(--danger); }
+.legend .l-safe { border-top: 2px dashed var(--ok); }
+.legend .l-gl { border-top: 2px solid var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>タテ型名刺の <span>余白・黄金比</span> デザイン定石</h1>
+<p class="note">日本標準名刺 55×91mm（縦使い）における塗り足し・安全領域・要素配置の実数ガイドライン</p>
+
+<div class="meta">
+  <div><b>調査日:</b> 2026-05-29</div>
+  <div><b>調査軸:</b> 3本</div>
+  <div><b>ソース数:</b> 34（重複排除後）</div>
+  <div><b>タグ:</b> <span class="tag">design</span></div>
+  <div><b>関連プロダクト:</b> 横断（名刺・印刷物全般）</div>
+  <div><b>メソドロジー:</b> 計画→収集→分析→報告</div>
+  <div style="grid-column:1/-1"><b>再利用:</b> 名刺デザイン制作 / 縦型印刷物レイアウト / Canva・Illustrator 入稿データ作成 / QRコード配置設計</div>
+</div>
+
+<div class="callout ok">
+<b>結論（実装用の確定値）</b><br>
+日本標準のタテ型名刺は、<b>入稿データ <span class="num">97×61mm</span></b>（仕上がり 91×55mm + 四辺塗り足し3mm）。文字・ロゴ・QRなど切れて困る要素は内側3mmの<b>安全枠 <span class="num">85×49mm</span></b>に収める。視覚バランスは<b>黄金分割点（上端から 34.8mm / 56.2mm）</b>と<b>三分割線</b>を要素配置の基準にする。余白は名刺面積の<b>約3割</b>を確保するのが洗練の目安。
+</div>
+
+<!-- 図 -->
+<div class="diagram">
+  <div class="card-fig">
+    <div class="bleed"></div>
+    <div class="safe"></div>
+    <div class="gl1"></div>
+    <div class="gl2"></div>
+    <div class="lbl" style="top:38.2%;right:2px;transform:translateY(-100%)">34.8mm (38.2%)</div>
+    <div class="lbl" style="top:61.8%;right:2px;transform:translateY(-100%)">56.2mm (61.8%)</div>
+  </div>
+  <div class="legend">
+    <p><span class="l-bleed"></span> 塗り足し外周 +3mm（入稿 97×61mm）</p>
+    <p><span class="l-safe"></span> 安全枠 −3mm（85×49mm）</p>
+    <p><span class="l-gl"></span> 黄金分割線（上から38.2% / 61.8%）</p>
+    <p class="note">仕上がり 91×55mm（縦使い）。比率 1:1.654 ≒ 黄金比近似</p>
+  </div>
+</div>
+
+<!-- ====================== 軸1 ====================== -->
+<h2>軸1. 印刷規格 — 塗り足し・安全領域・入稿サイズ</h2>
+<p>日本国内ネット印刷の主要6社（ラクスル / グラフィック / プリントモール / 東京カラー印刷 / メガプリント / WAVE）は値がほぼ完全一致。分布のばらつきは事実上ゼロ。</p>
+
+<table>
+<tr><th>指標</th><th>実数</th><th>ソース</th></tr>
+<tr><td>仕上がりサイズ</td><td class="num">91 × 55 mm</td><td>ラクスル / グラフィック</td></tr>
+<tr><td>塗り足し（ブリード）</td><td class="num">四辺 各 +3mm</td><td>主要6社一致</td></tr>
+<tr><td>安全領域（内側余白）</td><td class="num">仕上がり線から内側 3mm</td><td>主要6社一致（下限2mmとする社あり）</td></tr>
+<tr><td>有効デザイン枠</td><td class="num">85 × 49 mm</td><td>仕上がり −6mm</td></tr>
+<tr><td>入稿データサイズ</td><td class="num">97 × 61 mm</td><td>仕上がり +6mm（業界デファクト）</td></tr>
+<tr><td>内トンボ↔外トンボ間隔</td><td class="num">3mm</td><td>＝塗り足し領域と一致</td></tr>
+</table>
+
+<div class="callout warn">
+<b>分布外れ注意:</b> Vistaprint は仕上がりが欧州規格 <span class="num">85×55mm</span>（塗り足し四辺1.5mm相当）で、日本標準 91×55mm とサイズ自体が異なる。<b>Vistaprint 値を日本名刺データに流用してはいけない。</b>日本標準は「3mm」を採用すること。
+</div>
+
+<h3>塗り足しと安全領域は「役割が逆方向の同値（3mm）」</h3>
+<ul>
+<li><b>塗り足し（外3mm）:</b> 仕上がり線の外まで背景・地色を伸ばす（断裁時の白フチ防止）</li>
+<li><b>安全領域（内3mm）:</b> 切れて困る文字・ロゴはここに置かない</li>
+<li>断裁ズレ実測は約1〜2mm前後。両側マージンとして3mmが設定されている。1mm運用は断裁ズレ耐性が低く汎用設計では非推奨</li>
+</ul>
+<p class="note">ネット入稿では各社テンプレート（仕上がり線・塗り足し線つき）使用時はトンボ不要が主流。「トンボは付けず、97×61mmデータに仕上がり91×55・安全85×49のガイド線を持たせる」のが最も汎用的。</p>
+
+<!-- ====================== 軸2 ====================== -->
+<h2>軸2. 視覚バランス — 黄金比・三分割法・余白率</h2>
+
+<table>
+<tr><th>手法</th><th>推奨値 / 比率</th><th>55×91mm での実寸換算</th><th>ソース</th></tr>
+<tr><td>黄金比（基本）</td><td>1:1.618</td><td>名刺は 1:1.654（理論黄金値より長辺+2mm）≒ 近似</td><td>hattan / mitekaku / IxDF</td></tr>
+<tr><td>黄金分割点（縦）</td><td>上から 38.2% / 61.8%</td><td class="num">34.8mm / 56.2mm</td><td>scinet / IxDF / Adobe</td></tr>
+<tr><td>黄金分割点（横）</td><td>左から 38.2% / 61.8%</td><td class="num">21.0mm / 34.0mm</td><td>scinet / Figma</td></tr>
+<tr><td>三分割法（縦）</td><td>33% / 67%</td><td class="num">30.3mm / 60.7mm</td><td>IxDF / Gelato</td></tr>
+<tr><td>三分割法（横）</td><td>33% / 67%</td><td class="num">18.3mm / 36.7mm</td><td>IxDF / Gelato</td></tr>
+<tr><td>外周マージン</td><td>基準5mm（範囲3〜10mm）</td><td>四辺5mmで印字域 45×81mm</td><td>ハットツールデザイン</td></tr>
+<tr><td>余白率（面積比）</td><td>余白 約27%（印字 約73%）</td><td>四辺5mm時。高級志向は四辺10mmで余白約50%</td><td>ハットツールデザイン</td></tr>
+<tr><td>見出しスケール</td><td>各階層 ×1.618</td><td>連絡先8pt→肩書13pt→氏名21pt</td><td>scinet / peasydesign</td></tr>
+<tr><td>縦型視線パターン</td><td>N字（右上→中央→左下）</td><td>社名=右上 / 氏名=中央 / 連絡先=左下</td><td>tos.tokyo / mitekaku / canva</td></tr>
+</table>
+
+<div class="callout">
+<b>55×91mm は黄金比「そのもの」ではなく近似。</b> 実寸比 1:1.654 は尺貫法由来（長辺3寸=91mm）で、黄金比は後付けの説明。「黄金の長方形だから縦に分ければ整う」のではなく、<b>黄金分割点（上から34.8mm / 56.2mm）を要素配置の基準線として使う</b>のが再現可能な手法。複数ソースが 38.2%/61.8% で一致。
+</div>
+
+<h3>実装に効く5原則</h3>
+<ol>
+<li><b>黄金分割点 + N字視線の二層設計:</b> ロゴ/社名=右上象限、氏名=縦の黄金分割点56.2mm付近（中央やや下）に最大、連絡先=左下</li>
+<li><b>余白率は面積比で管理:</b> 四辺5mm=余白27%が標準。情報少なめ・高級志向なら四辺10mm=余白約50%まで</li>
+<li><b>要素間余白はグルーピング（近接の原理）:</b> 外周マージン > ブロック間余白 > 行内余白 の3段階。Fibonacci（8,13,21,34）や×1.618をスペーシング単位に</li>
+<li><b>縦書き氏名は中央軸+センター大書き:</b> 縦書き軸を中央27.5mm or 左右黄金分割点（21/34mm）に通す</li>
+<li><b>外周マージンの均等性を死守:</b> 四辺均等が崩れると重心が傾く</li>
+</ol>
+
+<!-- ====================== 軸3 ====================== -->
+<h2>軸3. 要素配置 — QR・氏名・連絡先の必要余白</h2>
+
+<table>
+<tr><th>要素</th><th>最小〜推奨</th><th>根拠</th><th>ソース</th></tr>
+<tr><td>QRコード サイズ</td><td class="num">最小10mm / 推奨15mm角以上</td><td>15mm未満はスマホのフォーカスが合わず読取不能リスク。アスペクト比1:1必須</td><td>QR WORLD / 山櫻 TSUTAFU</td></tr>
+<tr><td>QR セル（1モジュール）</td><td class="num">0.4mm以上（0.5mm推奨）</td><td>デンソーウェーブ公式: 1セル4ドット以上で印字</td><td>デンソーウェーブ公式</td></tr>
+<tr><td>QR クワイエットゾーン（規格）</td><td class="num">四辺 4セル分</td><td>JIS/ISO規格上の必須余白</td><td>デンソーウェーブ公式</td></tr>
+<tr><td>QR クワイエットゾーン（名刺実務）</td><td class="num">最小2mm以上</td><td>規格厳守だと占有過大。実務は2mmが最頻</td><td>QR WORLD / 高山印刷</td></tr>
+<tr><td>氏名フォント</td><td class="num">実用8.5〜11pt / デザイン18〜20pt</td><td>二極化。名刺内で最大サイズに置くのが定石</td><td>センウェル / ラクスル / エムクロス</td></tr>
+<tr><td>会社名</td><td class="num">7〜14pt（最頻9pt）</td><td>氏名の次の階層</td><td>ラクスル / エムクロス</td></tr>
+<tr><td>連絡先（メール/電話/URL）</td><td class="num">最小6pt</td><td>印刷再現性の絶対下限（潰れ防止）。ラクスル入稿要件で明示</td><td>ラクスル公式（複数一致）</td></tr>
+<tr><td>仕上がり端→文字マージン</td><td class="num">3mm以上内側</td><td>断裁ズレによる文字切れ防止</td><td>ラクスル公式</td></tr>
+<tr><td>最小線幅</td><td class="num">0.3pt（0.1mm）以上</td><td>細線の断裁ズレ目立ち防止</td><td>ラクスル公式</td></tr>
+</table>
+
+<div class="callout warn">
+<b>連絡先6ptが「絶対に割ってはいけない床」。</b> ラクスル公式が入稿要件として6pt以上を明示。これは可読性ではなく印刷再現性（潰れ）の下限で、複数ソースが完全一致＝信頼度最高。メール・URLは文字数が多く小さくなりがちなので、6pt到達を設計の制約条件にすること。
+</div>
+
+<h3>QRの安全解</h3>
+<p>タテ型名刺なら <b>本体15mm角 + 周囲クワイエットゾーン2mm = 占有19mm角</b> を1ブロックとして確保。さらに端側では「QR本体 + QZ 2mm + 端マージン3mm」が累積する点に注意。</p>
+
+<!-- ====================== 統合分析 ====================== -->
+<h2>統合分析（So What — 名刺デザインに落とす確定値）</h2>
+
+<h3>① データ枠の3層構造（必ずこの3枠で作る）</h3>
+<table>
+<tr><th>枠</th><th>サイズ</th><th>役割</th></tr>
+<tr><td>入稿データ（塗り足し含む）</td><td class="num">97 × 61 mm</td><td>背景・地色はここまで伸ばす</td></tr>
+<tr><td>仕上がり（トリム）</td><td class="num">91 × 55 mm</td><td>実際に断裁される線</td></tr>
+<tr><td>安全枠（文字・ロゴ・QR）</td><td class="num">85 × 49 mm</td><td>切れて困る要素は必ずこの内側</td></tr>
+</table>
+
+<h3>② 縦位置の基準線（要素を「なんとなく」置かない）</h3>
+<ul>
+<li>黄金分割点: 上から <span class="num">34.8mm</span>（38.2%）/ <span class="num">56.2mm</span>（61.8%）</li>
+<li>三分割線: 上から <span class="num">30.3mm</span> / <span class="num">60.7mm</span></li>
+<li><b>氏名は中央やや下（56.2mm付近）に最大級</b>、ロゴ/社名は上1/3、連絡先・QRは下1/3にまとめる</li>
+</ul>
+
+<h3>③ 余白の規律</h3>
+<ul>
+<li>外周マージン: <b>四辺均等5mm</b>を基準（高級志向なら最大10mm）。均等性を崩さない</li>
+<li>余白率: 名刺面積の<b>約3割（27%）を余白に</b>。詰め込みすぎが最大の素人感</li>
+<li>要素間: 外周マージン > ブロック間 > 行内 の3段階で序列。関連情報は近づけ、グループ間は離す</li>
+</ul>
+
+<h3>④ フォント階層（×1.618 で組むと黄金比スケール）</h3>
+<ul>
+<li>氏名 = 名刺内最大（実用なら9〜11pt、デザイン主張なら18〜20pt）</li>
+<li>肩書・社名 = 中（氏名 ÷1.618 程度）</li>
+<li>連絡先 = 最小だが <b>6pt を下回らない</b></li>
+</ul>
+
+<h3>⑤ QRの占有予算</h3>
+<ul>
+<li>本体15mm角 + 周囲2mm = 19mm角ブロック</li>
+<li>端に寄せる場合は端マージン3mmを足して計算</li>
+<li>下1/3の中央 or 左下が定位置</li>
+</ul>
+
+<div class="callout ok">
+<b>マスター名刺（縦書き氏名・中央集約型）への適用:</b> 現行の確定版は「縦書き氏名を中央に大書き → 下部に肩書・連絡先・QRを中央寄せ」の構成。これは黄金分割点（氏名=上1/3〜中央、情報ブロック=下1/3）と整合する王道レイアウト。編集時は <b>(a)文字・QRが安全枠85×49mm内にあるか (b)外周マージンが四辺均等か (c)連絡先が6pt以上か</b> の3点を死守すれば崩れない。
+</div>
+
+<!-- ====================== ソース ====================== -->
+<h2>ソース一覧（34・重複排除後）</h2>
+<h3>印刷規格（日本）</h3>
+<ol>
+<li>ラクスル「塗り足しと文字位置」 <a href="https://raksul.com/guide/create-data/knowledge-of-printing/extra-length-from-trim-mask/">raksul.com</a>（2026）</li>
+<li>ラクスル「名刺の印刷用データ作成方法」 <a href="https://raksul.com/guide/create-data/item/businesscard/guide/">raksul.com</a>（2026）</li>
+<li>ラクスルマガジン「名刺に最適なフォントサイズ」 <a href="https://raksul.com/magazine/column/businesscard-font-size/">raksul.com</a>（2025）</li>
+<li>グラフィック「塗り足しとは」 <a href="https://www.graphic.jp/feature/bleed_area">graphic.jp</a>（2026）</li>
+<li>プリントモール「仕上がりサイズ・塗り足し」 <a href="https://printmall.jp/tech/dtp/size">printmall.jp</a>（2026）</li>
+<li>東京カラー印刷「入稿データ作成の注意」 <a href="https://www.tcpc.co.jp/links/makeInfo">tcpc.co.jp</a>（2026）</li>
+<li>メガプリント「セーフティーゾーン」 <a href="https://www.megaprint.jp/Technical/technical-size-safetyzone">megaprint.jp</a>（2026）</li>
+<li>WAVE「塗り足し・文字切れ」 <a href="https://www.wave-inc.co.jp/data/imagefile/nuritashi.html">wave-inc.co.jp</a>（2026）</li>
+<li>名刺21「データ作成方法」 <a href="https://www.meishi21.jp/Technical/PrintSize">meishi21.jp</a>（2026）</li>
+<li>マヒトデザイン「トンボと塗り足し」 <a href="https://mhtdesign.net/guide/final-data-workarea.html">mhtdesign.net</a>（2026）</li>
+<li>オンデマンド印刷おまかせ.com「仕上がりサイズ（トンボ）と塗り足し」 <a href="https://www.ondemandinsatsu.com/technical/tech_base3.html">ondemandinsatsu.com</a>（2026）</li>
+<li>名刺印刷メディアライブラリー「塗り足し・余白設定」 <a href="https://m-c.jp/guide/data_gude/003.php">m-c.jp</a>（2024）</li>
+<li>VistaPrint（欧州規格・参考）「Business Card Dimensions」 <a href="https://www.vistaprint.com/hub/business-card-dimensions">vistaprint.com</a>（2026）</li>
+</ol>
+
+<h3>視覚バランス・黄金比</h3>
+<ol start="14">
+<li>hattan.info「黄金比で作る名刺デザイン」 <a href="https://hattan.info/golden-ratio-card/">hattan.info</a>（2024）</li>
+<li>mitekaku「名刺における黄金比とは」 <a href="https://mitekaku.com/rd/journal/383">mitekaku.com</a>（2024）</li>
+<li>名刺ハウス「名刺作成と黄金比」 <a href="https://www.meishi-house.net/golden-rule">meishi-house.net</a>（2024）</li>
+<li>タスラブログ「名刺のレイアウトで困ったら黄金比」 <a href="https://t3l.org/dtp/676/">t3l.org</a>（2024）</li>
+<li>ハットツールデザイン「適度な余白は何mm？」 <a href="https://hattool.com/hat810/sagatsukubacknumber/design-margin">hattool.com</a>（2024）</li>
+<li>三栄Navi「縦型名刺のレイアウトルール」 <a href="https://www.sanei-print.co.jp/blog/2017/05/18/208">sanei-print.co.jp</a>（2017）</li>
+<li>東京名刺センター「名刺のレイアウト・色づかい」 <a href="https://tos.tokyo.jp/article/business-card-layout/">tos.tokyo.jp</a>（2024）</li>
+<li>Interaction Design Foundation「The Rule of Thirds」 <a href="https://ixdf.org/literature/article/the-rule-of-thirds-know-your-layout-sweet-spots">ixdf.org</a>（2024）</li>
+<li>Interaction Design Foundation「The Golden Ratio」 <a href="https://ixdf.org/literature/article/the-golden-ratio-principles-of-form-and-layout">ixdf.org</a>（2024）</li>
+<li>Scinet「Golden ratio &amp; Fibonacci in web design」 <a href="https://www.scinet.eu/en/blog/webdesign/der-goldene-schnitt-harmonie-fibonacci-webdesign/">scinet.eu</a>（2024）</li>
+<li>Adobe「Golden ratio: A beginner's guide」 <a href="https://www.adobe.com/creativecloud/design/discover/golden-ratio.html">adobe.com</a>（2024）</li>
+<li>Gelato「How To Design A Business Card: 2024 Guide」 <a href="https://www.gelato.com/blog/how-to-design-a-business-card-2024-guide">gelato.com</a>（2024）</li>
+<li>DQ Graphic Design「Typography Rules for Business Cards」 <a href="https://www.davidquartino.com/typography-rules-for-business-cards-how-to-choose-fonts-sizes-and-layout/">davidquartino.com</a>（2024）</li>
+</ol>
+
+<h3>QR・フォント・要素配置</h3>
+<ol start="27">
+<li>デンソーウェーブ公式「セルの大きさ」 <a href="https://www.qrcode.com/howto/cell.html">qrcode.com</a>（2024）</li>
+<li>デンソーウェーブ公式「QRコードとは」 <a href="https://www.denso-wave.com/ja/system/qr/fundamental/qrcode/qrc/index.html">denso-wave.com</a>（2024）</li>
+<li>QR WORLD「印刷時の大きさ・最小サイズ」 <a href="https://qr.c-cloud.co.jp/articles/knowledge/min-size">qr.c-cloud.co.jp</a>（2024）</li>
+<li>QR WORLD「クワイエットゾーン」 <a href="https://qr.c-cloud.co.jp/articles/knowledge/margin">qr.c-cloud.co.jp</a>（2024）</li>
+<li>印刷ネットドットコム「クワイエットゾーン」 <a href="https://shop.insatsu-net.com/knowledge-bar-about-quietzone">insatsu-net.com</a>（2024）</li>
+<li>高山印刷 QRラボ「サイズ・余白」 <a href="https://qr.takayama-dp.com/column/setting-qr/">takayama-dp.com</a>（2024）</li>
+<li>山櫻 TSUTAFU「QRコード付き名刺」 <a href="https://tsutafu.yamazakura.jp/shop/pages/blog-0023.aspx">tsutafu.yamazakura.jp</a>（2025）</li>
+<li>wasabi3「名刺デザインの注意事項（サイズ・QR）」 <a href="https://www.wasabi3.com/meishisizeqr/">wasabi3.com</a>（2024）</li>
+<li>センウェル「名刺のフォントのポイント数」 <a href="https://www.centwell.co.jp/blog/archives/484">centwell.co.jp</a>（2024）</li>
+<li>エムクロス「名刺の最適なフォントサイズ」 <a href="https://www.mcross.co.jp/optimal-font-size-for-business-cards/">mcross.co.jp</a>（2025）</li>
+</ol>
+
+<p class="note" style="margin-top:1.5rem">※ 黄金分割点・三分割の mm 換算（34.8 / 56.2 / 30.3 / 60.7 / 21.0 / 34.0 / 18.3 / 36.7mm）および余白面積率（27% / 50%）は、出典の比率（38.2%/61.8% ・ 33%/67% ・ 四辺マージン値）を 55×91mm に当方で機械換算した計算結果です。比率・元数値は各出典に基づきます。</p>
+
+</body>
+</html>

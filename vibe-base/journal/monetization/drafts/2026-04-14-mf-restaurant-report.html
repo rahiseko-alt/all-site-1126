@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>MF 飲食店向け AI活用記事 レポート v2 — basic/2006</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #666;
+    --border: #ddd;
+    --bg: #fafafa;
+    --bg-alt: #f4f4f4;
+    --accent: #2a5d84;
+    --accent-2: #0e7490;
+    --hi: #047857;
+    --mid: #b45309;
+    --lo: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Segoe UI", sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 14px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+  }
+  header { border-bottom: 2px solid var(--fg); padding-bottom: 12px; margin-bottom: 20px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 12px; }
+  h2 {
+    font-size: 17px;
+    margin: 32px 0 10px;
+    padding: 6px 12px;
+    border-left: 5px solid var(--accent);
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 14px; margin: 18px 0 6px; color: var(--accent); }
+  h4 { font-size: 13px; margin: 12px 0 4px; color: var(--accent-2); }
+  p { margin: 6px 0; }
+  ul, ol { padding-left: 22px; margin: 6px 0; }
+  li { margin: 2px 0; }
+  code { background: var(--bg-alt); padding: 1px 5px; border-radius: 2px; font-size: 12px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+    margin: 8px 0 16px;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-alt);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.center { text-align: center; }
+
+  .note { background: #fff; border-left: 3px solid var(--accent); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .warn { background: #fef9c3; border-left: 3px solid var(--mid); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .critical { background: #fee2e2; border-left: 3px solid var(--lo); padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+
+  .tag-hi { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #d1fae5; color: var(--hi); border: 1px solid #a7f3d0; }
+  .tag-mid { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #fef3c7; color: var(--mid); border: 1px solid #fde68a; }
+  .tag-lo { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #fee2e2; color: var(--lo); border: 1px solid #fecaca; }
+
+  .tag-active { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+  .tag-frozen { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #e5e7eb; color: #374151; border: 1px solid #d1d5db; }
+  .tag-ready { display: inline-block; padding: 1px 7px; border-radius: 2px; font-size: 11px; font-weight: 700; background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+
+  .label-fact { color: var(--hi); font-weight: 700; font-size: 11px; }
+  .label-guess { color: var(--mid); font-weight: 700; font-size: 11px; }
+
+  /* ゲージ */
+  .gauge { display: inline-block; width: 80px; height: 10px; background: var(--bg-alt); border-radius: 5px; border: 1px solid var(--border); overflow: hidden; vertical-align: middle; margin-right: 4px; }
+  .gauge > span { display: block; height: 100%; background: linear-gradient(90deg, #0e7490, #2a5d84); }
+  .gauge.diff > span { background: linear-gradient(90deg, #047857, #b45309, #b91c1c); }
+  .score-num { display: inline-block; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12px; color: var(--fg); min-width: 28px; }
+
+  /* 営業ルートバッジ */
+  .route { display: inline-block; padding: 1px 6px; margin: 1px 2px 1px 0; border-radius: 10px; font-size: 10px; background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; white-space: nowrap; }
+  .route.direct { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .route.saas { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+  .route.oem { background: #fae8ff; color: #701a75; border-color: #f5d0fe; }
+  .route.mkt { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+  .route.overseas { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+
+  .toc { background: #fff; border: 1px solid var(--border); padding: 12px 18px; margin: 16px 0 24px; font-size: 13px; }
+  .toc strong { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .toc ol { margin: 0; padding-left: 20px; }
+  .toc a { color: var(--fg); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .src { font-size: 11px; color: var(--muted); margin-top: 20px; padding-top: 10px; border-top: 1px dashed var(--border); }
+
+  .card { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 12px 16px; margin: 10px 0; }
+  .card h3 { margin-top: 0; }
+  .meta-row { font-size: 12px; color: var(--muted); margin: 4px 0; }
+  .meta-row strong { color: var(--fg); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MoneyForward「飲食店でAIを活用するとどう変わる？」レポート <span style="font-size:13px;color:var(--muted);">v2 全面改訂</span></h1>
+  <div class="subtitle">元URL: <code>https://biz.moneyforward.com/restaurant/basic/2006/</code> / 記事更新日: 2026-04-01 / 監修: マネーフォワード クラウド</div>
+  <div class="subtitle">レポート作成: 2026-04-14 / 作成者: vibe-base 司令塔 / v1→v2 変更: ココナラ出品前提を撤廃、既存資産棚卸し+完全新規開発+グローバル営業ルートを導入</div>
+  <div class="subtitle">確信度ラベル: <span class="label-fact">【事実】</span> 記事本文・プロダクト実態に直接記載 / <span class="label-guess">【推測】</span> 我々の解釈・スコア推定</div>
+</header>
+
+<nav class="toc">
+  <strong>目次</strong>
+  <ol>
+    <li><a href="#s1">§1. 記事の要点</a></li>
+    <li><a href="#s2">§2. 業務課題の整理表</a></li>
+    <li><a href="#s3">§3. 既存プロダクト資産カタログ（新設）</a></li>
+    <li><a href="#s4">§4. 難易度10 基準点（新設）</a></li>
+    <li><a href="#s5">§5. 製品化案（全面置換 / 15案）</a></li>
+    <li><a href="#s6">§6. 推奨 TOP 5</a></li>
+    <li><a href="#s7">§7. リスク・注意点（グローバル展開特有を追加）</a></li>
+    <li><a href="#s8">§8. 次のアクション</a></li>
+  </ol>
+</nav>
+
+<!-- ========================================= -->
+<h2 id="s1">§1. 記事の要点</h2>
+
+<h3>主題</h3>
+<p><span class="label-fact">【事実】</span> 飲食店業界における<strong>人手不足と業務効率化</strong>の課題解決手段として AI 活用方法を目的別に解説し、具体的なツール導入のポイントを紹介する記事。</p>
+
+<h3>記事が言及している 8 つの業務課題</h3>
+<ol>
+  <li>人手不足・シフト調整の負担</li>
+  <li>急な欠勤による現場混乱</li>
+  <li>混雑時の注文対応の遅延</li>
+  <li>スタッフごとの接客スキル差による対応品質のばらつき</li>
+  <li>売上傾向把握の経験・勘への依存</li>
+  <li>在庫切れ・ダブり発注・食品廃棄の発生</li>
+  <li>リピーター獲得施策の顧客個別対応の困難さ</li>
+  <li>営業時間外の予約受付対応の限界</li>
+</ol>
+
+<h3>記事が提案している解決策カテゴリ</h3>
+<ul>
+  <li><strong>セルフオーダーシステム</strong>（タブレット・スマホ注文）</li>
+  <li><strong>配膳ロボット</strong></li>
+  <li><strong>AI チャットボット</strong>（24h 自動応答・予約・問合せ）</li>
+  <li><strong>売上分析ツール・需要予測 AI</strong></li>
+  <li><strong>AI 活用在庫管理システム</strong></li>
+  <li><strong>AI メニュー価格最適化ツール</strong></li>
+  <li><strong>キッチン自動化システム</strong></li>
+  <li><strong>AI マーケティングプラットフォーム</strong></li>
+</ul>
+
+<h3>記事中の重要な数値（コスト相場）</h3>
+<table>
+  <thead><tr><th>ソリューション</th><th>初期費用</th><th>月額</th><th>備考</th></tr></thead>
+  <tbody>
+    <tr><td>セルフオーダー</td><td>機器30-50万円 + 設置10-50万円</td><td>1-3万円</td><td>決済手数料 1.5-5%</td></tr>
+    <tr><td>配膳ロボット</td><td>購入 200-300万円/台</td><td>レンタル 3-10万円</td><td>—</td></tr>
+    <tr><td>在庫管理システム</td><td>POS連携 数十万円〜</td><td>数千円〜数十万円</td><td>独自開発は数百万〜1000万円超</td></tr>
+    <tr><td>AIチャットボット（簡易）</td><td>数万円</td><td>—</td><td>—</td></tr>
+    <tr><td>AIチャットボット（高度）</td><td>50-100万円</td><td>—</td><td>カスタマイズは1000万円超も</td></tr>
+    <tr><td>売上分析ツール</td><td>—</td><td>数千円〜数百万円</td><td>幅が非常に広い</td></tr>
+  </tbody>
+</table>
+
+<h3>補助金情報（記事記載）</h3>
+<ul>
+  <li><strong>小規模事業者持続化補助金</strong>: 補助率 2/3、上限 最大 200 万円</li>
+  <li><strong>IT 導入補助金</strong>: 補助額 最大 450 万円、補助率 1/2 〜 3/4</li>
+</ul>
+
+<!-- ========================================= -->
+<h2 id="s2">§2. 業務課題の整理表</h2>
+
+<p>記事の8課題を「頻度」「深刻度」「自動化可能性」「AIチャットボット親和性」で評価。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th><th>業務課題</th><th>頻度</th><th>深刻度</th><th>自動化可能性</th><th>AIチャットボット親和性</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>人手不足・シフト調整</td><td><span class="tag-hi">高</span></td><td><span class="tag-hi">高</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-mid">中</span></td></tr>
+    <tr><td>2</td><td>急な欠勤対応</td><td><span class="tag-hi">高</span></td><td><span class="tag-hi">高</span></td><td><span class="tag-lo">低</span></td><td><span class="tag-lo">低</span></td></tr>
+    <tr><td>3</td><td>混雑時 注文対応遅延</td><td><span class="tag-hi">高</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-hi">高</span></td><td><span class="tag-mid">中</span></td></tr>
+    <tr><td>4</td><td>接客スキルのばらつき</td><td><span class="tag-mid">中</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-mid">中</span></td></tr>
+    <tr><td>5</td><td>売上傾向把握の属人化</td><td><span class="tag-hi">高</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-hi">高</span></td><td><span class="tag-lo">低</span></td></tr>
+    <tr><td>6</td><td>在庫切れ・ロス</td><td><span class="tag-hi">高</span></td><td><span class="tag-hi">高</span></td><td><span class="tag-hi">高</span></td><td><span class="tag-lo">低</span></td></tr>
+    <tr><td>7</td><td>リピーター個別対応</td><td><span class="tag-mid">中</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-hi">高</span></td></tr>
+    <tr><td>8</td><td>営業時間外 予約受付</td><td><span class="tag-hi">高</span></td><td><span class="tag-mid">中</span></td><td><span class="tag-hi">高</span></td><td><span class="tag-hi">高</span></td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+<span class="label-guess">【推測】</span> 我々の既存プロダクト群との親和性が最も高いのは <strong>#5 売上分析</strong>・<strong>#6 在庫管理</strong>・<strong>#7 リピーター対応</strong>・<strong>#8 予約受付</strong>。#2 急な欠勤は物理的な人員配置問題で技術解決は限定的。
+</div>
+
+<!-- ========================================= -->
+<h2 id="s3">§3. 既存プロダクト資産カタログ</h2>
+
+<p><span class="label-fact">【事実】</span> <code>products/</code> 以下の全プロダクトを棚卸しし、飲食店向け製品化に再利用可能な資産を抽出した。凍結状態はCLAUDE.mdおよびMISSION_LOGから確認。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>プロダクト</th><th>状態</th><th>技術スタック</th><th>再利用可能な資産（飲食向け観点）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>ai-concierge (AI Answer)</strong><br>AIカスタマーサポート</td>
+      <td><span class="tag-active">稼働 P2</span></td>
+      <td>React+Vite+Tailwind / Vercel Functions / Supabase / Gemini 2.5 Flash / LINE連携 / Webウィジェット</td>
+      <td>問合せ対応チャットBOT一式。管理画面・FAQ CRUD・半自動オンボーディング・納品ドキュメント5点完成済み。<strong>LP→自動返信→セットアップ→プロビジョニング</strong>の導線が完成。飲食特化FAQ化は事実上コピペで可能</td>
+    </tr>
+    <tr>
+      <td><strong>dify-service</strong><br>Dify構築代行</td>
+      <td><span class="tag-active">稼働 P1</span></td>
+      <td>Dify Community Edition / Docker Compose / DSLエクスポート/インポート</td>
+      <td>Dify DSLの設計ノウハウ・構築代行フロー。LLMキー顧客持ちモデル。飲食店向けDSLテンプレを量産しやすい</td>
+    </tr>
+    <tr>
+      <td><strong>biz-efficiency/eff-vba01</strong><br>Excel VBAマクロパック</td>
+      <td><span class="tag-active">稼働 納品実績あり</span></td>
+      <td>Excel 2016+ / VBA / .xlsm / install_macros.bat 自動インストーラ</td>
+      <td>5つのマクロ基盤+自動インストーラ。飲食店向けマクロ（シフト/売上/在庫/発注書）に直接派生可能</td>
+    </tr>
+    <tr>
+      <td><strong>biz-efficiency/eff-py01</strong><br>Webデータ収集ツール</td>
+      <td><span class="tag-active">稼働 納品実績あり</span></td>
+      <td>Python / requests+BS4 / Playwright / PyInstaller .exe化</td>
+      <td>Pythonインストール不要の.exe配布基盤。config.yamlで対象URL変更可能。口コミ収集・競合価格収集に流用可</td>
+    </tr>
+    <tr>
+      <td><strong>biz-efficiency/eff-rpa01</strong><br>RPAツールキット</td>
+      <td><span class="tag-active">稼働 納品実績あり</span></td>
+      <td>Python / Playwright / openpyxl / PyInstaller .exe化 / tasks プラグイン構造</td>
+      <td>file_organizer / excel_reporter / web_form_filler / screenshot_batch の4タスク基盤。POS CSV整形・帳票自動化に流用可</td>
+    </tr>
+    <tr>
+      <td><strong>aiueo</strong><br>飲食店モバイルオーダー</td>
+      <td><span class="tag-active">稼働 P2</span></td>
+      <td>React 19+Vite 7+Tailwind / PocketBase / Oracle Free Tier+Caddy / PWA</td>
+      <td><strong>飲食向け最大資産</strong>。モバイルオーダー・レジ・KDS・QR注文・セルフチェックアウト。無料POS市場調査・差別化方針（端末自由・月額永久無料・QR10秒復旧）あり。LP・動画素材完備</td>
+    </tr>
+    <tr>
+      <td><strong>review-analysis (ReviewAI)</strong><br>Googleクチコミ分析</td>
+      <td><span class="tag-active">稼働 P1</span></td>
+      <td>Next.js 16+React 19 / Gemini 2.5 Flash / Google OAuth / GBP API連携(クォータ0未解決)</td>
+      <td>Googleクチコミ自動収集+AI要約+返信案生成。個人飲食店向け。$10-30/月SaaS志向。ORM市場$12.57B狙い</td>
+    </tr>
+    <tr>
+      <td><strong>foodee</strong><br>飲食業界特化RSS</td>
+      <td><span class="tag-active">稼働 P1</span></td>
+      <td>React+Vercel+Firebase / 13フィードRSS / 気象庁JSON / OG image取得</td>
+      <td>RSS統合基盤・気象庁JSON連携・訴訟回避設計。天気連動需要予測のインプット源として転用可</td>
+    </tr>
+    <tr>
+      <td><strong>hearing-bot</strong><br>見積自動化ボット</td>
+      <td><span class="tag-active">稼働 P1</span></td>
+      <td>シングルファイルHTML / Vercel Serverless / Gemini 2.5 Flash / Resend</td>
+      <td>対話形式の事前ヒアリング+見積提示+リード獲得。飲食店向けヒアリング特化版に改造可能</td>
+    </tr>
+    <tr>
+      <td><strong>omotenashi-trainer</strong><br>接客発声採点</td>
+      <td><span class="tag-active">稼働 P0-1</span></td>
+      <td>シングルHTML / Web Speech API / Web Audio API / Gemini 2.0 Flash</td>
+      <td>話速・ピッチ・敬語採点エンジン。#4 接客スキルばらつき問題に直接対応。単体完結</td>
+    </tr>
+    <tr>
+      <td><strong>gas-bot</strong><br>GAS Bot構築代行</td>
+      <td><span class="tag-active">稼働 P1</span></td>
+      <td>Google Apps Script / LINE Messaging API / ChatWork API / Slack / Google Sheets</td>
+      <td>サーバー費ゼロのBOT基盤。飲食店向け予約受付・LINE発注・売上記録を数時間で構築可能</td>
+    </tr>
+    <tr>
+      <td><strong>microscope</strong><br>AI市場調査SaaS</td>
+      <td><span class="tag-active">稼働 P0-1</span></td>
+      <td>Next.js / Gemini / WebSearch / 構造化継続収集</td>
+      <td>競合調査・市場監視の基盤。飲食業界の相場・補助金情報の定点観測として使える</td>
+    </tr>
+    <tr>
+      <td><strong>design-seed</strong><br>URL模写ノーコード</td>
+      <td><span class="tag-active">稼働 P2</span></td>
+      <td>React+Vite+Tailwind / Gemini 2.5 Flash / Supabase / Stripe</td>
+      <td>URL貼付→模写→自分用WEB生成エンジン。飲食店向けテンプレ（LP・メニュー・予約ページ）生成に特化可能</td>
+    </tr>
+    <tr>
+      <td><strong>video-studio</strong><br>Remotion動画制作</td>
+      <td><span class="tag-ready">稼働 プロト</span></td>
+      <td>Remotion / Replicate (flux) / tokens.ts 12トークン一元化</td>
+      <td>飲食店向け30秒SNS広告動画テンプレ量産基盤。hotel/lawyer/realestate 3業種実績あり</td>
+    </tr>
+    <tr>
+      <td><strong>kobaraku</strong><br>5機能ハブアプリ</td>
+      <td><span class="tag-ready">凍結解除済み</span></td>
+      <td>React 19+Vite / ExcelJS / localStorage / PWA / Claude API</td>
+      <td>食器棚卸・テナント売上AI分析・相互チェック機能。個人店向け軽量ハブの雛形</td>
+    </tr>
+    <tr>
+      <td><strong>doutor-clone (demos/sample-cafe)</strong></td>
+      <td><span class="tag-ready">デモ資産</span></td>
+      <td>Next.js (最新版) / カフェLPテンプレ</td>
+      <td>カフェ業種のLPテンプレ雛形。AI Answer等のデモ環境として完備</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note">
+<span class="label-guess">【推測】</span> 飲食向け資産として最も完成度が高いのは <strong>aiueo</strong>（モバイルオーダー全体）・<strong>ai-concierge</strong>（チャットBOT基盤+オンボーディング）・<strong>review-analysis</strong>（クチコミ分析）の3つ。これらを「販路ごとに包装し直す」だけで製品化可能。
+</div>
+
+<!-- ========================================= -->
+<h2 id="s4">§4. 難易度10 基準点</h2>
+
+<p>新規開発難易度のスコアリングに絶対スケールがないので、<strong>我々が既に仕上げた最高難度プロダクト = 難易度10</strong> を基準点とする。<span class="label-guess">【推測】</span></p>
+
+<div class="card">
+  <h3>基準点: <strong>AI Answer（ai-concierge）全体 = 難易度 10</strong></h3>
+  <p><span class="label-fact">【事実】</span> P2到達済み。内訳:</p>
+  <ul>
+    <li><strong>管理画面</strong>: React+Vite+Tailwind の SPA。FAQ CRUD・テナント切替・設定画面・ログビュー</li>
+    <li><strong>APIレイヤー</strong>: Vercel Functions（LINE Webhook + AI応答 + FAQ API）</li>
+    <li><strong>DB/Auth</strong>: Supabase（マルチテナント設計・RLS・スキーマ管理）</li>
+    <li><strong>LLM統合</strong>: Gemini 2.5 Flash。無料→従量切替手順を用意</li>
+    <li><strong>LINE連携</strong>: リッチメニュー→Webウィジェット方式</li>
+    <li><strong>Webウィジェット</strong>: scriptタグ1行で顧客サイトに埋込できるスタンドアロンJS</li>
+    <li><strong>LP</strong>: 申込フォーム・法務記載・Resend連携</li>
+    <li><strong>半自動オンボーディング</strong>: LP申込→自動返信→セットアップページ→5分手動プロビジョニング</li>
+    <li><strong>納品ドキュメント5点</strong>: テナント設定/ヒアリング/納品メッセージ/マニュアル/CMSガイド</li>
+    <li><strong>動画</strong>: Remotion業種特化版3本</li>
+  </ul>
+  <p><span class="label-guess">【推測】</span> これを10として、以下の相対スコアを各製品化案に付ける:</p>
+</div>
+
+<table>
+  <thead><tr><th>スコア</th><th>定義</th><th>既存プロダクトの例</th></tr></thead>
+  <tbody>
+    <tr><td class="center"><strong>1-2</strong></td><td>既存マクロ・テンプレの設定変更のみ</td><td>eff-vba01 のシート差し替え</td></tr>
+    <tr><td class="center"><strong>3-4</strong></td><td>既存基盤に軽微な機能追加。数時間〜数日</td><td>eff-py01 の収集対象追加</td></tr>
+    <tr><td class="center"><strong>5-6</strong></td><td>既存基盤の業種特化改造。1-2週間</td><td>gas-bot の飲食予約版</td></tr>
+    <tr><td class="center"><strong>7-8</strong></td><td>新規UIコンポーネント多数+外部API連携1-2個。2-4週間</td><td>review-analysis 単体機能追加</td></tr>
+    <tr><td class="center"><strong>9-10</strong></td><td>フルスタック新製品（既存基盤流用）・マルチテナント・LP+オンボーディング一式</td><td><strong>AI Answer 全体</strong>・aiueo レジ/KDS統合</td></tr>
+    <tr><td class="center"><strong>11-12</strong></td><td>POSハードウェア連携 or 複数プラットフォーム API統合 or 多言語+多通貨</td><td>該当実績なし</td></tr>
+    <tr><td class="center"><strong>13-15</strong></td><td>AI独自モデル学習 or リアルタイム音声認識+映像認識 or 決済ライセンス取得</td><td>該当実績なし</td></tr>
+  </tbody>
+</table>
+
+<!-- ========================================= -->
+<h2 id="s5">§5. 製品化案（全面置換 / 15案）</h2>
+
+<p>既存プロダクトの組み合わせ+完全新規開発を含む15案を提示。スコアは <strong>既存資産活用率（0-100%）</strong>と<strong>新規開発難易度（0-15、AI Answer=10基準）</strong>の2軸。販路はココナラ限定ではなく世界中の飲食店を対象とする。</p>
+
+<h3>凡例</h3>
+<p>
+  <span class="route direct">直販 B2B</span> 国内中小チェーン営業 /
+  <span class="route saas">SaaS</span> 月額 /
+  <span class="route">ココナラ</span> 国内小規模店 /
+  <span class="route oem">OEM/WL</span> POS企業への組込 /
+  <span class="route mkt">マケプレ</span> Shopify/WP Plugin等 /
+  <span class="route overseas">越境</span> 海外飲食店直販 /
+  <span class="route">代理店</span> /
+  <span class="route">SNS/YT</span>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:18%;">コードネーム</th>
+      <th>対応課題</th>
+      <th>納品物・サービス内容</th>
+      <th>既存活用率</th>
+      <th>難易度</th>
+      <th>推奨営業ルート</th>
+      <th>収益モデル / 単価</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr>
+      <td><strong>rest-concierge-suite</strong><br>飲食特化 AI Answer エディション</td>
+      <td>#3 #4 #7 #8</td>
+      <td>AI Answer 本体を飲食業界向けに包装。FAQテンプレ30個(アレルギー/カロリー/営業時間/定休日/アクセス/駐車場/予約変更/ベジ対応/子連れ/禁煙等)+多言語(JP/EN/ZH/KO)+LINEリッチメニューテンプレ+納品ドキュメント飲食版</td>
+      <td><span class="score-num">85%</span><span class="gauge"><span style="width:85%"></span></span></td>
+      <td><span class="score-num">4</span><span class="gauge diff"><span style="width:26%"></span></span></td>
+      <td><span class="route">ココナラ</span><span class="route direct">直販 B2B</span><span class="route saas">SaaS</span><span class="route">代理店</span></td>
+      <td>初期¥50,000 + 月¥3,000-10,000<br>年額¥50,000-150,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-reviewai-pro</strong><br>飲食店クチコミAI月額SaaS</td>
+      <td>#4 #7 評判管理</td>
+      <td>review-analysis を飲食特化でパッケージ化。Googleクチコミ自動収集+AI要約+返信案生成+改善レポート週次配信。競合店比較・★スコア推移。1-5店舗対応</td>
+      <td><span class="score-num">75%</span><span class="gauge"><span style="width:75%"></span></span></td>
+      <td><span class="score-num">6</span><span class="gauge diff"><span style="width:40%"></span></span></td>
+      <td><span class="route saas">SaaS</span><span class="route direct">直販 B2B</span><span class="route overseas">越境</span><span class="route mkt">マケプレ</span></td>
+      <td>月¥2,980 / ¥4,980 / ¥9,800<br>(1店/3店/無制限)</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-aiueo-franchise</strong><br>Aiueo チェーン一括導入版</td>
+      <td>#3 #4 #5 POS代替</td>
+      <td>Aiueo モバイルオーダー/レジ/KDSを多店舗管理機能付きで提供。本部ダッシュボード+店舗横断売上集計+メニュー一括配信。端末自由・月額永久無料の差別化を維持しつつ年額保守料で収益化</td>
+      <td><span class="score-num">70%</span><span class="gauge"><span style="width:70%"></span></span></td>
+      <td><span class="score-num">9</span><span class="gauge diff"><span style="width:60%"></span></span></td>
+      <td><span class="route direct">直販 B2B</span><span class="route">代理店</span><span class="route">SNS/YT</span></td>
+      <td>初期¥200,000-500,000 /店<br>年額保守¥60,000-180,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-vba-pack</strong><br>飲食店Excelマクロ5点セット</td>
+      <td>#1 #5 #6</td>
+      <td>eff-vba01 を飲食特化で再パッケージ。マクロ5本=①シフト自動生成(スキルレベル/ピーク考慮) ②売上日報集計 ③在庫発注書自動作成 ④ロス率トラッカー ⑤レシピ原価計算。install_macros.bat でワンクリックインストール</td>
+      <td><span class="score-num">90%</span><span class="gauge"><span style="width:90%"></span></span></td>
+      <td><span class="score-num">3</span><span class="gauge diff"><span style="width:20%"></span></span></td>
+      <td><span class="route">ココナラ</span><span class="route mkt">マケプレ</span><span class="route direct">直販 B2B</span></td>
+      <td>買い切り ¥8,000 / ¥15,000(複数店版)</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-dify-dsl-pack</strong><br>飲食店Dify DSLテンプレ集</td>
+      <td>#3 #4 #7 #8</td>
+      <td>dify-service の知見で飲食店向けDSL 8本を制作。予約受付/FAQ/メニュー案内/クーポン配布/アンケート/クレーム一次対応/多言語接客/アレルギー確認。顧客は自前Difyにインポートするだけ</td>
+      <td><span class="score-num">80%</span><span class="gauge"><span style="width:80%"></span></span></td>
+      <td><span class="score-num">4</span><span class="gauge diff"><span style="width:26%"></span></span></td>
+      <td><span class="route">ココナラ</span><span class="route mkt">マケプレ</span><span class="route overseas">越境</span></td>
+      <td>DSL単品 ¥5,000-15,000<br>8点セット ¥30,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-omotenashi-sme</strong><br>接客トレーナー店舗導入版</td>
+      <td>#4 接客スキルばらつき</td>
+      <td>omotenashi-trainer を店舗向け多人数版に拡張。スタッフアカウント管理+月次スコア推移+店長レポート+外国人スタッフ向け多言語フレーズDB。新人教育と定期チェックの両用</td>
+      <td><span class="score-num">50%</span><span class="gauge"><span style="width:50%"></span></span></td>
+      <td><span class="score-num">6</span><span class="gauge diff"><span style="width:40%"></span></span></td>
+      <td><span class="route saas">SaaS</span><span class="route direct">直販 B2B</span><span class="route">代理店</span></td>
+      <td>月¥1,980/店舗 + 初期¥30,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-gas-reservation</strong><br>GAS予約台帳BOT</td>
+      <td>#8 営業時間外予約</td>
+      <td>gas-bot 派生。LINE Messaging API+Google Sheets+Googleカレンダーで予約受付。営業時間/定休日/満席判定/キャンセルフロー/リマインダー送信を全てGASで実装。サーバー費ゼロ</td>
+      <td><span class="score-num">65%</span><span class="gauge"><span style="width:65%"></span></span></td>
+      <td><span class="score-num">4</span><span class="gauge diff"><span style="width:26%"></span></span></td>
+      <td><span class="route">ココナラ</span><span class="route direct">直販 B2B</span></td>
+      <td>買い切り ¥20,000 + 設定代行 ¥10,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-weather-demand</strong><br>天気連動需要予測 Python</td>
+      <td>#5 #6 発注最適化</td>
+      <td>eff-py01 + foodee気象庁JSON連携基盤 + 過去売上CSVを入力に翌週の需要予測CSVを出力する.exe。曜日×天気×祝日×イベント回帰モデル。config.yaml で店舗固有設定</td>
+      <td><span class="score-num">60%</span><span class="gauge"><span style="width:60%"></span></span></td>
+      <td><span class="score-num">6</span><span class="gauge diff"><span style="width:40%"></span></span></td>
+      <td><span class="route">ココナラ</span><span class="route direct">直販 B2B</span><span class="route">代理店</span></td>
+      <td>買い切り ¥30,000-60,000<br>月額更新 ¥3,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-video-pack</strong><br>飲食店SNS広告動画量産</td>
+      <td>#7 集客・リピーター</td>
+      <td>video-studio + Replicate で飲食店向け30秒SNS広告動画を量産。新メニュー告知/クーポン/期間限定/スタッフ紹介のテンプレ4種。店舗写真+ロゴ+コピーを入れ替えるだけ</td>
+      <td><span class="score-num">70%</span><span class="gauge"><span style="width:70%"></span></span></td>
+      <td><span class="score-num">5</span><span class="gauge diff"><span style="width:33%"></span></span></td>
+      <td><span class="route">ココナラ</span><span class="route direct">直販 B2B</span><span class="route">代理店</span></td>
+      <td>1本 ¥8,000 / 4本パック ¥25,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-hearing-lead</strong><br>飲食店特化 AI ヒアリングボット</td>
+      <td>#7 リピーター戦略相談</td>
+      <td>hearing-bot を飲食店向けに改造し、飲食店オーナーが自店のSNS・集客・DX課題を対話しながら整理できる無料ツール。最後に我々のTOP製品(rest-concierge-suite/rest-reviewai-pro)を自動推薦。リード獲得フロー</td>
+      <td><span class="score-num">55%</span><span class="gauge"><span style="width:55%"></span></span></td>
+      <td><span class="score-num">4</span><span class="gauge diff"><span style="width:26%"></span></span></td>
+      <td><span class="route">SNS/YT</span><span class="route direct">直販 B2B</span></td>
+      <td>無料（リード獲得源）<br>後段製品のLTVで回収</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-pos-connector</strong><br>POS CSV 取込アダプタ (新規)</td>
+      <td>#5 #6 POS連携</td>
+      <td><strong>新規開発</strong>: Airレジ/スマレジ/ユビレジ/Square/Squareレストラン等の主要POS 10種のCSV/API出力形式を標準フォーマットに正規化するアダプタライブラリ。rest-vba-pack/rest-reviewai-pro/rest-weather-demand の共通前段として機能</td>
+      <td><span class="score-num">25%</span><span class="gauge"><span style="width:25%"></span></span></td>
+      <td><span class="score-num">8</span><span class="gauge diff"><span style="width:53%"></span></span></td>
+      <td><span class="route oem">OEM/WL</span><span class="route direct">直販 B2B</span><span class="route mkt">マケプレ</span></td>
+      <td>ライセンス ¥200,000/年/POS企業<br>or 買切¥100,000/店舗</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-global-menu</strong><br>多言語メニュー自動生成 SaaS (新規)</td>
+      <td>#3 #4 インバウンド</td>
+      <td><strong>新規開発</strong>: メニューPDF/画像をアップロードすると OCR→翻訳→アレルギー自動タグ付け→QRコード付き多言語Webメニューを自動生成。JP/EN/ZH-CN/ZH-TW/KO/ES/FR/PT 8言語。design-seed のテンプレ生成基盤流用</td>
+      <td><span class="score-num">40%</span><span class="gauge"><span style="width:40%"></span></span></td>
+      <td><span class="score-num">9</span><span class="gauge diff"><span style="width:60%"></span></span></td>
+      <td><span class="route saas">SaaS</span><span class="route overseas">越境</span><span class="route direct">直販 B2B</span><span class="route mkt">マケプレ</span></td>
+      <td>Free/¥1,980/¥4,980/¥9,800<br>(月額・店舗数段階)</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-kitchen-voice</strong><br>キッチン音声オーダー (新規)</td>
+      <td>#3 混雑時対応</td>
+      <td><strong>新規開発</strong>: Web Speech API で調理スタッフが「ラーメン2杯上がり」と発声→KDS/Sheets/aiueo連携に自動反映。omotenashi-trainer の音声認識基盤+aiueo KDS統合</td>
+      <td><span class="score-num">35%</span><span class="gauge"><span style="width:35%"></span></span></td>
+      <td><span class="score-num">10</span><span class="gauge diff"><span style="width:66%"></span></span></td>
+      <td><span class="route saas">SaaS</span><span class="route direct">直販 B2B</span><span class="route oem">OEM/WL</span></td>
+      <td>月¥4,980/店舗 + 初期¥80,000</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-pricing-ai</strong><br>メニュー価格最適化AI (完全新規)</td>
+      <td>#5 価格最適化</td>
+      <td><strong>完全新規</strong>: 過去POSデータ+競合価格+原材料費+曜日天気を入力に、メニュー品目ごとの最適価格をAI提案。ダイナミックプライシング可(ランチ/ディナー/雨天割)。eff-py01 の収集基盤+独自回帰モデル</td>
+      <td><span class="score-num">20%</span><span class="gauge"><span style="width:20%"></span></span></td>
+      <td><span class="score-num">12</span><span class="gauge diff"><span style="width:80%"></span></span></td>
+      <td><span class="route saas">SaaS</span><span class="route direct">直販 B2B</span><span class="route overseas">越境</span></td>
+      <td>月¥9,800-29,800/店舗</td>
+    </tr>
+
+    <tr>
+      <td><strong>rest-fullstack-os</strong><br>飲食店オールインワンOS (超新規)</td>
+      <td>#1-#8 全部</td>
+      <td><strong>完全新規 超大規模</strong>: 予約/注文/POS/在庫/シフト/クチコミ/マーケの7機能統合SaaS。Toast・Square for Restaurants のグローバル競合。aiueo + ai-concierge + review-analysis + rest-pos-connector を基盤に統合。多言語・多通貨・決済パートナー連携</td>
+      <td><span class="score-num">45%</span><span class="gauge"><span style="width:45%"></span></span></td>
+      <td><span class="score-num">14</span><span class="gauge diff"><span style="width:93%"></span></span></td>
+      <td><span class="route saas">SaaS</span><span class="route direct">直販 B2B</span><span class="route overseas">越境</span><span class="route">代理店</span></td>
+      <td>月$79-299/店舗 + 初期$500-2000<br>グローバル展開前提</td>
+    </tr>
+
+  </tbody>
+</table>
+
+<div class="note">
+<span class="label-guess">【推測】</span> 15案のうち <strong>9案</strong>は既存資産活用率50%以上。<strong>rest-pos-connector / rest-global-menu / rest-kitchen-voice / rest-pricing-ai / rest-fullstack-os</strong> の5案は新規開発難易度8以上で、AI Answer基準で相当の投資が必要。
+</div>
+
+<!-- ========================================= -->
+<h2 id="s6">§6. 推奨 TOP 5</h2>
+
+<p>優先基準: <strong>①既存資産活用率が高い ②難易度が手頃(3-6) ③収益ポテンシャルが大きい ④販路の広がりがある</strong>。マネタイズ大作戦（4月1円→9月開業届）の時間軸に適合するものを優先。</p>
+
+<div class="card">
+  <h3>TOP 1: <code>rest-concierge-suite</code> — 飲食特化 AI Answer</h3>
+  <div class="meta-row"><strong>活用率</strong> 85% / <strong>難易度</strong> 4 / <strong>課題</strong> #3 #4 #7 #8</div>
+  <div class="meta-row"><strong>推奨ルート</strong> ココナラ → 直販 B2B → SaaS → 代理店</div>
+  <ul>
+    <li>AI Answer全体をそのまま飲食特化で包装。FAQテンプレ30個+多言語化のみで差別化完成</li>
+    <li>半自動オンボーディング導線が既に完成しているため、販路を変えるだけで収益化が走る</li>
+    <li><span class="label-guess">【推測】</span>マネタイズ大作戦の主力（AI Answer）の派生なので、マスターの既定路線とも整合</li>
+    <li>グローバル展開時は越境SaaSに直結（LINE→WhatsApp/Messenger 切替だけで海外対応可能）</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>TOP 2: <code>rest-vba-pack</code> — 飲食店Excelマクロ5点セット</h3>
+  <div class="meta-row"><strong>活用率</strong> 90% / <strong>難易度</strong> 3 / <strong>課題</strong> #1 #5 #6</div>
+  <div class="meta-row"><strong>推奨ルート</strong> ココナラ → マケプレ → 直販 B2B</div>
+  <ul>
+    <li>biz-efficiency 部門の既存成果を直接流用。install_macros.bat ワンクリックインストールの実績あり</li>
+    <li>飲食特化の制約条件（スキルレベル/ピーク自動判別/ロス率トラッカー）が差別化ポイント</li>
+    <li>¥8,000帯で小規模店のハードル低。レビュー獲得→単価UPの第一歩として最短</li>
+    <li>カテゴリ230（出品6,824件・中央値¥12,500）の業務効率化部門と直結</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>TOP 3: <code>rest-reviewai-pro</code> — 飲食店クチコミAI月額SaaS</h3>
+  <div class="meta-row"><strong>活用率</strong> 75% / <strong>難易度</strong> 6 / <strong>課題</strong> #4 #7</div>
+  <div class="meta-row"><strong>推奨ルート</strong> SaaS月額 → 直販 B2B → 越境 → マケプレ</div>
+  <ul>
+    <li>review-analysis の既存設計（個人店向け $10-30/月）をそのまま再利用</li>
+    <li>ORM市場 $12.57B の空白地帯狙い。Harvard HBR「★ひとつで売上9%」フックが強い</li>
+    <li><strong>リスク</strong>: GBP API クォータ0問題が未解決。Places API課金戦略も未確定 → 着手前に解決必須</li>
+    <li>Stripe課金設計は未実装だが Stage3 到達時に実装予定（設計済み）</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>TOP 4: <code>rest-dify-dsl-pack</code> — 飲食店Dify DSLテンプレ集</h3>
+  <div class="meta-row"><strong>活用率</strong> 80% / <strong>難易度</strong> 4 / <strong>課題</strong> #3 #4 #7 #8</div>
+  <div class="meta-row"><strong>推奨ルート</strong> ココナラ → マケプレ (Dify Marketplace) → 越境</div>
+  <ul>
+    <li>dify-service の知見で8本のDSLを量産。顧客は自前Difyにインポートするだけの軽量納品</li>
+    <li>Japan Dify Marketplace + グローバル Dify コミュニティ両方に出せる</li>
+    <li>LLM APIキー顧客持ちモデルなので我々にランニングコストゼロ</li>
+    <li>rest-concierge-suite の入門商品として機能（DSL→Dify環境→専用アプリの階段）</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>TOP 5: <code>rest-video-pack</code> — 飲食店SNS広告動画量産</h3>
+  <div class="meta-row"><strong>活用率</strong> 70% / <strong>難易度</strong> 5 / <strong>課題</strong> #7 集客</div>
+  <div class="meta-row"><strong>推奨ルート</strong> ココナラ → 直販 B2B → 代理店</div>
+  <ul>
+    <li>video-studio + Replicate 基盤。業種特化動画3本の実績（hotel/lawyer/realestate）で量産ノウハウ確立</li>
+    <li>SNS広告動画は単価設定が幅広く(¥8,000-50,000)、レビュー獲得→単価UPが効きやすい</li>
+    <li>¥5,000帯DSLパック顧客への横売りに最適</li>
+    <li><span class="label-guess">【推測】</span>競合のCanva/CapCut系は「飲食特化テンプレ」空白あり</li>
+  </ul>
+</div>
+
+<div class="note">
+<strong>TOP5以外で注目すべき案:</strong> <code>rest-global-menu</code>(新規難度9だがインバウンド需要顕在化) と <code>rest-pos-connector</code>(OEM販路限定だが1社獲れば年額ライセンスが大きい) は中期検討対象。<code>rest-fullstack-os</code> は超大規模なのでマネタイズ大作戦の9月開業届以降に検討。
+</div>
+
+<!-- ========================================= -->
+<h2 id="s7">§7. リスク・注意点</h2>
+
+<h3>国内共通リスク（v1から継承）</h3>
+
+<div class="critical">
+<strong>景品表示法 リスク:</strong> 売上分析・需要予測・価格最適化系で「売上N%アップ」「利益保証」等の断定は即NG。<strong>「〇〇の見える化を支援します」</strong>レベルの表現に抑える。ココナラ出品表現ルールメモ参照。
+</div>
+
+<div class="warn">
+<strong>スクレイピング法的リスク:</strong> 食べログ・ぐるなび・Google Maps のスクレイピングは各社利用規約違反の可能性。foodee 訴訟回避ルールと同等の注記を納品物に含める。rest-pricing-ai の競合価格収集は <strong>公開価格ページのみ</strong>に限定。
+</div>
+
+<div class="warn">
+<strong>個人情報取扱い:</strong> 顧客 DB を扱うケース（rest-concierge-suite/rest-reviewai-pro/rest-aiueo-franchise）は個人情報保護法への対応が必要。マルチテナント時はテナント間データ分離を明示。
+</div>
+
+<h3>グローバル展開特有のリスク（v2追加）</h3>
+
+<div class="critical">
+<strong>GDPR・州法（法規）:</strong> 越境ルート使用時は EU GDPR / 米カリフォルニア CCPA / 英UK-GDPR への対応が必須。<strong>特に rest-reviewai-pro はクチコミ=個人データ扱い</strong>で、EU顧客に売るならデータ処理者契約(DPA)+EU域内ホスティングが事実上必須。<span class="label-guess">【推測】</span>当面はJP/EN 顧客でも日本国内ホスティング限定を明記。
+</div>
+
+<div class="warn">
+<strong>税務（越境販売）:</strong> 海外SaaS販売は 付加価値税(VAT/GST)の現地税登録が閾値超で必要になる場合あり（EU は VAT OSS、英・豪・NZ 等は $ 0 から登録義務の国もある）。Stripe Tax 等の自動計算サービス導入で初期コスト発生。マネタイズ大作戦の9月開業届以降でないと実質対応不可。
+</div>
+
+<div class="warn">
+<strong>言語・サポート体制:</strong> 多言語UIは LLM 翻訳で即時対応可能だが、<strong>カスタマーサポートの返信対応</strong>は人的リソース限界。当面は English+Japanese 限定でスタートし、他言語はドキュメント翻訳+FAQボット対応に限る。
+</div>
+
+<div class="warn">
+<strong>決済（グローバル）:</strong> 国内顧客は Stripe JP + 銀行振込で足りるが、越境時は Stripe 国際版 / Paddle / Lemon Squeezy 等の Merchant of Record サービス利用で税務代行含めて委託するのが安全。手数料 5-8% のコスト増を織り込む。
+</div>
+
+<div class="warn">
+<strong>POS連携・ハードウェア:</strong> rest-pos-connector/rest-aiueo-franchise でPOSハードウェアに踏み込む場合、国・地域ごとにレシート印刷・電子帳簿・PCI-DSS(クレカ) 等の規制差が大きい。先行して国内法(電子帳簿保存法)→米国(Square準拠)の順で段階展開。
+</div>
+
+<div class="note">
+<strong>競合の強弱（推測）:</strong> Toast / Square for Restaurants / Lightspeed / TouchBistro 等のグローバル競合は機能で勝負しても勝てない。<strong>我々の強みは「単機能で安い・即納・カスタム柔軟」</strong>に寄せる。rest-fullstack-os は夢物語として置いておき、TOP5 の単機能勝負を優先。
+</div>
+
+<!-- ========================================= -->
+<h2 id="s8">§8. 次のアクション</h2>
+
+<p>採用案のフェーズによって従うSOPを使い分ける。</p>
+
+<table>
+  <thead><tr><th>案</th><th>適用SOP</th><th>P0 開始手順</th><th>必要時間</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>rest-concierge-suite</strong> (TOP1)</td>
+      <td><code>docs/ops/listing-cycle.md</code> + AI Answer PC表</td>
+      <td>①AI Answer 現状の P2 進捗確認 ②飲食特化FAQテンプレ30個制作 ③多言語(EN/ZH/KO)追加 ④デモ用テナント構築(sample-cafeで) ⑤ココナラ出品原稿を飲食版に複製</td>
+      <td>調査 3h / 実装 20-30h</td>
+    </tr>
+    <tr>
+      <td><strong>rest-vba-pack</strong> (TOP2)</td>
+      <td><code>docs/ops/listing-cycle.md</code></td>
+      <td>①カテゴリ230/飲食 既存出品20件調査 ②eff-vba01 既存5マクロの飲食向け拡張設計 ③サンプル店舗データで動作検証 ④install_macros.bat をfoodservice版に調整 ⑤ココナラ出品原稿作成</td>
+      <td>調査 2h / 実装 8-12h</td>
+    </tr>
+    <tr>
+      <td><strong>rest-reviewai-pro</strong> (TOP3)</td>
+      <td><code>docs/ops/product-cycle.md</code> P2-P3（既にP1）</td>
+      <td>①GBP API クォータ申請状況確認 ②Places API課金戦略確定 ③Stripe課金Stage3実装 ④飲食特化LP制作 ⑤ウェイトリスト100件集客</td>
+      <td>未解決課題解消後: 実装 40-60h</td>
+    </tr>
+    <tr>
+      <td><strong>rest-dify-dsl-pack</strong> (TOP4)</td>
+      <td><code>docs/ops/listing-cycle.md</code> + dify-service PC表</td>
+      <td>①dify-service 現状 DSL資産確認 ②飲食向け8DSL設計書作成 ③Dify Cloud Sandboxで試作→動作確認 ④DSLエクスポート+使い方ドキュメント整備 ⑤ココナラ+Dify Marketplace両出品</td>
+      <td>調査 3h / 実装 15-25h</td>
+    </tr>
+    <tr>
+      <td><strong>rest-video-pack</strong> (TOP5)</td>
+      <td><code>docs/ops/listing-cycle.md</code> + video-studio PC表</td>
+      <td>①video-studio 既存3業種動画のトークン棚卸し ②飲食4テンプレ設計 (新メニュー/クーポン/期間限定/スタッフ紹介) ③Replicate 背景素材生成 ④サンプル動画 4本書き出し ⑤ココナラ出品</td>
+      <td>調査 2h / 実装 12-18h</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>採用しない場合でも残すべきこと</h3>
+<ul>
+  <li>§1 記事要点と§2 業務課題整理表は「飲食業界課題辞書」として保持（v1から継承）</li>
+  <li>§3 既存プロダクト資産カタログは<strong>vibe-base全体の業界別再利用性評価の雛形</strong>として他業界展開時にコピペできる</li>
+  <li>§4 難易度10基準点は他の製品化検討にも流用可能。以後「AI Answer=10」を全社共通スケールとする提案</li>
+</ul>
+
+<p class="src">
+作成: vibe-base 司令塔 / 2026-04-14 Session 169 / v2 全面改訂<br>
+元資料: <code>https://biz.moneyforward.com/restaurant/basic/2006/</code><br>
+参照: <code>products/*/CLAUDE.md</code> (17プロダクト) / <code>memory/project_monetization-battleplan.md</code> / <code>memory/project_monetization-bizeff-dept.md</code><br>
+保管先: <code>journal/monetization/drafts/2026-04-14-mf-restaurant-report.html</code><br>
+次工程: マスター検討 → TOP5 採用判断 → 各案ごとに該当 SOP でサイクル開始
+</p>
+
+</body>
+</html>

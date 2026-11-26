@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-07 | vibe-base memory管理アーキ再設計 + フック全プロダクト伝播</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.6; }
+  h1 { font-size: 1.4em; border-bottom: 3px solid #333; padding-bottom: 8px; }
+  h2 { font-size: 1.1em; border-left: 4px solid #555; padding-left: 10px; margin-top: 32px; }
+  .alert-red { background: #fff0f0; border: 2px solid #cc0000; padding: 12px 16px; border-radius: 4px; margin: 16px 0; }
+  .alert-red strong { color: #cc0000; }
+  .tag-h { background: #cc0000; color: #fff; padding: 1px 6px; border-radius: 3px; font-size: .8em; }
+  .tag-m { background: #e08000; color: #fff; padding: 1px 6px; border-radius: 3px; font-size: .8em; }
+  .tag-l { background: #666; color: #fff; padding: 1px 6px; border-radius: 3px; font-size: .8em; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+  th { background: #f5f5f5; }
+  code { background: #f0f0f0; padding: 1px 4px; border-radius: 2px; font-size: .9em; }
+  li { margin: 4px 0; }
+  .notice { color: #880000; font-weight: bold; font-size: 1.1em; }
+</style>
+</head>
+<body>
+
+<h1>Check-out 2026-06-07 | memory管理アーキ再設計 + フック全プロダクト伝播</h1>
+<p>branch: <code>master</code> &nbsp;|&nbsp; 次セッションは本ファイルを先に Read してから着手すること</p>
+
+<div class="alert-red">
+  <strong>⚠️ 最重要（次セッション着手前確認）</strong>
+  <ol>
+    <li><strong>trimmer-system <code>ponchi-v2.html</code> に 355行 unstaged 変更</strong> — trimmer-system product の作業残置。意図的か確認必要</li>
+    <li><strong><code>tmp/</code> に大量ファイル</strong>（blender-4.5.10-windows-x64.zip 等 380MB 級）— 捨てる/残す判断未完了</li>
+    <li><strong>outside-vibe-base-gate ネストプロジェクト問題</strong> — products/*/app 等では CLAUDE_PROJECT_DIR が vibe-base ルートを指さない。設計上の制約・次セッション検討要</li>
+  </ol>
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ul>
+  <li><strong>memory管理アーキ根本再設計</strong> — 「AI自己規律依存」から「機械強制」への完全移行</li>
+  <li><code>~/.claude/CLAUDE.md</code> 新規作成 — A群18件のスタイル/行動規律を30行で記載（全プロジェクト横断・毎セッション自動ロード）</li>
+  <li>MEMORY.md 55行→43行に圧縮（A群削除・~/.claude/CLAUDE.md へ参照移管）</li>
+  <li>checkout スキル B-2.1 を改修 — 「解決したか判定」→「次セッションに引き継ぐ事実を列挙」（AI判定除去）</li>
+  <li><code>.claude/hooks/outside-vibe-base-gate.mjs</code> 新設 — vibe-base 外への Write/Edit を機械ブロック</li>
+  <li><code>.claude/hooks/memory-observation-gate.mjs</code> 新設 — memory.md への継続観察タスク記述を機械ブロック（MultiEdit対応済）</li>
+  <li><code>scripts/archive-orphan-memories.mjs</code> 新設 — MEMORY.md未参照ファイルをarchiveへ移動</li>
+  <li><code>scripts/memory-cleanup.mjs</code> 新設 — 孤立ファイル数を検出・報告</li>
+  <li>trimmer-system v3 中止・v2 回収方針に変更（memory.md 更新・v3 plan ファイル削除済）</li>
+  <li>trimmer-system への新フック適用確認（outside-vibe-base-gate + memory-observation-gate が settings.json に登録済）</li>
+  <li>フック全21プロダクト伝播（propagate-hooks.mjs — settings.json 21件更新 + フックファイル 42件コピー）</li>
+  <li>code-reviewer 指摘 計7件中 5件修正済（MultiEdit未対応・--dry-run強制・import未使用・||→??・matcher不一致）</li>
+  <li>MEMORY.md P1#8 ポインタ修正（壊れた既存誤ポインタを正しいパスに修正）</li>
+</ul>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+  <tr><th>hash</th><th>種別</th><th>内容</th></tr>
+  <tr><td><code>6732661d</code></td><td>feat(hooks)</td><td>B群フック2件追加（outside-vibe-base-gate + memory-observation-gate）</td></tr>
+  <tr><td><code>d9599858</code></td><td>feat(scripts)</td><td>memory孤立ファイル管理スクリプト追加（archive + cleanup）</td></tr>
+  <tr><td><code>f3e9067c</code></td><td>chore(trimmer-system)</td><td>v3中止・v2回収方針に変更</td></tr>
+  <tr><td><code>732b6cf3</code></td><td>chore</td><td>中断セッション作業回収（settings権限拡張・運用スクリプト改善）</td></tr>
+  <tr><td>本セッション末</td><td>chore(memory)</td><td>Check-out — memory管理アーキ再設計完了 + bug fix 2件</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<ul>
+  <li><code>~/.claude/CLAUDE.md</code> が新設されたため、全プロジェクト（vibe-base 以外も含む）に A群規律が自動適用される</li>
+  <li>MEMORY.md が圧縮された（43行）ため、次セッション以降のコンテキスト消費が削減</li>
+  <li>outside-vibe-base-gate は <code>~/.claude/</code> 配下の例外を許可済み（スキル・エージェント等への書き込みは通過）</li>
+  <li>memory-observation-gate は MEMORY.md だけでなく全 memory.md ファイルが対象</li>
+</ul>
+
+<h2>D. 残作業（次セッション以降）</h2>
+<table>
+  <tr><th>優先度</th><th>内容</th><th>備考</th></tr>
+  <tr>
+    <td><span class="tag-m">M</span></td>
+    <td>code-reviewer 残4件の修正判断</td>
+    <td>①②scripts/*.mjs のハードコードパス（設計上許容範囲の可能性あり）③archive-orphan-memories.mjs renameSync 衝突時上書き ④outside-vibe-base-gate ALLOWED_PREFIXES ハードコード</td>
+  </tr>
+  <tr>
+    <td><span class="tag-m">M</span></td>
+    <td>trimmer-system ponchi-v2.html の 355行unstaged 変更確認</td>
+    <td>trimmer-system agent の作業残置か判断</td>
+  </tr>
+  <tr>
+    <td><span class="tag-l">L</span></td>
+    <td>tmp/ の大量ファイル処理</td>
+    <td>blender-4.5.10-windows-x64.zip 等 380MB。捨てる/残す判断</td>
+  </tr>
+  <tr>
+    <td><span class="tag-l">L</span></td>
+    <td>Claude Code 運用近代化 Phase 3 以降</td>
+    <td>docs/session-reports/2026-06-04-operation-modernization-handover.md 参照</td>
+  </tr>
+</table>
+
+<h2>E. 本セッション配備済資産</h2>
+<table>
+  <tr><th>種別</th><th>パス</th><th>内容</th></tr>
+  <tr><td>user-level</td><td><code>~/.claude/CLAUDE.md</code></td><td>A群スタイル規律18件（全プロジェクト共通）</td></tr>
+  <tr><td>hook</td><td><code>.claude/hooks/outside-vibe-base-gate.mjs</code></td><td>vibe-base外Write/Editブロック</td></tr>
+  <tr><td>hook</td><td><code>.claude/hooks/memory-observation-gate.mjs</code></td><td>memory.md継続観察タスクブロック（MultiEdit対応）</td></tr>
+  <tr><td>script</td><td><code>scripts/archive-orphan-memories.mjs</code></td><td>MEMORY.md未参照ファイルをarchiveへ移動</td></tr>
+  <tr><td>script</td><td><code>scripts/memory-cleanup.mjs</code></td><td>孤立ファイル数レポート</td></tr>
+</table>
+
+<h2>F. 本セッション生成レポート</h2>
+<ul>
+  <li>本ファイル: <code>docs/session-reports/2026-06-07-checkout.html</code></li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+  <li><code>node scripts/memory-cleanup.mjs</code> — 孤立ファイル数確認（0件が理想）</li>
+  <li>ponchi-v2.html の unstaged 355行差分を確認（<code>git diff products/trimmer-system/src/design-samples/ponchi-v2.html | head -50</code>）</li>
+  <li>trimmer-system チェックイン（前回マスター指示継続）</li>
+  <li>code-reviewer 残4件の修正要否をマスターに確認</li>
+</ol>
+
+<h2>Wave A-2 機械検証結果</h2>
+<table>
+  <tr><th>項目</th><th>結果</th><th>備考</th></tr>
+  <tr><td>npm test</td><td>SKIP</td><td>vibe-base ルートにテスト未定義</td></tr>
+  <tr><td>npm run typecheck</td><td>SKIP</td><td>同上</td></tr>
+  <tr><td>npm run lint</td><td>SKIP</td><td>同上</td></tr>
+  <tr><td>secret-grep</td><td>PASS</td><td>マッチ 0件</td></tr>
+</table>
+
+<h2>Wave A-3 コードレビュー指摘（6件）</h2>
+<table>
+  <tr><th>No.</th><th>ファイル:行</th><th>問題</th><th>状態</th></tr>
+  <tr><td>1</td><td>scripts/archive-orphan-memories.mjs:14</td><td>ハードコード絶対パス</td><td>未修正（許容範囲の可能性あり）</td></tr>
+  <tr><td>2</td><td>scripts/memory-cleanup.mjs:13</td><td>ハードコード絶対パス</td><td>未修正（同上）</td></tr>
+  <tr><td>3</td><td>scripts/archive-orphan-memories.mjs:85</td><td>renameSync衝突時サイレント上書き</td><td>未修正</td></tr>
+  <tr><td>4</td><td>outside-vibe-base-gate.mjs:7-13</td><td>ALLOWED_PREFIXES ハードコード</td><td>未修正</td></tr>
+  <tr><td>5</td><td>memory-observation-gate.mjs:25</td><td>MultiEdit edits[].new_string 未チェック</td><td><strong>✅ 修正済</strong></td></tr>
+  <tr><td>6</td><td>scripts/memory-cleanup.mjs:17-21</td><td>--dry-runなしで常にexit 1</td><td><strong>✅ 修正済</strong></td></tr>
+</table>
+
+</body>
+</html>

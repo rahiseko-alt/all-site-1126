@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>業務改善診断</title>
+<meta name="description" content="店舗・事業者向けの業務改善診断です。5つの質問で日々の困りごとを棚卸しし、回答の要約と、合った支援がありそうな場合の見立てをお見せします。着地しない場合は「まずは相談」をご案内します。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<style>
+:root{
+--accent:#0f5e68;
+--accent-dark:#0a4750;
+--accent-soft:#e7f1f0;
+--orange:#dd8a1d;
+--teal:#3f8f83;
+--blue:#3a6ea5;
+--bg:#ffffff;
+--bg-alt:#f4f6f5;
+--surface:#ffffff;
+--ink:#1f2328;
+--muted:#5b6670;
+--line:#e3e7ea;
+--footer-bg:#22262b;
+--footer-ink:#e8eaed;
+--wrap:1100px;
+}
+@media (prefers-color-scheme: dark){
+:root{
+--bg:#101214;
+--bg-alt:#16181b;
+--surface:#1b1e22;
+--accent-soft:#17302f;
+--ink:#f2f4f6;
+--muted:#a7b0b8;
+--line:#33383e;
+--footer-bg:#0b0c0e;
+--footer-ink:#cfd4d9;
+}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+margin:0;
+font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif;
+background:var(--bg);
+color:var(--ink);
+line-height:1.7;
+-webkit-font-smoothing:antialiased;
+overflow-x:clip;
+}
+a{color:var(--accent-dark)}
+@media (prefers-color-scheme: dark){ a{color:var(--accent)}}
+.container{max-width:var(--wrap);margin:0 auto;padding:0 20px}
+section{scroll-margin-top:24px}
+
+/* ---------- Back link ---------- */
+.topbar{border-bottom:1px solid var(--line);background:var(--surface)}
+.topbar .container{padding-top:10px;padding-bottom:10px}
+.back-link{
+display:inline-flex;align-items:center;gap:7px;
+color:var(--ink);text-decoration:none;
+font-size:14px;font-weight:700;padding:4px 0;
+}
+.back-link:hover{color:var(--accent)}
+.back-link svg{flex:none}
+
+/* ---------- Buttons ---------- */
+.btn{
+display:inline-block;text-align:center;text-decoration:none;
+font-size:16px;font-weight:900;padding:14px 34px;border-radius:999px;
+}
+.btn:active{transform:scale(.99)}
+.btn-main{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(15,94,104,.28)}
+.btn-main:hover{background:var(--accent-dark)}
+.btn-outline{background:var(--surface);color:var(--accent);border:2px solid var(--accent)}
+.btn-line{background:#06c755;color:#fff;box-shadow:0 6px 18px rgba(6,199,85,.28)}
+.btn-line:hover{background:#05a648}
+.contact-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+@media (max-width:640px){.contact-actions .btn{width:100%}}
+
+/* ---------- Hero ---------- */
+.hero{
+position:relative;overflow:hidden;
+background:var(--bg);
+border-bottom:1px solid var(--line);
+}
+.hero-deco{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-deco span{position:absolute;display:block}
+.hero-deco .t1{
+top:-16px;right:-14px;width:200px;height:210px;
+background:var(--accent);opacity:.9;
+clip-path:polygon(0 0,100% 38%,0 100%);
+}
+.hero-deco .t2{
+top:36%;right:-34px;width:160px;height:180px;
+background:var(--orange);opacity:.85;
+clip-path:polygon(0 0,100% 50%,0 100%);
+}
+.hero-deco .t3{
+bottom:-24px;right:5%;width:160px;height:150px;
+background:var(--blue);opacity:.8;
+clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+.hero-deco .t4{
+bottom:-30px;right:24%;width:90px;height:84px;
+background:var(--teal);opacity:.45;
+clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+.hero-inner{position:relative;z-index:1;max-width:680px;padding:52px 0 60px}
+.hero-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hero-tags .label{
+border:2px solid var(--accent);color:var(--accent);
+border-radius:999px;padding:3px 16px;
+font-size:13.5px;font-weight:900;letter-spacing:.14em;
+}
+.hero h1{
+font-size:clamp(30px,5.6vw,44px);font-weight:900;
+line-height:1.4;margin:20px 0 10px;letter-spacing:.01em;
+}
+.hero h1 .accent{color:var(--accent)}
+.hero-lead{font-size:16px;line-height:1.85;margin:0;max-width:600px}
+.hero-lead strong{color:var(--accent-dark)}
+@media (prefers-color-scheme: dark){.hero-lead strong{color:var(--accent)}}
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+@media (max-width:640px){
+.hero-ctas .btn{width:100%}
+.hero-deco{opacity:.14}
+.hero-deco .t1{width:110px;height:120px}
+.hero-deco .t2{width:90px;height:100px}
+.hero-deco .t3,.hero-deco .t4{display:none}
+}
+/* ---------- Sections ---------- */
+.section{padding:64px 0 72px;overflow:hidden}
+.section.alt{background:var(--bg-alt)}
+.sec-head{position:relative;text-align:center;margin:0 0 36px;padding-top:30px}
+.sec-bg{
+position:absolute;left:50%;top:-16px;transform:translateX(-50%);
+font-size:clamp(62px,11vw,108px);font-weight:900;letter-spacing:.05em;
+color:var(--accent-soft);line-height:1;white-space:nowrap;
+user-select:none;z-index:0;
+}
+.sec-head h2{
+position:relative;z-index:1;
+font-size:clamp(26px,4.4vw,34px);font-weight:900;
+color:var(--ink);margin:0;line-height:1.35;
+}
+.sec-lead{
+position:relative;z-index:1;text-align:center;
+font-size:15px;color:var(--muted);margin:10px auto 0;max-width:640px;line-height:1.8;
+}
+.center-row{text-align:center;margin-top:28px}
+
+/* ---------- Support cards ---------- */
+.supports{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:640px){.supports{grid-template-columns:1fr 1fr}}
+@media (min-width:1100px){.supports{grid-template-columns:1fr 1fr}}
+.support{
+background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+box-shadow:0 3px 14px rgba(0,0,0,.05);
+display:flex;flex-direction:column;
+}
+.support .band{height:8px}
+.support .band.aio{background:var(--blue)}
+.support .band.eff{background:var(--teal)}
+.support .band.dx{background:var(--accent)}
+.support .band.dev{background:var(--orange)}
+.support .inner{padding:20px 20px 22px;flex:1}
+.support .name{font-size:19px;font-weight:900;line-height:1.45}
+.support .name small{font-size:11.5px;color:var(--muted);font-weight:700;margin-left:6px;letter-spacing:.1em}
+.support .desc{font-size:14px;color:var(--muted);margin:8px 0 0;line-height:1.75}
+.support ul{margin:12px 0 0;padding:0;list-style:none}
+.support ul li{
+font-size:13.5px;line-height:1.7;padding-left:20px;position:relative;margin:4px 0;
+}
+.support ul li::before{
+content:"";position:absolute;left:2px;top:9px;width:8px;height:8px;
+border-radius:50%;background:var(--accent);
+}
+
+/* ---------- Diagnosis ---------- */
+.diag-card{
+background:var(--surface);border:1px solid var(--line);border-radius:16px;
+box-shadow:0 8px 26px rgba(0,0,0,.07);
+padding:28px 24px 26px;
+max-width:900px;margin:0 auto;
+}
+.diag-q{margin:0 0 26px}
+.diag-q:last-of-type{margin-bottom:8px}
+.diag-q-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.diag-q-no{
+flex:none;background:var(--accent);color:#fff;border-radius:6px;
+font-size:12px;font-weight:900;padding:2px 9px;letter-spacing:.05em;
+}
+.diag-q-head h3{font-size:16.5px;font-weight:900;margin:0;line-height:1.5}
+.diag-opts{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:640px){.diag-opts{grid-template-columns:1fr 1fr}}
+@media (min-width:900px){.diag-opts{grid-template-columns:repeat(3,1fr)}}
+.diag-opt{
+font-family:inherit;text-align:left;cursor:pointer;
+background:var(--bg);color:var(--ink);
+border:1.5px solid var(--line);border-radius:10px;
+padding:13px 15px;font-size:14.5px;line-height:1.55;
+display:flex;gap:10px;align-items:flex-start;width:100%;
+}
+.diag-opt b{display:block;font-size:15px}
+.diag-opt span{color:var(--muted);font-size:13px;display:block}
+.diag-opt .dot{
+flex:none;width:20px;height:20px;border-radius:50%;margin-top:2px;
+border:2px solid var(--line);background:var(--surface);position:relative;
+}
+.diag-opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+.diag-opt.selected .dot{border-color:var(--accent)}
+.diag-opt.selected .dot::after{
+content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent);
+}
+.diag-opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.diag-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.diag-go{
+font-family:inherit;background:var(--accent);color:#fff;border:none;cursor:pointer;
+font-size:16px;font-weight:900;padding:14px 36px;border-radius:999px;
+box-shadow:0 6px 18px rgba(15,94,104,.28);
+}
+.diag-go:hover{background:var(--accent-dark)}
+.diag-go:active{transform:scale(.99)}
+.diag-reset{
+font-family:inherit;background:transparent;color:var(--muted);border:none;cursor:pointer;
+font-size:14px;font-weight:700;padding:10px 6px;text-decoration:underline;
+}
+.diag-error{
+display:none;margin:16px 0 0;font-size:14px;font-weight:700;color:#b3261e;
+background:#fdecea;border:1px solid #f0c6c2;border-radius:8px;padding:10px 14px;
+}
+@media (prefers-color-scheme: dark){.diag-error{background:#3a1d1a;border-color:#6e3733;color:#f2b8b2}}
+.diag-error.show{display:block}
+.diag-result{
+display:none;margin-top:26px;border:2px solid var(--accent);border-radius:12px;
+padding:22px 20px;background:var(--bg);
+}
+.diag-result.show{display:block}
+.diag-result .r-label{
+font-size:12.5px;font-weight:900;color:var(--accent);letter-spacing:.1em;margin:0 0 4px;
+}
+.diag-result .r-name{font-size:clamp(23px,4.6vw,28px);font-weight:900;margin:0;line-height:1.4}
+.diag-result .r-name small{font-size:13px;color:var(--muted);font-weight:700;margin-left:8px;letter-spacing:.08em}
+.diag-result .r-desc{font-size:15px;font-weight:700;margin:8px 0 0;line-height:1.8}
+.diag-result .r-budget{
+margin:14px 0 0;font-size:15px;font-weight:900;color:var(--accent-dark);
+background:var(--accent-soft);border-radius:10px;padding:12px 14px;line-height:1.6;
+}
+@media (prefers-color-scheme: dark){.diag-result .r-budget{color:#a8d8d2}}
+.diag-result .r-reasons{margin:14px 0 0;padding:0;list-style:none}
+.diag-result .r-reasons li{
+font-size:14px;line-height:1.7;padding-left:22px;position:relative;margin:4px 0;
+}
+.diag-result .r-reasons li::before{
+content:"";position:absolute;left:2px;top:9px;width:9px;height:9px;
+border-radius:50%;background:var(--accent);
+}
+.diag-result .r-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;align-items:center}
+@media (max-width:640px){.diag-result .r-ctas .btn{width:100%}}
+.diag-intro{font-size:15px;line-height:1.85;margin:0 0 26px;padding:16px 18px;background:var(--accent-soft);border-radius:10px}
+.diag-q[hidden]{display:none}
+.diag-opt .opt-label{color:var(--ink);font-size:14.5px;font-weight:500;line-height:1.6;display:block}
+.q2-hint{font-size:14px;color:var(--muted);margin:0;padding:14px 16px;border:1.5px dashed var(--line);border-radius:10px;line-height:1.7}
+.diag-result .r-sub{font-size:12.5px;font-weight:900;color:var(--accent);letter-spacing:.08em;margin:18px 0 4px}
+.diag-result .r-sub:first-of-type{margin-top:14px}
+.diag-result .r-summary{font-size:15px;line-height:1.85;margin:0}
+.diag-result .r-note{font-size:13.5px;color:var(--muted);line-height:1.75;margin:16px 0 0}
+.diag-result .r-examples{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:640px){.diag-result .r-examples{grid-template-columns:repeat(3,1fr)}}
+.diag-result .r-examples li{font-size:13.5px;font-weight:700;line-height:1.6;background:var(--accent-soft);border-radius:10px;padding:12px 14px}
+.diag-result .r-example-note{font-size:13px;color:var(--muted);line-height:1.7;margin:10px 0 0}
+.r-again{
+font-family:inherit;background:transparent;color:var(--muted);border:none;cursor:pointer;
+font-size:14px;font-weight:700;padding:10px 6px;text-decoration:underline;
+}
+
+/* ---------- Pricing ---------- */
+.pricing-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:640px){.pricing-grid{grid-template-columns:1fr 1fr}}
+@media (min-width:1024px){.pricing-grid{grid-template-columns:repeat(3,1fr)}}
+.price-card{
+background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+box-shadow:0 3px 14px rgba(0,0,0,.05);
+display:flex;flex-direction:column;
+}
+.price-card .band{height:8px}
+.price-card .band.free{background:var(--teal)}
+.price-card .band.light{background:var(--blue)}
+.price-card .band.standard{background:var(--accent)}
+.price-card .band.pro{background:var(--orange)}
+.price-card .band.seminar{background:var(--teal)}
+.price-card .inner{padding:20px 20px 22px;flex:1}
+.price-card .p-name{font-size:17px;font-weight:900;line-height:1.45}
+.price-card .p-name small{font-size:11.5px;color:var(--muted);font-weight:700;margin-left:6px;letter-spacing:.1em}
+.price-card .p-price{font-size:26px;font-weight:900;color:var(--accent);margin:8px 0 0;line-height:1.35}
+.price-card .p-price small{font-size:14px;color:var(--muted);font-weight:700}
+@media (prefers-color-scheme: dark){.price-card .p-price{color:#7fc7bd}}
+.price-card .p-desc{font-size:14px;margin:8px 0 0;line-height:1.75}
+.price-card .p-term{font-size:13px;color:var(--muted);margin:6px 0 0}
+.tax-note{text-align:center;font-size:13.5px;color:var(--muted);margin:18px 0 0}
+.plan-flow-title{font-size:20px;font-weight:900;text-align:center;margin:46px 0 20px;line-height:1.45}
+.plan-flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:640px){.plan-flow{grid-template-columns:1fr 1fr}}
+@media (min-width:1024px){.plan-flow{grid-template-columns:repeat(4,1fr)}}
+.plan-flow li{
+background:var(--surface);border:1px solid var(--line);border-radius:12px;
+padding:18px;box-shadow:0 3px 12px rgba(0,0,0,.04);
+}
+.plan-flow .pf-week{font-size:12.5px;font-weight:900;color:var(--accent);letter-spacing:.08em;display:block;margin-bottom:4px}
+@media (prefers-color-scheme: dark){.plan-flow .pf-week{color:#7fc7bd}}
+.plan-flow b{font-size:15.5px;line-height:1.5}
+.plan-note{font-size:13px;color:var(--muted);margin:14px 0 0;line-height:1.7}
+
+/* ---------- Flow ---------- */
+.flow-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:640px){.flow-grid{grid-template-columns:1fr 1fr}}
+@media (min-width:1100px){.flow-grid{grid-template-columns:repeat(3,1fr)}}
+.flow-grid li{
+background:var(--surface);border:1px solid var(--line);border-radius:12px;
+padding:20px 18px;box-shadow:0 3px 12px rgba(0,0,0,.04);
+}
+.flow-grid .f-no{
+display:flex;align-items:center;justify-content:center;
+width:40px;height:40px;border-radius:50%;
+background:var(--accent);color:#fff;
+font-weight:900;font-size:17px;margin-bottom:12px;
+}
+.flow-grid b{display:block;font-size:15.5px;line-height:1.5;margin-bottom:6px}
+.flow-grid .f-desc{font-size:13.5px;color:var(--muted);line-height:1.7;display:block}
+
+/* ---------- Contact ---------- */
+.contact-sec{background:var(--accent-soft)}
+.contact-sec .sec-head{margin-bottom:24px}
+.contact-card{
+background:var(--surface);border:1px solid var(--line);border-radius:16px;
+box-shadow:0 8px 26px rgba(0,0,0,.07);
+padding:28px 24px 26px;max-width:900px;margin:0 auto;
+}
+.contact-card p{font-size:15px;line-height:1.85;margin:0 0 18px}
+.contact-fields{display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 22px}
+@media (min-width:640px){.contact-fields{grid-template-columns:1fr 1fr}}
+.contact-field{
+border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg);
+}
+.contact-field .f-label{font-size:12.5px;font-weight:900;color:var(--accent);letter-spacing:.08em;display:block;margin-bottom:2px}
+.contact-field .f-value{font-size:17px;font-weight:700;letter-spacing:.06em}
+.contact-note{font-size:13px;color:var(--muted);line-height:1.75;margin:14px 0 0}
+
+/* ---------- Back to top ---------- */
+.to-top{
+position:fixed;right:16px;bottom:16px;z-index:55;
+width:46px;height:46px;border-radius:10px;
+background:var(--surface);border:1px solid var(--line);
+box-shadow:0 4px 14px rgba(0,0,0,.14);
+display:none;align-items:center;justify-content:center;
+color:var(--accent);text-decoration:none;
+}
+.to-top.show{display:flex}
+
+/* ---------- Footer ---------- */
+footer{background:var(--footer-bg);color:var(--footer-ink)}
+.footer-main{
+display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;
+padding:38px 0 8px;
+}
+.footer-main .site-name{color:#fff;font-size:16px;font-weight:700;text-decoration:none;padding-top:6px}
+.footer-nav{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding-top:8px}
+.footer-nav a{color:var(--footer-ink);text-decoration:none;font-size:13.5px}
+.footer-nav a:hover{color:#fff}
+.footer-bottom{
+border-top:1px solid rgba(255,255,255,.14);
+margin-top:22px;padding:16px 0 26px;
+font-size:12px;opacity:.8;line-height:1.8;text-align:center;
+}
+</style>
+</head>
+<body id="top">
+
+<!-- 入口ページへ戻る（リンク先は後で差し替え） -->
+<div class="topbar">
+<div class="container">
+<a class="back-link" href="/" data-back-to-entry="true" data-target="entry-page"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>入口ページに戻る</a>
+</div>
+</div>
+
+<!-- 冒頭 -->
+<div class="hero">
+<div class="hero-deco" aria-hidden="true"><span class="t1"></span><span class="t2"></span><span class="t3"></span><span class="t4"></span></div>
+<div class="container">
+<div class="hero-inner">
+<div class="hero-tags">
+<span class="label">店舗・事業者向け</span>
+</div>
+<h1>業務改善<span class="accent">診断</span></h1>
+<p class="hero-lead"><strong>5つの質問</strong>で、日々の困りごとを棚卸しします。</p>
+<div class="hero-ctas">
+<a class="btn btn-main" href="#diagnosis">診断をはじめる</a>
+<a class="btn btn-outline" href="#supports">支援の種類を見る</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 支援の種類 -->
+<section class="section alt" id="supports">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">SUPPORT</span><h2>支援の種類</h2></div>
+
+<div class="supports">
+<div class="support">
+<div class="band aio"></div>
+<div class="inner">
+<div class="name">AIO対策<small>AIO</small></div>
+<p class="desc">AI検索で、お店・会社が見つけてもらえる状態を目指します。</p>
+</div>
+</div>
+
+<div class="support">
+<div class="band eff"></div>
+<div class="inner">
+<div class="name">AI活用・業務効率化支援<small>EFFICIENCY</small></div>
+<p class="desc">AIで、日々の手間と時間を減らします。</p>
+</div>
+</div>
+
+<div class="support">
+<div class="band dx"></div>
+<div class="inner">
+<div class="name">DX支援<small>DX</small></div>
+<p class="desc">業務のデジタル化を、まとめて相談できます。</p>
+</div>
+</div>
+
+<div class="support">
+<div class="band dev"></div>
+<div class="inner">
+<div class="name">アプリ開発・システム開発<small>DEVELOPMENT</small></div>
+<p class="desc">既存ツールが合わない場合に、自社用に作ります。</p>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- 業務改善診断 -->
+<section class="section" id="diagnosis">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">DIAGNOSIS</span><h2>業務改善診断</h2></div>
+
+<div class="diag-card">
+<p class="diag-intro">5つの質問に、いちばん近いものを選んでください。</p>
+
+<div class="diag-q" data-q="q1">
+<div class="diag-q-head"><span class="diag-q-no">Q1</span><h3>日々の仕事で、いちばん時間が取られている、または面倒だと感じる場面はどれですか？</h3></div>
+<div class="diag-opts" role="group" aria-label="時間が取られている場面">
+<button type="button" class="diag-opt" data-value="1" aria-pressed="false"><span class="dot"></span><span class="opt-label">予約や問い合わせへの対応</span></button>
+<button type="button" class="diag-opt" data-value="2" aria-pressed="false"><span class="dot"></span><span class="opt-label">請求書、書類、データの処理</span></button>
+<button type="button" class="diag-opt" data-value="3" aria-pressed="false"><span class="dot"></span><span class="opt-label">集客やお店・会社の情報発信</span></button>
+<button type="button" class="diag-opt" data-value="4" aria-pressed="false"><span class="dot"></span><span class="opt-label">スタッフ同士の連絡や引き継ぎ</span></button>
+<button type="button" class="diag-opt" data-value="5" aria-pressed="false"><span class="dot"></span><span class="opt-label">特定の場面ではなく、全体的に忙しい</span></button>
+<button type="button" class="diag-opt" data-value="6" aria-pressed="false"><span class="dot"></span><span class="opt-label">特に困っていることはない</span></button>
+</div>
+</div>
+
+<div class="diag-q" data-q="q2" id="q2Block">
+<div class="diag-q-head"><span class="diag-q-no">Q2</span><h3>その場面で、いちばん「なんとかしたい」と感じることは何ですか？</h3></div>
+<p class="q2-hint" id="q2Hint">まずQ1で場面を選んでください。選ぶと、ここに具体的な困りごとの選択肢が表示されます。</p>
+<div class="diag-opts" id="q2Opts" role="group" aria-label="なんとかしたいこと"></div>
+</div>
+
+<div class="diag-q" data-q="q3" id="q3Block">
+<div class="diag-q-head"><span class="diag-q-no">Q3</span><h3>その困りごとは、どれくらいの頻度で起きていますか？</h3></div>
+<div class="diag-opts" role="group" aria-label="困りごとの頻度">
+<button type="button" class="diag-opt" data-value="1" aria-pressed="false"><span class="dot"></span><span class="opt-label">ほぼ毎日</span></button>
+<button type="button" class="diag-opt" data-value="2" aria-pressed="false"><span class="dot"></span><span class="opt-label">週に数回</span></button>
+<button type="button" class="diag-opt" data-value="3" aria-pressed="false"><span class="dot"></span><span class="opt-label">月に数回</span></button>
+<button type="button" class="diag-opt" data-value="4" aria-pressed="false"><span class="dot"></span><span class="opt-label">繁忙期など、時期によって集中する</span></button>
+</div>
+</div>
+
+<div class="diag-q" data-q="q4" id="q4Block">
+<div class="diag-q-head"><span class="diag-q-no">Q4</span><h3>今は、その困りごとにどう対処していますか？</h3></div>
+<div class="diag-opts" role="group" aria-label="今の対処">
+<button type="button" class="diag-opt" data-value="1" aria-pressed="false"><span class="dot"></span><span class="opt-label">手作業でなんとかしている</span></button>
+<button type="button" class="diag-opt" data-value="2" aria-pressed="false"><span class="dot"></span><span class="opt-label">アプリやサービスを使っているが、自社には合っていない</span></button>
+<button type="button" class="diag-opt" data-value="3" aria-pressed="false"><span class="dot"></span><span class="opt-label">できる人に頼りきりになっている</span></button>
+<button type="button" class="diag-opt" data-value="4" aria-pressed="false"><span class="dot"></span><span class="opt-label">対処できず、後回しになっている</span></button>
+</div>
+</div>
+
+<div class="diag-q" data-q="q5" id="q5Block">
+<div class="diag-q-head"><span class="diag-q-no">Q5</span><h3>その場面がどうなっていたら、いちばん助かりますか？</h3></div>
+<div class="diag-opts" role="group" aria-label="どうなれば助かるか">
+<button type="button" class="diag-opt" data-value="1" aria-pressed="false"><span class="dot"></span><span class="opt-label">時間が空く</span></button>
+<button type="button" class="diag-opt" data-value="2" aria-pressed="false"><span class="dot"></span><span class="opt-label">ミスや見落としが減る</span></button>
+<button type="button" class="diag-opt" data-value="3" aria-pressed="false"><span class="dot"></span><span class="opt-label">自分がいなくても回る</span></button>
+<button type="button" class="diag-opt" data-value="4" aria-pressed="false"><span class="dot"></span><span class="opt-label">お客様に見つけてもらえる、問い合わせが増える</span></button>
+<button type="button" class="diag-opt" data-value="5" aria-pressed="false"><span class="dot"></span><span class="opt-label">まだ分からない</span></button>
+</div>
+</div>
+
+<div class="diag-actions">
+<button type="button" class="diag-go" id="diagGo">診断結果を見る</button>
+<button type="button" class="diag-reset" id="diagReset">選び直す</button>
+</div>
+<p class="diag-error" id="diagError" role="alert"></p>
+
+<div class="diag-result" id="diagResult" aria-live="polite">
+<p class="r-label">診断結果</p>
+<p class="r-sub">あなたの回答の要約</p>
+<p class="r-summary" id="rSummary"></p>
+<p class="r-sub" id="rSupportLabel">合いそうな支援</p>
+<p class="r-name"><span id="rName"></span><small id="rEn"></small></p>
+<p class="r-desc" id="rDesc"></p>
+<p class="r-budget" id="rBudget"></p>
+<p class="r-sub">例えば、こういう方法があります</p>
+<ul class="r-examples" id="rExamples"></ul>
+<p class="r-example-note">あくまで一例です。合う方法は状況によって変わります。</p>
+<p class="r-note">この診断の回答内容をそのまま伝えてもらえると、相談がスムーズです</p>
+<div class="r-ctas">
+<a class="btn btn-main" href="mailto:info@kouheikosehira.com">メールでお問い合わせ</a>
+<a class="btn btn-line" href="https://lin.ee/YPixPcL" target="_blank" rel="noopener">LINEでお問い合わせ</a>
+<button type="button" class="r-again" id="diagAgain">もう一度診断する</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 料金の目安 -->
+<section class="section alt" id="pricing">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">PRICE</span><h2>料金の目安</h2></div>
+
+<div class="pricing-grid">
+<div class="price-card">
+<div class="band free"></div>
+<div class="inner">
+<div class="p-name">無料相談・診断</div>
+<p class="p-price">無料</p>
+<p class="p-desc">まずは無料で相談・診断を受けられます。</p>
+</div>
+</div>
+
+<div class="price-card">
+<div class="band light"></div>
+<div class="inner">
+<div class="p-name">ライトプラン</div>
+<p class="p-price">月5万円</p>
+<p class="p-desc">既存ツールを使った業務改善</p>
+<p class="p-term">1ヶ月ごとの契約</p>
+</div>
+</div>
+
+<div class="price-card">
+<div class="band standard"></div>
+<div class="inner">
+<div class="p-name">スタンダード</div>
+<p class="p-price">月10万円</p>
+<p class="p-desc">ライト＋アプリ開発</p>
+<p class="p-term">契約期間：2ヶ月</p>
+</div>
+</div>
+
+<div class="price-card">
+<div class="band pro"></div>
+<div class="inner">
+<div class="p-name">プロプラン</div>
+<p class="p-price">月20万円<small>から</small></p>
+<p class="p-desc">スタンダード＋社内教育</p>
+<p class="p-term">契約期間：3ヶ月</p>
+</div>
+</div>
+
+<div class="price-card">
+<div class="band seminar"></div>
+<div class="inner">
+<div class="p-name">社内教育<small>セミナー</small></div>
+<p class="p-price">1時間 2万円</p>
+<p class="p-desc">初回のみ1万円</p>
+</div>
+</div>
+
+</div>
+<p class="tax-note">価格は全て税抜です。</p>
+
+<h3 class="plan-flow-title">支援の流れ（ライトプランの例）</h3>
+<ol class="plan-flow">
+<li><span class="pf-week">1週間目</span><b>ヒアリング</b></li>
+<li><span class="pf-week">2週間目</span><b>初回納品</b></li>
+<li><span class="pf-week">3週目</span><b>フィードバックと改善</b></li>
+<li><span class="pf-week">4週目</span><b>運用資料の納品</b></li>
+</ol>
+<p class="plan-note">※支援規模によってスケジュールは変動致します。</p>
+</div>
+</section>
+
+<!-- 進め方 -->
+<section class="section" id="flow">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">FLOW</span><h2>相談までの流れ</h2></div>
+<ol class="flow-grid">
+<li><span class="f-no">1</span><b>診断に答える</b><span class="f-desc">5つの質問に選んで答えます。</span></li>
+<li><span class="f-no">2</span><b>回答の要約を確認する</b><span class="f-desc">要約と、合う場合だけ支援の見立てを表示します。</span></li>
+<li><span class="f-no">3</span><b>担当者へ相談する</b><span class="f-desc">メールまたはLINEでご相談ください。</span></li>
+</ol>
+<div class="center-row">
+<a class="btn btn-main" href="#contact">お問い合わせへ進む</a>
+</div>
+</div>
+</section>
+
+<!-- お問い合わせ -->
+<section class="section contact-sec" id="contact">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">CONTACT</span><h2>お問い合わせ</h2></div>
+<div class="contact-card">
+<p>ご相談・ご質問は、メールまたはLINEでお問い合わせください。</p>
+<div class="contact-actions">
+<a class="btn btn-main" href="mailto:info@kouheikosehira.com">メールでお問い合わせ</a>
+<a class="btn btn-line" href="https://lin.ee/YPixPcL" target="_blank" rel="noopener">LINEでお問い合わせ</a>
+</div>
+<p class="contact-note">ご都合のよい方法でご連絡ください。</p>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<div class="footer-main">
+<a class="site-name" href="#top">業務改善診断</a>
+<nav class="footer-nav" aria-label="フッターメニュー">
+<a href="#supports">支援の種類</a>
+<a href="#diagnosis">業務改善診断</a>
+<a href="#pricing">料金の目安</a>
+<a href="#flow">相談までの流れ</a>
+<a href="#contact">お問い合わせ</a>
+<a href="/" data-back-to-entry="true" data-target="entry-page">入口ページに戻る</a>
+</nav>
+</div>
+<div class="footer-bottom">店舗・事業者の業務改善に関するご案内ページです。</div>
+</div>
+</footer>
+
+<!-- ページ先頭へ戻る -->
+<a class="to-top" id="toTop" href="#top" aria-label="ページの先頭へ戻る"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg></a>
+
+<script>
+(function(){
+var toTop = document.getElementById("toTop");
+function update(){
+if (toTop) toTop.classList.toggle("show", window.scrollY > 400);
+}
+update();
+var ticking = false;
+window.addEventListener("scroll", function(){
+if (!ticking){
+ticking = true;
+window.requestAnimationFrame(function(){ update(); ticking = false;});
+}
+}, { passive: true});
+})();
+</script>
+
+<script>
+(function(){
+// 業務改善診断（困りごとの棚卸し）：このページ内だけで判定します（保存・送信はしません）
+// 流れ：場面（Q1）→具体的な困りごと（Q2、Q1で切替）→頻度（Q3）→今の対処（Q4）→どうなりたいか（Q5）
+// 結果は必ず「回答の要約」を表示し、当てはまる場合だけ優先順 A→D→B→C で見立てを1つ添えます。当てはまらなければ結果E「まずは相談」です。
+var Q1_LABELS = {
+"1": "予約や問い合わせへの対応",
+"2": "請求書、書類、データの処理",
+"3": "集客やお店・会社の情報発信",
+"4": "スタッフ同士の連絡や引き継ぎ",
+"5": "特定の場面ではなく、全体的に忙しい",
+"6": "特に困っていることはない"
+};
+var Q2_OPTIONS = {
+"1": ["返信に時間がかかっている", "電話・LINE・メールなど窓口がバラバラで見落としが出る", "同じ質問に何度も答えている", "変更やキャンセルの連絡対応が多い"],
+"2": ["同じ内容を何度も入力している", "紙とデータを行き来している", "チェックや確認に時間がかかっている", "月末などにまとめてやるので大変"],
+"3": ["発信の更新が続かない", "何を書けばいいか分からない", "検索やAIの回答にお店・会社が出てこない", "発信しても問い合わせにつながらない"],
+"4": ["情報が特定の人に依存して伝わらない", "必要な情報を探すのに時間がかかる", "引き継ぎでミスや漏れが出る", "連絡手段がバラバラで追えない"],
+"5": ["何から手をつければいいか分からない", "人手が足りない", "やることが多くて優先順位がつけられない", "経営や本来の仕事に時間が使えない"]
+};
+var Q3_FREQ = {
+"1": "ほぼ毎日",
+"2": "週に数回",
+"3": "月に数回",
+"4": "繁忙期など時期によって集中して"
+};
+var Q4_LABELS = {
+"1": "手作業でなんとかしている",
+"2": "アプリやサービスを使っているが、自社には合っていない",
+"3": "できる人に頼りきりになっている",
+"4": "対処できず、後回しになっている"
+};
+var Q5_LABELS = {
+"1": "時間が空く",
+"2": "ミスや見落としが減る",
+"3": "自分がいなくても回る",
+"4": "お客様に見つけてもらえる、問い合わせが増える",
+"5": "まだ分からない"
+};
+var RESULTS = {
+A: {
+name: "AIO対策",
+en: "AIO",
+desc: "検索やAIの回答で、お店・会社が見つけてもらえていない可能性があります。情報の整え方を見直す支援（AIO対策）が合っているかもしれません。",
+budget: "予算の目安：ライトプラン 月5万円（税抜）",
+examples: ["お店・会社の基本情報の整備", "よくある質問と回答の整理", "検索とAIの回答で伝わる発信内容への見直し"]
+},
+D: {
+name: "DX支援",
+en: "DX",
+desc: "困りごとの中心が、作業より人と情報の流れにありそうです。業務全体の流れを見直す支援（DX支援）が向いているかもしれません。",
+budget: "予算の目安：プロプラン 月20万円から（税抜）",
+examples: ["情報の置き場所の統一", "引き継ぎの型化", "連絡手段の整理"]
+},
+B: {
+name: "AI活用・業務効率化支援",
+en: "EFFICIENCY",
+desc: "繰り返し作業を手作業で回している状態です。進め方の見直しやAI活用で、時間を空けられるかもしれません。",
+budget: "予算の目安：ライトプラン 月5万円（税抜）",
+examples: ["繰り返し作業の手順の型化", "定型文や下書きのAI作成", "入力や転記の作業の自動化"]
+},
+C: {
+name: "アプリ開発・システム開発",
+en: "DEVELOPMENT",
+desc: "既存のアプリやサービスが、自社の進め方に合っていないようです。足りない部分を自社用に作る選択肢もあります。",
+budget: "予算の目安：スタンダード 月10万円（税抜）",
+examples: ["予約や問い合わせの窓口の一元化", "現場向けの入力フォーム", "自社専用の管理画面"]
+},
+E: {
+name: "まずは相談",
+en: "CONSULTATION",
+desc: "無理に支援を当てはめることはしません。まずは困りごとを一緒に整理するところから始めましょう。",
+budget: "予算の目安：無料相談・診断から",
+examples: ["仕事の棚卸しをして詰まっている場所を特定する", "今使っているツールの使い方の見直し", "小さな作業からAI活用を試す"]
+}
+};
+var QNAMES = {
+q1: "Q1（時間が取られている場面）",
+q2: "Q2（なんとかしたいこと）",
+q3: "Q3（頻度）",
+q4: "Q4（今の対処）",
+q5: "Q5（どうなれば助かるか）"
+};
+
+var answers = { q1: null, q2: null, q3: null, q4: null, q5: null};
+var errorEl = document.getElementById("diagError");
+var resultBox = document.getElementById("diagResult");
+function hideError(){ errorEl.classList.remove("show"); errorEl.textContent = "";}
+function showError(msg){ errorEl.textContent = msg; errorEl.classList.add("show");}
+
+function selectInGroup(groupEl, opt){
+var opts = groupEl.querySelectorAll(".diag-opt");
+Array.prototype.forEach.call(opts, function(o){
+o.classList.remove("selected");
+o.setAttribute("aria-pressed", "false");
+});
+opt.classList.add("selected");
+opt.setAttribute("aria-pressed", "true");
+}
+function clearGroupSelection(key){
+var group = document.querySelector('.diag-q[data-q="' + key + '"]');
+if (!group) return;
+Array.prototype.forEach.call(group.querySelectorAll(".diag-opt"), function(o){
+o.classList.remove("selected");
+o.setAttribute("aria-pressed", "false");
+});
+}
+
+var q2Block = document.getElementById("q2Block");
+var q2Opts = document.getElementById("q2Opts");
+var q2Hint = document.getElementById("q2Hint");
+var laterBlocks = [q2Block, document.getElementById("q3Block"), document.getElementById("q4Block"), document.getElementById("q5Block")];
+
+function renderQ2(q1Value){
+q2Opts.innerHTML = "";
+answers.q2 = null;
+var options = Q2_OPTIONS[q1Value] || [];
+if (!options.length){
+q2Hint.style.display = "";
+return;
+}
+q2Hint.style.display = "none";
+options.forEach(function(label, idx){
+var btn = document.createElement("button");
+btn.type = "button";
+btn.className = "diag-opt";
+btn.setAttribute("data-value", String(idx + 1));
+btn.setAttribute("aria-pressed", "false");
+var dot = document.createElement("span");
+dot.className = "dot";
+var text = document.createElement("span");
+text.className = "opt-label";
+text.textContent = label;
+btn.appendChild(dot);
+btn.appendChild(text);
+btn.addEventListener("click", function(){
+selectInGroup(q2Block, btn);
+answers.q2 = btn.getAttribute("data-value");
+hideError();
+resultBox.classList.remove("show");
+});
+q2Opts.appendChild(btn);
+});
+}
+
+function setLaterVisible(visible){
+laterBlocks.forEach(function(block){
+if (block) block.hidden = !visible;
+});
+}
+
+function onQ1Changed(value){
+renderQ2(value);
+if (value === "6"){
+["q3", "q4", "q5"].forEach(function(key){
+answers[key] = null;
+clearGroupSelection(key);
+});
+setLaterVisible(false);
+} else {
+setLaterVisible(true);
+}
+}
+
+// 静的な質問グループ（Q1・Q3・Q4・Q5）の選択処理
+["q1", "q3", "q4", "q5"].forEach(function(key){
+var group = document.querySelector('.diag-q[data-q="' + key + '"]');
+if (!group) return;
+var opts = group.querySelectorAll(".diag-opt");
+Array.prototype.forEach.call(opts, function(opt){
+opt.addEventListener("click", function(){
+selectInGroup(group, opt);
+answers[key] = opt.getAttribute("data-value");
+hideError();
+resultBox.classList.remove("show");
+if (key === "q1") onQ1Changed(answers.q1);
+});
+});
+});
+
+function q2Label(a){
+var options = Q2_OPTIONS[a.q1] || [];
+var idx = parseInt(a.q2, 10) - 1;
+return options[idx] || "";
+}
+function q2SummaryFragment(label){
+if (label === "月末などにまとめてやるので大変") return "月末などにまとめて作業が集中して負担が大きいこと";
+return label + "こと";
+}
+
+function buildSummary(a){
+if (a.q1 === "6") return "特に困っていることはないとのことでした。";
+var opening;
+if (a.q1 === "5"){
+opening = "特定の場面ではなく、全体的に忙しい状況で、";
+} else {
+opening = Q1_LABELS[a.q1] + "に時間が取られていて、";
+}
+var part1 = opening + q2SummaryFragment(q2Label(a)) + "が" + Q3_FREQ[a.q3] + "起きていて、今は" + Q4_LABELS[a.q4] + "状態ですね。";
+var part2;
+if (a.q5 === "5"){
+part2 = "どうなれば助かるかは、まだ分からないとのことです。";
+} else {
+part2 = "「" + Q5_LABELS[a.q5] + "」ようになれば助かる、というご希望です。";
+}
+return part1 + part2;
+}
+
+function determineResult(a){
+if (a.q1 === "3" && (a.q2 === "3" || a.q5 === "4")) return "A";
+if (a.q1 === "4" && a.q4 === "3" && a.q5 === "3") return "D";
+if ((a.q1 === "1" || a.q1 === "2" || a.q1 === "4") && a.q4 === "1" && (a.q3 === "1" || a.q3 === "2")) return "B";
+if (a.q4 === "2") return "C";
+return "E";
+}
+
+function showResult(){
+var key = answers.q1 === "6" ? "E" : determineResult(answers);
+var result = RESULTS[key];
+document.getElementById("rSummary").textContent = buildSummary(answers);
+document.getElementById("rSupportLabel").textContent = key === "E" ? "ご案内" : "合いそうな支援";
+document.getElementById("rName").textContent = result.name;
+document.getElementById("rEn").textContent = result.en;
+document.getElementById("rDesc").textContent = result.desc;
+document.getElementById("rBudget").textContent = result.budget;
+var exList = document.getElementById("rExamples");
+exList.innerHTML = "";
+(result.examples || []).forEach(function(text){
+var li = document.createElement("li");
+li.textContent = text;
+exList.appendChild(li);
+});
+resultBox.classList.add("show");
+resultBox.scrollIntoView({ behavior: "smooth", block: "nearest"});
+}
+
+function resetDiagnosis(scroll){
+answers = { q1: null, q2: null, q3: null, q4: null, q5: null};
+Array.prototype.forEach.call(document.querySelectorAll(".diag-opt"), function(o){
+o.classList.remove("selected");
+o.setAttribute("aria-pressed", "false");
+});
+q2Opts.innerHTML = "";
+q2Hint.style.display = "";
+setLaterVisible(true);
+hideError();
+resultBox.classList.remove("show");
+if (scroll) document.getElementById("diagnosis").scrollIntoView({ behavior: "smooth"});
+}
+
+document.getElementById("diagGo").addEventListener("click", function(){
+if (answers.q1 === "6"){
+hideError();
+showResult();
+return;
+}
+var missing = [];
+["q1", "q2", "q3", "q4", "q5"].forEach(function(key){
+if (!answers[key]) missing.push(QNAMES[key]);
+});
+if (missing.length){
+showError(missing.join("・") + " が未回答です。すべてお答えください。");
+return;
+}
+hideError();
+showResult();
+});
+
+document.getElementById("diagReset").addEventListener("click", function(){ resetDiagnosis(true);});
+document.getElementById("diagAgain").addEventListener("click", function(){ resetDiagnosis(true);});
+})();
+</script>
+</body>
+</html>

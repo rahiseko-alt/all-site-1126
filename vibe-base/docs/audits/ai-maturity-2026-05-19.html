@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>AI 開発成熟度監査 — vibe-base 2026-05-19</title>
+<style>
+  body { font-family: "Hiragino Kaku Gothic ProN", "Meiryo", "Segoe UI", sans-serif; max-width: 1080px; margin: 2rem auto; padding: 0 1.5rem; color: #1a1a1a; line-height: 1.7; }
+  h1 { border-bottom: 3px solid #2c5282; padding-bottom: 0.4rem; }
+  h2 { border-left: 6px solid #2c5282; padding-left: 0.6rem; margin-top: 2.2rem; }
+  h3 { color: #2c5282; margin-top: 1.6rem; }
+  .score-box { background: #fffaf0; border: 2px solid #d69e2e; border-radius: 8px; padding: 1rem 1.4rem; display: inline-block; margin: 0.5rem 0; }
+  .score-num { font-size: 2.4rem; font-weight: bold; color: #b7791f; }
+  .level-badge { background: #2c5282; color: white; padding: 0.3rem 0.8rem; border-radius: 4px; font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #cbd5e0; padding: 0.5rem 0.8rem; text-align: left; vertical-align: top; }
+  th { background: #edf2f7; }
+  .item { background: #f7fafc; border-left: 4px solid #4299e1; padding: 0.8rem 1rem; margin: 0.8rem 0; border-radius: 4px; }
+  .item .header { display: flex; justify-content: space-between; align-items: baseline; }
+  .item .name { font-weight: bold; font-size: 1.1rem; }
+  .item .score { font-family: monospace; font-weight: bold; }
+  .score-5 { color: #2f855a; }
+  .score-4 { color: #38a169; }
+  .score-3 { color: #d69e2e; }
+  .score-2 { color: #ed8936; }
+  .score-1 { color: #c53030; }
+  .label { font-weight: bold; color: #4a5568; min-width: 4em; display: inline-block; }
+  code { background: #edf2f7; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.92em; }
+  .verdict { background: #2c5282; color: white; padding: 1.2rem 1.5rem; border-radius: 8px; font-size: 1.15rem; margin: 2rem 0; }
+  .verdict .yes { color: #68d391; font-weight: bold; font-size: 1.4rem; }
+  ol li, ul li { margin: 0.3rem 0; }
+</style>
+</head>
+<body>
+
+<h1>AI 開発成熟度監査 — vibe-base</h1>
+<p><strong>監査日:</strong> 2026-05-19 (Session 297) / <strong>監査エージェント:</strong> general-purpose subagent (独立コンテキスト) / <strong>対象:</strong> <code>C:\Users\user\Desktop\vibe-base</code></p>
+
+<div class="score-box">
+  <div>総合スコア</div>
+  <div class="score-num">72 / 100</div>
+  <div>レベル: <span class="level-badge">L4 (高度自動化)</span> — L5 へ漸近中だが未到達</div>
+</div>
+
+<h2>STEP 1: 項目別採点</h2>
+
+<div class="item">
+  <div class="header"><div class="name">A. 永続メモリ</div><div class="score score-5">5 / 5</div></div>
+  <p><span class="label">証拠:</span> root <code>CLAUDE.md</code> v5.9 (52 行) / 13 product <code>CLAUDE.md</code> / <code>.claude/rules/</code> 26 ファイル / <code>docs/ops/</code> SOP 62 件 / 司令塔 <code>memory.md</code> 47 行 / product 別 <code>memory.md</code> 13 個 / user-level auto-memory に MEMORY.md + 138 個の .md / <code>docs/adr/0001-auto-hearing-plan-mode.md</code> / <code>docs/ops/session-191-lessons.md</code></p>
+  <p><span class="label">理由:</span> 4 階層構造で重複排除と参照分離が徹底。importance タグ + archive 規律 + 行数上限まで設計済。失敗事例を 7 客観基準で blameless 登録するスキーム稼働中</p>
+  <p><span class="label">改善:</span> 維持。業界トップ水準</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">B. コードベース理解支援</div><div class="score score-3">3 / 5</div></div>
+  <p><span class="label">証拠:</span> <code>scripts/propagate-hooks.mjs</code> / <code>scripts/check-in-verify.sh</code> (256 行・K1-K5 NG 検知) / <code>docs/ops/handoff-protocol.md</code> / <code>session-191-lessons.md</code> / <code>sop-index.md</code> / <code>product-cycle.md</code></p>
+  <p><span class="label">不足:</span> アーキテクチャ図 (dependency map / 依存関係グラフ) 未確認 / <code>/init</code> 自動生成形跡なし (手作業構築)</p>
+  <p><span class="label">改善:</span> products 間の依存関係マップ整備、master architecture doc</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">C. 並列 AI 開発</div><div class="score score-4">4 / 5</div></div>
+  <p><span class="label">証拠:</span> 「1 フォルダ=1 エージェント」モデル (CLAUDE.md §0) / product 別 memory.md / agent ↔ agent 直接通信禁止 / 13 product 並列開発が現役稼働 / <code>.claude/worktrees/</code> 存在 (空)</p>
+  <p><span class="label">不足:</span> worktree 物理活用ゼロ / merge strategy 自動化なし</p>
+  <p><span class="label">改善:</span> 実験ブランチで worktree 活用</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">D. CLI 能力</div><div class="score score-1">1 / 5</div></div>
+  <p><span class="label">証拠:</span> PATH 上に <code>gh</code> のみ存在 (<code>/c/Program Files/GitHub CLI/gh</code>) / 不在: rg, fd, jq, fzf, bat, delta, tree, make, just, task</p>
+  <p><span class="label">理由:</span> 標準 CLI tools がほぼ未導入。代替に <code>node -e</code> を多用しスクリプトが冗長化</p>
+  <p><span class="label">改善:</span> <code>winget install BurntSushi.ripgrep.MSVC jqlang.jq sharkdp.fd</code> 等で即時導入</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">E. 外部コンテキスト</div><div class="score score-5">5 / 5</div></div>
+  <p><span class="label">証拠:</span> MCP servers 8 系統 (notion / notebooklm / canva / gmail / google_calendar / google_drive / playwright / stitch) / <code>.claude/rules/notebooklm.md</code> 運用 SOP / <code>docs/research-bank/</code> 32 件のリサーチ資産 / WebFetch allowlist 20+ domain / <code>MASTER_VAULT_ROOT</code> env 経由で Obsidian vault 連携</p>
+  <p><span class="label">改善:</span> 維持</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">F. IDE 統合</div><div class="score score-1">1 / 5</div></div>
+  <p><span class="label">証拠:</span> <code>.vscode/</code> 不在 / <code>.editorconfig</code> 不在 / statusline 設定のみ (<code>~/.claude/settings.json</code>)</p>
+  <p><span class="label">理由:</span> IDE 側の設定統合は皆無。Claude Code CLI 単体運用</p>
+  <p><span class="label">改善:</span> <code>.editorconfig</code> 追加で命名規律 kebab-case 機械強制と整合</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">G. エージェント分離</div><div class="score score-3">3 / 5</div></div>
+  <p><span class="label">証拠:</span> <code>~/.claude/agents/</code> 不在 / <code>.claude/agents/</code> 不在 / 代替: <code>~/.claude/skills/</code> 33 個 (plan-document-reviewer-prompt / brainstorming / writing-plans / systematic-debugging 等) / <code>.claude/rules/plan-mode-auto-hearing.md</code> で subagent dispatch 想定</p>
+  <p><span class="label">不足:</span> 公式 subagent 機能未活用 / subagent 委譲経路が文書のみ / 運用試行回数の証跡少 (ADR 0001 で測定開始したばかり)</p>
+  <p><span class="label">改善:</span> research / review / debug の専属 subagent を <code>.claude/agents/</code> に定義</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">H. コマンド運用</div><div class="score score-3">3 / 5</div></div>
+  <p><span class="label">証拠 (実例):</span> <code>~/.claude/commands/remotion-review.md</code> / skills 33 個 = brainstorming (5 軸ヒアリング) / code-review (品質レビュー) / create-image (Replicate 画像生成) / deep-research (リサーチ資産化) / pc-checkin (チェックイン全工程) / learning-suite-add-kanji (漢字追加経路) / plan-document-reviewer-prompt (plan 3 軸レビュー) / vercel-deploy (デプロイ前後) / verification-before-completion (完了前検証) / writing-plans (plan 作成) ほか 23 個 / 独立 git repo <code>rahiseko-alt/claude-skills-base</code> 管理 / <code>scripts/check-skills-spec.mjs</code> 機械検証</p>
+  <p><span class="label">不足:</span> skill 利用ログ集計・効果測定 (発火率・成功率) 未確認</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">I. コンテキスト衛生</div><div class="score score-4">4 / 5</div></div>
+  <p><span class="label">証拠:</span> <code>archive/</code> 配下 20+ 個の旧 mission-log / memory.md 110 行超 archive ルール / <code>/compact</code> <code>/clear</code> 使い分け SOP / importance タグで M/L の 30〜90 日 archive / root CLAUDE.md §5.1「自己生成ファイルの再読禁止」「コマンド連結義務」</p>
+  <p><span class="label">不足:</span> <code>settings.local.json</code> 622 行に肥大化 (allow 領域累積) / memory.md archive 自動化スクリプト未確認</p>
+  <p><span class="label">改善:</span> settings.local.json 半年棚卸し / archive 自動化スクリプト</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">J. コスト管理</div><div class="score score-3">3 / 5</div></div>
+  <p><span class="label">証拠:</span> <code>docs/ops/cost-budget-sop.md</code> / <code>.claude/rules/cost.md</code> / <code>memory/feedback_opus-manual-operation.md</code> / CLAUDE.md §5.1「トークン効率規律」</p>
+  <p><span class="label">不足:</span> token 使用量モニタ・session 長メトリクス・実測ログ未確認 (<code>telemetry/</code> dir は存在するが運用未確認)</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">K. 大規模処理</div><div class="score score-4">4 / 5</div></div>
+  <p><span class="label">証拠:</span> file count (node_modules 除外) 4,350 件 / JS/TS file 853 件 / .git size 480 MB / git log 1,082 commits / markdown files 837 件 / SOP 62 件 / rules 26 件 / docs/ 配下 md 102 件</p>
+  <p><span class="label">不足:</span> index 化 (embedding/search) 未確認 / コードベース全体の architecture overview なし</p>
+</div>
+
+<div class="item">
+  <div class="header"><div class="name">L. 開発ライフサイクル統合</div><div class="score score-3">3 / 5</div></div>
+  <p><span class="label">証拠:</span> <code>.github/workflows/audit.yml</code> NPM Audit 週次 / <code>.github/dependabot.yml</code> 週次 minor/patch グループ化 / <code>scripts/git-hooks/pre-commit</code> = ESLint + MISSION_LOG 件数 + settings.local.json ガード + シークレット検知 / <code>.claude/hooks/</code> 11 個 / skill: security-review / code-review / vercel-deploy</p>
+  <p><span class="label">不足:</span> CI 上 lint/test 実行は audit のみで限定的 / test generation 自動化未確認 / PR review 自動化 (Claude 経由) 未確認</p>
+  <p><span class="label">改善:</span> CI に lint/test/typecheck 追加 / PR への Claude review bot 連携</p>
+</div>
+
+<h2>STEP 2: 隠れ監査</h2>
+
+<h3>① 過小評価されている強み</h3>
+<p>hook 11 個 + check-in-verify.sh 256 行による「機械強制 fail-safe」設計。AI 自己規律を信用しない方針が memory.md P1.5 で確立 (Session 296 確定)。これは L4 → L5 の核心要素。</p>
+
+<h3>② 過剰設計部分</h3>
+<p><code>.claude/rules/</code> 26 個と <code>docs/ops/</code> 62 SOP の数。CLAUDE.md §1 メタルール「Refactor-on-Write」と矛盾しがちで、運用者の参照コストが高い。root CLAUDE.md は 52 行に圧縮済だが分散先が膨張。</p>
+
+<h3>③ AI 能力阻害要因</h3>
+<ul>
+  <li>rg/fd/jq 不在で Grep ツール以外の検索が node ワンライナーで肥大化</li>
+  <li>subagent 公式機能未活用で skill 委譲が AI 単体で完結 (並列 reasoning 機会損失)</li>
+</ul>
+
+<h3>④ 人間側オーバーヘッド</h3>
+<ul>
+  <li>settings.local.json への allow 追記頻発 (622 行)</li>
+  <li>PC 表バージョン管理が product 13 個分</li>
+  <li>memory.md の P1 引継ぎ手動更新</li>
+</ul>
+
+<h3>⑤ 改善インパクト TOP 10</h3>
+<ol>
+  <li>rg/fd/jq 導入 (即効)</li>
+  <li><code>.claude/agents/</code> で公式 subagent 定義</li>
+  <li>CI に lint/typecheck 追加 (audit のみ → fail-fast)</li>
+  <li>settings.local.json 棚卸しスクリプト</li>
+  <li>memory.md archive 自動化 (importance L 30 日経過自動退避)</li>
+  <li>PR review に Claude bot 統合</li>
+  <li><code>.editorconfig</code> で命名 / EOL 強制</li>
+  <li>test generation skill 追加</li>
+  <li>dependency graph 自動生成</li>
+  <li>architecture overview doc 整備</li>
+</ol>
+
+<h3>⑥ AI 不在時の脆弱性</h3>
+<p>大。SOP は人間可読だが、PC 表進捗 / memory.md 更新 / hook 配布が AI 前提運用。マスター単独継承困難。</p>
+
+<h3>⑦ 属人化箇所</h3>
+<p>マスター (小齊平氏) の判断点が memory.md / 行動ログヒアリングに集約。司令塔 AI 不在で運用継続不可。</p>
+
+<h3>⑧ 将来ボトルネック</h3>
+<p>13 product の memory.md / PC 表 / CLAUDE.md の整合維持コスト (product 数増で線形悪化)。</p>
+
+<h2>STEP 4: 最終判定</h2>
+
+<h3>現在位置: L4 (高度自動化)</h3>
+
+<h3>強み (証拠付き)</h3>
+<ol>
+  <li><strong>memory + SOP + rule 4 層永続化</strong>が業界トップ水準 (A 5/5)</li>
+  <li><strong>hook 11 個 + pre-commit + CI audit の機械強制三重防御</strong> +「AI 自己規律を信用しない」設計方針 (memory.md P1.5)</li>
+  <li><strong>MCP 統合の幅</strong> (notion/notebooklm/canva/gmail/calendar/drive/playwright/stitch + WebFetch allowlist + Obsidian vault env 連携)</li>
+</ol>
+
+<h3>弱み (証拠付き)</h3>
+<ol>
+  <li><strong>CLI tools 未整備</strong> (rg/fd/jq/make 全て不在・gh のみ)</li>
+  <li><strong>公式 subagent 未活用</strong> (<code>~/.claude/agents/</code> 不在・skill で代替するが委譲経路が文書のみ)</li>
+  <li><strong>IDE 統合ゼロ</strong> (<code>.vscode/</code> / <code>.editorconfig</code> 不在)</li>
+</ol>
+
+<h3>不足 TOP 5</h3>
+<ol>
+  <li><code>.claude/agents/</code> 配下の subagent 定義 (research / review / debug)</li>
+  <li>CI lint/test/typecheck (audit のみで品質ゲート不足)</li>
+  <li><code>winget</code> で rg/fd/jq/bat</li>
+  <li>architecture overview / dependency map ドキュメント</li>
+  <li>PR レビューの Claude bot 自動化</li>
+</ol>
+
+<h3>即改善 TOP 3</h3>
+<ol>
+  <li><code>winget install BurntSushi.ripgrep.MSVC jqlang.jq sharkdp.fd</code> で CLI tools 一括導入 (D: 1 → 4)</li>
+  <li><code>.claude/agents/</code> に plan-reviewer / research-explorer / security-auditor の 3 subagent 定義 (G: 3 → 5)</li>
+  <li><code>.editorconfig</code> 追加で命名 / EOL / インデント機械強制 (F: 1 → 3)</li>
+</ol>
+
+<h3>長期改善 TOP 5</h3>
+<ol>
+  <li>CI lint/test/typecheck の matrix 拡張 (L: 3 → 5)</li>
+  <li>memory.md archive 自動化スクリプト (importance L 30 日経過退避)</li>
+  <li><code>settings.local.json</code> 棚卸しスクリプト + 半年圧縮 cron</li>
+  <li>architecture overview ドキュメント + dependency map 自動生成</li>
+  <li>PR への Claude review subagent 自動 dispatch</li>
+</ol>
+
+<div class="verdict">
+<h3 style="border:none; color: white; margin-top: 0;">最終回答: この環境は AI ネイティブ開発環境と言えるか？</h3>
+<p class="yes">YES</p>
+<p>永続メモリ (4 階層)・機械強制 hook (11 個)・CI 自動化 (audit + dependabot)・MCP 外部統合 (8 系統)・skill エコシステム (33 個・独立 repo 管理)・blameless 失敗学習 (P3 7 客観基準) が全て稼働中で、人間 (マスター) は判断点に専念し、AI が継続的に自律実行する構造になっている。</p>
+<p>ただし subagent 公式機能未活用・CLI tools 未整備・IDE 統合ゼロにより L5「自律開発基盤」には未到達。現状は <strong>L4 高度自動化の上位帯 (72/100)</strong> が正確な位置付け。</p>
+</div>
+
+<hr>
+<p style="color: #718096; font-size: 0.9rem;">監査ファイル: <code>docs/audits/ai-maturity-2026-05-19.html</code> / 監査エージェント: general-purpose subagent (独立コンテキスト・実ファイル証拠のみ・推測禁止)</p>
+
+</body>
+</html>

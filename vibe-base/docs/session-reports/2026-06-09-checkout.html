@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-09 — html-toranomaki 品質保証</title>
+<style>
+  body { font-family: sans-serif; max-width: 900px; margin: 2rem auto; padding: 1rem; background: #f9f9f9; color: #222; }
+  h1 { border-bottom: 3px solid #e00; padding-bottom: .5rem; }
+  h2 { border-left: 4px solid #e00; padding-left: .5rem; margin-top: 2rem; }
+  .alert-red { background: #fff0f0; border: 2px solid #e00; padding: 1rem; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: .4rem .7rem; text-align: left; }
+  th { background: #eee; }
+  code { background: #eef; padding: 0 3px; border-radius: 2px; font-family: monospace; }
+  .pass { color: green; font-weight: bold; }
+  .warn { color: orange; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Check-out レポート — 2026-06-09</h1>
+<p><strong>branch:</strong> master ／ <strong>次セッション:</strong> 本ファイルを先頭から Read してから着手すること</p>
+
+<div class="alert-red">
+<strong>最重要事項</strong>
+<ul>
+  <li>html-toranomaki の blindtest スクリプトが完成。次回テーマ追加時は必ず <code>node scripts/toranomaki-blindtest.mjs {テーマ} {impl}</code> を実行してから完了宣言すること</li>
+  <li>curtainsjs v8 は <code>build/curtains.min.js</code> が存在しない。<code>type="module" + src/index.mjs</code> のみ有効（今回修正済み）</li>
+</ul>
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+  <li>plan 承認済「html-toranomaki 根本解決」を全ステップ実施完了</li>
+  <li><code>scripts/toranomaki-blindtest.mjs</code> 新規作成 — playwright headless:false + GPU + pngjs 黒ピクセル率判定</li>
+  <li><code>RULES.md §3.5</code> を playwright コマンド実行必須・落とし穴明記に書き直し</li>
+  <li><code>html-toranomaki-add/SKILL.md</code> Step 3.5 強化（スキップ禁止・落とし穴追記）</li>
+  <li><code>impl-curtainsjs-8.1/index.html</code> の壊れた CDN を <code>type="module"</code> ESM に修正</li>
+  <li><code>impl-curtainsjs-8.1/js/app.js</code> の <code>CURTAINS.*</code> を ESM <code>import { Curtains, Plane }</code> に修正</li>
+  <li>受け入れ基準5項目 全 PASS 確認（blindtest 両テーマ EXIT 0）</li>
+  <li>コードレビューで発見した bugs 3件を修正（resolve衝突・スクショ上書き・パストラバーサル）</li>
+  <li><code>webgl-card-distortion-hover/concept.md</code> のタイトル・説明を「ホバー」→「カードぐにゃーん」に変更</li>
+  <li><code>webgl-card-distortion/concept.md</code> クロスリファレンス更新</li>
+</ol>
+
+<h2>B. コミット（このセッション分）</h2>
+<table>
+  <tr><th>hash</th><th>内容</th></tr>
+  <tr><td>（このセッション後）</td><td>feat(html-toranomaki): blindtest 義務化・curtainsjs ESM修正・表記ぐにゃーん化</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<ul>
+  <li><code>impl-curtainsjs-8.1</code> の動作が修正されたため、実際にブラウザで動くようになった</li>
+  <li>今後のテーマ追加フローに <code>toranomaki-blindtest.mjs</code> 実行が強制される</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table>
+  <tr><th>優先度</th><th>内容</th></tr>
+  <tr><td>M</td><td>webgl-card-distortion-ripple の concept.md 内「ホバー」表記も確認・必要なら更新</td></tr>
+  <tr><td>L</td><td>blindtest.mjs の screenshotPath を仕様書に記載（現在 test-results/{theme}-{impl}.png）</td></tr>
+</table>
+
+<h2>E. 配備済スキル・スクリプト（本セッション追加分）</h2>
+<table>
+  <tr><th>ファイル</th><th>役割</th></tr>
+  <tr><td><code>scripts/toranomaki-blindtest.mjs</code></td><td>WebGL 描画確認テスト（blindtest）</td></tr>
+</table>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+  <li>本レポートを Read 完了</li>
+  <li>残作業 D の webgl-card-distortion-ripple 確認（任意）</li>
+  <li>新テーマを追加する場合は <code>html-toranomaki-add</code> スキルを発火させる</li>
+</ol>
+
+<h3>機械検証サマリ（Wave A-2）</h3>
+<table>
+  <tr><th>項目</th><th>結果</th></tr>
+  <tr><td>シークレット混入</td><td class="pass">PASS（0件）</td></tr>
+  <tr><td>blindtest webgl-card-distortion</td><td class="pass">PASS（黒ピクセル率 2.6%、EXIT 0）</td></tr>
+  <tr><td>blindtest webgl-spatial-dive</td><td class="pass">PASS（黒ピクセル率 0.0%、EXIT 0）</td></tr>
+</table>
+
+<h3>コードレビュー指摘（Wave A-3）</h3>
+<p>5件検出 → 実バグ3件を修正済。残2件は軽微（空 src 属性は JS で動的設定のため意図的、コメント記述は実害なし）</p>
+
+</body>
+</html>

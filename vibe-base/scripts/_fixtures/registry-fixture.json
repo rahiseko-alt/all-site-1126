@@ -1,0 +1,17 @@
+{
+  "_comment": "json-canary 用 registry スキーマ fixture（toranomaki-intake.mjs の registry upsert transform 検証用）。本番 registry とは独立。変更不可。",
+  "version": 1,
+  "schema": {},
+  "entries": [
+    {
+      "slug": "fixture-sample",
+      "title": "fixture",
+      "blurb": "canary fixture entry",
+      "tags": [],
+      "impl": "impl-x-1.0",
+      "portfolio": false,
+      "order": 1,
+      "codeVisible": false
+    }
+  ]
+}

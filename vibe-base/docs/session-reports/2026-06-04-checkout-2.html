@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-04 (Session 2) — feed-check + フリノバ hero 仕上げ</title>
+<style>
+  body{font-family:"Hiragino Sans","Yu Gothic",system-ui,sans-serif;max-width:900px;margin:0 auto;padding:28px;line-height:1.7;color:#1a1a1a;background:#fafafa}
+  h1{font-size:22px;border-bottom:3px solid #333;padding-bottom:8px}
+  h2{font-size:17px;margin-top:28px;border-left:5px solid #555;padding-left:10px}
+  code{background:#eee;padding:1px 5px;border-radius:3px;font-size:13px}
+  .must{background:#fff3f3;border:2px solid #d44;border-radius:6px;padding:12px 16px;margin:16px 0}
+  .alert-red{background:#fff3f3;border-left:5px solid #d44;padding:10px 14px;margin:12px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+  th,td{border:1px solid #ccc;padding:6px 10px;text-align:left}
+  th{background:#eee}
+  .h{color:#c0392b;font-weight:bold} .m{color:#d68910;font-weight:bold} .l{color:#888}
+</style>
+</head>
+<body>
+<h1>Check-out 2026-06-04 (Session 2) — 司令塔</h1>
+<p>branch: <code>master</code></p>
+<div class="must"><strong>🔴 次セッション必読:</strong> 本ファイルを冒頭で Read。design ガバナンスの ★思想 詳細は前回 <code>docs/session-reports/2026-06-04-checkout.html</code>（Session 1）と <code>2026-06-02-checkout.html</code> を参照。</div>
+
+<div class="alert-red"><strong>最重要 1 件:</strong> 本セッションの成果物は <strong>git 追跡外</strong>に集中（feed-check = 外部 vault / hero = gitignored <code>tmp/</code>）。vibe-base への commit は memory.md + 本レポートのみ。<code>products/trimmer-system/</code> の working-tree 差分・各種 untracked（.mcp.json / backups/ / outputs/ / 他）は<strong>本セッション無関係</strong>のため commit しない。</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li><strong>/feed-check デフォルト7経路 完遂</strong>。98取得 → 新規・事業関連 <strong>13件</strong>を vault 保存（公式情報1 / トレンド12）。既存・純技術ネタは除外。</li>
+<li><strong>事業文脈分析レポート生成</strong>: <code>倉庫\事業戦略\ナレッジ\分析\2026-06-04_feed-analysis.md</code>。Top10深掘り（横展開/派生/営業トーク）+ 行動推奨Top3。</li>
+<li>Top5記事に Obsidian <strong>Wikilink 追記</strong>（グラフ可視化）。<strong>Gmail 下書き保存</strong>（件名 <code>Vibe-base-news</code>）。</li>
+<li><strong>フリノバLP ヒーロー仕上げ 完遂</strong>（P1#2）。3案から <strong>pro-2（Three.js 3D文字飛込）＋ pro-1（可変フォント・ロゴ着地）の組合せ</strong>をマスター選択 → <code>tmp/fn-hero2/hero-final.html</code> を新規作成・ブラウザ確認・マスター承認（「おｋ」）。</li>
+<li>セッション開始スクリプト実行: propagate-hooks（差分0）/ backup-agents（差分0）/ check-in-verify.sh <strong>EXIT 0</strong>（OK12 / WARN1 / NG0）。</li>
+</ol>
+
+<h2>B. 完了 commit 一覧</h2>
+<table><tr><th>種別</th><th>内容</th></tr>
+<tr><td>chore(memory)</td><td>Check-out — memory.md P1#2 完了反映 + @参照を本レポートへ更新</td></tr></table>
+<p style="font-size:13px;color:#888">※ feed-check 成果物（vault 13ノート+分析+Gmail）と hero-final.html（gitignore）は git 追跡外のため commit に含まれない。</p>
+
+<h2>D. 残作業（次セッション着手対象）</h2>
+<table>
+<tr><td><span class="h">H</span></td><td>design ガバナンス載せ替え 運用化フェーズ（残3: ①judge実案件突合75-90% ②Swipe File在庫蓄積 ③19product @import）</td></tr>
+<tr><td><span class="m">M</span></td><td>フリノバLP 続き: ヒーロー確定（<code>tmp/fn-hero2/hero-final.html</code>）→ ①LP本体セクション設計 ②実フリノバ映像へ素材差替（現状 a1-b3 プレースホルダ）③shift-ai 配下へ正式配置（配置単位・§1-3 は product agent 領域）</td></tr>
+<tr><td><span class="l">L</span></td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否決定（実害なし・温存中）</td></tr>
+</table>
+
+<h2>F. 本セッション生成物（参照可）</h2>
+<ul>
+<li><code>tmp/fn-hero2/hero-final.html</code> — フリノバLP 確定ヒーロー（pro-2 base + pro-1 logo・gitignore）。原案 hero-pro-1/2/3.html は温存。</li>
+<li><code>倉庫\事業戦略\ナレッジ\分析\2026-06-04_feed-analysis.md</code> — feed-check 事業文脈分析（外部 vault）。</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本HTML + memory.md を Read。</li>
+<li>残作業 D から着手対象を選定（H: design運用化 / M: フリノバLP続き）。</li>
+<li>機械検証サマリ: check-in-verify EXIT 0（WARN1=runbook不在5件・既知/NG0）。secret-grep マッチ0。</li>
+<li>コードレビュー: 本セッションは vibe-base 追跡コード差分なし（hero は gitignore scratch）。</li>
+</ol>
+</body>
+</html>

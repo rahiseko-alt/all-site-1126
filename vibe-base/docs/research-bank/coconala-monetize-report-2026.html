@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フリーランス開発マネタイズ 最終レポート</title>
+<style>
+:root{--bg:#0f1117;--s1:#1a1d27;--s2:#232733;--bd:#2d3140;--tx:#e4e6ed;--mu:#8b8fa3;--ac:#4f8cff;--gn:#36d399;--or:#f59e42;--rd:#ef4444;--pp:#a78bfa}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.7}
+.hero{background:linear-gradient(135deg,#1a1d27,#0f1117 50%,#1a2744);border-bottom:1px solid var(--bd);padding:56px 40px 44px;text-align:center}
+.hero h1{font-size:2.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.hero h1 span{color:var(--ac)}
+.hero .sub{color:var(--mu);font-size:.95rem;margin-bottom:20px}
+.hero .meta{display:inline-flex;gap:20px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 24px;font-size:.83rem;color:var(--mu)}
+.hero .meta strong{color:var(--tx)}
+.c{max-width:1100px;margin:0 auto;padding:36px 20px}
+.toc{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:24px 32px;margin-bottom:24px}
+.toc h3{color:var(--tx);margin-bottom:10px;font-size:1rem}
+.toc ol{padding-left:22px;columns:2;column-gap:32px}
+.toc li{margin-bottom:5px;font-size:.88rem}
+.toc a{color:var(--ac);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+.sec{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:28px;margin-bottom:22px}
+.sec h2{font-size:1.25rem;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--bd);display:flex;align-items:center;gap:8px}
+.sec h2 .n{background:var(--ac);color:#fff;font-size:.75rem;font-weight:700;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec h3{font-size:1rem;font-weight:600;margin:18px 0 8px;color:var(--ac)}
+table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:.88rem}
+thead th{background:var(--s2);border:1px solid var(--bd);padding:8px 12px;text-align:left;font-weight:600;font-size:.8rem;color:var(--mu);letter-spacing:.03em}
+tbody td{border:1px solid var(--bd);padding:8px 12px;vertical-align:top}
+tbody tr:hover{background:rgba(79,140,255,.04)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600}
+.tg{background:rgba(54,211,153,.15);color:var(--gn)}
+.tb{background:rgba(79,140,255,.15);color:var(--ac)}
+.to{background:rgba(245,158,66,.15);color:var(--or)}
+.tr{background:rgba(239,68,68,.15);color:var(--rd)}
+.tp{background:rgba(167,139,250,.15);color:var(--pp)}
+.al{border-radius:8px;padding:14px 18px;margin:14px 0;font-size:.88rem;border-left:4px solid}
+.al-g{background:rgba(54,211,153,.08);border-color:var(--gn)}
+.al-b{background:rgba(79,140,255,.08);border-color:var(--ac)}
+.al-o{background:rgba(245,158,66,.08);border-color:var(--or)}
+.al-r{background:rgba(239,68,68,.08);border-color:var(--rd)}
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:14px 0}
+.cd{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:18px}
+.cd h4{font-size:.92rem;font-weight:700;margin-bottom:6px}
+.cd p,.cd ul{font-size:.86rem;color:var(--mu)}
+.cd ul{padding-left:16px}
+.cd ul li{margin-bottom:3px}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
+.kp{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;text-align:center}
+.kp .v{font-size:1.7rem;font-weight:800;color:var(--ac)}
+.kp .l{font-size:.78rem;color:var(--mu);margin-top:3px}
+ul.st{padding-left:18px;margin:6px 0}
+ul.st li{margin-bottom:4px;font-size:.9rem}
+ol.st{padding-left:20px;margin:6px 0}
+ol.st li{margin-bottom:6px;font-size:.9rem}
+p{margin-bottom:8px;font-size:.9rem}
+.br{margin:16px 0}
+.brow{display:flex;align-items:center;margin-bottom:7px;font-size:.86rem}
+.blb{width:150px;flex-shrink:0;color:var(--mu)}
+.btk{flex:1;height:22px;background:var(--s2);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:.72rem;font-weight:600;color:#fff}
+.ph{display:flex;gap:0;margin:18px 0}
+.ps{flex:1;text-align:center;padding:12px 6px;background:var(--s2);border:1px solid var(--bd);font-size:.8rem}
+.ps:first-child{border-radius:8px 0 0 8px}
+.ps:last-child{border-radius:0 8px 8px 0}
+.ps .pl{font-weight:700;font-size:.88rem;margin-bottom:2px}
+.ps.ac{background:rgba(79,140,255,.12);border-color:var(--ac)}
+.fv{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px 18px;margin-bottom:14px;font-size:.88rem;white-space:pre-wrap;line-height:1.8;user-select:all}
+.fl{font-size:.73rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.ft{text-align:center;padding:36px 0 16px;color:var(--mu);font-size:.78rem}
+@media(max-width:700px){.toc ol{columns:1}.cg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>フリーランス開発<span>マネタイズ</span><br>最終レポート</h1>
+  <p class="sub">市場実データ + 競合分析 + 実力診断 + 信頼構築戦略 + 出品原稿 統合版</p>
+  <div class="meta">
+    <span>調査日: <strong>2026-03-28</strong></span>
+    <span>情報源: <strong>40+</strong></span>
+    <span>対象: <strong>ココナラ / CrowdWorks / ランサーズ</strong></span>
+  </div>
+</div>
+
+<div class="c">
+
+<div class="toc">
+  <h3>目次</h3>
+  <ol>
+    <li><a href="#s1">結論と戦略</a></li>
+    <li><a href="#s2">3プラットフォーム比較（実データ）</a></li>
+    <li><a href="#s3">カテゴリ別 実売データ</a></li>
+    <li><a href="#s4">競合密度マップ</a></li>
+    <li><a href="#s5">実力診断（vibe-base実績ベース）</a></li>
+    <li><a href="#s6">信頼構築戦略（テストなしの道）</a></li>
+    <li><a href="#s7">出品原稿（修正版）</a></li>
+    <li><a href="#s8">CW/ランサーズ攻略</a></li>
+    <li><a href="#s9">収益シミュレーション（修正版）</a></li>
+    <li><a href="#s10">実行ロードマップ</a></li>
+  </ol>
+</div>
+
+<!-- ===== 1. 結論 ===== -->
+<div class="sec" id="s1">
+  <h2><span class="n">1</span>結論と戦略</h2>
+
+  <div class="al al-g">
+    <strong>最速マネタイズの答え:</strong> ココナラでWebアプリMVP（20,000円〜）を主力にしつつ、CW/ランサーズのAI開発案件（10万〜20万円）に提案を並行する。低価格Botで実績を積む戦略は「経験値にならない」ため却下。
+  </div>
+
+  <h3>なぜこの結論か（データ根拠）</h3>
+  <table>
+    <thead><tr><th>判断</th><th>根拠データ</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>主力はWebアプリMVP 20,000円〜</td>
+        <td>ココナラWebアプリ開発カテゴリの最多販売が20,000円(130件)。マスターの最大の武器（review-analysis/design-seed/aiueo）が直接ポートフォリオになる</td>
+      </tr>
+      <tr>
+        <td>CW/ランサーズ並行</td>
+        <td>AI開発案件の予算が10万〜200万円で応募が0〜1件。同じスキルで10〜100倍の単価。手数料もCW 5〜20% / ランサーズ 16.5% とココナラ(22%)より安い</td>
+      </tr>
+      <tr>
+        <td>5,000円Botは却下</td>
+        <td>手取り3,900円。技術的にDifyで十分（API開発不要）。経験値にならず疲弊する</td>
+      </tr>
+      <tr>
+        <td>ココナラでプラチナ目標</td>
+        <td>プラチナ条件=直近3ヶ月で月10万円+完了率90%+評価4.8。WebアプリMVP 20,000円×5件/月で達成可能</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 2. 3プラットフォーム比較 ===== -->
+<div class="sec" id="s2">
+  <h2><span class="n">2</span>3プラットフォーム比較（実データ）</h2>
+
+  <table>
+    <thead><tr><th>項目</th><th>ココナラ</th><th>ランサーズ</th><th>クラウドワークス</th></tr></thead>
+    <tbody>
+      <tr><td>形式</td><td><strong>出品型</strong>（自分で価格設定）</td><td>出品型(パッケージ) + 提案型</td><td><strong>提案型</strong>（案件に応募）</td></tr>
+      <tr><td>手数料</td><td class="highlight-red"><strong>22%</strong></td><td><strong>16.5%</strong></td><td><strong>5〜20%</strong>（段階制）</td></tr>
+      <tr><td>AI関連 出品/案件数</td><td>Bot 462件 / 自動化 6,535件</td><td>AIパッケージ <strong>1,310件</strong> / 案件 598件</td><td>AI案件 <strong>5,832件/年</strong>(YoY 8.4倍)</td></tr>
+      <tr><td>AI案件の価格帯</td><td>5,000〜50,000円</td><td>パッケージ: 1万〜50万 / 案件: 10万〜200万</td><td><strong>10万〜200万</strong>（非AIの1.8倍）</td></tr>
+      <tr><td>競合の応募数</td><td>N/A（出品型）</td><td>案件あたり0〜1件</td><td>案件あたり0〜1件</td></tr>
+    </tbody>
+  </table>
+
+  <div class="al al-b">
+    <strong>同じ「AIチャットボット開発」の価格差:</strong><br>
+    ココナラ: <strong>5,000円</strong>（Dify Bot 63件販売） → ランサーズ パッケージ: <strong>55,000円</strong>（35満足） → CW/ランサーズ 案件: <strong>100,000〜400,000円</strong>（応募0〜1件）
+  </div>
+</div>
+
+<!-- ===== 3. カテゴリ別実売データ ===== -->
+<div class="sec" id="s3">
+  <h2><span class="n">3</span>カテゴリ別 実売データ</h2>
+
+  <h3>ココナラ — AIチャットボット(カテゴリ772) 462件</h3>
+  <table>
+    <thead><tr><th>順位</th><th>出品</th><th>価格</th><th>販売実績</th><th>評価</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>DifyでAIチャットボット作ります</td><td><strong>5,000円</strong></td><td><strong>63件</strong></td><td>5.0</td></tr>
+      <tr><td>2</td><td>ChatGPTを用いたLINE Botを作成します</td><td><strong>50,000円</strong></td><td><strong>53件</strong></td><td>5.0</td></tr>
+      <tr><td>3</td><td>DifyとMakeやGASでLINEbot作ります</td><td>10,000円</td><td>21件</td><td>5.0</td></tr>
+      <tr><td>4</td><td>自前データを元に回答するChatボット</td><td>4,000円</td><td>22件</td><td>5.0</td></tr>
+      <tr><td>5</td><td>オーダーメイドのAI LINEボット構築</td><td>20,000円</td><td>21件</td><td>5.0</td></tr>
+    </tbody>
+  </table>
+  <p><strong>発見:</strong> 5,000円(63件)と50,000円(53件)の二極化。低価格Dify系と高価格LINE Bot系。</p>
+
+  <h3>ココナラ — 作業自動化(カテゴリ230) 6,535件 / 実績4.3万件</h3>
+  <table>
+    <thead><tr><th>順位</th><th>出品</th><th>価格</th><th>販売実績</th><th>評価</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>VBAマクロで繰り返し作業を自動化</td><td><strong>3,000円</strong></td><td><strong>813件</strong></td><td>5.0</td></tr>
+      <tr><td>2</td><td>自動化・自動購入ツールを開発</td><td><strong>45,000円</strong></td><td><strong>647件</strong></td><td>4.8</td></tr>
+      <tr><td>3</td><td>Google Apps Scriptで自動化</td><td><strong>3,000円</strong></td><td><strong>886件</strong></td><td>5.0</td></tr>
+      <tr><td>4</td><td>PythonでWebスクレイピングツール</td><td><strong>10,000円</strong></td><td><strong>582件</strong></td><td>5.0</td></tr>
+      <tr><td>5</td><td>Excel VBAによる自動化</td><td>29,000円</td><td>436件</td><td>5.0</td></tr>
+    </tbody>
+  </table>
+  <p><strong>発見:</strong> 「安いほど売れる」は誤り。45,000円の自動購入ツールが647件。<strong>ROIが明確なツールは高くても売れる。</strong></p>
+
+  <h3>ココナラ — Webアプリ開発(カテゴリ813) 753件</h3>
+  <table>
+    <thead><tr><th>順位</th><th>出品</th><th>価格</th><th>販売実績</th><th>評価</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Webサイト・システム開発</td><td><strong>20,000円</strong></td><td><strong>130件</strong></td><td>5.0</td></tr>
+      <tr><td>2</td><td>WEBシステムの開発・構築・カスタマイズ</td><td>20,000円</td><td>74件</td><td>4.9</td></tr>
+      <tr><td>3</td><td>WordPressプラグインを開発</td><td>20,000円</td><td>70件</td><td>5.0</td></tr>
+      <tr><td>4</td><td>Webシステムの新規開発やご相談</td><td>100,000円</td><td>40件</td><td>5.0</td></tr>
+      <tr><td>5</td><td>Webシステムの開発をお手伝い</td><td>100,000円</td><td>34件</td><td>5.0</td></tr>
+    </tbody>
+  </table>
+  <p><strong>発見:</strong> 20,000円が最頻出かつ最多販売。100,000円帯も34〜40件で十分売れている。</p>
+
+  <h3>ココナラ — AIアプリ制作(カテゴリ774) 市場未成熟</h3>
+  <table>
+    <thead><tr><th>出品</th><th>価格</th><th>販売実績</th></tr></thead>
+    <tbody>
+      <tr><td>ChatGPT APIを使った開発</td><td>3,000円</td><td>5件</td></tr>
+      <tr><td>AIツール開発（5社限定）</td><td>50,000円</td><td>2件</td></tr>
+      <tr><td>ChatGPT・生成AI関連の対応</td><td>10,000円</td><td>2件</td></tr>
+      <tr><td>買切AIカスタマーサポートBot</td><td>50,000円</td><td>0件</td></tr>
+      <tr><td>AI業務自動化 LLM×API</td><td>45,000円</td><td>0件</td></tr>
+    </tbody>
+  </table>
+  <p><strong>発見:</strong> 全出品が0〜5件。「穴場」ではなく「まだ客がいない」。ただし先行参入のメリットはある。</p>
+
+  <h3>ランサーズ — AI関連パッケージ 1,310件</h3>
+  <table>
+    <thead><tr><th>パッケージ</th><th>価格</th><th>満足数</th></tr></thead>
+    <tbody>
+      <tr><td>多資料ナレッジAI最短導入</td><td><strong>198,000円〜</strong></td><td>67</td></tr>
+      <tr><td>Difyチャットボット作成</td><td><strong>55,000円〜</strong></td><td>35</td></tr>
+      <tr><td>AI-OCR書類自動転記ツール</td><td><strong>50,000円〜</strong></td><td>27</td></tr>
+      <tr><td>ChatGPT導入コンサルティング</td><td>15,000円〜</td><td>23</td></tr>
+      <tr><td>Pythonアプリ・AI・機械学習開発</td><td><strong>500,000円〜</strong></td><td>18</td></tr>
+    </tbody>
+  </table>
+  <p><strong>発見:</strong> ココナラと同じDify Botがランサーズでは55,000円（11倍）。価格設定力の差。</p>
+
+  <h3>CW/ランサーズ — AI開発案件の予算分布</h3>
+  <table>
+    <thead><tr><th>予算帯</th><th>案件例</th><th>応募数</th></tr></thead>
+    <tbody>
+      <tr><td>10,000〜30,000円</td><td>ChatGPT×スプレッドシート連携</td><td>1件</td></tr>
+      <tr><td>100,000〜200,000円</td><td>PDF仕訳データ生成、FAQ Bot、美容室予約Bot</td><td>0〜1件</td></tr>
+      <tr><td>200,000〜300,000円</td><td>受発注管理自動化、チャットボット引き継ぎ</td><td>1件</td></tr>
+      <tr><td>300,000〜400,000円</td><td>LINE×ChatGPT質問対応システム</td><td>1件</td></tr>
+      <tr><td>1,000,000〜2,000,000円</td><td>AI診断レポート自動生成</td><td>1件</td></tr>
+    </tbody>
+  </table>
+  <p><strong>発見:</strong> 10万〜30万円帯のAI開発案件で応募が0〜1件。<strong>供給が明確に足りていない。</strong></p>
+</div>
+
+<!-- ===== 4. 競合密度マップ ===== -->
+<div class="sec" id="s4">
+  <h2><span class="n">4</span>競合密度マップ</h2>
+
+  <h3>ココナラ内 技術キーワード検索結果</h3>
+  <table>
+    <thead><tr><th>キーワード</th><th>出品数</th><th>実績ある出品</th><th>評価</th></tr></thead>
+    <tbody>
+      <tr><td>WordPress</td><td>数千件</td><td>多数</td><td><span class="tr">飽和</span></td></tr>
+      <tr><td>GAS・スプレッドシート</td><td>数百件</td><td>多数（886件販売の出品あり）</td><td><span class="to">激戦</span></td></tr>
+      <tr><td>Claude API</td><td><strong>253件</strong></td><td>大半はClaude Code講座。API開発は少数</td><td><span class="tb">参入余地あり</span></td></tr>
+      <tr><td>Supabase</td><td><strong>154件</strong></td><td>上位10件中4件のみ実績あり</td><td><span class="tg">少ない</span></td></tr>
+      <tr><td>Next.js</td><td><strong>15件</strong></td><td>2件（各1件の実績）</td><td><span class="tg">ほぼ空白</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>カテゴリ別 競合密度</h3>
+  <div class="br">
+    <div class="brow"><span class="blb">作業自動化</span><div class="btk"><div class="bf" style="width:95%;background:var(--rd)">6,535件 / 実績4.3万 — 激戦</div></div></div>
+    <div class="brow"><span class="blb">AIパッケージ(ランサーズ)</span><div class="btk"><div class="bf" style="width:65%;background:var(--or)">1,310件 — 中程度</div></div></div>
+    <div class="brow"><span class="blb">Webアプリ開発</span><div class="btk"><div class="bf" style="width:40%;background:var(--ac)">753件 — 参入可能</div></div></div>
+    <div class="brow"><span class="blb">CW AI案件</span><div class="btk"><div class="bf" style="width:35%;background:var(--ac)">598件 / 応募0-1 — 供給不足</div></div></div>
+    <div class="brow"><span class="blb">AIチャットBot</span><div class="btk"><div class="bf" style="width:25%;background:var(--gn)">462件 — 参入可能</div></div></div>
+    <div class="brow"><span class="blb">AIアプリ制作</span><div class="btk"><div class="bf" style="width:8%;background:var(--gn)">少数 / 実績0-5 — 市場未成熟</div></div></div>
+    <div class="brow"><span class="blb">Next.js出品</span><div class="btk"><div class="bf" style="width:3%;background:var(--gn)">15件 — ほぼ空白</div></div></div>
+  </div>
+</div>
+
+<!-- ===== 5. 実力診断 ===== -->
+<div class="sec" id="s5">
+  <h2><span class="n">5</span>実力診断（vibe-base実績ベース）</h2>
+
+  <div class="kr">
+    <div class="kp"><div class="v">13</div><div class="l">デプロイ済みプロダクト</div></div>
+    <div class="kp"><div class="v">368</div><div class="l">2026年3月コミット数</div></div>
+    <div class="kp"><div class="v">6</div><div class="l">使用DB/BaaS種類</div></div>
+    <div class="kp"><div class="v">13</div><div class="l">Vercel本番デプロイ</div></div>
+  </div>
+
+  <h3>プロダクト別 技術深度</h3>
+  <table>
+    <thead><tr><th>プロダクト</th><th>スタック</th><th>実装機能</th></tr></thead>
+    <tbody>
+      <tr><td><strong>review-analysis</strong></td><td>Next.js + Prisma + NextAuth + Gemini AI + Google Maps</td><td>認証、DB6テーブル、API13本、AI分析、地図、メール</td></tr>
+      <tr><td><strong>design-seed</strong></td><td>React + Express + Supabase + Stripe + Gemini AI</td><td>認証、決済、AI生成、ファイルDL、法令ページ</td></tr>
+      <tr><td><strong>aiueo</strong></td><td>React + PocketBase + PWA</td><td>注文管理、シフト、クーポン、DBマイグレーション15本、QRコード</td></tr>
+      <tr><td><strong>kobaraku</strong></td><td>React(Vite) + Excel処理</td><td>回覧、相互チェック、食器棚卸、テナント売上</td></tr>
+    </tbody>
+  </table>
+
+  <h3>案件タイプ別 受注可否判定</h3>
+  <table>
+    <thead><tr><th>案件</th><th>判定</th><th>根拠</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>ココナラ: Webアプリ MVP 20,000円〜</td>
+        <td><span class="tg">○ 可能</span></td>
+        <td>review-analysis/design-seed/aiueoで同等以上のアプリを実装済み。ポートフォリオが直接証明になる</td>
+      </tr>
+      <tr>
+        <td>ココナラ: AI連携Bot 10,000〜50,000円</td>
+        <td><span class="tb">△ 条件付き可能</span></td>
+        <td>Gemini API連携の実績あり。LINE Messaging API経験なし。初回は工数バッファ多めに取る</td>
+      </tr>
+      <tr>
+        <td>CW/ランサーズ: AI開発 100,000〜200,000円</td>
+        <td><span class="tb">△ 小規模から</span></td>
+        <td>技術的には対応可能。クライアントワーク経験ゼロのため、10万円以下の案件で練習してから</td>
+      </tr>
+      <tr>
+        <td>CW/ランサーズ: 300,000円+</td>
+        <td><span class="to">△ 実績3件後</span></td>
+        <td>見積もり知識(pricing-guide.md)はある。CW/ランサーズで3件以上の実績を積んでから</td>
+      </tr>
+      <tr>
+        <td>ネイティブモバイルアプリ</td>
+        <td><span class="tr">× 不可</span></td>
+        <td>iOS/Android開発の実績なし。受けてはいけない</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>見積もり能力</h3>
+  <div class="al al-g">
+    <strong>pricing-guide.md v2 整備済み。</strong> 工程別相場（要件定義20〜50万、設計20〜50万、開発30〜100万/機能…）、機能別相場（認証10〜40万、決済30〜50万、地図50〜200万…）、人月単価（個人30〜60万）、バッファ・権利関係・見積書テンプレまで完備。
+  </div>
+</div>
+
+<!-- ===== 6. 信頼構築戦略 ===== -->
+<div class="sec" id="s6">
+  <h2><span class="n">6</span>信頼構築戦略（テストなしの道）</h2>
+
+  <div class="al al-r">
+    <strong>前提:</strong> ココナラ/CW/ランサーズの上位出品者で、自動テスト（jest/vitest）のカバレッジを信頼の根拠にしている出品者は<strong>ゼロ</strong>。テストの有無は購入者の判断基準に存在しない。
+  </div>
+
+  <h3>購入者が実際に見ているもの（実売TOP出品者の共通点）</h3>
+  <table>
+    <thead><tr><th>信頼の根拠</th><th>VBA 3,000円(813件)</th><th>自動化 45,000円(647件)</th><th>Web開発 20,000円(130件)</th><th>マスターの現状</th></tr></thead>
+    <tbody>
+      <tr><td>動くポートフォリオ</td><td>○</td><td>○</td><td>○</td><td><span class="tg">○ 13プロダクト</span></td></tr>
+      <tr><td>修正保証</td><td>○</td><td>○</td><td>○</td><td>出品時に設定する</td></tr>
+      <tr><td>★4.8以上</td><td>○(5.0)</td><td>○(4.8)</td><td>○(5.0)</td><td>これから</td></tr>
+      <tr><td>即レス</td><td>○</td><td>○</td><td>○</td><td>アプリ通知ONで対応</td></tr>
+      <tr><td>自動テスト</td><td>言及なし</td><td>言及なし</td><td>言及なし</td><td>不要</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5つの信頼メカニズム</h3>
+  <div class="cg">
+    <div class="cd" style="border-left:3px solid var(--gn)">
+      <h4>1. 動く本番URL</h4>
+      <p>「テスト書いてます」より「これ触ってください」が100倍強い。13プロダクトのデプロイ済みURLがそのままポートフォリオ。</p>
+    </div>
+    <div class="cd" style="border-left:3px solid var(--ac)">
+      <h4>2. 修正保証</h4>
+      <p>「バグがあったらどうなるか」→「14日間無料で直します」。リスクの引き受けが信頼を生む。TOP出品者は全員やっている。</p>
+    </div>
+    <div class="cd" style="border-left:3px solid var(--or)">
+      <h4>3. 中間納品</h4>
+      <p>「3日ごとに動くものを見せます」。テストの代替として最も有効。スコープクリープも防げる。</p>
+    </div>
+    <div class="cd" style="border-left:3px solid var(--pp)">
+      <h4>4. エラー検知（Sentry）</h4>
+      <p>自動テストは事前検知、Sentryは事後検知。購入者にとっては「バグが出たら即座に気づいて直す」ならどちらでも同じ。導入5分。</p>
+    </div>
+    <div class="cd" style="border-left:3px solid var(--rd)">
+      <h4>5. ★4.8以上の死守</h4>
+      <p>10件の★5.0があればテストの有無を聞く人はいない。最初の10件に全力を注ぐ。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 7. 出品原稿（修正版） ===== -->
+<div class="sec" id="s7">
+  <h2><span class="n">7</span>出品原稿（修正版 — データ裏付け済み）</h2>
+
+  <div class="al al-b">
+    <strong>修正点:</strong> 初版の価格設定を実売データで修正。出品Aを「5,000円Bot」→「20,000円 Webアプリ」に変更（経験値にならないため）。出品Bを「AI連携開発」に特化。
+  </div>
+
+  <!-- 出品A -->
+  <h3>出品A: Webアプリ MVP開発 <span class="tg">主力</span></h3>
+  <table>
+    <thead><tr><th>項目</th><th>設定</th><th>根拠</th></tr></thead>
+    <tbody>
+      <tr><td>カテゴリ</td><td>Webアプリ開発 (813)</td><td>753件。飽和していない</td></tr>
+      <tr><td>初期価格</td><td><strong>20,000円</strong></td><td>カテゴリ最多販売が20,000円(130件)</td></tr>
+      <tr><td>値上げ後</td><td>50,000〜100,000円</td><td>同カテゴリ4位が100,000円(40件)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="fl">タイトル</div>
+  <div class="fv">【丸投げOK】WebアプリのMVPを爆速開発します</div>
+
+  <div class="fl">サービス説明文</div>
+  <div class="fv">■ こんな方におすすめ
+・新規サービスのアイデアがあるが、形にできるエンジニアがいない方
+・制作会社の見積もり（50万円〜）が予算に合わない方
+・「まずは最小限の機能で試したい」というスタートアップ・個人事業主の方
+・既存のWebサービスに新機能を追加したい方
+
+■ サービス内容
+「アイデアを最短で動くプロダクトにする」ことに特化した開発サービスです。
+
+【基本プラン（20,000円）に含まれるもの】
+・要件ヒアリング
+・フロントエンド開発（React / Next.js）
+・バックエンド・データベース構築（Supabase / PostgreSQL）
+・基本機能2つまで
+・レスポンシブ対応（PC / スマホ）
+・Vercelへのデプロイ（本番公開）
+・操作マニュアル
+・納品後14日間の無料バグ修正
+
+■ 過去の制作例
+・AI搭載の口コミ分析ダッシュボード（認証+DB+AI分析+地図連携）
+・デザインAI生成ツール（Stripe決済+AI API+ファイルDL）
+・飲食店オーダー管理システム（注文+シフト+クーポン+QRコード）
+※ 全てデモURLをお見せできます
+
+■ オプション
+・追加機能（1機能）: +10,000円
+・AI機能組み込み（ChatGPT/Claude/Gemini連携）: +15,000円
+・ユーザー認証（ログイン/登録）: +8,000円
+・決済機能（Stripe連携）: +15,000円
+・独自ドメイン設定+SSL: +5,000円
+・月額保守・機能改善: 5,000円/月
+
+■ 納期
+・基本プラン: 10〜14日
+・オプション込み: 14〜21日
+
+■ 制作の流れ
+1. ヒアリング（アイデアの整理・実現可能性の確認）
+2. 設計（画面構成を共有し方向性合意）
+3. 開発（3日ごとに動くものを共有）
+4. テスト・修正（2回まで）
+5. デプロイ・納品
+
+■ よくある質問
+Q: アイデアだけで依頼しても大丈夫ですか？
+A: はい。ヒアリングで一緒に整理します。
+
+Q: ランニングコストはいくらですか？
+A: Vercel（無料枠）+ Supabase（無料枠）で月額0円からスタート可能です。
+
+Q: ソースコードはもらえますか？
+A: はい。GitHubリポジトリごとお渡しします。</div>
+
+  <div class="fl">有料オプション</div>
+  <table>
+    <thead><tr><th>オプション</th><th>価格</th><th>納期追加</th></tr></thead>
+    <tbody>
+      <tr><td>追加機能（1機能）</td><td>10,000円</td><td>+3日</td></tr>
+      <tr><td>AI機能組み込み</td><td>15,000円</td><td>+5日</td></tr>
+      <tr><td>ユーザー認証</td><td>8,000円</td><td>+2日</td></tr>
+      <tr><td>決済機能（Stripe）</td><td>15,000円</td><td>+5日</td></tr>
+      <tr><td>独自ドメイン+SSL</td><td>5,000円</td><td>+1日</td></tr>
+      <tr><td>月額保守</td><td>5,000円/月</td><td>-</td></tr>
+    </tbody>
+  </table>
+  <div class="al al-o">
+    <strong>収益計算:</strong> 20,000円 × 0.78 = 手取り15,600円。オプション平均込みで45,000円（手取り35,100円）が現実的な平均単価。月5件で手取り175,500円。
+  </div>
+
+  <!-- 出品B -->
+  <h3>出品B: AI連携ツール開発 <span class="tb">差別化</span></h3>
+  <table>
+    <thead><tr><th>項目</th><th>設定</th><th>根拠</th></tr></thead>
+    <tbody>
+      <tr><td>カテゴリ</td><td>AIチャットボット制作 (772)</td><td>462件。50,000円帯のLINE Bot(53件)が主力価格帯</td></tr>
+      <tr><td>初期価格</td><td><strong>20,000円</strong></td><td>5位のAI LINEボット構築が20,000円(21件)</td></tr>
+      <tr><td>値上げ後</td><td>50,000円</td><td>2位のLINE Bot 50,000円(53件)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="fl">タイトル</div>
+  <div class="fv">【ChatGPT/Claude/Gemini対応】AI搭載ツール・Botを開発します</div>
+
+  <div class="fl">サービス説明文</div>
+  <div class="fv">■ こんな方におすすめ
+・自社の問い合わせ対応をAIで自動化したい方
+・社内マニュアルやFAQをAIに学習させたい方
+・LINE公式アカウントにAI応答を組み込みたい方
+・AIを業務に活用したいが何から始めればいいかわからない方
+
+■ サービス内容
+ChatGPT / Claude / Gemini 等のAI APIを活用し、あなたの業務に最適なAIツールを構築します。
+
+【基本プラン（20,000円）に含まれるもの】
+・要件ヒアリング
+・AIツール1機能の設計・開発
+・Webブラウザから操作できる画面
+・プロンプト設計（業務特化の応答設定）
+・操作マニュアル
+・納品後14日間の無料バグ修正
+
+【対応可能な構成】
+・Webサイト埋め込み型AIツール
+・LINE公式アカウント連携Bot
+・社内Slack連携Bot
+・独自データ学習（RAG構成）
+・API経由で既存システムに組み込み
+
+■ オプション
+・LINE公式アカウント連携: +10,000円
+・独自データ学習（RAG構成）: +15,000円
+・管理画面（会話履歴・分析）: +15,000円
+・外部サービス連携（Gmail/Slack/Notion等）: +10,000円
+・月額保守サポート: 5,000円/月
+
+■ 納期
+・基本プラン: 7〜10日
+・オプション込み: 10〜14日
+
+■ 使用技術
+React / Next.js / Supabase / Vercel / ChatGPT API / Claude API / Gemini API</div>
+
+  <div class="al al-o">
+    <strong>収益計算:</strong> 20,000円 × 0.78 = 手取り15,600円。オプション平均込みで40,000円（手取り31,200円）が現実的。月3件で手取り93,600円。
+  </div>
+</div>
+
+<!-- ===== 8. CW/ランサーズ攻略 ===== -->
+<div class="sec" id="s8">
+  <h2><span class="n">8</span>CW/ランサーズ攻略</h2>
+
+  <div class="al al-b">
+    <strong>ココナラとの使い分け:</strong> ココナラ = 出品して待つ+公開依頼提案。CW/ランサーズ = 案件に提案して取りに行く。並行運用で「待ち」と「攻め」を両立。
+  </div>
+
+  <h3>狙う案件（実データから）</h3>
+  <table>
+    <thead><tr><th>プラットフォーム</th><th>狙う案件タイプ</th><th>予算帯</th><th>競合状況</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>CW</td>
+        <td>ChatGPT×業務ツール（スプレッドシート連携、FAQ Bot等）</td>
+        <td>10,000〜200,000円</td>
+        <td>応募0〜1件</td>
+      </tr>
+      <tr>
+        <td>CW</td>
+        <td>Webアプリ開発・改修</td>
+        <td>50,000〜200,000円</td>
+        <td>応募数少なめ</td>
+      </tr>
+      <tr>
+        <td>ランサーズ（パッケージ）</td>
+        <td>AI連携ツール開発、Webアプリ構築</td>
+        <td>50,000〜200,000円</td>
+        <td>実績ある出品が少ない</td>
+      </tr>
+      <tr>
+        <td>ランサーズ（案件）</td>
+        <td>LINE×AI Bot、業務自動化</td>
+        <td>100,000〜300,000円</td>
+        <td>応募0〜1件</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>避ける案件</h3>
+  <ul class="st">
+    <li><strong>ネイティブモバイルアプリ</strong> — 実績なし。受けてはいけない</li>
+    <li><strong>WordPress案件</strong> — 飽和。単価が安い</li>
+    <li><strong>VBA/GAS</strong> — 3,000円の激戦区。技術的にも主力ではない</li>
+    <li><strong>300,000円超の案件</strong> — CW/ランサーズで3件以上の実績を積んでから</li>
+  </ul>
+
+  <h3>提案テンプレート</h3>
+  <div class="fl">CW/ランサーズ 提案文（要件ごとに書き換え）</div>
+  <div class="fv">はじめまして。ご依頼内容を拝見しました。
+
+【ご提案】
+○○（依頼内容を具体的に言い換え）について、以下の構成で対応可能です。
+
+・△△の機能 → □□で実装
+・△△の部分 → □□で対応
+・納期: ○日程度
+・お見積り: ○○円
+
+【実績】
+フルスタックエンジニアとして、AI搭載Webアプリを複数開発・運用中です。
+・AI口コミ分析ダッシュボード（Next.js + Prisma + Gemini AI + Google Maps）
+・デザインAI生成ツール（React + Supabase + Stripe決済）
+・飲食店オーダー管理（React + PocketBase + QRコード）
+全てデモURLをお見せできます。
+
+【使用技術】
+React / Next.js / TypeScript / Supabase / Prisma / Vercel / ChatGPT API / Claude API / Gemini API / Stripe
+
+ご不明点があればお気軽にご質問ください。</div>
+</div>
+
+<!-- ===== 9. 収益シミュレーション ===== -->
+<div class="sec" id="s9">
+  <h2><span class="n">9</span>収益シミュレーション（修正版）</h2>
+
+  <h3>手数料比較</h3>
+  <table>
+    <thead><tr><th>PF</th><th>手数料</th><th>10万円の手取り</th></tr></thead>
+    <tbody>
+      <tr><td>ココナラ</td><td>22%</td><td><strong>78,000円</strong></td></tr>
+      <tr><td>ランサーズ</td><td>16.5%</td><td><strong>83,500円</strong></td></tr>
+      <tr><td>CW（10万以下）</td><td>20%</td><td><strong>80,000円</strong></td></tr>
+      <tr><td>CW（10万超部分）</td><td>10%</td><td><strong>90,000円</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>月別収益目標</h3>
+  <table>
+    <thead><tr><th>月</th><th>ココナラ</th><th>CW/ランサーズ</th><th>合計手取り</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>1ヶ月目</strong></td>
+        <td>出品A×3件(20K)+出品B×2件(20K) = 100K<br>手取り: 78,000円</td>
+        <td>小規模案件×1件 = 50K<br>手取り: 40,000円</td>
+        <td><strong>118,000円</strong></td>
+      </tr>
+      <tr>
+        <td><strong>3ヶ月目</strong></td>
+        <td>出品A×3件(45K)+出品B×2件(40K) = 215K<br>手取り: 167,700円</td>
+        <td>案件×2件 = 200K<br>手取り: 166,000円</td>
+        <td><strong>333,700円</strong></td>
+      </tr>
+      <tr>
+        <td><strong>6ヶ月目</strong></td>
+        <td>出品A×3件(80K)+出品B×2件(50K) = 340K<br>手取り: 265,200円</td>
+        <td>案件×2件 = 400K<br>手取り: 340,000円</td>
+        <td><strong>605,200円</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="al al-o">
+    <strong>現実チェック:</strong> 1ヶ月目はフル稼働前提の楽観シナリオ。CW/ランサーズの初案件獲得に2〜4週間かかる可能性あり。ただしAI開発案件は応募0〜1件のため、提案の質が高ければ受注確率は高い。
+  </div>
+</div>
+
+<!-- ===== 10. 実行ロードマップ ===== -->
+<div class="sec" id="s10">
+  <h2><span class="n">10</span>実行ロードマップ</h2>
+
+  <div class="ph">
+    <div class="ps ac"><div class="pl" style="color:var(--ac)">Week 1</div>アカウント準備<br>+出品作成</div>
+    <div class="ps"><div class="pl">Week 2-4</div>提案開始<br>+初受注</div>
+    <div class="ps"><div class="pl">Month 2-3</div>実績積み<br>+値上げ</div>
+    <div class="ps"><div class="pl">Month 4+</div>プラチナ<br>+高単価シフト</div>
+  </div>
+
+  <h3>Week 1: アカウント準備+出品作成</h3>
+  <table>
+    <thead><tr><th>#</th><th>タスク</th><th>PF</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>ココナラ: 本人確認+プロフィール+NDA対応可</td><td>ココナラ</td></tr>
+      <tr><td>2</td><td>出品A（WebアプリMVP 20,000円）作成</td><td>ココナラ</td></tr>
+      <tr><td>3</td><td>出品B（AI連携ツール 20,000円）作成</td><td>ココナラ</td></tr>
+      <tr><td>4</td><td>サムネイル画像作成（成果物スクショ+技術名）</td><td>ココナラ</td></tr>
+      <tr><td>5</td><td>ポートフォリオ画像5件以上（既存プロダクトのスクショ）</td><td>全PF</td></tr>
+      <tr><td>6</td><td>CWアカウント作成+本人確認+プロフィール</td><td>CW</td></tr>
+      <tr><td>7</td><td>ランサーズアカウント作成+本人確認+プロフィール</td><td>ランサーズ</td></tr>
+      <tr><td>8</td><td>ランサーズ: AIツール開発パッケージ出品（50,000円〜）</td><td>ランサーズ</td></tr>
+      <tr><td>9</td><td>ココナラアプリ通知ON / 毎日ログイン開始</td><td>ココナラ</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Week 2-4: 提案開始+初受注</h3>
+  <table>
+    <thead><tr><th>#</th><th>タスク</th><th>頻度</th></tr></thead>
+    <tbody>
+      <tr><td>10</td><td>ココナラ公開依頼に提案（AI・Web開発系を狙う）</td><td>毎日1件以上</td></tr>
+      <tr><td>11</td><td>CW: ChatGPT/AI開発案件に提案</td><td>週3件以上</td></tr>
+      <tr><td>12</td><td>ランサーズ: AI開発案件に提案</td><td>週2件以上</td></tr>
+      <tr><td>13</td><td>全PFのメッセージに1時間以内で返信</td><td>常時</td></tr>
+      <tr><td>14</td><td>初受注→最高品質で納品→★5.0獲得</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Month 2-3: 実績積み+値上げ</h3>
+  <ul class="st">
+    <li>ココナラ: レビュー10件+★4.8以上を確保→出品A/Bを<strong>1.5〜2倍に値上げ</strong></li>
+    <li>CW/ランサーズ: 3件以上の完了実績を積む→提案の説得力が上がる</li>
+    <li>有料オプション・保守月額で客単価UP</li>
+    <li>X・ブログからの外部集客導線を構築</li>
+  </ul>
+
+  <h3>Month 4+: プラチナ+高単価シフト</h3>
+  <ul class="st">
+    <li>ココナラ: プラチナ到達（月10万円）→出品を50,000〜100,000円帯にシフト</li>
+    <li>CW/ランサーズ: 実績ベースで20〜30万円案件に提案開始</li>
+    <li>定期購入（月額保守）で安定収入基盤を構築</li>
+    <li>長期: 直請え案件の比率を上げて手数料フリーの収益を拡大</li>
+  </ul>
+</div>
+
+<div class="ft">
+  Generated by vibe-base Intelligence | 2026-03-28 | Sources: 40+ articles &amp; platform data<br>
+  ココナラ公式 / ランサーズ公式 / クラウドワークス公式 / 業界レポート / vibe-base実績分析
+</div>
+
+</div>
+</body>
+</html>

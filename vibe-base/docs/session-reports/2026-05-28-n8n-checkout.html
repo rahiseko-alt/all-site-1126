@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>n8n Check-out 2026-05-28</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; color: #202124; }
+    h1, h2 { line-height: 1.25; }
+    code { background: #f1f3f4; padding: 2px 4px; border-radius: 4px; }
+    .alert { border-left: 6px solid #c5221f; background: #fce8e6; padding: 12px 16px; margin: 12px 0; }
+    .box { border-left: 4px solid #1a73e8; background: #e8f0fe; padding: 10px 14px; margin: 12px 0; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #dadce0; padding: 8px; vertical-align: top; }
+    th { background: #f8fafd; }
+  </style>
+</head>
+<body>
+  <h1>n8n Check-out: 2026-05-28</h1>
+  <p><strong>branch:</strong> master</p>
+  <p><strong>次セッションで本ファイル先頭から Read 必須。</strong></p>
+
+  <div class="alert">
+    <strong>最重要 1:</strong> 大原則確定 — <code>products/n8n/</code> への指示はすべて <strong>n8n ワークフロー構築</strong>として実装する。司令塔の Claude Code 内 WebFetch + Write による直接実行は本 product では禁止。
+  </div>
+
+  <div class="alert">
+    <strong>最重要 2:</strong> docker permission を <code>products/n8n/.claude/settings.local.json</code> に追加済だが、<strong>現セッションには反映されない</strong>。次セッションは Claude Code 再起動済前提で進める。
+  </div>
+
+  <div class="alert">
+    <strong>最重要 3 (司令塔への申し送り):</strong> 本セッションで <code>vibe-base/memory.md</code> と <code>products/learning-suite-kanji-foreign/src/routes/admin/+page.svelte</code> に未 staged 変更が発生（私=n8n agent は触っていない・領域外）。司令塔セッション or 該当 agent セッションで処理されたい。
+  </div>
+
+  <h2>A. 本セッション TL;DR</h2>
+  <ul>
+    <li>マスター指示「<code>/feed-check</code> と同等の情報収集を Obsidian に保存」を、当初 Claude Code 内 WebFetch + Write で実装しようとし、マスターから「n8n 大原則」指摘で方針転換。</li>
+    <li>n8n ワークフロー JSON <code>products/n8n/n8n-workspace/workflows/feed-check.workflow.json</code>（12 ノード・221 行）を生成。</li>
+    <li>Plan Mode 配下で plan ファイル <code>~/.claude/plans/wiggly-dreaming-kazoo.md</code> 起草 → ExitPlanMode → 実装。</li>
+    <li>受入基準 10/10 PASS（test -f / wc -l / grep -c / git diff --stat による静的検証）。</li>
+    <li>docker permission を <code>products/n8n/.claude/settings.local.json</code> に追加（現セッション未反映）。</li>
+    <li>Plan Mode 自動発動不能の構造課題が判明（user-level <code>defaultMode: "auto"</code>）→ 司令塔セッションで持ち越し。</li>
+  </ul>
+
+  <h2>B. 完了 commit 一覧</h2>
+  <p>本 Check-out 実行時点で commit 作成前。commit hash は最終報告を正とする。</p>
+
+  <h2>C. 影響波及</h2>
+  <table>
+    <tr><th>領域</th><th>内容</th></tr>
+    <tr><td>n8n product</td><td><code>feed-check.workflow.json</code> 新規追加（12 ノード）。<code>.claude/settings.local.json</code> に docker permission 追加。<code>memory.md</code> P1 / P4 更新。</td></tr>
+    <tr><td>n8n コンテナ</td><td>未変更（Import 未実行のためコンテナ内部状態に変化なし）。docker-compose.yml も未変更。</td></tr>
+    <tr><td>vault</td><td>未書込（Manual Trigger 未実行 + vault mount 未設定のため）。</td></tr>
+    <tr><td>司令塔領域</td><td><code>vibe-base/memory.md</code> に +1 行（Plan Mode 自動発動不能教訓・本セッションで判明した内容だが n8n agent は権限外。司令塔セッションで処理）。</td></tr>
+  </table>
+
+  <h2>D. 残作業</h2>
+  <ul>
+    <li><strong>H:</strong> Claude Code 再起動 → <code>docker exec n8n n8n import:workflow --input=...</code> 実行 → <code>docker exec n8n n8n execute --id=feed_check_local</code> 実行。</li>
+    <li><strong>H:</strong> <code>docker-compose.yml</code> に vault bind mount 追加（例: <code>- C:/Users/user/Desktop/obsidian/vault:/vault:rw</code>）+ <code>docker compose up -d</code> 反映。</li>
+    <li><strong>H:</strong> workflow JSON 内の <code>$env.MASTER_VAULT_ROOT</code> 参照を、コンテナ内 mount path に書き換え（Read Binary Files / Write Markdown ノードの fileSelector / fileName）。</li>
+    <li><strong>M:</strong> 旧 P1 #2 継続 — 外部接続境界の再確認（明示承認まで API 触らず）。</li>
+    <li><strong>M:</strong> 旧 P1 #3 継続 — Codex 側 <code>/pc-checkin</code> / <code>/checkout</code> 発火確認。</li>
+    <li><strong>L:</strong> Schedule Trigger 化（cron 1 日 1 回等）。</li>
+    <li><strong>L:</strong> n8n_data のバックアップ方針（前セッション持ち越し）。</li>
+  </ul>
+
+  <h2>E. 配備済 subagent / skill / hook</h2>
+  <ul>
+    <li>新規 workflow: <code>products/n8n/n8n-workspace/workflows/feed-check.workflow.json</code>（12 ノード・default true 経路 5 source: hacker-news / openai-blog / anthropic-news / zenn-ai / itmedia-business）</li>
+    <li>新規 settings: <code>products/n8n/.claude/settings.local.json</code> に <code>Bash(docker:*)</code> + <code>Bash(docker compose:*)</code></li>
+    <li>plan ファイル: <code>~/.claude/plans/wiggly-dreaming-kazoo.md</code>（n8n ワークフロー構築計画・受入基準 10 件・Import 手順）</li>
+  </ul>
+
+  <h2>F. 本セッション生成レポート</h2>
+  <ul>
+    <li><code>products/n8n/n8n-workspace/workflows/feed-check.workflow.json</code></li>
+    <li><code>~/.claude/plans/wiggly-dreaming-kazoo.md</code></li>
+    <li>本 Check-out レポート: <code>docs/session-reports/2026-05-28-n8n-checkout.html</code></li>
+  </ul>
+
+  <h2>G. 次セッション初手 (recommended)</h2>
+  <ol>
+    <li><code>products/n8n/memory.md</code> 冒頭の本レポートを読む。</li>
+    <li>Claude Code 再起動済かを確認（<code>docker compose -f products/n8n/n8n-workspace/docker-compose.yml ps</code> が通れば反映済）。</li>
+    <li>docker-compose.yml に vault bind mount を追加し <code>docker compose up -d</code> 反映。</li>
+    <li>workflow JSON 内の vault path を mount path に書換。</li>
+    <li><code>docker exec n8n n8n import:workflow --input=/data/workflows/feed-check.workflow.json</code>（コンテナ内 path は volume mount に依存）。</li>
+    <li><code>docker exec n8n n8n execute --id=feed_check_local</code> で Manual Trigger 実行。</li>
+    <li>vault 配下 <code>公式情報/</code> <code>トレンド/</code> に新着 <code>.md</code> が増えたか確認。</li>
+  </ol>
+
+  <h2>H. 司令塔セッションへの申し送り（任意）</h2>
+  <ul>
+    <li><strong>Plan Mode 自動発動不能の解消</strong>: <code>~/.claude/settings.json:14</code> の <code>defaultMode: "auto"</code> を <code>"plan"</code> に変更（CLAUDE.md §7 / memory P1.5 と整合）。</li>
+    <li><strong>vibe-base/memory.md +1 行</strong>: 本セッションで判明した「defaultMode 自動 Plan Mode 発動不全」教訓が混入。司令塔判断で残置 or 統合 or revert を決定。</li>
+    <li><strong>learning-suite-kanji-foreign</strong>: <code>src/routes/admin/+page.svelte</code> に未 staged 変更（n8n agent は触っていない・該当 agent セッションで処理依頼）。</li>
+  </ul>
+</body>
+</html>

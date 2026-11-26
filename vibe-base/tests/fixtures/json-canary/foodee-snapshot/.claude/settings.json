@@ -1,0 +1,182 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(bash *)",
+      "PowerShell(Get-Content *)",
+      "Bash(env)",
+      "Bash(curl *)",
+      "Bash(npm install:*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git branch -D*)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Write(.env)",
+      "Write(**/.env)",
+      "Edit(.git/**)",
+      "Write(.git/**)",
+      "Write(**/secrets/**)",
+      "Bash(*migrate*)",
+      "Bash(*migration*)",
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(npm publish:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(yarn add:*)",
+      "Bash(pip install:*)",
+      "Bash(docker:*)",
+      "Bash(kubectl:*)",
+      "Bash(terraform:*)",
+      "Bash(aws:*)",
+      "Bash(gcloud:*)"
+    ],
+    "ask": [
+      "Bash(node -e *)",
+      "Bash(node --eval*)",
+      "Bash(node -p *)",
+      "Bash(node --input-type=*)",
+      "Bash(npm install *)",
+      "Bash(npx --yes*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-bash.js"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-write.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/../../.claude/hooks/hook-runner.mjs --hook=pc-version-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pc-version-gate.mjs",
+            "statusMessage": "PC表バージョン照合中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/../../.claude/hooks/hook-runner.mjs --hook=rules-coverage-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/rules-coverage-gate.mjs",
+            "statusMessage": "ルールカバレッジ検証中..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/measure-gate.sh",
+            "statusMessage": "計測表(site-measurement.md)存在確認中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/animation-gate.sh",
+            "statusMessage": "アニメーション抽出データ検証中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/animation-verify-gate.sh",
+            "statusMessage": "Layer 3検証データ確認中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/../../.claude/hooks/hook-runner.mjs --hook=area-gate -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/area-gate.mjs",
+            "statusMessage": "運用エリアゲート検証中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/../../.claude/hooks/hook-runner.mjs --hook=check-notebook-query -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-notebook-query.mjs",
+            "statusMessage": "create-image: ベスプラ参照確認中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/../../.claude/hooks/hook-runner.mjs --hook=pre-bash-destructive -- node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-bash-destructive.mjs",
+            "statusMessage": "破壊的コマンド検知中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/../../.claude/hooks/hook-runner.mjs --hook=secret-write-gate -- node \"$CLAUDE_PROJECT_DIR\"/../../.claude/hooks/secret-write-gate.mjs",
+            "statusMessage": "settings.local.json シークレット混入チェック中..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-write-glob-check.sh",
+            "statusMessage": "plan Glob 義務: Write 対象 path 存在確認中..."
+          }
+        ]
+      }
+    ]
+  }
+}

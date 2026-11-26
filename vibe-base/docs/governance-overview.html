@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ガバナンス3層構造ビューア</title>
+<style>
+  :root { --bg:#fafaf9; --card:#fff; --border:#d6d3d1; --text:#1c1917; --muted:#78716c; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans JP','Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.7; padding:2rem; max-width:1100px; margin:0 auto; }
+  h1 { font-size:1.5rem; font-weight:800; margin-bottom:0.2rem; }
+  .meta { color:var(--muted); font-size:0.8rem; margin-bottom:1.2rem; }
+
+  /* Tab navigation */
+  .tabs { display:flex; gap:0; margin-bottom:0; border-bottom:2px solid var(--border); }
+  .tab { padding:0.7rem 1.5rem; font-size:0.9rem; font-weight:700; cursor:pointer; border:1px solid transparent; border-bottom:none; border-radius:8px 8px 0 0; background:transparent; color:var(--muted); transition:all 0.2s; }
+  .tab:hover { background:#f5f5f4; }
+  .tab.active { background:var(--card); color:var(--text); border-color:var(--border); position:relative; }
+  .tab.active::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px; background:var(--card); }
+  .tab .badge { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:10px; font-size:0.7rem; font-weight:700; }
+  .badge-blue { background:#dbeafe; color:#1d4ed8; }
+  .badge-amber { background:#fef3c7; color:#92400e; }
+  .badge-green { background:#dcfce7; color:#166534; }
+
+  .tab-content { display:none; background:var(--card); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:1.5rem; }
+  .tab-content.active { display:block; }
+
+  .section { background:#fafaf9; border:1px solid #e7e5e4; border-radius:8px; padding:0.8rem 1rem; margin:0.7rem 0; }
+  .section-head { font-weight:700; font-size:0.88rem; margin-bottom:0.3rem; }
+  .lines { font-size:0.7rem; color:var(--muted); float:right; }
+  ul, ol { padding-left:1.4rem; font-size:0.83rem; }
+  li { margin:0.2rem 0; }
+  code { background:#f5f5f4; padding:1px 5px; border-radius:3px; font-size:0.78rem; }
+  strong { color:#1c1917; }
+  table { width:100%; border-collapse:collapse; font-size:0.82rem; margin:0.5rem 0; }
+  th { background:#f5f5f4; text-align:left; padding:0.4rem 0.6rem; font-weight:700; border-bottom:2px solid var(--border); }
+  td { padding:0.4rem 0.6rem; border-bottom:1px solid #e7e5e4; vertical-align:top; }
+  .warn { color:#dc2626; font-weight:700; }
+  .ok { color:#16a34a; font-weight:700; }
+
+  .layer-label { display:inline-block; padding:0.15rem 0.6rem; border-radius:6px; font-size:0.72rem; font-weight:700; margin-bottom:0.5rem; }
+  .layer-all { background:#dbeafe; color:#1d4ed8; }
+  .layer-cmd { background:#fef3c7; color:#92400e; }
+  .layer-product { background:#dcfce7; color:#166534; }
+
+  .priority-banner { border-radius:8px; padding:0.4rem 0.8rem; font-size:0.82rem; font-weight:700; margin:0.8rem 0 0.4rem; }
+  .p1-banner { background:#fef2f2; border:2px solid #fca5a5; color:#991b1b; }
+  .p2-banner { background:#fffbeb; border:2px solid #fcd34d; color:#92400e; }
+  .p3-banner { background:#f0fdf4; border:2px solid #86efac; color:#166534; }
+
+  .arch { display:flex; gap:12px; margin:1rem 0; flex-wrap:wrap; }
+  .arch-box { flex:1; min-width:200px; background:var(--card); border:2px solid var(--border); border-radius:10px; padding:1rem; text-align:center; }
+  .arch-box h3 { font-size:0.85rem; margin-bottom:0.3rem; }
+  .arch-box p { font-size:0.75rem; color:var(--muted); }
+  .arch-arrow { display:flex; align-items:center; font-size:1.2rem; color:var(--muted); }
+</style>
+</head>
+<body>
+<div style="background:#7f1d1d;color:#fff;padding:12px 16px;font-size:14px;line-height:1.6;border-radius:6px;margin:12px;">⚠️ <strong>歴史資料</strong>: 本資料は Session 295 以前の旧運用（MISSION_LOG / SESSION_JOURNAL 体制）を記述しています。現行の正はセッションライフサイクル（<code style="background:rgba(255,255,255,.18);color:#fff;padding:1px 5px;border-radius:3px;">.claude/rules/session-lifecycle.md</code> → <code style="background:rgba(255,255,255,.18);color:#fff;padding:1px 5px;border-radius:3px;">docs/rules/session-lifecycle-canonical.md</code>）と memory.md 分散運用 v2.0 です。本資料の手順には従わないこと。</div>
+
+<h1>ガバナンス3層構造</h1>
+<p class="meta">2026-03-18 時点 | CLAUDE.md v4.6 (48行) + MEMORY.md (80行) + agent-rules.md (25行)</p>
+
+<!-- Architecture diagram -->
+<div class="arch">
+  <div class="arch-box" style="border-color:#2563eb;">
+    <span class="layer-label layer-all">Layer 1: 全エージェント</span>
+    <h3>CLAUDE.md</h3>
+    <p>共通憲法。git root遡上で全ディレクトリから到達</p>
+    <p style="margin-top:4px;font-size:0.7rem;">§3 SOP運用 → 28/32本は .claude/rules/ で自動注入</p>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box" style="border-color:#2563eb;">
+    <span class="layer-label layer-all">Layer 1: 全エージェント</span>
+    <h3>agent-rules.md</h3>
+    <p>PC表ルール8項 + 作業ルール5項</p>
+    <p style="margin-top:4px;font-size:0.7rem;">リポジトリ内。全ディレクトリからアクセス可</p>
+  </div>
+  <div class="arch-arrow">|</div>
+  <div class="arch-box" style="border-color:#d97706;">
+    <span class="layer-label layer-cmd">Layer 2: vibe-base司令塔</span>
+    <h3>MEMORY.md</h3>
+    <p>司令塔の行動規範・教訓・参照索引</p>
+    <p style="margin-top:4px;font-size:0.7rem;">Claude Codeローカルストレージ。vibe-base起動時のみ</p>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('claude')">CLAUDE.md <span class="badge badge-blue">48行</span></div>
+  <div class="tab" onclick="showTab('memory')">MEMORY.md <span class="badge badge-amber">80行</span></div>
+  <div class="tab" onclick="showTab('agent')">agent-rules.md <span class="badge badge-green">25行</span></div>
+</div>
+
+<!-- ==================== CLAUDE.md ==================== -->
+<div id="claude" class="tab-content active">
+<span class="layer-label layer-all">全エージェントが読む共通憲法</span>
+
+<div class="section">
+  <div class="section-head">§0. 概要 <span class="lines">L5-8</span></div>
+  <ul>
+    <li><strong>Vibe-Base:</strong> 複数のAIエージェントが協調して開発を行うための共通インフラ</li>
+    <li><strong>作業ディレクトリ:</strong> エージェントごとに専用ディレクトリを使用する</li>
+    <li><strong>運用:</strong> 各プロダクトが企画→保守を自律完結</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">§1. メタルール <span class="lines">L10-13</span></div>
+  <ol>
+    <li><strong>Refactor-on-Write:</strong> ルール追加時、既存との統合・置換を先に検討。純増は最終手段</li>
+    <li><strong>Reference-over-Redundancy:</strong> 1箇所に定義、他からは参照パスを記せ</li>
+    <li><strong>Self-Correction Loop:</strong> SOPを読まずに作業開始禁止</li>
+  </ol>
+</div>
+
+<div class="section">
+  <div class="section-head">§2. プロダクトサイクル <span class="lines">L15-16</span></div>
+  <p style="font-size:0.83rem;">各プロダクトは P0→P4 を順に通過する。<strong>定義・タスク・種別・ゲート条件 → <code>docs/ops/product-cycle.md</code></strong></p>
+</div>
+
+<div class="section">
+  <div class="section-head">§3. SOP運用 <span class="lines">L18-34</span></div>
+  <p style="font-size:0.78rem;color:#64748b;margin:4px 0 8px">28/32本は <code>.claude/rules/</code> から自動注入。以下4本のみ手動参照</p>
+  <table>
+    <thead><tr><th>ファイル</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td><code>docs/ops/project-promotion.md</code></td><td>外部リポ→vibe-base昇格</td></tr>
+      <tr><td><code>docs/ops/shared-asset-ops.md</code></td><td>散財→共有資産化</td></tr>
+      <tr><td><code>memory/patrol.md</code></td><td>パトロール指示</td></tr>
+      <tr><td><code>docs/md-inventory.md</code></td><td>全mdファイル棚卸し</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-head">§4. 開発ルール <span class="lines">L31-34</span></div>
+  <ul>
+    <li><strong>命名:</strong> kebab-case必須。日本語・スペース・大文字（拡張子除く）禁止</li>
+    <li><strong>三打席ルール:</strong> 同一箇所3回失敗→コミット→MISSION_LOG記録→引き継ぎ要請</li>
+    <li><strong>横断チェック:</strong> バグ修正時、同パターンを全ファイル検索し一括修正</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">§5. AIセルフガバナンス <span class="lines">L36-42</span></div>
+  <ul>
+    <li><strong>フェーズゲート:</strong> ゲート種別タスクではマスター判定なく次フェーズに進まない</li>
+    <li><strong>先行バリデーション:</strong> 変更前に本憲法（スコープ・禁止事項）を照合</li>
+    <li><strong>能力限界の事前申告:</strong> 未検証を「確認済み」と報告禁止</li>
+    <li><strong>混乱検知:</strong> 否定的FB 1回で全停止→整理→報告</li>
+    <li><strong>Check-in義務:</strong> セッション開始時に <code>MISSION_LOG.md</code> を読み、前回の未解決事項を把握せよ</li>
+    <li><strong>製品参照義務:</strong> 製品作業時は自治憲法 + PC表を読め</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">§6. 禁止事項 <span class="lines">L44-45</span></div>
+  <ul>
+    <li><code>main</code>への <code>--force</code> push / シークレットのコミット / <code>archive/</code>無断削除</li>
+  </ul>
+</div>
+
+<p style="font-size:0.75rem; color:var(--muted); margin-top:1rem;">v4.6 | 改訂履歴 → <code>docs/ops/revision-history.md</code></p>
+</div>
+
+<!-- ==================== MEMORY.md ==================== -->
+<div id="memory" class="tab-content">
+<span class="layer-label layer-cmd">vibe-baseで開いたエージェント専用</span>
+
+<div class="priority-banner p1-banner">P1: 絶対規律（絶対に消さない）— L8-12</div>
+
+<div class="section">
+  <ol>
+    <li><strong>口調:</strong> ですます調（丁寧語）を常に使用する</li>
+    <li><strong>迎合禁止。</strong> 同意できない点はそのまま述べる</li>
+    <li><strong>マスター発言を master-statements-all.md に記録する（省略なし）</strong></li>
+  </ol>
+  <p style="font-size:0.75rem; color:var(--muted); margin-top:0.5rem;">※ PC表規律等は <code>docs/ops/agent-rules.md</code> に分離済み</p>
+</div>
+
+<div class="priority-banner p2-banner">P2: 行動規範・教訓 — L14-46</div>
+
+<div class="section">
+  <div class="section-head">マスターの好み <span class="lines">L16-21</span></div>
+  <ul>
+    <li>反対意見は正直に言え</li>
+    <li>トークン効率意識するが<strong>開発クオリティ維持が最優先</strong></li>
+    <li>開発ルールに厳格。曖昧な計画を嫌う。手を煩わせるな</li>
+    <li>データは<strong>中央値・最頻値の実数</strong>で。平均値のみ禁止</li>
+    <li>選択肢を提示する質問には<strong>番号付き</strong>で回答できるようにせよ（必須）</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">過去の教訓（手戻り防止） <span class="lines">L23-26</span></div>
+  <ul>
+    <li>目先の提案をするな。ライフサイクル全体を俯瞰して提案</li>
+    <li>マスター指示は最小限に。「LP1つやって」で動けるIFを設計しろ</li>
+    <li>二重書き込み設計を提案するな。1データストアで済むならそうしろ</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">発言集の運用 <span class="lines">L28-33</span></div>
+  <table>
+    <thead><tr><th>ファイル</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code>master-statements-all.md</code></td><td>全発言（番号+タグ。省略なし）</td></tr>
+      <tr><td><code>master-statements-key.md</code></td><td>名言集（Bから昇格。A番号→B番号参照）</td></tr>
+    </tbody>
+  </table>
+  <ul style="margin-top:0.4rem;">
+    <li>読込: 自動読込しない。「発言集読め」指示時にA/B/A+Bを質問</li>
+    <li>タグ: [日時] [対象] [種別: 方針/基準/指摘/提案/却下]</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">参照先（P2） <span class="lines">L35-46</span></div>
+  <table>
+    <thead><tr><th>項目</th><th>参照先</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ok">✅</span> ガバナンス改革(3/17)</td><td><code>memory/project_governance-reform.md</code></td></tr>
+      <tr><td>PC管理プロンプト改善</td><td><code>memory/pc-prompt-feedback.md</code></td></tr>
+      <tr><td>X投稿方針</td><td><code>memory/feedback_x-posting-manual.md</code></td></tr>
+      <tr><td>マスター発言集</td><td><code>docs/master-statements-all.md</code></td></tr>
+      <tr><td>HTMLは自分で開け</td><td><code>memory/feedback_open-html-yourself.md</code></td></tr>
+      <tr><td><strong>HTML提示義務</strong></td><td><code>memory/feedback_html-presentation.md</code></td></tr>
+      <tr><td>Sonnetもエージェント配下で作業可</td><td><code>memory/feedback_sonnet-in-ag-dir.md</code></td></tr>
+      <tr><td>Aiueo開発優先度(3/14)</td><td><code>memory/project_aiueo-dev-priorities.md</code></td></tr>
+      <tr><td class="warn">Aiueo以外提示禁止</td><td><code>memory/feedback_aiueo-focus-only.md</code></td></tr>
+      <tr><td>UI刷新はOpusのみ</td><td><code>memory/feedback_ui-refresh-opus-only.md</code></td></tr>
+      <tr><td>UI刷新の現状(3/15-4)</td><td><code>memory/project_ui-refresh-state.md</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="priority-banner p3-banner">P3: 運用情報（容量圧迫時に削減対象）— L48-80</div>
+
+<div class="section">
+  <div class="section-head">プロジェクト概要 <span class="lines">L50-53</span></div>
+  <ul>
+    <li>共通憲法: <code>CLAUDE.md</code> v4.6 / SOP: <code>docs/ops/product-cycle.md</code> v5.0</li>
+    <li>引き継ぎ: <code>MISSION_LOG.md</code>（直近5件。セッション開始時に読む）</li>
+    <li>プロダクト詳細: 各自治憲法(CLAUDE.md)とMISSION_LOGを参照</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">並列運用ルール <span class="lines">L55-58</span></div>
+  <ul>
+    <li><strong>1フォルダ = 1エージェント（厳守）</strong></li>
+    <li>ハンドオフ: 全てMISSION_LOG経由</li>
+    <li>PC表・自治憲法はvibe-base司令塔からも編集可</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-head">参照先インデックス（P3） <span class="lines">L60-74</span></div>
+  <table>
+    <thead><tr><th>項目</th><th>参照先</th></tr></thead>
+    <tbody>
+      <tr><td><span class="warn">⚠️</span> Aiueoビジネスモデル(3/15)</td><td><code>memory/project_aiueo-business-model.md</code></td></tr>
+      <tr><td><span class="warn">⚠️</span> オンボーディング半自動化(3/16)</td><td><code>memory/project_onboarding-semi-auto.md</code></td></tr>
+      <tr><td>Aiueo競合比較表</td><td><code>docs/aiueo-feature-comparison.html</code></td></tr>
+      <tr><td>パトロール</td><td><code>memory/patrol.md</code></td></tr>
+      <tr><td><span class="ok">✅</span> GA4 MCP</td><td><code>memory/ga4-mcp-setup.md</code></td></tr>
+      <tr><td>lit.link集客導線</td><td><code>memory/litlink-setup.md</code></td></tr>
+      <tr><td class="warn">集客(P3)話題禁止</td><td><code>memory/project_p3-hold.md</code></td></tr>
+      <tr><td>P4計測TODO非表示</td><td><code>memory/feedback_p4-no-todo.md</code></td></tr>
+      <tr><td>スキル導入制限</td><td>司令塔指示がない限り禁止</td></tr>
+      <tr><td>推論矯正ルール</td><td><code>memory/feedback_reasoning-gear.md</code></td></tr>
+      <tr><td>顧客影響=深刻バグ</td><td><code>memory/feedback_customer-facing-bugs.md</code></td></tr>
+      <tr><td><span class="ok">✅</span> フォルダ構造改革(3/16)</td><td><code>docs/ops/folder-lifecycle.md</code></td></tr>
+      <tr><td>全md棚卸し分類表</td><td><code>docs/md-inventory.md</code></td></tr>
+      <tr><td>構造診断プロセス</td><td><code>docs/ops/structural-diagnosis.md</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-head">整理予定 <span class="lines">L76-79</span></div>
+  <ul>
+    <li><span class="ok">✅</span> 削除済み(3/18): Booking App / SHIFT AI / Wikipedia Draft Bot</li>
+    <li><span class="warn">⚠️</span> kobaraku: 製品CLAUDE.md+pc-progress.md未作成。<strong>対処完了まで開発禁止</strong></li>
+    <li>統合: ReviewAI Misfits版→#4、vibe-base+Misfits.PJ</li>
+  </ul>
+</div>
+</div>
+
+<!-- ==================== agent-rules.md ==================== -->
+<div id="agent" class="tab-content">
+<span class="layer-label layer-all">全エージェントが遵守する共通ルール</span>
+
+<div class="section">
+  <div class="section-head">PC表ルール（8項目） <span class="lines">L5-14</span></div>
+  <ol>
+    <li><strong>省略禁止:</strong> 全行・全列・全フェーズを省略なく提示せよ。抜粋・要約は一切禁止</li>
+    <li><strong>照合義務:</strong> 進捗に言及するときは必ずPC表照合が先。照合なしに進捗を語ることは禁止</li>
+    <li><strong>実物確認必須:</strong> 「未確認」「推定」で✅にするな。実物を確認してから記入</li>
+    <li><strong>他エージェントの完了報告は、自分で実物確認するまで信用するな</strong></li>
+    <li><strong>セッション開始時:</strong> 対象プロダクトのPC表照合を最初に行う</li>
+    <li><strong>完了報告:</strong> PC表の#指定が必須</li>
+    <li><strong>PC表に載っていない作業を勝手に着手するな。</strong> 抜けを発見したらPC表への追加を提案し、承認後に着手せよ</li>
+    <li><strong>PC表連動:</strong> タスクの状態を変更したら、対応するPC表を同一コミット内で更新せよ</li>
+  </ol>
+</div>
+
+<div class="section">
+  <div class="section-head">作業ルール（5項目） <span class="lines">L16-22</span></div>
+  <ul>
+    <li><strong>セッション終了時は指示がなくても必ず MISSION_LOG Check-out + コミットを実行する</strong></li>
+    <li><strong>デプロイまでが1タスク。</strong> ローカルテストだけで完了宣言禁止</li>
+    <li><strong>正式GO前に着手するな。</strong> 指示書作成≠実行許可</li>
+    <li><strong>UI変更時は競合調査必須。</strong> モック/コード/移行 形態問わず全適用</li>
+    <li><strong>1フォルダ = 1エージェント。</strong> 自分が開かれたディレクトリ範囲外のファイルを無断で変更するな</li>
+  </ul>
+</div>
+
+<p style="font-size:0.75rem; color:var(--muted); margin-top:1rem;">v1.0 | 2026-03-18 | MEMORY.mdから全エージェント向けルールを分離・新設</p>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector(`[onclick="showTab('${id}')"]`).classList.add('active');
+}
+</script>
+
+</body>
+</html>

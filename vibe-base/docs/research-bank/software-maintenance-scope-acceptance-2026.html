@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>受託開発の保守範囲・検収・漏洩責任 — Research Bank</title>
+<style>
+ :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#222634;--border:#2c3140;--text:#e6e8ee;--text2:#9aa3b2;--accent:#5b8def;--accent2:#48c9a9;--warn:#e8705b;--red:#e2574c;}
+ *{box-sizing:border-box}
+ body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:32px;line-height:1.7}
+ .wrap{max-width:980px;margin:0 auto}
+ h1{font-size:1.5rem;margin:0 0 6px}h1 span{color:var(--accent2)}
+ h2{font-size:1.15rem;margin:34px 0 10px;color:var(--accent2);border-bottom:1px solid var(--border);padding-bottom:6px}
+ h3{font-size:.98rem;margin:18px 0 6px;color:var(--accent)}
+ .meta{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-size:.82rem;color:var(--text2);margin:0 0 8px}
+ .meta b{color:var(--text)}
+ .tldr{background:var(--surface2);border-left:4px solid var(--accent2);border-radius:6px;padding:14px 16px;margin:14px 0}
+ table{width:100%;border-collapse:collapse;font-size:.84rem;margin:10px 0}
+ th,td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:top}
+ th{background:var(--surface2);color:var(--accent2)}
+ td.who{white-space:nowrap;font-weight:600}
+ .warn{color:var(--warn);font-weight:600}.red{color:var(--red);font-weight:700}
+ ul{margin:6px 0 6px 0;padding-left:20px}li{margin:3px 0}
+ a{color:var(--accent)}
+ code{background:var(--surface2);padding:1px 6px;border-radius:4px;font-size:.85em}
+ .src td{font-size:.78rem;color:var(--text2)}
+ .sofwhat{background:#16241f;border:1px solid #2c5547;border-radius:8px;padding:16px 18px;margin:14px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>受託開発の<span>保守範囲・検収・漏洩責任</span> 出典付き調査</h1>
+<div class="meta">
+ <b>調査日</b>: 2026-06-28 &nbsp;|&nbsp; <b>調査軸</b>: 4本 &nbsp;|&nbsp; <b>ソース数</b>: 約50 &nbsp;|&nbsp; <b>タグ</b>: legal / pricing / ux &nbsp;|&nbsp; <b>関連</b>: trimmer-system（横断再利用可）<br>
+ <b>再利用用途</b>: 受託/保守契約の線引き条文設計・検収/受け入れ基準の合意フロー・UX改善の課金設計・個人情報/DB漏洩の責任分界説明
+</div>
+<div class="tldr">
+<b>エグゼクティブ・サマリー（4論点の結論）</b>
+<ul>
+<li><b>① 保守範囲</b>：バグが法的に「契約不適合（瑕疵）」になるのは「仕様不一致 <b>かつ</b> 稼働に重大な支障 <b>かつ</b> 迅速に補修できない」場合のみ（東京地判平9.2.18）。実務はIPAモデル契約に倣い「開発段階の契約不適合責任」と「検収後の保守契約」を分離し、保守は<b>バグ修正=限定列挙／改善・追加=除外列挙</b>で書く。</li>
+<li><b>② 検収・線引き</b>：非技術な顧客が判定できる鍵は「<b>プロトタイプ先行合意 → 顧客の言葉の受け入れ基準(AC) → UAT(受入テスト) → 検収</b>」。ACはGiven-When-Then＝業務シナリオで書き、技術仕様や数字では書かない。「感じが悪い」を不合格理由にしないため定量/シナリオ基準を着手前に合意。</li>
+<li><b>③ UX改善の課金</b>：使い心地調整はバグでも新機能でもない第3類型。<b>大多数は「都度見積（タイムチャージ/個別見積）」で対応＝着手前に金額を提示し顧客承認</b>。月額リテイナー(伴走)は sonicgarden 等の<b>少数派モデル</b>で受託の大多数はやらない。実勢は時給3,000〜10,000円、伴走を持つ場合は月5〜30万円。際限ない要望は<b>「タダではやらない＝都度見積」</b>で止まり、伴走がある場合のみ「月◯時間の工数上限」で制御。</li>
+<li><b>④ 漏洩責任</b>：「DB内部が漏れたらDBベンダー責任」は<b>ほぼ成立しない</b>。責任共有モデルで設定・アクセス制御・暗号化は利用者(開発側)責任、ベンダーSLAは損害をほぼ全額免責（上限=直近12ヶ月の利用料）。個人情報保護法では委託しても<b>委託元の安全管理・監督義務(法25条)は残る</b>。実事例(Capital One/WelcomeHR)もアプリ側設定ミスでベンダー免責。</li>
+</ul>
+</div>
+
+<div class="sofwhat">
+<b>So What（カルテアプリ等の小規模受託への落とし込み）</b>
+<ul>
+<li><b>線引きは「読めない仕様書」でなく「着手前デモ＋顧客の言葉のAC」で引く</b>。例：「対象を選ぶ→記録画面が開く→書いて保存→後で見ると残っている」が目視でできれば完成（=バグなし）。非技術な顧客自身が判定できる。</li>
+<li><b>3区分を契約に明記</b>：バグ修正（保守）／UX改善（別軸）／新機能（別途見積）。<b>標準は都度見積（着手前に金額提示→承認）</b>。月額の伴走契約を持つ場合のみ「月◯時間まで」の工数上限で吸収する（伴走は少数派モデル）。</li>
+<li><b>漏洩責任は「ベンダーに丸投げ」と書かない</b>。基盤起因=ベンダー／実装の穴=開発側／運用(PW・端末)=店舗、の3分界を契約に書く。顧客の個人情報をDB保存する以上、無認証方針は撤回が前提。</li>
+<li><b>検収条項に「みなし検収」を入れるなら受け入れ基準とセット</b>。基準なき「沈黙＝合格」は最大の紛争源。</li>
+</ul>
+</div>
+
+<h2>論点① 保守範囲 — バグ修正と改善要望の線引き</h2>
+<h3>結論</h3>
+<ul>
+<li>バグ＝裁判所基準は「仕様不一致＋稼働に軽微でない支障＋遅滞なく補修できない」。速やかに補修・代替すれば瑕疵(契約不適合)と認定されない（東京地判平9.2.18）[S7][S12]。</li>
+<li>2020年民法改正で「引渡から1年」→「不適合を知った時から1年以内通知」に変更。発見が数年後でも追及可となり、保守契約で開発段階責任を切り分ける条文が必須に[S4][S6]。</li>
+<li>IPAモデル契約は「開発=契約不適合責任／検収後=保守契約」の二段構造。これが「バグ修正(無償期間内)→改善・追加(別途有償)」慣行の法的土台[S1][S2]。</li>
+<li>保守契約は<b>含む業務(エラーパッチ・回避策提供)を限定列挙＋含まない業務(機能改善・拡張・第三者製品更新対応)を除外列挙</b>するのが標準[S8][S9][S11]。</li>
+<li>非機能要件(速度等)が未定義なら、遅さはバグに当たらない（東京高判令6.1.31）[S14]。</li>
+</ul>
+<h3>紛争の典型と予防</h3>
+<ul>
+<li>典型：仕様書に無い挙動の是正要求／「動くが業務に合わない」をバグと主張／非機能要件未定義の速度問題[S5][S13][S14]。</li>
+<li>予防：要件・設計の文書化と双方署名／変更管理手続きの契約明記／不具合報告と改善要望の受付経路を分ける[S13][S15]。</li>
+</ul>
+
+<h2>論点② 検収・受け入れ基準 — 顧客が判定できる線引き</h2>
+<h3>結論</h3>
+<ul>
+<li>受け入れ基準(AC)はユーザーストーリーごとの合格条件。技術仕様でなく<b>ユーザー視点</b>で書く。Definition of Done(DoD)とは別物[S2][S3][S4]。</li>
+<li>記述形式は<b>Given-When-Then(Gherkin)</b>が普及。前提・操作・期待結果の3要素で非技術者も読める[S1][S5]。</li>
+<li>UATは発注者/エンドユーザーが本番近似で行う最終確認。合格基準の<b>事前合意</b>が最大の成功要因。「感じが悪い」を不合格にしないため定量/シナリオ基準を契約前に合意[S8][S9][S10]。</li>
+<li>仕様書は非技術顧客に伝わらない→<b>プロトタイプ・デモ先行で「見て触って合意」</b>。デジタル庁の調達でもプロトタイプ検証が標準[S13][S16]。</li>
+<li>請負では検収＝完成確認かつ報酬請求権の起点。検収後も契約不適合責任は残る。「みなし検収」は受け入れ基準の明文化とセットで使う[S19][S24][S25]。</li>
+</ul>
+<h3>顧客の言葉への翻訳例</h3>
+<table>
+<tr><th>悪い基準(作り手目線)</th><th>良い基準(顧客が判定できる)</th></tr>
+<tr><td>仕様書3.2項に準拠 / レスポンス200ms以内</td><td>「検索ボタンを押して結果が出るまで、固まったように感じない」</td></tr>
+<tr><td>API応答が正常</td><td>「犬を選ぶ→カルテが開く→書いて保存→後で見ると残っている」</td></tr>
+</table>
+
+<h2>論点③ UX改善・継続改善の課金モデルと相場</h2>
+<h3>結論</h3>
+<ul>
+<li>使い心地調整はバグでも新機能でもない第3類型。<b>標準は都度見積（タイムチャージ/個別見積）</b>＝改善要望ごとに着手前に金額を提示し顧客承認を得る。月額リテイナー(伴走)は継続関係前提の<b>少数派モデル</b>(sonicgarden/mofmof等)で、受託の大多数は採らない[S-b1][S-b8]。</li>
+<li>「際限ない要望」の根本対処は、<b>都度見積なら「着手前に金額提示→承認」</b>（タダではやらないので止まる）。<b>伴走契約がある場合のみ月◯時間の工数上限</b>で制御する[S-b8][S-b11]。</li>
+<li>バグ修正(請負)／UX改善(準委任・月額工数)／新機能(別途請負)の3区分を契約に明示するのがトラブル防止の最善[S-b8]。</li>
+</ul>
+<h3>主要数値（中央値・分布）</h3>
+<table>
+<tr><th>項目</th><th>数値</th><th>出典</th></tr>
+<tr><td>フリーランスエンジニア月額単価</td><td>中央値64〜70万・範囲40〜150万</td><td>PE-BANK/HiPro</td></tr>
+<tr><td>UI/UXデザイナー フリーランス時給</td><td>中央値5,000円・範囲3,000〜10,000円</td><td>picks-design</td></tr>
+<tr><td>システム保守費(年額)</td><td>開発費の15〜25%/年(最頻15%)</td><td>SIA/MF</td></tr>
+<tr><td>Webサイト保守(更新・改善込み)月額</td><td>2〜5万円</td><td>upgrade/アイミツ</td></tr>
+<tr><td>個人の継続改善 月額プラン</td><td>稼働5〜10h=3〜10万 / 20〜40h=10〜30万</td><td>radicode/hnavi</td></tr>
+</table>
+
+<h2>論点④ 漏洩時の責任分界（責任共有モデル・SLA免責・個人情報保護法）</h2>
+<h3>結論</h3>
+<ul>
+<li>「DB内部が漏れたらDBベンダー責任」は<b>ほぼ成立しない</b>。AWS/Google/Supabase/Cloudflare とも、データ内容・アクセス制御・暗号化設定は利用者(開発側)責任と明文化[L1][L2][L3][L4]。</li>
+<li>ベンダーSLAはデータ漏洩損害をほぼ全額免責。賠償上限=直近12ヶ月の利用料[L5][L6]。</li>
+<li>個人情報保護法：委託しても委託元の安全管理措置(法23条)・委託先監督義務(法25条)は残る。委託先で漏洩しても委託元が処分対象[L7][L8][L9]。</li>
+<li>クラウド事業者が個人データを「取り扱わない」場合でも、漏洩報告義務者は利用事業者(法26条)[L10][L11]。</li>
+<li>実事例：Capital One($190M+$80M, AWS免責)・WelcomeHR(アクセス権限誤設定で運営会社責任)。いずれもアプリ側起因[L12][L13]。</li>
+</ul>
+<h3>責任分界（契約に書くべき3区分）</h3>
+<table>
+<tr><th>漏洩の原因層</th><th>責任主体</th><th>例</th></tr>
+<tr><td class="who">基盤(DB基盤そのもの)</td><td class="who">DBベンダー</td><td>基盤侵害・物理障害・DBエンジン脆弱性(SLA準拠)</td></tr>
+<tr><td class="who">アプリ(作り込み)</td><td class="who">開発側</td><td>認証の穴・SQLi・権限設定ミス・鍵/PW漏れ(漏洩の大半)</td></tr>
+<tr><td class="who">運用</td><td class="who">店舗側</td><td>パスワード管理・端末紛失・誤操作・誤共有</td></tr>
+</table>
+
+<h2>ソース一覧</h2>
+<h3>① 保守範囲 / ② 検収</h3>
+<table class="src">
+<tr><th>#</th><th>名称 / 発行元</th><th>URL</th><th>年</th></tr>
+<tr><td>S1</td><td>情報システム・モデル取引・契約書(第二版) / IPA</td><td><a href="https://www.ipa.go.jp/digital/model/index.html">ipa.go.jp</a></td><td>2020(2024更新)</td></tr>
+<tr><td>S2</td><td>モデル契約書 見直しのポイント / IPA</td><td><a href="https://www.ipa.go.jp/digital/model/review-point.html">ipa.go.jp</a></td><td>2020</td></tr>
+<tr><td>S4</td><td>契約不適合責任 / BUSINESS LAWYERS</td><td><a href="https://www.businesslawyers.jp/practices/763">businesslawyers.jp</a></td><td>2020-24</td></tr>
+<tr><td>S5</td><td>システム開発紛争のパターン / BUSINESS LAWYERS</td><td><a href="https://www.businesslawyers.jp/practices/667">businesslawyers.jp</a></td><td>2023</td></tr>
+<tr><td>S6</td><td>民法改正の影響 / Authense法律事務所</td><td><a href="https://www.authense.jp/professionalinsights/bt/lawsuit/91/">authense.jp</a></td><td>2024</td></tr>
+<tr><td>S7</td><td>バグは「瑕疵」にあたるか(東京地判平9.2.18) / 弁護士坂生</td><td><a href="https://bengoshi-sakao.com/column/">bengoshi-sakao.com</a></td><td>2021</td></tr>
+<tr><td>S8</td><td>システム保守契約のサンプルと留意点 / 弁護士法人クラフトマン</td><td><a href="https://www.ishioroshi.com/biz/kaisetu/it/index/hoshu/">ishioroshi.com</a></td><td>2023</td></tr>
+<tr><td>S9</td><td>運用・保守契約の注意点 / IT法務.COM(内田・鮫島)</td><td><a href="https://www.it-houmu.com/archives/1416">it-houmu.com</a></td><td>2022</td></tr>
+<tr><td>S11</td><td>保守契約書の意識すべき条項 / ys-law.jp</td><td><a href="https://www.ys-law.jp/IT/column/column-3399/">ys-law.jp</a></td><td>2023</td></tr>
+<tr><td>S12</td><td>納入後の瑕疵(契約不適合) / クラフトマン</td><td><a href="https://www.ishioroshi.com/biz/kaisetu/it/index/kashi/">ishioroshi.com</a></td><td>2023</td></tr>
+<tr><td>S13</td><td>情報システム開発トラブル事例(元東京高裁専門委員) / 財務省財務総研</td><td><a href="https://www.mof.go.jp/pri/research/seminar/fy2022/lm20230322.pdf">mof.go.jp</a></td><td>2023</td></tr>
+<tr><td>S14</td><td>判例で読み解くシステム開発紛争(令6.3) / SOFTIC</td><td><a href="https://www.softic.or.jp/">softic.or.jp</a></td><td>2024</td></tr>
+<tr><td>S1b</td><td>受け入れ条件(アジャイル) / TestRail(techmatrix)</td><td><a href="https://blog.testrail.techmatrix.jp/acceptance-criteria-agile/">testrail.techmatrix.jp</a></td><td>2024</td></tr>
+<tr><td>S2b</td><td>Acceptance Criteria / Scrum Alliance</td><td><a href="https://resources.scrumalliance.org/Article/need-know-acceptance-criteria">scrumalliance.org</a></td><td>2022</td></tr>
+<tr><td>S5b</td><td>Gherkin入門(Given/When/Then) / Beekle</td><td><a href="https://beekle.jp/knowledge/gherkin-bdd-introduction">beekle.jp</a></td><td>2024</td></tr>
+<tr><td>S8b</td><td>受け入れテスト(UAT)の目的 / 発注ラウンジ</td><td><a href="https://hnavi.co.jp/knowledge/blog/uat/">hnavi.co.jp</a></td><td>2024</td></tr>
+<tr><td>S10b</td><td>受入テスト(UAT)完全ガイド / テスター10</td><td><a href="https://minna-systems.co.jp/test/kinds/uat-complete-guide/">minna-systems.co.jp</a></td><td>2024</td></tr>
+<tr><td>S16</td><td>調達仕様書(プロトタイプ検証) / デジタル庁</td><td><a href="https://www.digital.go.jp/">digital.go.jp</a></td><td>2024</td></tr>
+<tr><td>S19</td><td>請負か準委任か / CIO.com</td><td><a href="https://www.cio.com/article/4056822/">cio.com</a></td><td>2025</td></tr>
+<tr><td>S25</td><td>検収・完成・みなし検収 / CIO.com</td><td><a href="https://www.cio.com/article/4056825/">cio.com</a></td><td>2025</td></tr>
+</table>
+<h3>③ 課金相場</h3>
+<table class="src">
+<tr><td>S-b1</td><td>納品のない受託開発 / ソニックガーデン</td><td><a href="https://www.sonicgarden.jp/">sonicgarden.jp</a></td><td>2024</td></tr>
+<tr><td>S-b3</td><td>UIUXデザイン発注の相場 / picks design</td><td><a href="https://picks-design.com/blog/4543/">picks-design.com</a></td><td>2025</td></tr>
+<tr><td>S-b5</td><td>受託開発費を左右する9要素 2025 / SIA</td><td><a href="https://www.siainc.jp/topic/outsourced-development-cost-factors-2025">siainc.jp</a></td><td>2025</td></tr>
+<tr><td>S-b6</td><td>保守契約とは / マネーフォワード</td><td><a href="https://biz.moneyforward.com/contract/basic/4380/">moneyforward.com</a></td><td>2024</td></tr>
+<tr><td>S-b8</td><td>仕様変更・スコープ変更の追加請求 / IT法務.COM</td><td><a href="https://www.it-houmu.com/archives/1480">it-houmu.com</a></td><td>2024</td></tr>
+<tr><td>S-b9</td><td>ホームページ保守費用相場 / PRONIアイミツ</td><td><a href="https://imitsu.jp/cost/hp-design/website-maintenance-cost">imitsu.jp</a></td><td>2025</td></tr>
+<tr><td>S-b10</td><td>受託開発サブスク5選 / RADICODE</td><td><a href="https://blog.radicode.co.jp/development/1668">radicode.co.jp</a></td><td>2024</td></tr>
+<tr><td>S-b11</td><td>スコープクリープとは / Adobe Business</td><td><a href="https://business.adobe.com/jp/blog/basics/scope-creep">business.adobe.com</a></td><td>2024</td></tr>
+<tr><td>S-b12</td><td>人月単価相場2025-2026 / アプリの達人</td><td><a href="https://app-tatsujin.com/contract-development-man-month-rate-calculation-2025-2026/">app-tatsujin.com</a></td><td>2025</td></tr>
+<tr><td>S-b14</td><td>フリーランス単価相場 / PE-BANK</td><td><a href="https://pe-bank.jp/guide/freelance/freelance_unit_price/">pe-bank.jp</a></td><td>2025</td></tr>
+</table>
+<h3>④ 漏洩責任</h3>
+<table class="src">
+<tr><td>L1</td><td>Shared Responsibility Model / AWS</td><td><a href="https://aws.amazon.com/compliance/shared-responsibility-model/">aws.amazon.com</a></td><td>2024</td></tr>
+<tr><td>L2</td><td>Shared responsibilities & shared fate / Google Cloud</td><td><a href="https://docs.cloud.google.com/architecture/framework/security/shared-responsibility-shared-fate">cloud.google.com</a></td><td>2024</td></tr>
+<tr><td>L3</td><td>Shared Responsibility Model / Supabase Docs</td><td><a href="https://supabase.com/docs/guides/deployment/shared-responsibility-model">supabase.com</a></td><td>2024</td></tr>
+<tr><td>L4</td><td>Enterprise Subscription Terms / Cloudflare</td><td><a href="https://www.cloudflare.com/enterpriseterms/">cloudflare.com</a></td><td>2024</td></tr>
+<tr><td>L5</td><td>AWS Customer Agreement(免責・賠償上限) / AWS</td><td><a href="https://aws.amazon.com/agreement/">aws.amazon.com</a></td><td>2024</td></tr>
+<tr><td>L7</td><td>個人情報保護法 FAQ(23/25条) / 個人情報保護委員会</td><td><a href="https://www.ppc.go.jp/personalinfo/faq/APPI_QA/">ppc.go.jp</a></td><td>随時</td></tr>
+<tr><td>L9</td><td>PPC行政指導の近時傾向 / 牛島総合法律事務所</td><td><a href="https://www.ushijima-law.gr.jp/client-alert_seminar/client-alert/ppc_enforcement/">ushijima-law.gr.jp</a></td><td>2024</td></tr>
+<tr><td>L10</td><td>FAQ Q7-53(クラウド利用と委託) / PPC</td><td><a href="https://www.ppc.go.jp/all_faq_index/faq1-q7-53/">ppc.go.jp</a></td><td>随時</td></tr>
+<tr><td>L11</td><td>FAQ Q6-22(クラウド利用時の漏洩報告) / PPC</td><td><a href="https://www.ppc.go.jp/all_faq_index/faq1-q6-22_/">ppc.go.jp</a></td><td>随時</td></tr>
+<tr><td>L12</td><td>AWS責任共有モデル Capital One事例 / AppSec Engineer</td><td><a href="https://www.appsecengineer.com/blog/aws-shared-responsibility-model-capital-one-breach-case-study">appsecengineer.com</a></td><td>2024</td></tr>
+<tr><td>L13</td><td>WelcomeHR 個人情報漏洩(15万人超) / cybersecurity-jp</td><td><a href="https://cybersecurity-jp.com/news/96677">cybersecurity-jp.com</a></td><td>2024</td></tr>
+</table>
+
+<h3>信頼度・未検証</h3>
+<ul>
+<li>信頼度 高：論点①②④(IPA/PPC/クラウド公式/判例/法律事務所の三角検証)。論点③の単価(複数業界調査一致)。</li>
+<li>未検証：紛争パターン別の定量発生率(SOFTIC PDF非テキスト)／IPAモデル契約の検収条項全文／ソニックガーデン等の非公開料金／ベンダー自身の過失による漏洩判例。</li>
+</ul>
+</div>
+</body>
+</html>

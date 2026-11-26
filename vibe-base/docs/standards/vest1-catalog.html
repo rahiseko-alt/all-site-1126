@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vest1 カタログ — 全30件（廃止3含む）</title>
+<style>
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #232733; --border: #2e3345;
+    --text: #e4e6ed; --text-dim: #8b8fa3; --accent: #6c7bf7; --accent-dim: rgba(108,123,247,0.12);
+    --green: #34d399; --green-dim: rgba(52,211,153,0.12);
+    --amber: #fbbf24; --amber-dim: rgba(251,191,36,0.12);
+    --teal: #2dd4bf; --teal-dim: rgba(45,212,191,0.12);
+    --purple: #a78bfa; --purple-dim: rgba(167,139,250,0.12);
+    --red: #ef4444; --red-dim: rgba(239,68,68,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; line-height: 1.7; padding: 40px 24px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 12px; }
+  .stats-bar { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+  .stat-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.8rem; }
+  .stat-chip strong { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+  .card.deprecated { opacity: 0.55; }
+  .card.deprecated .card-title { text-decoration: line-through; }
+  .card-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .card-num { background: var(--accent-dim); color: var(--accent); font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+  .card-title { font-size: 1rem; font-weight: 600; flex: 1; min-width: 180px; }
+  .card-cat { font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+  .cat-t { background: var(--green-dim); color: var(--green); }
+  .cat-b { background: var(--amber-dim); color: var(--amber); }
+  .cat-c { background: var(--teal-dim); color: var(--teal); }
+  .cat-o { background: var(--purple-dim); color: var(--purple); }
+  .cat-d { background: var(--red-dim); color: var(--red); }
+  .card-path { font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-dim); background: var(--surface2); padding: 2px 8px; border-radius: 4px; }
+
+  .card-body { padding: 16px 20px; }
+  .plain { background: var(--surface2); border-radius: 8px; padding: 12px 16px; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 14px; line-height: 1.7; }
+
+  .wh-table { width: 100%; border-collapse: collapse; }
+  .wh-table th { width: 100px; text-align: left; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; color: var(--accent); background: var(--accent-dim); border-bottom: 1px solid var(--border); vertical-align: top; }
+  .wh-table td { padding: 6px 10px; font-size: 0.8rem; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .wh-table tr:last-child th, .wh-table tr:last-child td { border-bottom: none; }
+
+  .section-divider { text-align: center; color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 36px 0 20px; padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>vest1 カタログ</h1>
+<p class="subtitle">全30件（廃止3含む）の正本一覧。5W2H + 素人向け説明付き</p>
+<div class="stats-bar">
+  <div class="stat-chip"><strong>27</strong> 有効vest1</div>
+  <div class="stat-chip"><strong>19</strong> テンプレート (T)</div>
+  <div class="stat-chip"><strong>3</strong> ボイラープレート (B)</div>
+  <div class="stat-chip"><strong>4</strong> チェックリスト (C)</div>
+  <div class="stat-chip"><strong>1</strong> 運用 (O)</div>
+  <div class="stat-chip"><strong>3</strong> 廃止 (D)</div>
+</div>
+
+<div class="section-divider">テンプレート (T) — 20件</div>
+
+<!-- #1 PC表 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#1</span>
+    <span class="card-title">PC表（プロダクトサイクル進捗表）</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/pc-template.html</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">全プロダクト共通の「工程管理表」の雛形。建設現場の工程表と同じで、企画→開発→販売準備→集客→計測の各フェーズで「何をやるか」「終わったか」「証拠は何か」を1枚のHTMLで管理する。全プロダクトがこの雛形をコピーして使うので、どの製品も同じフォーマットで進捗が見える。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>プロダクトの全フェーズ（P0〜P4）の進捗を管理するHTML表</td></tr>
+      <tr><th>Why</th><td>進捗を1箇所で管理し、抜け漏れ・虚偽完了・フェーズ飛ばしを防ぐ</td></tr>
+      <tr><th>Who</th><td>エージェントが作業ごとに更新 → マスターがゲート判定時に確認</td></tr>
+      <tr><th>When</th><td>プロダクト新設時にコピー。以降はタスク完了のたびに更新</td></tr>
+      <tr><th>Where</th><td>各プロダクトの pc-progress.html にコピー</td></tr>
+      <tr><th>How</th><td>{プロダクト名}を置換 → 各タスクの状態(○/△/×/skip)を更新 → rationaleに証跡を記入</td></tr>
+      <tr><th>How much</th><td>初回コピー: 5分。タスク完了ごとの更新: 1分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #2 設計書 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#2</span>
+    <span class="card-title">設計ドキュメントテンプレート集</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/design-doc.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「何を作るか」を開発前に整理するための書類の雛形集。料理で言えば「レシピ」を書くためのフォーマット。材料（機能）、手順（画面遷移）、完成イメージ（デザイン）を事前に決めておくことで、作り始めてから「思ってたのと違う」を防ぐ。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>設計書5種（PRD/デザインシステム/画面遷移/ペルソナ/検索設計）の雛形集</td></tr>
+      <tr><th>Why</th><td>設計なしに開発を始めると手戻りが大きい。書くべき項目が決まっていれば抜け漏れも防げる</td></tr>
+      <tr><th>Who</th><td>エージェントがコピーして記入 → マスターが確認・承認</td></tr>
+      <tr><th>When</th><td>P0（企画）でPRD・ペルソナ。P1（開発）でデザインシステム・画面遷移・検索設計</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/ にコピー</td></tr>
+      <tr><th>How</th><td>必要な種類のテンプレをコピー → {…} 部分をプロダクト固有の内容に記入</td></tr>
+      <tr><th>How much</th><td>PRD: 2〜3時間。デザインシステム: 1時間。画面遷移: 1〜2時間</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #3 外部サービス確認 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#3</span>
+    <span class="card-title">外部サービス確認テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/external-service-check.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">うちの製品が依存している他社サービス（GoogleのAI、Stripeの決済、Vercelのサーバー等）の「健康診断表」の雛形。それぞれの無料枠・上限・リスク・最近の仕様変更を一覧にして管理する。飲食店が「ガス・電気・食材卸」の契約内容と緊急連絡先をまとめた一覧表を持つのと同じ。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>プロダクトが依存する外部サービスの仕様・制限・リスクの一覧表の雛形</td></tr>
+      <tr><th>Why</th><td>無料枠超過・仕様変更・障害で突然止まるリスクを事前に把握する</td></tr>
+      <tr><th>Who</th><td>エージェントが記入 → マスターが確認（コスト判断が必要な項目は報告）</td></tr>
+      <tr><th>When</th><td>P1（開発フェーズ）の#7タスク。以降はデプロイ前・障害時に更新</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/external-service-check.md にコピー</td></tr>
+      <tr><th>How</th><td>サービスごとに8項目（SDK/旧SDK/エンドポイント/認証/無料枠/リスク/対応/確認日）を調査して記入</td></tr>
+      <tr><th>How much</th><td>1サービスあたり15〜30分。5サービスなら2時間程度</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #4 障害シナリオ -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#4</span>
+    <span class="card-title">障害シナリオ分析テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/failure-scenario.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「壊れたらどうなる？」を事前に全部洗い出すチェックシートの雛形。ビルの防災計画と同じで、「火事が起きたら？」「停電したら？」「水が止まったら？」を全パターン書き出して、対策を決めておく。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>全障害パスを洗い出す分析シート。7カテゴリ（認証/DB/外部API/AI/ホスティング/ネットワーク/データ整合性）</td></tr>
+      <tr><th>Why</th><td>本番で壊れてから慌てると対応が後手になる。事前に「こうなったらこうする」を決めておく</td></tr>
+      <tr><th>Who</th><td>エージェントが記入 → マスターが確認（致命的なものはP1で対応）</td></tr>
+      <tr><th>When</th><td>P1（開発フェーズ）の#12タスク「CL-3: 壊れたらどうなるか」</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/cl3-failure-scenarios.md にコピー</td></tr>
+      <tr><th>How</th><td>7カテゴリの表をコピー → チェック項目を見ながら自分のプロダクトに当てはめて記入</td></tr>
+      <tr><th>How much</th><td>1プロダクトあたり1〜2時間（コード読みながら記入）</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #5 納品テンプレ -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#5</span>
+    <span class="card-title">運用・納品テンプレート集</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/onboarding.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">お客さんに商品を渡すときの「渡し方マニュアル」の雛形集。ソフトウェアは作っただけでは使えないので、「アカウントの作り方」「使い方の説明書」等をセットで渡す必要がある。レストランの開店準備キット（メニュー表の雛形、スタッフ研修資料の雛形）のようなもの。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>納品時にクライアントへ渡す書類（セットアップ手順・操作マニュアル・PH Launch）の雛形3種</td></tr>
+      <tr><th>Why</th><td>納品のたびにゼロから書くと抜け漏れが出る。雛形をコピーすれば品質が安定する</td></tr>
+      <tr><th>Who</th><td>エージェントがコピーして記入 → マスターが確認 → クライアントに渡す</td></tr>
+      <tr><th>When</th><td>P2（販売準備フェーズ）の#23-24タスク</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/delivery/ にコピー</td></tr>
+      <tr><th>How</th><td>3種のテンプレ（①セットアップ手順 ②操作マニュアル ③PH Launch）をコピー → 記入</td></tr>
+      <tr><th>How much</th><td>1種あたり30分〜1時間。全3種で半日</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #6 テスト計画 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#6</span>
+    <span class="card-title">テスト計画テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/test-plan.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「この操作をしたら、こうなるはず」を全部書き出して、1つずつ確認するチェックシートの雛形。車の出荷前検査シートと同じで、「エンジンかかるか」「ブレーキ効くか」「ライト点くか」を項目ごとに○×つけていく。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>手動テストケースの計画書。7グループ（認証/ユーザー管理/コア機能/データ操作/外部連携/エラー/レスポンシブ）</td></tr>
+      <tr><th>Why</th><td>「動くはず」を「動いた」に変える。テストせずにリリースするとお客さんの前でバグが出る</td></tr>
+      <tr><th>Who</th><td>エージェントがテスト項目を記入+実行 → 結果を記録 → マスターに報告</td></tr>
+      <tr><th>When</th><td>P1（開発フェーズ）の#10-11タスク</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/test-plan.md にコピー</td></tr>
+      <tr><th>How</th><td>7グループのテンプレをコピー → 機能に合わせてテスト項目を記入 → 1件ずつ実行して結果列に記録</td></tr>
+      <tr><th>How much</th><td>テスト項目作成: 1時間。テスト実行: 機能数×10分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #7 メール -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#7</span>
+    <span class="card-title">メール自動送信 設計テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/email-template.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">アプリが自動でメールを送る仕組みの設計図の雛形。ECサイトで注文すると「ご注文ありがとうございます」メールが届くのと同じで、「いつ」「誰に」「何を」送るかを4種類（①登録完了 ②フォローアップ ③管理者通知 ④フォーム自動返信）に分類して設計する。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>アプリが自動送信するメール4種（ウェルカム/フォローアップ/管理者通知/自動返信）の設計テンプレ</td></tr>
+      <tr><th>Why</th><td>メール送信は全SaaSで必要。設計なしに作るとトリガー条件やエラー時の挙動が曖昧になる</td></tr>
+      <tr><th>Who</th><td>エージェントが設計 → 実装 → マスターがテスト確認</td></tr>
+      <tr><th>When</th><td>P2(販売準備フェーズ)の#20-21タスク</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/ にコピー</td></tr>
+      <tr><th>How</th><td>4種から必要なものを選び、トリガー条件・送信先・件名・本文・エラー時動作を記入</td></tr>
+      <tr><th>How much</th><td>1種あたり30分。4種全部で2時間</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #8 競合比較 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#8</span>
+    <span class="card-title">機能別競合比較表</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/feature-comparison.html</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">うちの製品と競合3〜5社を並べて「どの機能がある/ない」「いくらか」を比較する表の雛形。家電を買うときに価格.comで「機能・価格・スペック」を横並びで比較するのと同じ。企画フェーズで「うちの強み・弱み」を客観的に把握するために使う。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>自社 vs 競合3〜5社の機能・価格・コストを横並びで比較するHTML表</td></tr>
+      <tr><th>Why</th><td>競合との差別化ポイントを客観的に把握する。「多分勝てる」ではなく数字で判断</td></tr>
+      <tr><th>Who</th><td>エージェントが調査+記入 → マスターが確認・戦略判断</td></tr>
+      <tr><th>When</th><td>P0(企画フェーズ)の#5-12タスク</td></tr>
+      <tr><th>Where</th><td>各プロダクトにコピー</td></tr>
+      <tr><th>How</th><td>{プロダクト名}と競合名を置換 → 機能行を追加 → 価格・コスト試算を記入</td></tr>
+      <tr><th>How much</th><td>競合調査込みで3〜5時間。表の記入だけなら1時間</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #9 納品メッセージ -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#9</span>
+    <span class="card-title">クライアント納品メッセージ</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/client-credentials.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">お客さんに「あなたのログインIDとパスワードはこれです」と伝えるメッセージの雛形。鍵を渡すときに「玄関の鍵です。使い方は…」と一緒に説明書を添えるのと同じ。テキストチャネル（ココナラトーク等）にコピペして送る。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>クライアントにログイン情報を送付するためのコピペ用メッセージテンプレート</td></tr>
+      <tr><th>Why</th><td>毎回ゼロから書くと情報の抜け漏れが出る。雛形があれば「変数を埋めるだけ」で送れる</td></tr>
+      <tr><th>Who</th><td>エージェントが {{…}} を実際の値に置き換え → クライアントに送付</td></tr>
+      <tr><th>When</th><td>納品完了時。セットアップ作業が終わった直後</td></tr>
+      <tr><th>Where</th><td>ココナラトーク / LINE / メール等のテキストチャネル</td></tr>
+      <tr><th>How</th><td>テンプレをコピー → {{店舗名}} {{URL}} {{パスワード}} 等を実際の値に置換 → 送信</td></tr>
+      <tr><th>How much</th><td>コピペ+置換で1分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #10 QRガイド -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#10</span>
+    <span class="card-title">QRコード発行・設置ガイド</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/qr-guide.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">QRコードで端末にロール（役割）を割り当てるプロダクト向けの、クライアント配布用ガイドの雛形。店のテーブルにQRコードを貼っておいて、スマホで読み取ると注文画面が開く…のような仕組みの「設置説明書」。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>QRコードで端末にロールを割り当てるプロダクト向けの、クライアント配布用ガイド</td></tr>
+      <tr><th>Why</th><td>QR発行→印刷→設置の手順を1枚にまとめ、クライアントがセルフで端末セットアップできるようにする</td></tr>
+      <tr><th>Who</th><td>エージェントがコピー → プロダクト固有の内容に書き換え → クライアントに送付</td></tr>
+      <tr><th>When</th><td>納品時。ログイン情報（client-credentials）と一緒に渡す</td></tr>
+      <tr><th>Where</th><td>テキストチャネル or ブラウザで編集→印刷</td></tr>
+      <tr><th>How</th><td>{{…}} 部分をプロダクト固有の内容に置き換える</td></tr>
+      <tr><th>How much</th><td>コピペ+置換で3分。ロール定義のカスタマイズ込みで10分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #12 ヒアリング -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#12</span>
+    <span class="card-title">ヒアリングテンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/hearing-template.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">受託・納品型プロダクトで、購入後にクライアントから「店名は？」「業種は？」「口調の希望は？」等を聞き取るための質問リストの雛形。病院の問診票と同じで、必要な情報を漏れなく集めるためのフォーマット。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>受託・納品型プロダクトで、購入後にクライアントから情報を聞き取るためのテンプレート</td></tr>
+      <tr><th>Why</th><td>聞き漏れ防止。毎回ゼロから質問を考えると抜けが出る</td></tr>
+      <tr><th>Who</th><td>エージェントがコピー → クライアントに送信（ココナラトーク/メール等）</td></tr>
+      <tr><th>When</th><td>購入成立直後。納品作業の最初のステップ</td></tr>
+      <tr><th>Where</th><td>ココナラトークルーム / メール / チャット等のテキストチャネル</td></tr>
+      <tr><th>How</th><td>{{…}} 部分をプロダクト固有の内容に置き換えてから使う</td></tr>
+      <tr><th>How much</th><td>コピペ+置換で1分。クライアント回答待ち: 1〜3営業日</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #14 収益モデル -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#14</span>
+    <span class="card-title">収益モデル+損益計算テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/revenue-model.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「どうやって稼ぐか」「いくらで売るか」「いくらかかるか」を1枚にまとめる記入表の雛形。毎回ゼロから考えると抜け漏れが出る。このテンプレを埋めれば、収益構造が一目で分かる。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>収益モデル・価格設定・コスト構造・損益分岐点を1枚にまとめるテンプレート</td></tr>
+      <tr><th>Why</th><td>ビジネスモデルの前提を数字で押さえないと、集客しても黒字化しない</td></tr>
+      <tr><th>Who</th><td>エージェントが記入 → マスターが数値を確認・承認</td></tr>
+      <tr><th>When</th><td>P0(企画フェーズ)の収益モデル検討時</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/ にコピー</td></tr>
+      <tr><th>How</th><td>収益源・単価・ランニングコスト・損益分岐点数を記入</td></tr>
+      <tr><th>How much</th><td>初回作成: 1〜2時間</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #16 即死仮説検証 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#16</span>
+    <span class="card-title">即死仮説 検証記録テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/hypothesis-verification.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「これがウソなら商売が成り立たない」という最重要の前提（即死仮説）を、実際に動くコードで数値検証した結果を記録する表。感覚ではなく「基準値X、実測値Y、差Z%」で合否を判定する。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>プロダクトの生命線となる仮説を実コードで検証・数値記録するテンプレート</td></tr>
+      <tr><th>Why</th><td>仮説が机上の空論のまま開発が進むと、全部作った後で根本から崩れるリスクがある</td></tr>
+      <tr><th>Who</th><td>エージェントが検証コードを書き → 実測 → 記録 → マスターが合否判定</td></tr>
+      <tr><th>When</th><td>P1(開発フェーズ)の#9aタスク</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/hypothesis-verification.md にコピー</td></tr>
+      <tr><th>How</th><td>仮説を明文化 → 基準値を設定 → 最小コードで実測 → 結果を表に記録</td></tr>
+      <tr><th>How much</th><td>仮説1つあたり半日〜1日</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #17 ログ・監視設計 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#17</span>
+    <span class="card-title">ログ・監視設計テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/monitoring-design.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「壊れたとき、どうやって気づくか」の設計書の雛形。エラーログの保存先・アラートの発火条件・死活監視の方法を決める。これがないと障害が起きても誰も気づかない。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>エラーログ・アラート・死活監視の設計テンプレート</td></tr>
+      <tr><th>Why</th><td>障害検知の仕組みがないと、お客さんの苦情で初めて気づくことになる</td></tr>
+      <tr><th>Who</th><td>エージェントが設計 → 実装 → マスターが発火条件を承認</td></tr>
+      <tr><th>When</th><td>P1(開発フェーズ)の#9bタスク</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/ にコピー</td></tr>
+      <tr><th>How</th><td>監視対象・保存先・アラート条件・通知先を記入</td></tr>
+      <tr><th>How much</th><td>初回設計: 1〜2時間</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #18 性能ベースライン -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#18</span>
+    <span class="card-title">性能ベースライン計測表テンプレート</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/performance-baseline.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「今どれくらいの速さで動いているか」を記録する表の雛形。ページ表示○秒、API応答○秒、エラー率○%。P4で「遅くなってないか」を確認するときの比較元になる。基準がないと劣化に気づけない。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>プロダクト稼働時の性能指標（レイテンシ・エラー率・スループット）の基準値テンプレート</td></tr>
+      <tr><th>Why</th><td>リリース後の劣化を検知するには、リリース時点の基準値が必要</td></tr>
+      <tr><th>Who</th><td>エージェントが計測 → 記録 → P4で比較運用</td></tr>
+      <tr><th>When</th><td>P1(開発フェーズ)の#9cタスク。以降P4で定点観測</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/ にコピー</td></tr>
+      <tr><th>How</th><td>計測対象・計測方法・基準値・許容劣化率を記入</td></tr>
+      <tr><th>How much</th><td>初回計測: 1時間。定点観測: 15分/回</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #21 マーケトラッカー -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#21</span>
+    <span class="card-title">マーケティングトラッカー</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/marketing-tracker.xlsx</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">集客施策の結果を記録する表（Excel）の雛形。SNS投稿・広告出稿・記事執筆の結果（表示数・クリック・コンバージョン）を1行ずつ記録して、効果のある施策を見える化する。旧Markdown版は deprecated（Session 169で xlsx に移行）。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>集客施策の効果を日次/週次で記録する Excel トラッカー</td></tr>
+      <tr><th>Why</th><td>Markdown表では数式・集計が使えず、集客分析の粒度が粗かった</td></tr>
+      <tr><th>Who</th><td>エージェントが記入 → マスターが効果判定</td></tr>
+      <tr><th>When</th><td>P3(集客フェーズ)の開始時にコピー。以降は施策実行ごとに追記</td></tr>
+      <tr><th>Where</th><td>各プロダクトにコピー or monetization.xlsx に統合</td></tr>
+      <tr><th>How</th><td>施策種別・日付・指標・結果を行追加で記録</td></tr>
+      <tr><th>How much</th><td>1施策あたり5分の追記</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #22 P4計測 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#22</span>
+    <span class="card-title">P4計測トラッカー</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/p4-measurement.xlsx</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">P4(計測フェーズ)で定点観測する指標を記録する表(Excel)の雛形。売上・利用者数・継続率・満足度等のKPIを月次で記録。旧Markdown版は deprecated(Session 169で xlsx に移行)。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>P4計測フェーズで継続的に観測するKPIの Excel トラッカー</td></tr>
+      <tr><th>Why</th><td>運用後の定点観測で、事業のヘルスチェックを定量化する</td></tr>
+      <tr><th>Who</th><td>エージェントが月次で記入 → マスターがトレンド判定</td></tr>
+      <tr><th>When</th><td>P4(計測フェーズ)の開始時。以降は月次更新</td></tr>
+      <tr><th>Where</th><td>各プロダクトにコピー</td></tr>
+      <tr><th>How</th><td>指標・計測日・実測値を行追加で記録</td></tr>
+      <tr><th>How much</th><td>月次1回あたり30分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #27 サムネガイド -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#27</span>
+    <span class="card-title">サムネイル お手本 黄金律ガイド v2.0</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/thumbnail-master-guide.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">サムネイルお手本(#26)の運用解説。5原則（構図/配置/文字数/配色/階層）を全プロダクト共通の基礎として定義。アクセント色の分散禁止・中央集約型・ジャンプ率211:119:43 等の数値ルールを含む。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>サムネイル制作の基礎原則5つと適用ガイド</td></tr>
+      <tr><th>Why</th><td>プロダクト間でサムネ品質にばらつきが出ないよう、共通ルールで統制</td></tr>
+      <tr><th>Who</th><td>エージェントが参照しながらサムネ制作</td></tr>
+      <tr><th>When</th><td>サムネ制作時（create-image スキル STEP 2 で参照）</td></tr>
+      <tr><th>Where</th><td>参照のみ。コピーは不要</td></tr>
+      <tr><th>How</th><td>制作前にガイドを読み、原則に沿って配色・文字数を決める</td></tr>
+      <tr><th>How much</th><td>ガイド通読: 10分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #32 LPコピー黄金律ガイド -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#32</span>
+    <span class="card-title">LPコピー黄金律 統合ガイド</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/lp-golden-rules-guide.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">#31 チェックリストの根拠となる詳細解説。VWO/Landingi/Unbounce 3出典URL・構成フレームワーク(痛点→ベネフィット→差別化→反論対処→社会的証明→CTA)・見出し/本文/社会的証明/CTAそれぞれの黄金律・失敗パターン・実証データ(A/Bテスト事例)・日本語言い換え例(違反例→修正例)を収録。旧 docs/ops/lp-design-sop.md §4 の内容を吸収して一本化。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>LPコピー黄金律の根拠・出典・実証データ・日本語言い換え例をまとめた統合ガイド</td></tr>
+      <tr><th>Why</th><td>チェックリストの判定に迷った時、なぜその項目が必要かを出典付きで確認できるようにする</td></tr>
+      <tr><th>Who</th><td>エージェントが #31 で△❌判定になった項目の根拠・直し方を調べる時に参照</td></tr>
+      <tr><th>When</th><td>LP制作時・コピー修正時に該当ブロックのみ参照</td></tr>
+      <tr><th>Where</th><td>参照のみ。コピー不要</td></tr>
+      <tr><th>How</th><td>チェックリストの該当ブロック番号(A〜H)からガイドの対応セクションを引く</td></tr>
+      <tr><th>How much</th><td>該当セクションのみ参照: 3〜5分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #30 ココナラ出品文ライター -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#30</span>
+    <span class="card-title">ココナラ出品文ライター ロールプロンプト v1.0</span>
+    <span class="card-cat cat-t">T</span>
+    <span class="card-path">docs/standards/templates/coconala-listing-writer.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">マスターから「リサーチ結果(6要素)＋製品情報(会話文脈)」を受け取り、ココナラに投稿できる出品文フルセット(タイトル3案・キャッチ2案・サムネテキスト・本文・セルフチェック)を生成するロールプロンプト。create-text スキル STEP 2 分岐「Claude Code 内ベスプラ参照」の対象。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>ディープリサーチ結果＋製品情報から出品文フルセットを成形するロール定義</td></tr>
+      <tr><th>Why</th><td>リサーチ結果が毎回同じ6要素構造で渡される前提を固定し、出力品質を安定化</td></tr>
+      <tr><th>Who</th><td>create-text スキル発火時、本ロールを読み込んでClaude が成形</td></tr>
+      <tr><th>When</th><td>マスターがディープリサーチ結果を渡し「出品文書け」と指示したとき</td></tr>
+      <tr><th>Where</th><td>参照のみ。成果物は journal/monetization/listings/ 配下に保存</td></tr>
+      <tr><th>How</th><td>STEP1 情報確認 → STEP2 構造マッピング → STEP3 フルセット生成 → STEP4 セルフチェック</td></tr>
+      <tr><th>How much</th><td>1出品あたり30分〜1時間(修正ループ込み)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section-divider">ボイラープレート (B) — 3件</div>
+
+<!-- #13 OGP -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#13</span>
+    <span class="card-title">OGP画像テンプレート</span>
+    <span class="card-cat cat-b">B</span>
+    <span class="card-path">docs/standards/boilerplate/og-image-template.html</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">LINEやXでURLをシェアした時に表示されるサムネイル画像の元HTML。ブラウザで開いてスクリーンショットを撮り、それをLPに設定すると、URLを貼った時にテキストリンクではなく画像付きカードが表示される。集客導線の見栄えを良くする部品。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>SNSでURLをシェアした時に表示されるサムネイル画像の元HTML(1200×630px)</td></tr>
+      <tr><th>Why</th><td>画像付きカードはテキストリンクよりクリック率が高い。全LPで必要</td></tr>
+      <tr><th>Who</th><td>エージェントがコピーして編集 → スクショ → OGP画像として使用</td></tr>
+      <tr><th>When</th><td>LP制作時(P2)。デプロイ前にOGP画像を用意する</td></tr>
+      <tr><th>Where</th><td>各プロダクトの lp/public/ に og-image.png として配置</td></tr>
+      <tr><th>How</th><td>EDIT HERE の箇所をプロダクト固有の内容に置換 → ブラウザでスクショ → meta og:image で指定</td></tr>
+      <tr><th>How much</th><td>編集+スクショで5分。デザイン調整込みで15分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #20 利用規約/プラポリ -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#20</span>
+    <span class="card-title">利用規約・プライバシーポリシー・免責事項テンプレート</span>
+    <span class="card-cat cat-b">B</span>
+    <span class="card-path">docs/standards/boilerplate/legal-template.html</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">「このサービスを使う上でのルール」を書く雛形。特商法・プライバシーポリシー・利用規約・免責事項。法律で必要な項目が穴埋め式（{{}}）で並んでいて、埋めれば完成する。毎回ゼロから書くと必要な条文を見落とす。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>利用規約(9条)+プライバシーポリシー(5条)+免責事項の穴埋めHTMLテンプレート</td></tr>
+      <tr><th>Why</th><td>法令遵守のために必要な条文を毎回書き直さない。書き忘れも防止</td></tr>
+      <tr><th>Who</th><td>エージェントが {{}} を埋める → マスターが確認・承認</td></tr>
+      <tr><th>When</th><td>P2(販売準備フェーズ)のLP制作時・利用規約ページ作成時</td></tr>
+      <tr><th>Where</th><td>各プロダクトの lp/public/terms.html としてコピー</td></tr>
+      <tr><th>How</th><td>事業者名・サービス名・連絡先等の {{}} を埋めて完成</td></tr>
+      <tr><th>How much</th><td>穴埋め: 15分。カスタマイズ込みで30分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #26 サムネお手本 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#26</span>
+    <span class="card-title">サムネイル お手本 v2.0（全プロダクト共通・最初の1枚）</span>
+    <span class="card-cat cat-b">B</span>
+    <span class="card-path">docs/standards/boilerplate/thumbnail-master.html</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">全プロダクトが最初に使うサムネイルの雛形HTML。中央集約型・1220×1240縦長・パープル×バイオレット×ゴールド・比率70:25:5。v2.0で左55右45二分割を廃止し中央集約型に転換(2026-04-09、DSL設計コース実装過程で承認)。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>サムネイル制作の最初の1枚として参照する HTML お手本</td></tr>
+      <tr><th>Why</th><td>プロダクト間のブランド統一。文言・色は時と場合で変えるが、骨格はこの1枚から</td></tr>
+      <tr><th>Who</th><td>エージェントがコピーして文言を差し替え → ブラウザでスクショ</td></tr>
+      <tr><th>When</th><td>プロダクト新設時の最初のサムネ・ココナラ出品時</td></tr>
+      <tr><th>Where</th><td>各プロダクトのサムネ用HTMLとしてコピー</td></tr>
+      <tr><th>How</th><td>本HTMLをコピー → 文言のみ差し替え → 構図・色は崩さない</td></tr>
+      <tr><th>How much</th><td>文言差し替え: 10分。配色カスタムまで含め30分</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section-divider">チェックリスト (C) — 5件</div>
+
+<!-- #11 デプロイ -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#11</span>
+    <span class="card-title">Vercel デプロイ前チェックリスト</span>
+    <span class="card-cat cat-c">C</span>
+    <span class="card-path">docs/standards/checklists/deploy-checklist.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">Vercel(サーバー)にアプリを公開する前の「飛行前チェックリスト」の雛形。パイロットが離陸前に「燃料よし、計器よし、フラップよし」と確認するのと同じで、「環境変数よし、APIキーよし、ビルドよし」を1つずつ確認してから公開する。これをやらないと、公開した瞬間に動かない事故が起きる。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>Vercelデプロイ前に確認すべき環境変数・設定・ビルドのチェックリスト</td></tr>
+      <tr><th>Why</th><td>環境変数の設定漏れ1つでアプリが起動不可になる。デプロイ前に全数確認で事故防止</td></tr>
+      <tr><th>Who</th><td>エージェントがチェック実行 → 全項目OK確認 → デプロイ実行</td></tr>
+      <tr><th>When</th><td>毎回のVercelデプロイ直前。初回はP1で雛形を記入、以降はデプロイ前に参照</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/ にコピー</td></tr>
+      <tr><th>How</th><td>環境変数を1つずつ確認(必須/任意/取得元) → ビルド確認 → デプロイ実行 → 動作確認</td></tr>
+      <tr><th>How much</th><td>初回記入: 30分。以降のデプロイ前チェック: 5分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #19 SEO -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#19</span>
+    <span class="card-title">SEO設定チェックリスト</span>
+    <span class="card-cat cat-c">C</span>
+    <span class="card-path">docs/standards/checklists/seo-checklist.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">Googleに見つけてもらうための設定を、ページごとに1つずつ確認する表。title・description・OGP・JSON-LD・canonicalの5項目×全ページ。設定漏れ=検索に出ない・SNSでサムネが出ない。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>SEO必須5項目×全ページの設定確認チェックリスト</td></tr>
+      <tr><th>Why</th><td>各項目の漏れで検索順位低下・SNSでの表示崩れが発生する</td></tr>
+      <tr><th>Who</th><td>エージェントがページごとにチェック → マスターが公開前確認</td></tr>
+      <tr><th>When</th><td>P2(販売準備フェーズ)の#5-8タスク</td></tr>
+      <tr><th>Where</th><td>各プロダクトの docs/ にコピー</td></tr>
+      <tr><th>How</th><td>5項目(title/description/OGP/JSON-LD/canonical)をページごとに○×記録</td></tr>
+      <tr><th>How much</th><td>1ページあたり10分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #23 運用エリア新設 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#23</span>
+    <span class="card-title">運用エリア新設チェックリスト</span>
+    <span class="card-cat cat-c">C</span>
+    <span class="card-path">docs/standards/checklists/area-setup-checklist.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">新しい運用エリア(docs/ops/{area}/)を作るときに使う4点セットのチェックリスト。全項目を完了しないと、hookがファイル書込をブロックする。運用エリア新設時の必須工程。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>運用エリア新設時に揃える4つの成果物(SOP/テンプレ/hook/ドキュメント)のチェックリスト</td></tr>
+      <tr><th>Why</th><td>運用エリアを雑に作ると後続エージェントが迷子になる。4点セットで最低限の動線を担保</td></tr>
+      <tr><th>Who</th><td>エージェントが全項目完了 → hookが検証 → OKなら運用開始</td></tr>
+      <tr><th>When</th><td>新運用エリア追加時(research-bank、listings 等の新設時)</td></tr>
+      <tr><th>Where</th><td>該当運用エリアの作業前に参照</td></tr>
+      <tr><th>How</th><td>4点セットを1つずつ揃える → hookで検証 → 完了宣言</td></tr>
+      <tr><th>How much</th><td>1エリア新設あたり2〜4時間</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #25 サムネ黄金律 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#25</span>
+    <span class="card-title">サムネイル黄金律チェックリスト</span>
+    <span class="card-cat cat-c">C</span>
+    <span class="card-path">docs/standards/checklists/thumbnail-golden-rules.html</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">サムネイル制作に関する広範な調査レポート。3秒ルール/ココナラ特性/Fiverr/バナーCTR/視線誘導/出品物特性等を網羅。制作前に参照すると品質の底上げができる。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>サムネ制作の原則を網羅した調査レポート + チェックリスト</td></tr>
+      <tr><th>Why</th><td>クリック率の高いサムネには共通パターンがある。原則を押さえずに作ると闇雲になる</td></tr>
+      <tr><th>Who</th><td>エージェントが制作前に読む</td></tr>
+      <tr><th>When</th><td>サムネ制作時(create-image スキル STEP 2 で参照候補)</td></tr>
+      <tr><th>Where</th><td>参照のみ。コピー不要</td></tr>
+      <tr><th>How</th><td>制作前に通読し、該当項目を意識して制作</td></tr>
+      <tr><th>How much</th><td>通読: 15分</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- #31 LPコピー黄金律 -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#31</span>
+    <span class="card-title">LPコピー黄金律チェックリスト</span>
+    <span class="card-cat cat-c">C</span>
+    <span class="card-path">docs/standards/checklists/lp-golden-rules-checklist.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">VWO/Landingi/Unbounce の3ソースを横断して抽出したLPコピーライティングの黄金律を、8ブロックA〜H・39項目のチェックボックスにしたもの。LP実装の前後でコピーを自己点検する。焦点(Rule of One)・見出し・本文・社会的証明・CTA・構成・信頼・技術計測を網羅。根拠の詳細は #32 統合ガイド。products/homepage/anthropic-t5 の作業から汎用化して昇格。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>3ソース横断のLPコピー黄金律を8ブロック39項目にしたチェックリスト</td></tr>
+      <tr><th>Why</th><td>コピーはLPコンバージョンの約7割を占める。原則を機械的に照合し金太郎飴コピー・自分語り・証拠なき主張を排除</td></tr>
+      <tr><th>Who</th><td>エージェントがLP実装の前後で自己点検 → 未達項目を修正</td></tr>
+      <tr><th>When</th><td>LP制作時(web-design フロー)・提出前のコピー自己採点</td></tr>
+      <tr><th>Where</th><td>参照のみ。コピー不要</td></tr>
+      <tr><th>How</th><td>各項目を ✅/△/❌ で判定 → △❌ を潰す → 根拠が要る時は #32 ガイドを参照</td></tr>
+      <tr><th>How much</th><td>1LPあたり点検15〜20分</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section-divider">運用 (O) — 1件</div>
+
+<!-- #29 monetization.xlsx -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#29</span>
+    <span class="card-title">monetization.xlsx（マネタイズ作戦 SSoT）</span>
+    <span class="card-cat cat-o">O</span>
+    <span class="card-path">monetization.xlsx（repo root・例外配置）</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">マネタイズ作戦の単一情報源(SSoT)。出品マスタ・日次売上・履歴・ABC分析・カテゴリ・戦略・パイプライン・メモの9シート統合。Session 169新設。repo root に配置する例外扱い(通常は docs/standards/ 配下が原則)。</div>
+    <table class="wh-table">
+      <tr><th>What</th><td>マネタイズ運用(出品・販売・分析・戦略)の単一正本Excel</td></tr>
+      <tr><th>Why</th><td>旧Deta.xlsx・個別メモ・catalog等が散在していたのを1つに統合。記述矛盾時は本ファイルが正</td></tr>
+      <tr><th>Who</th><td>vibe-base 司令塔のみ書き込み可。他エージェントは読み専用</td></tr>
+      <tr><th>When</th><td>セッション開始時の catalog シート確認が必須。出品・価格・販売分析に着手する前</td></tr>
+      <tr><th>Where</th><td>repo root(例外配置)</td></tr>
+      <tr><th>How</th><td>scripts/monetization/build.py で生成。sync.py で更新</td></tr>
+      <tr><th>How much</th><td>初回読込: 5分。日次更新: 10分</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section-divider">廃止 (D) — 3件</div>
+
+<!-- #15 site-measurement 廃止 -->
+<div class="card deprecated">
+  <div class="card-header">
+    <span class="card-num">#15</span>
+    <span class="card-title">サイト計測テンプレート（廃止）</span>
+    <span class="card-cat cat-d">D</span>
+    <span class="card-path">docs/standards/templates/site-measurement.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">v16で廃止。measure-site.mjs v4 が自動生成に置換。サイト計測は `.playwright-mcp/` 配下のツール連携で自動化された。</div>
+  </div>
+</div>
+
+<!-- #24 components 廃止 -->
+<div class="card deprecated">
+  <div class="card-header">
+    <span class="card-num">#24</span>
+    <span class="card-title">コンポーネント一覧テンプレート（廃止）</span>
+    <span class="card-cat cat-d">D</span>
+    <span class="card-path">docs/standards/templates/components.md</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">v16で廃止。measure-site.mjs v4 が components.json を自動生成に置換。</div>
+  </div>
+</div>
+
+<!-- #28 ABC分析 廃止 -->
+<div class="card deprecated">
+  <div class="card-header">
+    <span class="card-num">#28</span>
+    <span class="card-title">ABC分析テンプレート（廃止）</span>
+    <span class="card-cat cat-d">D</span>
+    <span class="card-path">docs/standards/templates/abc-analysis-template.xlsx</span>
+  </div>
+  <div class="card-body">
+    <div class="plain">Session 169で廃止。monetization.xlsx の abc-analysis シートに統合。SSoT 一元化のため単独VESTは削除。</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

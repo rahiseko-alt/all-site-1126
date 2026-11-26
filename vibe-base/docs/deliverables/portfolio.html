@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技術ポートフォリオ</title>
+<style>
+  :root{
+    --ink:oklch(23% .014 255);
+    --sub:oklch(48% .018 255);
+    --muted:oklch(97.4% .006 90);
+    --paper:oklch(99.3% .003 90);
+    --line:oklch(86% .01 90);
+    --line-strong:oklch(68% .016 255);
+    --link:oklch(45% .11 238);
+    --sel:oklch(94.5% .025 226);
+    --ok:oklch(43% .09 155);
+    --warn:oklch(48% .1 70);
+    --code-bg:oklch(95.5% .01 250);
+    --human-bg:oklch(96% .032 22);
+    --human-ink:oklch(44% .13 25);
+    --system-bg:oklch(95% .03 238);
+    --system-ink:oklch(42% .12 242);
+    --focus:oklch(55% .15 240);
+  }
+  *{box-sizing:border-box}
+  html{background:var(--paper);overflow-x:clip;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI",sans-serif;
+    line-height:1.78;
+    overflow-wrap:anywhere;
+    overflow-x:clip;
+  }
+  .layout{
+    width:min(1440px,100%);
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:minmax(272px,320px) minmax(0,1fr);
+    min-height:100vh;
+  }
+  .nav{
+    border-right:1px solid var(--line);
+    padding:32px 22px 48px;
+    position:sticky;
+    top:0;
+    align-self:start;
+    max-height:100vh;
+    overflow:auto;
+  }
+  .nav-disclosure summary{display:none;}
+  .nav-content{min-width:0;}
+  .nav h1{
+    font-size:18px;
+    line-height:1.35;
+    margin:0 0 8px;
+    padding:0 10px;
+    letter-spacing:0;
+  }
+  .nav .lead{
+    margin:0 0 24px;
+    padding:0 10px;
+    color:var(--sub);
+    font-size:12.5px;
+    line-height:1.65;
+  }
+  .nav .group-label{
+    margin:28px 10px 8px;
+    font-size:10px;
+    color:var(--sub);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  .nav ul{list-style:none;margin:0;padding:0;}
+  .nav li{margin:0;}
+  .nav a{
+    display:block;
+    padding:9px 10px;
+    font-size:13px;
+    color:var(--ink);
+    text-decoration:none;
+    border-radius:0;
+    border-left:2px solid transparent;
+    cursor:pointer;
+    line-height:1.45;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .nav a:hover{background:var(--code-bg);}
+  .nav a:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+  .nav a:active{background:var(--line);}
+  .nav a.active{background:var(--sel);border-left-color:var(--link);color:var(--link);font-weight:700;}
+  .detail{
+    min-width:0;
+    width:min(100%,1040px);
+    padding:48px clamp(28px,5vw,72px) 88px;
+  }
+  .eyebrow{
+    margin:0 0 10px;
+    color:var(--sub);
+    font-family:Consolas,"SFMono-Regular",monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    font-weight:800;
+    text-transform:uppercase;
+  }
+  h2{
+    max-width:26ch;
+    font-size:clamp(26px,3.3vw,40px);
+    line-height:1.25;
+    margin:0 0 30px;
+    letter-spacing:0;
+    text-wrap:balance;
+    overflow-wrap:anywhere;
+  }
+  h3{
+    font-size:18px;
+    line-height:1.45;
+    margin:0 0 10px;
+    letter-spacing:0;
+  }
+  .summary{
+    font-size:15.5px;
+    color:#303238;
+    margin:0 0 26px;
+    max-width:68ch;
+  }
+  .block{
+    margin:0 0 26px;
+    padding:0 0 26px;
+    border-bottom:1px solid var(--line);
+  }
+  .block:last-child{border-bottom:none;}
+  .k{
+    font-size:12px;
+    color:var(--sub);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    font-weight:800;
+    margin:0 0 8px;
+  }
+  .v{font-size:14.5px;color:#303238;margin:0;}
+  code{
+    background:var(--code-bg);
+    padding:2px 6px;
+    border-radius:5px;
+    font-family:Consolas,monospace;
+    font-size:12.5px;
+    color:var(--link);
+  }
+  .note{
+    color:var(--sub);
+    font-size:13px;
+    margin:10px 0 0;
+  }
+  .demo-link{color:var(--ok);text-decoration:none;font-weight:700;}
+  .demo-link:hover{text-decoration:underline;}
+  .demo-note{font-size:12.5px;color:var(--sub);margin-top:6px;}
+  .proof-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+    margin:22px 0 0;
+  }
+  .proof{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:13px 14px;
+    background:var(--muted);
+  }
+  .proof b{display:block;font-size:13.5px;margin-bottom:4px;}
+  .proof span{display:block;font-size:12.5px;color:var(--sub);line-height:1.55;}
+  .flow{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+    margin:16px 0 0;
+  }
+  .flow-step{
+    position:relative;
+    min-width:0;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:8px;
+    padding:11px 12px;
+  }
+  .flow-step:not(:last-child)::after{
+    content:"";
+    position:absolute;
+    right:-8px;
+    top:50%;
+    width:10px;
+    height:10px;
+    border-top:2px solid var(--line);
+    border-right:2px solid var(--line);
+    transform:translateY(-50%) rotate(45deg);
+    background:var(--paper);
+  }
+  .flow-step:nth-child(3n)::after{display:none;}
+  .flow-step b{display:block;font-size:13.5px;line-height:1.45;}
+  .flow-step span{display:block;margin-top:4px;font-size:12px;color:var(--sub);line-height:1.55;}
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-top:18px;
+  }
+  .card{
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    padding:16px;
+  }
+  .card .tag{
+    display:inline-block;
+    color:var(--warn);
+    background:#fff8e8;
+    border:1px solid #f0dfbd;
+    border-radius:999px;
+    padding:2px 8px;
+    font-size:11px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .card p{margin:0;color:#333;font-size:13.5px;line-height:1.65;}
+  .process{
+    counter-reset:step;
+    display:grid;
+    gap:12px;
+    margin-top:18px;
+  }
+  .process-item{
+    display:grid;
+    grid-template-columns:44px minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+  }
+  .process-item::before{
+    counter-increment:step;
+    content:counter(step);
+    display:grid;
+    place-items:center;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:var(--sel);
+    color:var(--link);
+    font-weight:800;
+  }
+  .process-item b{display:block;font-size:14.5px;margin-bottom:2px;}
+  .process-item span{display:block;font-size:13px;color:var(--sub);line-height:1.65;}
+  .callout{
+    border-top:1px solid var(--line-strong);
+    background:transparent;
+    padding:16px 0 0;
+    margin:28px 0 0;
+    border-radius:0;
+    color:var(--sub);
+    font-size:12.5px;
+  }
+  .case-layout{
+    display:grid;
+    grid-template-columns:minmax(0,.86fr) minmax(420px,1fr);
+    gap:26px;
+    align-items:start;
+  }
+  .case-layout.video-only{
+    display:block;
+  }
+  .case-main,
+  .case-side{min-width:0;}
+  .case-side{
+    position:sticky;
+    top:28px;
+    display:grid;
+    gap:34px;
+  }
+  .case-layout.video-only .case-side{
+    position:static;
+  }
+  .side-panel{
+    border:0;
+    border-top:3px solid var(--ink);
+    border-bottom:1px solid var(--line);
+    border-radius:0;
+    background:transparent;
+    padding:22px 0 24px;
+  }
+  .side-panel h3{
+    margin:0 0 12px;
+    font-size:14px;
+    font-family:Consolas,"SFMono-Regular",monospace;
+    letter-spacing:.05em;
+  }
+  .side-panel p{
+    margin:0;
+    color:var(--ink);
+    font-size:14.5px;
+    line-height:1.85;
+    max-width:78ch;
+  }
+  .metric-row{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:0;
+    margin-top:24px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .metric{
+    min-width:0;
+    border:0;
+    border-right:1px solid var(--line);
+    border-radius:0;
+    background:transparent;
+    padding:14px 14px 13px;
+  }
+  .metric:last-child{border-right:0;}
+  .metric b{
+    display:block;
+    font-family:Consolas,"SFMono-Regular",monospace;
+    font-size:18px;
+    line-height:1.25;
+    color:var(--ink);
+  }
+  .metric span{display:block;margin-top:5px;color:var(--sub);font-size:10.5px;line-height:1.5;}
+  .side-panel .note{
+    margin-top:16px;
+    color:var(--sub);
+    font-size:12px;
+    line-height:1.7;
+  }
+  .vd-panel{
+    border-radius:0;
+    background:transparent;
+    padding:0;
+  }
+  .vd-panel h3{
+    margin:0 0 12px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line-strong);
+    font-family:Consolas,"SFMono-Regular",monospace;
+    font-size:13px;
+    letter-spacing:.05em;
+  }
+  .vd-flow{
+    display:grid;
+    gap:4px;
+    margin:0;
+    padding:0;
+    list-style:none;
+    counter-reset:flow-step;
+  }
+  .vd-step{
+    display:grid;
+    grid-template-columns:minmax(210px,.72fr) minmax(0,1.45fr);
+    gap:0;
+    min-width:0;
+    counter-increment:flow-step;
+  }
+  .vd-left,
+  .vd-right{
+    min-width:0;
+    border:0;
+    border-radius:0;
+    padding:15px 17px;
+  }
+  .vd-step.human .vd-left,
+  .vd-step.human .vd-right{
+    background:var(--human-bg);
+  }
+  .vd-step.ai .vd-left,
+  .vd-step.ai .vd-right{
+    background:var(--system-bg);
+  }
+  .vd-left{border-right:1px solid color-mix(in oklch,var(--ink) 11%,transparent);}
+  .vd-left b,
+  .vd-right b{display:block;font-size:12.5px;line-height:1.45;}
+  .vd-left b::before{
+    content:counter(flow-step,decimal-leading-zero) "  ";
+    font-family:Consolas,"SFMono-Regular",monospace;
+    font-size:10px;
+    color:var(--sub);
+  }
+  .vd-step.human .vd-left b{color:var(--human-ink);}
+  .vd-step.ai .vd-left b{color:var(--system-ink);}
+  .vd-left span{
+    display:block;
+    margin-top:6px;
+    color:var(--sub);
+    font-size:11.5px;
+    line-height:1.55;
+  }
+  .vd-right p{
+    margin:7px 0 0;
+    color:var(--ink);
+    font-size:12px;
+    line-height:1.7;
+  }
+  .vd-right code{
+    background:transparent;
+    padding:0;
+    border-radius:0;
+    color:inherit;
+  }
+  @media(max-width:48rem){
+    .layout{grid-template-columns:1fr;}
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:10;
+      max-height:100vh;
+      border-right:none;
+      border-bottom:1px solid var(--line);
+      padding:0;
+      background:color-mix(in oklch,var(--paper) 94%,transparent);
+      backdrop-filter:blur(12px);
+    }
+    .nav-disclosure summary{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      min-height:48px;
+      padding:0 18px;
+      color:var(--ink);
+      font-size:12px;
+      font-weight:700;
+      cursor:pointer;
+      list-style:none;
+    }
+    .nav-disclosure summary::-webkit-details-marker{display:none;}
+    .nav-disclosure summary::after{content:"＋";font-size:16px;font-weight:400;}
+    .nav-disclosure[open] summary::after{content:"−";}
+    .nav-disclosure summary:focus-visible{outline:2px solid var(--focus);outline-offset:-3px;}
+    .nav-disclosure summary:active{background:var(--code-bg);}
+    .nav-content{
+      max-height:calc(100vh - 49px);
+      overflow:auto;
+      padding:18px 14px 28px;
+      border-top:1px solid var(--line);
+      background:var(--paper);
+    }
+    .nav h1{font-size:16px;}
+    .nav .lead{margin-bottom:18px;}
+    .nav .group-label{margin-top:20px;}
+    .detail{padding:32px 18px 56px;}
+    h2{font-size:clamp(25px,8vw,34px);word-break:normal;}
+    .flow{display:grid;grid-template-columns:1fr;}
+    .flow-step:nth-child(3n)::after{display:block;}
+    .flow-step:not(:last-child)::after{
+      right:50%;
+      top:auto;
+      bottom:-8px;
+      transform:translateX(50%) rotate(135deg);
+    }
+    .process-item{grid-template-columns:38px minmax(0,1fr);}
+    .case-layout{grid-template-columns:1fr;}
+    .case-side{position:static;}
+    .vd-step{grid-template-columns:1fr;}
+    .vd-left{border-right:0;border-bottom:1px solid color-mix(in oklch,var(--ink) 11%,transparent);}
+    .metric-row{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .metric:nth-child(2){border-right:0;}
+    .metric:nth-child(-n+2){border-bottom:1px solid var(--line);}
+    .metric b{font-size:16px;}
+  }
+  @media(min-width:78rem){
+    .layout{width:min(1480px,100%);}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="nav" aria-label="技術ポートフォリオ">
+    <details class="nav-disclosure" open>
+      <summary>目次</summary>
+      <div class="nav-content">
+        <h1>技術ポートフォリオ</h1>
+        <div class="group-label">進め方</div>
+        <ul id="section-menu"></ul>
+        <div class="group-label">実績</div>
+        <ul id="item-menu"></ul>
+      </div>
+    </details>
+  </nav>
+  <main class="detail" id="detail"></main>
+</div>
+
+<script>
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+const items=[
+ {
+  title:"文書検索・根拠提示AI（RAG）",
+  navTitle:"文書検索・根拠提示AI",
+  problem:"PDFをページ単位で分割し、多言語埋め込みでベクトル検索、取得した断片だけを根拠に回答する文書検索AIです。文書に無い質問には正直に「記載なし」と答え、複数のAIが互いの回答を中央値方式で独立採点するダブルチェック評価ループまで備えています。出典ページと類似度をその場で確認でき、日本語の質問で英語文書も横断検索できます。",
+  note:"",
+  steps:[
+   {actor:"human",title:"文書と質問を渡す（ヒト）",summary:"参照する資料と質問を決める",tech:"入力文書 / 質問文",body:"対象PDFと質問を用意します。回答ルールと参照範囲もここで決めます。業務上の判断はAIに任せません。"},
+   {actor:"ai",title:"PDFをページ情報つきで分割する（システム）",summary:"原文へ戻れる検索単位に分ける",tech:"pypdf / RecursiveCharacterTextSplitter",body:"pypdfでページ単位に読み込み、段落→行→文の優先順位でチャンク分割（1000文字・150文字オーバーラップ）します。ページ番号のみ等30文字未満の断片は除外します。"},
+   {actor:"ai",title:"多言語埋め込みで索引化する（AI）",summary:"日本語の質問で英語文書も検索できる形にする",tech:"multilingual-e5-small / Chroma cosine",body:"文書側とquestion側で異なる接頭辞を付けて埋め込みを生成し正規化します。Chromaにcosine類似度前提で永続化し、クロスリンガル検索を可能にします。"},
+   {actor:"ai",title:"質問に近い断片を検索する（システム）",summary:"関係する箇所とページ・類似度を絞り込む",tech:"similarity_search_with_relevance_scores / TOP_K=4",body:"質問ベクトルに近い上位4件の断片を、類似度スコアとページ情報つきで取得します。"},
+   {actor:"ai",title:"取得した断片だけで回答を作る（AI）",summary:"文書に無いことは述べない",tech:"LangGraph retrieve/generate分離 / ChatAnthropic",body:"検索と生成のノードを分離し、取得した断片だけをAIに渡します。文書外の質問には「記載がありません」と答えるよう指示文で強制します。"},
+   {actor:"ai",title:"出典と類似度を提示する（システム）",summary:"回答の裏付けをその場で見せる",tech:"出典ページ / 類似度スコア表示",body:"回答ごとに参照した文書名・ページ番号・類似度スコアを表示し、なぜその回答になったかを検証可能にします。"},
+   {actor:"human",title:"回答と出典を確認する（ヒト）",summary:"出典ページを開いて原文を読む",tech:"回答表示 / 出典ページ",body:"回答、出典ページ、類似度を見比べます。必要な箇所は原文で確認し、最終判断は担当者が行います。"},
+   {actor:"ai",title:"複数のAIで独立採点する（AI）",summary:"生成AIと採点AIを分離する",tech:"LLM-as-judge / 3軸評価",body:"根拠忠実性・質問への直接性・誤情報の有無の3軸で、生成に使ったAIとは別の複数AIが0〜2点で独立採点します。"},
+   {actor:"ai",title:"中央値で合否判定する（システム）",summary:"評価者間で割れた項目は人手に回す",tech:"中央値・最頻値集計 / 人手レビュー振り分け",body:"平均でなく中央値・最頻値で集計し、各軸2点以上を合格とします。評価者間のスコア差が大きい項目は自動で人手サンプリングに回します。"},
+   {actor:"ai",title:"評価レポートを生成する（システム）",summary:"合否と根拠を第三者が追跡できる形にする",tech:"HTML評価レポート出力",body:"合否バッジ、出典、評価者ごとのスコア、意図的な誤答を混ぜた幻覚検出テストの結果までを含むレポートを自動生成します。"}
+  ]
+ },
+ {
+  title:"長尺動画の短尺編集・配布自動化",
+  navTitle:"動画編集・配布自動化",
+  problem:"長尺動画を投げるだけで、AIが発話を書き起こし見どころ候補を提案します。ただしAIに秒数を言わせず文字起こしへ逆照合して確定させ、公開の最終判断は必ず人が行うため暴走しません。字幕焼き込み・縦横変換・音ズレ実測0msの書き出しまで自動化します。",
+  note:"AIのAPIキーは預からず、既存サブスクリプション経由でコストゼロ動作します。",
+  steps:[
+   {actor:"human",title:"素材と目的を渡す（ヒト）",summary:"用途・字幕・縦横を必須指定する",tech:"mode(topic/digest) / sub / orient",body:"動画、用途、字幕の有無、縦横比を指定します。未指定はエラー停止し、前回値を引き継がせません。"},
+   {actor:"ai",title:"発話をタイムスタンプ付きで書き起こす（AI）",summary:"語単位の時間情報を取得する",tech:"faster-whisper / word_timestamps / Groq自動判定",body:"語単位のタイムスタンプ付きで文字起こしします。Groqキーがあれば高速バックエンドを使い、失敗時のみローカルへ自動フォールバックします。"},
+   {actor:"ai",title:"見どころ候補を作る・秒数は出させない（AI）",summary:"AIには逐語抜粋だけを言わせる",tech:"select-segments.mjs / 20分チャンク+60秒重複",body:"AIには逐語抜粋とフックだけを出力させ、秒数そのものは出力させません。長尺は20分チャンク+60秒オーバーラップで分割処理します。"},
+   {actor:"ai",title:"台本を検証・修正する（AI・digestモード）",summary:"不合格なら自動で再構成する",tech:"claude -p 子プロセス / 検証ループ最大3回",body:"理解→台本再構成→検証修正を最大3回繰り返し、合格スコア80に達するまでループします。既存サブスク経由で実行しコストは発生しません。"},
+   {actor:"ai",title:"逐語抜粋を文字起こしに逆照合し秒数を確定する（システム）",summary:"AIの言葉から秒数の幻覚を消す",tech:"reverse-match.mjs / 完全一致→部分一致",body:"AIが挙げた逐語抜粋を実際の文字起こしに照合して初めて秒数を確定します。重複する区間は間引きます。"},
+   {actor:"human",title:"採用・破棄を判断する（ヒト）",summary:"公開する候補だけを選ぶ",tech:"プレビューUI / 採用・破棄トグル",body:"候補を1本ずつプレビューし、採用・破棄を決めます。AIはここで公開判断をしません。"},
+   {actor:"ai",title:"承認された候補だけを次工程へ送る（システム）",summary:"未承認は書き出し工程に渡さない",tech:"採用分のみエクスポート",body:"人が採用したものだけを書き出し対象として渡します。破棄した候補は以後の処理に一切関与しません。"},
+   {actor:"ai",title:"音ズレなく切り出す（システム）",summary:"粗探索と精密探索の2段でシークする",tech:"FFmpeg 2段シーク / crop→scale",body:"粗いシークと精密なシークを組み合わせ、音と映像のズレを実測0msに抑えます。素材が小さい場合は無理な拡大をしません。"},
+   {actor:"ai",title:"字幕を焼き込み画面比率を変換する（システム）",summary:"再エンコードで縦横を書き出す",tech:"ASS字幕焼き込み / PTS正規化",body:"承認済みの区間に字幕を焼き込み、縦横比を変換して書き出します。映像と音声を別処理しズレを防ぎます。"},
+   {actor:"human",title:"納品物と改善点を確認する（ヒト）",summary:"完成動画を見て次回の条件を決める",tech:"完成動画 / 採用理由 / 修正点",body:"完成ファイルを見ながら、候補を落とした理由、字幕や尺の修正点、次回も使う条件を整理します。"}
+  ]
+ },
+ {
+  title:"個別最適型 漢字学習アプリ",
+  navTitle:"個別最適型 漢字学習アプリ",
+  problem:"ブラウザだけで動く子供向け漢字練習アプリです。書き順データから画数によらず一定速度でお手本を再生し、指でなぞった軌跡を実測して正しくなぞれた瞬間に次の画へ自動で進みます。音声読み上げや花火演出、キャラクターの着せ替えもすべてサーバー通信なしで完結し、サーバー費用ゼロで運用できます。",
+  note:"",
+  steps:[
+   {actor:"human",title:"練習する地名を選ぶ（ヒト）",summary:"教材から練習対象を選ぶ",tech:"SvelteKit / 教材データ管理",body:"都道府県セットをカードから複数選択し、選んだ漢字を一文字ずつ進めます。"},
+   {actor:"ai",title:"漢字データを読み込む（システム）",summary:"1漢字1ファイルで拡張しやすい構造にする",tech:"KanjiVG準拠SVGパス / 動作語データ",body:"文字ごとのSVGパス、書き順番号、読み上げる動作語を読み込みます。新規漢字の追加はファイル追加だけで完結する構造です。"},
+   {actor:"ai",title:"画数によらず一定速度でお手本を再生する（システム）",summary:"画数の多寡で体感速度が変わらないようにする",tech:"getTotalLength() / 速度clamp",body:"SVGパスの長さから各画の再生時間を計算し、1画あたりの描画速度を一定化します。極端に短い・長い画は上限下限でclampします。"},
+   {actor:"ai",title:"なぞり動作を実測判定する（システム）",summary:"時間待ちでなく実際になぞれたかで進める",tech:"軌跡カバー率判定 / 距離しきい値",body:"直近の書字軌跡とお手本パスの距離を判定し、一定のカバー率を超えたら自動的に次の画へ進みます。"},
+   {actor:"human",title:"見本を見てなぞる（ヒト）",summary:"指やペンで軌跡をなぞる",tech:"Pointer Events / Canvas座標変換",body:"タッチまたはポインターで画面をなぞります。見本は一時停止と再開ができ、文字ごとにやり直せます。"},
+   {actor:"ai",title:"完了演出を出す（システム）",summary:"外部ライブラリなしで達成感を演出する",tech:"純CSSパーティクルアニメ",body:"全画完了で複数パターンの花火演出を、外部アニメーションライブラリを使わずCSSアニメーションだけで表示します。"},
+   {actor:"ai",title:"音声読み上げ機能を実装する（システム）",summary:"自然な発話になるよう調整する",tech:"Web Speech API / 発話調整",body:"日本語音声を自動選定し、助詞として誤読されないよう表記を調整します。iOSの発話制約に対応した先行発話処理も実装しています。"},
+   {actor:"human",title:"キャラや褒め絵文字を写真から着せ替える（ヒト）",summary:"見た目を自分好みに変える",tech:"AssetSettings / 画像アップロード",body:"キャラクター、褒め絵文字、ボタン画像を写真から設定できます。"},
+   {actor:"ai",title:"画像を圧縮してブラウザ内に保存する（システム）",summary:"ストレージ容量を節約する",tech:"Canvas経由リサイズ / localStorage",body:"アップロードされた画像をブラウザ内でリサイズしてから保存し、進捗やお気に入りセットもあわせてブラウザ内に永続化します。"},
+   {actor:"human",title:"使いにくい点を返す（ヒト）",summary:"画面と教材への反応を伝える",tech:"実機フィードバック / 静的デプロイ",body:"操作で迷った場所、読み上げ速度、見本の分かりやすさを確認し、画面と教材の調整内容を決めます。"}
+  ]
+ },
+ {
+  title:"OCR連携 Excel帳票自動生成",
+  navTitle:"OCR連携 Excel帳票自動生成",
+  problem:"帳簿を写真で撮るだけで、AIが店舗ごとの売上・客単価を自動で読み取り、表記ゆれのある店舗名も自動で名寄せします。読み取れなかった項目だけをその場で手修正し、仕上がりは既存Excel様式と寸分違わぬ罫線・書式で自動生成。前月・前年同月比較まで一発計算し、APIキーは保存しないセキュリティ設計です。",
+  note:"",
+  steps:[
+   {actor:"human",title:"帳簿写真と対象月を選ぶ（ヒト）",summary:"複数枚まとめて指定する",tech:"複数画像選択 / 年月指定",body:"帳簿写真を複数枚選び、対象年月を指定します。元帳票の運用は変えずに入力を始めます。"},
+   {actor:"ai",title:"写真から店舗名と数値をAIが直接抽出する（AI）",summary:"バックエンドを経由せずブラウザから直接解析する",tech:"Claude API直叩き / JSON強制出力",body:"画像をブラウザから直接AIへ送り、店舗名・売上・客単価をJSON形式で抽出します。合計行やフロア計は除外するよう指示しています。"},
+   {actor:"ai",title:"複数画像の結果を非破壊でまとめる（システム）",summary:"後の画像が先の結果を消さない",tech:"店舗名キーでのマージ処理",body:"画像を1枚ずつ順に処理し、店舗名をキーに結果を統合します。複数ページに分かれた帳簿でもデータが欠落しません。"},
+   {actor:"ai",title:"店舗名の表記ゆれを吸収する（システム）",summary:"無理に当てはめず未取得として残す",tech:"正規化 / 完全一致→部分一致",body:"空白や記号の違いを正規化したうえで、既存マスタへ完全一致・部分一致の順で対応づけます。一致しない場合は無理に当てはめず未取得として確認画面に残します。"},
+   {actor:"human",title:"抽出値を確認・修正する（ヒト）",summary:"未取得項目を手入力で補完する",tech:"全店舗一覧UI / 手修正",body:"全店舗を取得済み・未取得で一覧表示し、未取得分は手入力で補完します。確認前の値は帳票へ流しません。"},
+   {actor:"ai",title:"既存様式を寸分違わず再現してExcelを生成する（システム）",summary:"運用や提出フローを一切変えずに済む",tech:"ExcelJS / セル結合・罫線・書式指定",body:"列幅、セル結合、罫線、ヘッダー色まで既存フォーマットどおりに再現して帳票を生成します。"},
+   {actor:"ai",title:"前月・前年同月比較を自動計算する（システム）",summary:"比較指標を一発算出する",tech:"昨対比 / 前月比 / シェア率",body:"保存済みの前月・前年同月データを読み出し、昨対比・前月売上対比・全体シェア率を店舗ごとに自動計算します。"},
+   {actor:"human",title:"Excelを最終確認する（ヒト）",summary:"数値と印刷時の見た目を確かめる",tech:"XLSX download / Excel",body:"業務書式のファイル名で自動保存されたファイルをExcelで開き、数値と体裁を確認します。"}
+  ]
+ },
+ {
+  title:"多言語AIカスタマーサポート基盤",
+  navTitle:"AIカスタマーサポート基盤",
+  problem:"登録したFAQを検索し、その内容を根拠にAIが日本語・英語・中国語・韓国語で自動応対するチャット窓口です。個人情報の送信は事前にブロックし、AIが答えられない質問は自動で担当者へメール通知します。他社データが混ざらない二重のテナント分離設計で、タグ1行の埋め込みだけで多言語カスタマーサポートを始められます。",
+  note:"",
+  steps:[
+   {actor:"human",title:"FAQと運用条件を登録する（ヒト）",summary:"自動回答の範囲と引継ぎ方法を決める",tech:"React admin / JWT認証",body:"管理者が質問、回答、利用言語、エスカレーション時の運用を登録します。FAQ更新はJWT認証とオーナーIDの一致確認を経て、導入先IDを強制付与して保存します。"},
+   {actor:"ai",title:"個人情報を送信前にブロックする（システム）",summary:"電話番号・メールをAIに渡さない",tech:"PIIパターン検知 / 送信前ブロック",body:"ウィジェット側で電話番号・メール・郵便番号のパターンを検知し、AIに送る前に警告を出して送信自体を止めます。"},
+   {actor:"ai",title:"導入先を二重に検証する（システム）",summary:"他社のデータに到達できないようにする",tech:"APIキー+ID照合 / DB側RLS",body:"埋め込みウィジェットのキーと導入先IDの一致をAPI側で確認し、データベース側でも行レベルのアクセス制御で二重に防御します。"},
+   {actor:"ai",title:"呼び出し頻度を制限する（システム）",summary:"連続送信や想定外の利用を抑える",tech:"IP別/テナント別レート制限",body:"送信元IPと導入先の両方に呼び出し回数の上限を設け、テナント確認より先にIP側の制限をかけます。"},
+   {actor:"ai",title:"利用回数の上限をデータベース側で原子的に判定する（システム）",summary:"同時アクセスでの上限突破を防ぐ",tech:"DB関数による原子的カウント",body:"日次・月次の利用回数はアプリ側の条件分岐ではなく、データベース関数で原子的に判定し、同時アクセスによる制限突破を防ぎます。"},
+   {actor:"ai",title:"導入先のFAQと直近の会話を取得する（システム）",summary:"他社のFAQを混ぜずに取得する",tech:"tenant-scoped query / 直近5件の会話履歴",body:"導入先に紐づくFAQだけを取得し、直近の会話履歴と合わせて回答用の情報を作ります。"},
+   {actor:"ai",title:"同じ言語で短く回答する（AI）",summary:"FAQを根拠に一次回答を返す",tech:"低temperature設定 / 言語一致ルール",body:"問い合わせと同じ言語で、登録済みFAQに沿った回答を返すよう指示文で強制します。緩くマッチした場合も必ず何か回答するルールです。"},
+   {actor:"ai",title:"回答困難な問い合わせを検知する（システム）",summary:"複数言語のパターンでエスカレーションを判定する",tech:"多言語エスカレーション検知",body:"AI応答文から「担当者へ」等の複数言語パターンを検知し、対応待ちとして記録します。"},
+   {actor:"ai",title:"担当者へ非同期で通知する（システム）",summary:"応答を止めずに通知だけ後追いで送る",tech:"非同期メール通知",body:"チャットへの応答をブロックせずに、問い合わせ言語を明記した通知メールを担当者へ送ります。"},
+   {actor:"human",title:"対応・解決状況を管理する（ヒト）",summary:"人が対応する問い合わせを確認する",tech:"管理画面 / ステータス更新",body:"管理画面で未解決の問い合わせと最近の会話を確認し、対応後にステータスを更新します。"},
+   {actor:"ai",title:"保存期間を過ぎたログを自動削除する（システム）",summary:"データを溜め続けない",tech:"定期クリーンアップ",body:"一定日数または件数を超えた会話ログを定期的に一括削除します。"}
+  ]
+ },
+ {
+  title:"業界情報キュレーション基盤",
+  navTitle:"業界情報キュレーション基盤",
+  problem:"業界サイトの新着情報を毎朝自動で集約するニュースキュレーションツールです。プライベートネットワークへの不正アクセスや巨大応答を遮断したうえでRSS/Atomを取得し、1つの情報源が失敗しても他は止まりません。記事本文は取得せず、配信元が提供する見出し・概要・リンクのみを表示することで著作権リスクを抑え、重複記事も自動で防ぎます。",
+  note:"AIによる要約や記事本文の転載は行いません。取得失敗は情報源ごとに記録します。",
+  steps:[
+   {actor:"human",title:"読みたい情報源を選ぶ（ヒト）",summary:"精査済みプリセットから必要なフィードだけを選ぶ",tech:"プリセットフィード選択UI",body:"業界サイト、行政、メディアから、更新の生きている情報源だけを精査したプリセットの中から選びます。"},
+   {actor:"ai",title:"毎朝定刻に自動取得する（システム）",summary:"第三者による不正起動を防ぐ",tech:"Vercel Cron / 起動元検証",body:"毎朝定刻に自動起動し、専用の合言葉ヘッダーで正規の起動元であることを確認してから取得を始めます。"},
+   {actor:"ai",title:"全フィードを並列取得し部分障害を許容する（システム）",summary:"1本の失敗が全体を止めない",tech:"並列取得 / 個別タイムアウト",body:"全フィードを並列で取得し、フィードごとにタイムアウトを設定します。一部の取得に失敗しても、ほかの情報源の処理は継続します。"},
+   {actor:"ai",title:"危険な取得先を遮断する（システム）",summary:"内部ネットワークへの不正アクセスを防ぐ",tech:"SSRF対策 / プライベートIP遮断",body:"内部ネットワークへの接続先や、本番環境では暗号化されていない通信を検査前に遮断します。"},
+   {actor:"ai",title:"巨大な応答を遮断する（システム）",summary:"過大な応答によるサービス妨害を防ぐ",tech:"応答サイズ上限",body:"想定外に大きな応答を上限サイズで遮断し、意図的な妨害的応答からシステムを守ります。"},
+   {actor:"ai",title:"RSS/Atomを共通形式に変換する（システム）",summary:"複数の配信方式・記法の違いを吸収する",tech:"RSS/Atom正規化処理 / CDATA対応",body:"見出し、リンク、概要、配信日時、画像を共通形式へ変換します。複数の配信方式や特殊な記法の違いを吸収します。"},
+   {actor:"ai",title:"本文は取得せず配信元の概要だけを保存する（システム）",summary:"全文の蓄積自体ができない設計にする",tech:"文字数上限 / 保存件数上限",body:"記事本文のスクレイピングは行わず、配信元がRSS/Atomで提供する概要を文字数上限つきで保存します。古い記事は件数上限を超えると自動で消去されます。"},
+   {actor:"ai",title:"重複を避けて記事を保存する（システム）",summary:"同じリンクを重ねて保存しない",tech:"リンクのハッシュ化 / merge書き込み",body:"リンクからIDを生成し、同一記事の再取得は上書きのみに留めてレコードを増殖させません。"},
+   {actor:"ai",title:"書き込みは自動取得だけに限定する（システム）",summary:"利用者は読み取りのみ許可する",tech:"アクセス制御ルール",body:"利用者側には記事の読み取りのみを許可し、書き込みは自動取得の仕組みだけに限定します。"},
+   {actor:"human",title:"元記事を開いて判断する（ヒト）",summary:"必要な記事だけ配信元で読む",tech:"元記事リンク遷移",body:"一覧から記事を選び、配信元ページで本文を読みます。保存するのは見出し、短い概要、リンクなどのメタデータだけです。"}
+  ]
+ },
+ {
+  title:"AI開発ガバナンス基盤",
+  navTitle:"AI開発ガバナンス基盤",
+  problem:"複数のAI開発案件を、案件ごとの規則に沿って安全に進める開発基盤です。危険な操作は実行前フックで機械的に止め、実装担当と検証担当のAIを分離し、書き込み直後にも規則違反を再検査します。受け入れ条件は機械検証できる形でしか書けないよう強制し、次回作業への引き継ぎも自動化しています。",
+  note:"",
+  steps:[
+   {actor:"human",title:"目的と受け入れ基準を固定する（ヒト）",summary:"曖昧な計画のまま実行に進ませない",tech:"計画の固定フォーマット / 承認ゲート",body:"目的、対象、変更範囲、完了条件を決まった形式で明文化し、承認を得てから実行フェーズに進みます。"},
+   {actor:"ai",title:"受け入れ基準に機械検証条件を強制する（システム）",summary:"「書いてあるだけ」の条件を書けなくする",tech:"受け入れ基準の機械検査フック",body:"受け入れ基準の文章に、コマンドの成功終了・件数一致・ファイル存在などの機械検証可能な条件が含まれていなければ、計画そのものの保存をブロックします。"},
+   {actor:"ai",title:"変更前に規則と既存実装を読む（AI）",summary:"前提と影響範囲を先に調べる",tech:"変更前調査 / 影響範囲分析",body:"既存実装と関連ルールを先に確認し、変更対象と検証条件を整理してから実装へ進みます。"},
+   {actor:"ai",title:"危険な操作を実行前に止める（システム）",summary:"コマンド実行前に内容を検査する",tech:"実行前フック / 評価順序制御",body:"破壊的操作、秘密情報を含む書き込み、担当範囲外の変更を、許可より先に評価する順序で実行前に検査します。"},
+   {actor:"ai",title:"担当を分けて実装・検証する（AI）",summary:"実装者が自分の作業を自己採点しない",tech:"役割分離エージェント / read-only検証者",body:"調査、実装、検証を別のAIに分離します。検証担当は実装や修正を一切行わない読み取り専用の役割です。"},
+   {actor:"ai",title:"書き込み直後に規則違反を再検査する（システム）",summary:"更新直後に規則と生成物を調べる",tech:"更新後フック / ポリシー検査",body:"ファイル更新後に、規則違反、過大な変更、生成物への秘密情報の混入を再検査します。"},
+   {actor:"ai",title:"並行作業のステージング混入を防ぐ（システム）",summary:"別作業のステージング済み変更を巻き込まない",tech:"変更範囲を限定したコミット強制",body:"コミット時に変更範囲を明示的に指定させ、無指定の一括コミットを機械的に禁止します。複数の作業が同時に進んでも、他作業のステージング済み変更を誤って巻き込みません。"},
+   {actor:"human",title:"検証結果を見て採否を決める（ヒト）",summary:"要件、検証結果、残るリスクを見る",tech:"検証ログ / 複数観点レビュー",body:"テスト結果だけで判断せず、依頼内容を満たしたか、どのようなリスクが残るかを確認して採否を決めます。"},
+   {actor:"ai",title:"完了宣言の前に複数観点で検証する（AI）",summary:"1つの観点だけで完了と判断させない",tech:"複数レンズでの検証呼び出し",body:"正当性・セキュリティ・仕様適合など複数の観点から検証を行い、重大な指摘が1件でも残っていれば完了扱いにしません。"},
+   {actor:"ai",title:"次回へ引継ぎを機械的に残す（システム）",summary:"判断・失敗・未完了を確実に次回へ渡す",tech:"引継ぎ記録の自動生成・自動注入",body:"判断内容、失敗事例、未完了事項を決まった手順で記録し、次回のセッション開始時に自動で提示します。"}
+  ]
+ },
+ {
+  title:"受注開発 記録カルテPWA",
+  navTitle:"受注開発 記録カルテPWA",
+  problem:"写真・数値・タッチ描画で記録するカルテをその場で入力し、公開前に必ずプレビューで確認してから専用URLとして配信するPWAです。写真は自動で二段階圧縮し、顧客ごとに軽量データと重量データを分離して一覧を軽快に保ちます。実機相当の環境でのE2Eテストまで担保し、個人情報は最小限しか持たない設計です。",
+  note:"顧客情報、実利用状況、業務上の効果は守秘義務により掲載していません。",
+  steps:[
+   {actor:"human",title:"利用者と対象記録を選ぶ（ヒト）",summary:"一覧から対象と月を開く",tech:"利用者一覧 / 月別履歴",body:"担当者が利用者と対象月を選び、新規記録または既存記録の編集へ進みます。"},
+   {actor:"ai",title:"軽量データと重量データを分けて読み込む（システム）",summary:"一覧表示を重くしない",tech:"Cloudflare Workers KV / データ分離",body:"一覧用の軽量な情報と、写真を含む記録本体を別々に保存・読み込みし、履歴画面を効率よく表示します。"},
+   {actor:"human",title:"写真・数値・コメントを入力する（ヒト）",summary:"現場で必要な記録を一画面へまとめる",tech:"PWA form / Web Speech API",body:"担当者が状態、数値、写真、コメントを入力します。対応ブラウザではコメント欄へ音声入力でき、非対応環境では自動的に隠れます。"},
+   {actor:"ai",title:"写真を二段階でブラウザ内圧縮する（システム）",summary:"保存容量の上限に収める",tech:"Canvas経由リサイズ",body:"アップロードされた写真をブラウザ内で二段階リサイズし、保存先の容量上限を超えないようにします。"},
+   {actor:"human",title:"図へ状態を書き込む（ヒト）",summary:"文章だけで伝えにくい位置を図示する",tech:"Konva.js / pen / arrow / stamp",body:"身体図へペン、矢印、文字、スタンプを書き込みます。指1本での描画と2本指でのズーム・パンに対応しています。"},
+   {actor:"ai",title:"描画を公開直前に画像化する（システム）",summary:"閉じた項目でも取りこぼさず変換する",tech:"Canvas書き出し",body:"公開の直前に描画内容を画像へ変換します。画面上で閉じている項目があっても、一時的に展開してから確実に変換します。"},
+   {actor:"human",title:"プレビューして公開を決める（ヒト）",summary:"即時公開せず必ず確認を挟む",tech:"プレビュー画面 / 公開確定操作",body:"入力内容を閲覧画面に近い状態で確認し、確定またはやり直しを選びます。公開判断は担当者が行い、AIが自動公開することはありません。"},
+   {actor:"ai",title:"サイズ超過を分かりやすいエラーで止める（システム）",summary:"原因と対処法を明示する",tech:"保存前サイズ検査",body:"保存先の容量上限を超える場合は、写真の枚数を減らすか撮り直すよう具体的な対処法を示して止めます。"},
+   {actor:"ai",title:"記録本体と月別一覧を分けて保存する（システム）",summary:"詳細と一覧を別々のキーに保存する",tech:"分離保存 / 一覧メタ更新",body:"写真を含む記録本体を個別キーに保存したうえで、月別の一覧情報へ参照を追記します。"},
+   {actor:"ai",title:"専用URLへ配信する（システム）",summary:"埋め込みデータのエスケープでXSSを防ぐ",tech:"専用URL配信 / エスケープ処理",body:"利用者ごとの専用URLを生成し、最新記録と月別履歴を同じ画面構成で配信します。埋め込むデータは表示前に無害化します。"},
+   {actor:"human",title:"実機相当の環境で運用確認する（ヒト）",summary:"スマホ操作と公開内容を確認する",tech:"Playwright E2E（公開フロー・巨大画像・PC操作）",body:"入力、描画、画面遷移、公開後の表示を、スマートフォンを含む実機相当の環境で複数シナリオのE2Eテストにより確認します。"}
+  ]
+ },
+ {
+  title:"ブラウザ完結型 発声トレーニング",
+  navTitle:"発声トレーニング",
+  problem:"マイクに向かって接客フレーズを話すだけで、AIが話す速さと声の高さを採点します。あなた自身の地声を基準にするから、声質の違いで一律に損をしません。声の高さの解析はブラウザ内の演算だけで完結し、音声データを自社サーバーには送信・保存しません。店舗独自の「お手本の声」も登録できる、インストール不要の発声トレーナーです。",
+  note:"敬語の正確さや接客品質全体は採点対象外です。",
+  steps:[
+   {actor:"human",title:"基準の声を測る（ヒト）",summary:"自分の普段の声の高さを登録する",tech:"3秒録音 / 基準音登録",body:"利用者が基準音を発声します。有効な計測値が足りない場合は失敗として再測定を求めます。"},
+   {actor:"ai",title:"ノイズを除去し波形を整える（システム）",summary:"人の声の帯域だけを取り出す",tech:"ハイパス/ローパスフィルタ",body:"人の声の帯域以外を除去するフィルタを直列にかけ、エコーキャンセルやノイズ抑制も有効にしてから解析します。"},
+   {actor:"ai",title:"自己相関法でピッチを推定する（システム）",summary:"無音や雑音を誤検出しない",tech:"自己相関法（autocorrelation）",body:"音量が小さすぎる区間は無音として除外し、人の声の周波数帯に探索範囲を絞ってピッチを推定します。"},
+   {actor:"ai",title:"外れ値に強い基準値を算出する（システム）",summary:"中央値で瞬間的なノイズの影響を抑える",tech:"中央値計算",body:"複数フレームのピッチ推定値から中央値を求め、本人の基準ピッチとして保存します。"},
+   {actor:"human",title:"練習場面とフレーズを選ぶ（ヒト）",summary:"標準または登録した独自文を選ぶ",tech:"プリセット場面 / カスタムフレーズ",body:"接客場面ごとの標準フレーズ、または登録した独自フレーズから練習内容を選びます。"},
+   {actor:"human",title:"指定フレーズを話す（ヒト）",summary:"画面の文をマイクへ向かって発声する",tech:"ブラウザ音声認識（継続認識）",body:"ブラウザ音声認識で発話テキストを取得しながら、同時にピッチ値を記録します。音声認識に非対応のブラウザでは話速の判定ができないため、対応ブラウザの利用を案内します。"},
+   {actor:"ai",title:"編集距離で誤発声を検出する（システム）",summary:"別の文を話した採点を避ける",tech:"レーベンシュタイン距離",body:"認識文と指定文を正規化して編集距離から類似度を計算します。一致度が一定より低い場合は採点せず、再録音を促します。"},
+   {actor:"ai",title:"話速を採点する（システム）",summary:"文字数と発話時間から速さを出す",tech:"文字/分 換算スコアリング",body:"認識した文字数と発話時間から話速を算出し、基準値からの乖離率で採点します。"},
+   {actor:"ai",title:"本人比で声の高さを採点する（システム）",summary:"声の高低という体質差を公平に評価する",tech:"本人ベースライン比較",body:"目標ピッチを絶対値でなく本人の基準音からの相対値で設定し、声が高い人・低い人を一律の基準で不利にしません。"},
+   {actor:"human",title:"店舗独自の基準を作成する（ヒト）",summary:"お手本の声を店舗ごとに登録する",tech:"複数回録音の平均化",body:"店長のお手本を複数回録音して平均化し、緊張や言い淀みによる一回限りの誤差を軽減した店舗基準を作成できます。"},
+   {actor:"human",title:"結果を見て繰り返す（ヒト）",summary:"話速と声の高さを見て再練習する",tech:"採点結果 / 認識文表示",body:"話速、ピッチ、認識文、改善内容を確認し、次のフレーズまたは再練習へ進みます。"}
+  ]
+ },
+ {
+  title:"X運用 自動投稿・分析基盤",
+  navTitle:"X運用 自動投稿・分析基盤",
+  problem:"投稿の生成・品質検査・重複防止・定時投稿・返信対応・反応分析・在庫監視までを自動化したX運用基盤です。月次コストの上限を機械的に強制する予算ガードと、失敗時に自動で再試行・復旧する設計により、費用超過も投稿停止も起きにくい運用にしています。文体や運用方針はいつでも人が更新できます。",
+  note:"定時投稿の実運用を確認済みです。",
+  steps:[
+   {actor:"human",title:"方針と手本を決める（ヒト）",summary:"文体・型・NG表現・参考アカウントを管理する",tech:"tone-and-manner.md / generation-rules.md / competitors.json / swipe_file",body:"文体規則（tone-and-manner.md）、型とNG表現（generation-rules.md）、参考アカウント（competitors.json）、過去の効いた表現ストック（swipe_file）を人が直接編集します。"},
+   {actor:"ai",title:"テーマをスコアリングし型を割り当てる（システム）",summary:"営業価値の高いテーマを優先し型を決める",tech:"scorer.py / config/scoring.json / news_type",body:"topics.json のテーマを scorer.py で営業価値スコアリングし、news_type から型①②③（type1/type2/type3）を判定します。"},
+   {actor:"ai",title:"LLMで本文を構造化生成する（AI）",summary:"本文とセルフリプ候補をJSONで作る",tech:"llm_service.generate_typed_post / スロットリング",body:"型に応じて本文と任意のセルフリプ候補をJSON生成します。Gemini無料枠のRPM上限を超えないよう、呼び出し間隔を7秒空けます。"},
+   {actor:"ai",title:"品質ゲートを通す（システム）",summary:"不合格文はqueueに入れない",tech:"quality_check.is_quality_ok / 再生成上限",body:"文字数、文末の完結性、URL、専門用語、二人称表現、禁止表現、記号を検査します。不合格は最大2回まで再生成（計3回試行）し、なお不合格ならreview-queue.jsonへ退避してqueueには入れません。"},
+   {actor:"ai",title:"LLM全滅時はテンプレへ降格する（システム）",summary:"生成が止まっても投稿を止めない",tech:"template フォールバック / fail-open設計",body:"LLMキー未設定や全滅時は、決定論的なテンプレート文へ降格して処理を継続します（EXIT 0）。フォールバック文は品質ゲートを経由しない決定論的な品質下限で運用します。"},
+   {actor:"ai",title:"重複本文をqueueに積ませない（システム）",summary:"同一本文の二重投入を機械的に防ぐ",tech:"append_threads.py / 本文完全一致dedup",body:"既存キューの本文と完全一致する草稿はスキップします。1件でも検査不合格があれば、その回はqueueに何も書き込みません。"},
+   {actor:"ai",title:"スレッド内の全ツイートを検査する（システム）",summary:"root文だけでなく全ツイートを検査する",tech:"queue_guard.py / thread_items検査",body:"root本文だけでなく、スレッド内の各ツイート（thread_items）も同じ基準で検査します。NG表現の免責はroot本文限定です。"},
+   {actor:"ai",title:"スケジュールに沿ってXへ投稿する（システム）",summary:"cronで起動しTweepy経由でX APIへ送信する",tech:"GitHub Actions / Tweepy（X API） / DRY_RUN",body:"cronで起動し、キューから対象を取得してTweepy経由でXへ単発またはスレッド投稿を実行します。DRY_RUNフラグでリハーサル実行できます。"},
+   {actor:"ai",title:"途中失敗から安全に再開する（システム）",summary:"投稿途中で落ちても続きから再開する",tech:"thread-state.json / チェックサム",body:"投稿位置、本文のチェックサム、投稿済みツイートID、次の投稿位置を状態ファイルへ保存し、途中失敗時は次回実行がそこから再開します。"},
+   {actor:"ai",title:"push衝突をリトライで解消する（システム）",summary:"他ワークフローとの競合を吸収する",tech:"git rebase --autostash / 最大5回リトライ",body:"投稿済み位置の保存コミットが競合で弾かれた場合、リベースして最大5回まで再試行します。全滅時はジョブを失敗させ、通知で表面化させます。"},
+   {actor:"ai",title:"予算超過を機械強制で止める（システム）",summary:"月次コストの上限で自動停止する",tech:"budget_guard.py / cost-ledger.json",body:"月ごとの投稿・API読み取りコストを台帳に記録し、上限を超える処理は実行前に停止します。"},
+   {actor:"ai",title:"Xの返信を検出し一次対応する（AI）",summary:"新規返信だけを拾い予算内で応答する",tech:"reply_fetch.py / X API mentions / reply_engine.py",body:"X APIのmentions（自分宛て返信一覧）から自分の投稿への新規返信を取得し、予算内であることを確認したうえで自動返信を送信し、対応履歴を記録します。"},
+   {actor:"ai",title:"Xでの反応を集計しレポート化する（システム）",summary:"伸びた投稿の指標を成績表へまとめる",tech:"collect_metrics.py / X API public metrics / analytics.aggregate",body:"投稿後24時間・7日の2時点でX APIからインプレッション等のpublic metricsを取得し、既存の集計ロジックを再利用して成績レポートを生成します。"},
+   {actor:"ai",title:"在庫・停止を閾値監視する（システム）",summary:"無投稿と在庫枯渇を早期検知する",tech:"monitor.py / 閾値監視",body:"一定時間以上投稿が無い場合、または在庫が一定件数を下回った場合に警告します。"},
+   {actor:"human",title:"結果を確認して方針を更新する（ヒト）",summary:"成績と履歴から次の運用方針を決める",tech:"analytics-summary.md / 投稿履歴",body:"成績レポートと投稿履歴を確認し、文体規則、型の方針、返信条件を更新します。"}
+  ]
+ }
+];
+
+function detailedCaseHTML(it,i){
+  const note=it.note ? `<p class="note">${esc(it.note)}</p>` : "";
+  const steps=(it.steps || []).map(step=>`
+    <li class="vd-step ${step.actor==="human" ? "human" : "ai"}">
+      <div class="vd-left"><b>${esc(step.title)}</b><span>${esc(step.summary)}</span></div>
+      <div class="vd-right"><b>${esc(step.tech)}</b><p>${esc(step.body)}</p></div>
+    </li>
+  `).join("");
+  return `
+    <p class="eyebrow">Case ${String(i+1).padStart(2,"0")}</p>
+    <h2>${esc(it.title)}</h2>
+    <div class="case-layout video-only">
+      <aside class="case-side" aria-label="${esc(it.title)}の詳細">
+        <section class="side-panel">
+          <h3>概要</h3>
+          <p>${esc(it.problem)}</p>
+          ${note}
+        </section>
+        <section class="vd-panel">
+          <h3>工程と技術構成</h3>
+          <ol class="vd-flow">${steps}</ol>
+        </section>
+      </aside>
+    </div>`;
+}
+
+const sections=[
+ {
+  id:"process",
+  navTitle:"導入・伴走の進め方",
+  eyebrow:"How it works",
+  title:"作って終わりではなく、現場で使われるところまで伴走します",
+  summary:"最初に現場の作業を聞き、試作を実機で確認してから納品します。使い始めて見つかった詰まりも調整します。",
+  html:`<div class="process">
+    <div class="process-item"><div><b>ヒアリング</b><span>今の作業、困る場面、使う人、避けたいことを聞き取ります。</span></div></div>
+    <div class="process-item"><div><b>要件定義</b><span>入力、出力、確認者、失敗時の扱いを文書化します。</span></div></div>
+    <div class="process-item"><div><b>試作</b><span>必要最小限の画面や自動化を作り、現場に合うか早い段階で見ます。</span></div></div>
+    <div class="process-item"><div><b>実機確認</b><span>PC、スマホ、実データに近い条件で動かし、使いにくい点を直します。</span></div></div>
+    <div class="process-item"><div><b>納品</b><span>使い方、運用手順、確認ポイントをセットで渡します。</span></div></div>
+    <div class="process-item"><div><b>定着支援</b><span>使い始めて詰まった箇所に合わせ、文言、画面、手順を調整します。</span></div></div>
+    <div class="process-item"><div><b>保守改善</b><span>利用状況と例外を見ながら、必要な箇所だけ手を入れます。</span></div></div>
+  </div>`
+ }
+];
+
+const sectionMenu=document.getElementById("section-menu");
+const itemMenu=document.getElementById("item-menu");
+const detail=document.getElementById("detail");
+const navLinks=[];
+
+function setActive(key){
+  navLinks.forEach(entry=>entry.link.classList.toggle("active",entry.key===key));
+}
+
+function settleNavigation(){
+  if(typeof window!=="undefined" && typeof window.scrollTo==="function"){
+    window.scrollTo(0,0);
+  }
+  if(typeof window!=="undefined" && window.matchMedia && window.matchMedia("(max-width: 48rem)").matches){
+    const disclosure=document.querySelector(".nav-disclosure");
+    if(disclosure) disclosure.removeAttribute("open");
+  }
+}
+
+function renderItem(i){
+  const it=items[i];
+  detail.innerHTML=detailedCaseHTML(it,i);
+  setActive(`item-${i}`);
+}
+
+function renderSection(i){
+  const section=sections[i];
+  detail.innerHTML=`
+    <p class="eyebrow">${esc(section.eyebrow)}</p>
+    <h2>${esc(section.title)}</h2>
+    <p class="summary">${esc(section.summary)}</p>
+    ${section.html}`;
+  setActive(`section-${i}`);
+}
+
+// クリック遷移では URL にハッシュを残さない（営業資料として共有時に #item-N が付くのを防ぐ）。
+// href は残すので、外部から届いた #item-N / #section-N の直リンクは従来どおり開く。
+function keepUrlClean(e){
+  if(e && typeof e.preventDefault==="function") e.preventDefault();
+  if(typeof history!=="undefined" && history.replaceState){
+    history.replaceState(null,"",location.pathname+location.search);
+  }
+}
+
+sections.forEach((section,i)=>{
+  const li=document.createElement("li");
+  const a=document.createElement("a");
+  const key=`section-${i}`;
+  a.textContent=section.navTitle;
+  a.href=`#${key}`;
+  a.onclick=(e)=>{ keepUrlClean(e); renderSection(i); settleNavigation(); };
+  li.appendChild(a);
+  sectionMenu.appendChild(li);
+  navLinks.push({key,link:a});
+});
+
+items.forEach((it,i)=>{
+  const li=document.createElement("li");
+  const a=document.createElement("a");
+  const key=`item-${i}`;
+  a.textContent=it.navTitle || it.title;
+  a.href=`#${key}`;
+  a.onclick=(e)=>{ keepUrlClean(e); renderItem(i); settleNavigation(); };
+  li.appendChild(a);
+  itemMenu.appendChild(li);
+  navLinks.push({key,link:a});
+});
+
+function renderByKey(key){
+  const sectionMatch=key.match(/^section-(\d+)$/);
+  if(sectionMatch && sections[Number(sectionMatch[1])]){
+    renderSection(Number(sectionMatch[1]));
+    return;
+  }
+  const itemMatch=key.match(/^item-(\d+)$/);
+  if(itemMatch && items[Number(itemMatch[1])]){
+    renderItem(Number(itemMatch[1]));
+    return;
+  }
+  renderSection(0);
+}
+
+if(typeof window!=="undefined"){
+  window.addEventListener("hashchange",()=>renderByKey(location.hash.slice(1)));
+}
+renderByKey(location.hash.slice(1));
+if(typeof window!=="undefined" && window.matchMedia && window.matchMedia("(max-width: 48rem)").matches){
+  const disclosure=document.querySelector(".nav-disclosure");
+  if(disclosure) disclosure.removeAttribute("open");
+}
+</script>
+</body>
+</html>

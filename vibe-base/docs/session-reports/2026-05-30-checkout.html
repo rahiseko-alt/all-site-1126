@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session 2026-05-30 Check-out — 名刺デザイン pro 規範統合</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e4e7;--text2:#9ca3af;--accent:#6366f1;--accent2:#818cf8;--ok:#10b981;--warn:#f59e0b;--danger:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+h1{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em;}
+h1 span{color:var(--accent2);}
+h2{font-size:1.2rem;margin:2.5rem 0 1rem;padding-bottom:.4rem;border-bottom:2px solid var(--accent);color:var(--accent2);}
+h3{font-size:1rem;margin:1.5rem 0 .6rem;color:var(--text);}
+p{margin:.6rem 0;}
+a{color:var(--accent2);word-break:break-all;}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.85rem;background:var(--surface);border-radius:8px;overflow:hidden;}
+th{background:var(--surface2);color:var(--accent2);padding:.6rem .7rem;text-align:left;font-weight:600;}
+td{padding:.55rem .7rem;border-top:1px solid var(--border);vertical-align:top;}
+.meta{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0 1.5rem;font-size:.85rem;color:var(--text2);display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.4rem 1.5rem;}
+.meta b{color:var(--text);}
+.alert-red{background:rgba(239,68,68,.1);border-left:3px solid var(--danger);border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1rem 0;}
+.alert-yellow{background:rgba(245,158,11,.1);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1rem 0;}
+.callout{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1rem 0;}
+.callout.ok{border-left-color:var(--ok);}
+ul,ol{margin:.6rem 0 .6rem 1.4rem;}
+li{margin:.35rem 0;}
+.num{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent2);}
+.tag{display:inline-block;padding:.1rem .45rem;border-radius:3px;font-size:.7rem;font-weight:600;}
+.tag-H{background:rgba(239,68,68,.18);color:#f87171;}
+.tag-M{background:rgba(245,158,11,.18);color:#fbbf24;}
+.tag-L{background:rgba(16,185,129,.18);color:#34d399;}
+code{background:var(--surface2);padding:.1rem .4rem;border-radius:4px;font-size:.85em;}
+.path{color:#a5b4fc;font-family:'Consolas',monospace;font-size:.85em;}
+</style>
+</head>
+<body>
+
+<h1>Session 2026-05-30 <span>Check-out</span><br>名刺デザイン pro 規範統合 + 入稿PDF 完成</h1>
+<p style="color:var(--text2);font-size:.85rem;margin-top:.3rem">次セッションで本ファイルを Read してから着手すること</p>
+
+<div class="meta">
+  <div><b>セッション日:</b> 2026-05-30</div>
+  <div><b>主作業:</b> 名刺デザイン制作・入稿PDF出力</div>
+  <div><b>commit予定:</b> 4 research bank entries + md-inventory + memory.md</div>
+  <div><b>新規 research bank:</b> 4件</div>
+  <div><b>新規 tmp 資産:</b> meishi-design 一式</div>
+</div>
+
+<!-- ============= 最重要 ============= -->
+<div class="alert-red">
+<b>⚠️ 最重要: 入稿PDF 4ファイルは <code>tmp/meishi-design/print/</code> 配下に保存・git未追跡</b><br>
+tmp/ は gitignored のため、PCリプレース時に消失します。マスターが印刷所に渡す前に <b>vibe-base 外（Desktop 等）にバックアップ</b>を推奨。<br>
+ファイル: <code>meishi-{front,back}-simple.pdf</code>（55×91mm・ネット印刷向け⭐推奨）/ <code>meishi-{front,back}-print.pdf</code>（61×97mm+トンボ・Illustrator系向け）
+</div>
+
+<!-- ============= A. TL;DR ============= -->
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li><b>名刺デザイン全面リニューアル</b>: マスター事業の新ポジショニング「AIコーチ / アプリ開発」「個人・法人向けAI活用サポート」を表裏で表現</li>
+<li><b>Tier A プロ規範実装</b>: Noto Serif JP + Noto Sans JP（Google Fonts明示ロード）/ 8pt grid / 中央軸貫通 / proximity 原則 / Visual Weight 補正</li>
+<li><b>QR LINE公式アカウント差替え</b>: マスター提供URL（<code>qr-official.line.me/gs/M_559jnyrg_GW.png</code>）→ Pillow で緑→黒変換 → 16mm 拡大（読取確実性UP）</li>
+<li><b>4本のディープリサーチ完遂・Research Bank 登録</b>: 計 <span class="num">312</span> ソース。次回名刺・LP・印刷物作業の永続資産</li>
+<li><b>入稿用PDF 2形式 × 表裏 = 4ファイル出力</b>: ネット印刷用（仕上がりサイズ）+ Illustrator系用（トンボ・塗り足し付き）</li>
+<li><b>表面連絡セクション pro 改善</b>: 中黒「・」セパレータ / Title-Contact gap 3.5mm / Email-Phone proximity 1.2mm / Phone字間0.08em</li>
+<li><b>マスター作業フロー検証</b>: 「ダサい」「カッコいい」「100点プロか」の連続問いに対し、リサーチ→自己診断→改善のループで品質向上を実証</li>
+</ol>
+
+<!-- ============= B. 完了 commit ============= -->
+<h2>B. コミット予定（本Check-outで実施）</h2>
+<table>
+<tr><th>種別</th><th>内容</th></tr>
+<tr><td>docs(research-bank)</td><td>4 entries 追加: margin-golden-ratio / designer-workflow / pro-design-thinking / copy-anti-cliche</td></tr>
+<tr><td>docs(research-bank)</td><td>index.html BANK エントリ追加（4件）+ lastUpdated 更新</td></tr>
+<tr><td>docs(md-inventory)</td><td>5r/5s/5t/5u 追加（4 research bank ファイル登録）</td></tr>
+<tr><td>chore(memory)</td><td>memory.md @ 参照更新（本ファイルへ）+ P4 永続教訓追加</td></tr>
+</table>
+
+<!-- ============= C. 影響波及 ============= -->
+<h2>C. 影響波及</h2>
+<div class="callout">
+<b>tmp/meishi-design/ 配下が大規模化:</b><br>
+HTML 3 / Python 1 / Node mjs 5 / package.json + lock / node_modules / assets/ / print/ — 計 約20MB（node_modules除く実体 約150KB）<br>
+gitignored のため commit には含まれず、ローカル環境固有資産。次回名刺改修時は本フォルダから再利用可能。
+</div>
+
+<!-- ============= D. 残作業 ============= -->
+<h2>D. 残作業</h2>
+
+<h3><span class="tag tag-H">H</span> なし</h3>
+
+<h3><span class="tag tag-M">M</span> マスター実機確認待ち</h3>
+<ol>
+<li><b>QR スキャン実機テスト</b>: 黒化済み QR がスマホで LINE 公式アカウントに正しく飛ぶか確認推奨</li>
+<li><b>入稿PDF バックアップ</b>: <code>tmp/meishi-design/print/*.pdf</code> 4ファイルを vibe-base 外（Desktop\倉庫\重要\ 等）にコピー</li>
+</ol>
+
+<h3><span class="tag tag-L">L</span> 余裕時</h3>
+<ol>
+<li><b>research-bank `business-card-designer-workflow-2026.html` 軽微修正</b>: line 63 の二重 <code>&lt;b&gt;</code> タグ（レンダリング影響なし・次回 deep-research 上書き時に自動修正）</li>
+<li><b>前 P1 残: <code>.codex/hooks/area-gate.mjs</code> 同期要否判断</b>（前セッション持ち越し）</li>
+</ol>
+
+<!-- ============= E. 配備物 ============= -->
+<h2>E. 本セッション配備</h2>
+<ul>
+<li><b>新規 subagent / skill / hook</b>: なし</li>
+<li><b>新規 research bank entry × 4</b>:
+<ul>
+<li><span class="path">docs/research-bank/business-card-margin-golden-ratio-2026.html</span> — 34 ソース・名刺余白規範</li>
+<li><span class="path">docs/research-bank/business-card-designer-workflow-2026.html</span> — 86 ソース・プロワークフロー</li>
+<li><span class="path">docs/research-bank/business-card-pro-design-thinking-2026.html</span> — 85 ソース・思考回路（プロの自問14リスト）</li>
+<li><span class="path">docs/research-bank/business-card-copy-anti-cliche-2026.html</span> — 107 ソース・ダサい/カッコいい構造</li>
+</ul>
+</li>
+<li><b>新規 tmp 作業資産</b>:
+<ul>
+<li><span class="path">tmp/meishi-design/meishi-front.html</span> — 表面 完成版（pro 規範準拠）</li>
+<li><span class="path">tmp/meishi-design/meishi-back.html</span> — 裏面 完成版</li>
+<li><span class="path">tmp/meishi-design/extract-qr.mjs</span> — 元PDF QR 切出（pdfjs operator list 経由・canvas不要）</li>
+<li><span class="path">tmp/meishi-design/render-src.mjs</span> — 元PDF 全ラスタライズ（canvas必要・現状エラー残存）</li>
+<li><span class="path">tmp/meishi-design/verify-diff.mjs</span> — playwright で HTML→PNG 出力（自己検証用）</li>
+<li><span class="path">tmp/meishi-design/blacken-qr.py</span> — LINE QR 緑→黒変換（Pillow）</li>
+<li><span class="path">tmp/meishi-design/render-print-pdf.mjs</span> — 入稿PDF（61×97mm + トンボ）出力</li>
+<li><span class="path">tmp/meishi-design/render-simple-pdf.mjs</span> — 入稿PDF（55×91mm 仕上がり）出力</li>
+</ul>
+</li>
+</ul>
+
+<!-- ============= F. 生成物 ============= -->
+<h2>F. 本セッション生成物（次セッション参照可）</h2>
+
+<h3>研究レポート（永続資産）</h3>
+<ul>
+<li><span class="path">docs/research-bank/business-card-margin-golden-ratio-2026.html</span>: 入稿97×61mm / 仕上がり91×55mm / 安全枠85×49mm / 黄金分割点34.8mm/56.2mm / 余白率27% / QR15mm角+QZ2mm / 連絡先最小6pt</li>
+<li><span class="path">docs/research-bank/business-card-designer-workflow-2026.html</span>: 国内9ステップ + ヒアリング9項目 + 海外 Modular Grid + 縦型71/29 + Illustrator標準</li>
+<li><span class="path">docs/research-bank/business-card-pro-design-thinking-2026.html</span>: 余白決定6ステップ + 黄金比道具運用 + チャンク4±1 + Squint Test + N字視線 + プロの自問14リスト</li>
+<li><span class="path">docs/research-bank/business-card-copy-anti-cliche-2026.html</span>: ダサ語60+件 + 5心理学的メカニズム + Sagmeister/Pentagram実例 + 逆張り10原則 + 数値基準（10字以内・動詞1個・修飾語ゼロ・8音節）</li>
+</ul>
+
+<h3>名刺最終仕上がり物（PCローカル）</h3>
+<ul>
+<li><span class="path">tmp/meishi-design/print/meishi-front-simple.pdf</span> — ⭐ ネット印刷向け（55×91mm）</li>
+<li><span class="path">tmp/meishi-design/print/meishi-back-simple.pdf</span> — ⭐ 同上</li>
+<li><span class="path">tmp/meishi-design/print/meishi-front-print.pdf</span> — Illustrator系（61×97mm + トンボ）</li>
+<li><span class="path">tmp/meishi-design/print/meishi-back-print.pdf</span> — 同上</li>
+</ul>
+
+<!-- ============= G. 次セッション初手 ============= -->
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本ファイル冒頭の「最重要」アラート確認</li>
+<li><code>git status --short</code> で名刺セッション後の状態確認</li>
+<li>名刺関連の追加要望があれば <span class="path">tmp/meishi-design/meishi-{front,back}.html</span> を編集して <code>node render-simple-pdf.mjs</code> 再実行</li>
+<li>新規名刺作業がなければ前セッション P1 残（<code>.codex/hooks/area-gate.mjs</code> 同期要否）を処理</li>
+<li>マスター発話を待つ</li>
+</ol>
+
+<div class="callout ok">
+<b>機械検証サマリ（Wave A-2）:</b>
+<ul>
+<li>secret-grep: 0 matches ✅</li>
+<li>git status: 軽微差分のみ（research bank 4 + index.html + md-inventory）✅</li>
+<li>code-reviewer 指摘: 2件（md-inventory 1件・HTML軽微1件）→ 1件本セッションで修正・1件 L 残</li>
+</ul>
+</div>
+
+<!-- ============= 次回名刺作業時の参照フロー ============= -->
+<h2>★ 次回名刺作業時の参照フロー（マスター指示に応じて）</h2>
+
+<div class="callout">
+<b>マスター発話「名刺作って／更新して」を受けたら:</b>
+
+<ol>
+<li><b>本ファイル F セクション</b>から既存テンプレ位置を取得</li>
+<li><b>4 research bank</b> を読み込んで pro 規範を脳内ロード:
+<ul>
+<li>余白・黄金比 → <code>business-card-margin-golden-ratio-2026.html</code></li>
+<li>作業フロー → <code>business-card-designer-workflow-2026.html</code></li>
+<li>思考回路（自問14リスト） → <code>business-card-pro-design-thinking-2026.html</code></li>
+<li>コピー逆張り → <code>business-card-copy-anti-cliche-2026.html</code></li>
+</ul>
+</li>
+<li><b>テンプレ HTML</b> <code>tmp/meishi-design/meishi-{front,back}.html</code> を Read</li>
+<li>編集して <code>node verify-diff.mjs</code> でプレビューPNG生成 → 自分の目で 14リスト診断</li>
+<li>マスター承認後 <code>node render-simple-pdf.mjs</code> で入稿PDF出力</li>
+</ol>
+
+<b>本セッションで確立した品質基準（次回も適用）:</b>
+<ul>
+<li>フォント: Noto Serif JP（Mincho）/ Noto Sans JP（Sans）の Google Fonts ロード</li>
+<li>名前: 10mm（hero）/ letter-spacing 0.1em / weight 400</li>
+<li>ふりがな: 親文字の35%（3.5mm）/ color #333 / 姓・名独立ブロック化</li>
+<li>連絡先: 7pt（2.46mm・印刷下限）/ 数字 letter-spacing 0.08em</li>
+<li>セパレータ: 中黒「・」（日本タイポ規範）</li>
+<li>QR: 16mm 推奨・15mm 下限</li>
+<li>外周マージン: 5.64mm（2u）/ 下安全領域 3mm</li>
+<li>カラー: 全モノクロ（K100相当・QRも黒化）</li>
+</ul>
+</div>
+
+</body>
+</html>

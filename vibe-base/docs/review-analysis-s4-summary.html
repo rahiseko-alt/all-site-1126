@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>クチコミ分析AI S4実現性検証 — 結果サマリー</title>
+<style>
+  body { font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; margin: 24px; background: #f8f9fa; color: #1e293b; max-width: 1100px; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  p.sub { color: #666; font-size: 13px; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); font-size: 13px; margin: 12px 0; }
+  th, td { border: 1px solid #d0d0d0; padding: 8px 10px; text-align: left; }
+  th { background: #2c3e50; color: #fff; font-weight: 600; font-size: 12px; }
+  th.ours { background: #ea580c; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .partial { color: #d97706; font-weight: 700; }
+  .section { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .section h2 { margin: 0 0 12px; }
+  .kill-pass { background: #ecfdf5; border: 2px solid #16a34a; border-radius: 8px; padding: 16px 20px; margin: 16px 0; color: #166534; font-size: 15px; }
+  .confirm-box { background: #fff; border: 2px solid #2563eb; border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .confirm-box h3 { margin: 0 0 10px; color: #1d4ed8; font-size: 15px; }
+  .confirm-box p { font-size: 13px; line-height: 1.7; margin: 6px 0; }
+  .risk { background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .risk h3 { margin: 0 0 10px; color: #d97706; font-size: 15px; }
+  .risk p { font-size: 13px; line-height: 1.7; margin: 6px 0; }
+  .pattern { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .pattern h4 { margin: 0 0 8px; font-size: 14px; }
+  .pattern-a { border-left: 4px solid #2563eb; }
+  .pattern-b { border-left: 4px solid #7c3aed; }
+  .pattern-c { border-left: 4px solid #16a34a; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+  .tag-cost { background: #dbeafe; color: #1d4ed8; }
+  .tag-risk { background: #fef2f2; color: #dc2626; }
+  .tag-ok { background: #ecfdf5; color: #16a34a; }
+  .pro-con { display: flex; gap: 16px; margin-top: 10px; }
+  .pro-con > div { flex: 1; font-size: 12px; }
+  .pro-con h5 { margin: 0 0 4px; font-size: 12px; }
+  .pro-con ul { margin: 0; padding-left: 16px; line-height: 1.7; }
+  .diff-box { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
+  .diff-box h3 { margin: 0 0 8px; font-size: 14px; }
+  .diff-box p { font-size: 13px; line-height: 1.7; }
+  .total-row { background: #f8fafc; font-weight: 700; }
+  .num { text-align: center; font-size: 14px; }
+  .compare-table td:first-child { font-weight: 600; width: 20%; }
+
+  /* --- コメント機能 --- */
+  .cmt-wrap { margin: 10px 0 4px; }
+  .cmt-toggle { background: none; border: 1px dashed #94a3b8; border-radius: 4px; padding: 3px 10px; font-size: 11px; color: #64748b; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .cmt-toggle:hover { background: #f1f5f9; border-color: #2563eb; color: #2563eb; }
+  .cmt-toggle.has-comment { background: #eff6ff; border: 1px solid #93c5fd; color: #1d4ed8; }
+  .cmt-area { display: none; margin-top: 6px; }
+  .cmt-area.open { display: block; }
+  .cmt-area textarea { width: 100%; min-height: 48px; border: 1px solid #93c5fd; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; color: #1e293b; background: #eff6ff; resize: vertical; box-sizing: border-box; }
+  .cmt-area textarea:focus { outline: 2px solid #2563eb; outline-offset: -1px; background: #fff; }
+  .cmt-area textarea::placeholder { color: #94a3b8; }
+  .cmt-badge { display: inline-block; background: #2563eb; color: #fff; font-size: 9px; font-weight: 700; border-radius: 50%; width: 16px; height: 16px; line-height: 16px; text-align: center; }
+
+  /* --- フリーコメント --- */
+  .free-cmt { background: #fff; border: 2px solid #94a3b8; border-radius: 8px; padding: 20px; margin: 24px 0; }
+  .free-cmt h3 { margin: 0 0 10px; font-size: 15px; color: #475569; }
+  .free-cmt textarea { width: 100%; min-height: 100px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; font-size: 13px; font-family: inherit; color: #1e293b; resize: vertical; box-sizing: border-box; }
+  .free-cmt textarea:focus { outline: 2px solid #2563eb; outline-offset: -1px; }
+  .free-cmt textarea::placeholder { color: #94a3b8; }
+
+  /* --- ツールバー --- */
+  .toolbar { position: sticky; top: 0; z-index: 10; background: #f8f9fa; padding: 8px 0; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 12px; align-items: center; }
+  .toolbar button { border: none; border-radius: 6px; padding: 8px 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-save { background: #2563eb; color: #fff; }
+  .btn-save:hover { background: #1d4ed8; }
+  .btn-export { background: #e2e8f0; color: #475569; }
+  .btn-export:hover { background: #cbd5e1; }
+  .save-status { font-size: 12px; color: #16a34a; font-weight: 600; display: none; }
+  .cmt-count { font-size: 12px; color: #64748b; margin-left: auto; }
+</style>
+</head>
+<body>
+
+<!-- ===== ツールバー ===== -->
+<div class="toolbar">
+  <button class="btn-save" onclick="saveAll()">保存</button>
+  <button class="btn-export" onclick="exportComments()">コメント書出</button>
+  <span class="save-status" id="saveStatus">保存しました</span>
+  <span class="cmt-count" id="cmtCount"></span>
+</div>
+
+<h1>クチコミ分析AI — S4 実現性検証 結果サマリー</h1>
+<p class="sub">2026-03-19 | P0#7〜#12完了 | 詳細 → <code>docs/review-analysis-feature-comparison.html#s4</code></p>
+
+<!-- ===== 採用スタック ===== -->
+<div class="section">
+  <h2>採用スタック一覧</h2>
+  <table>
+    <thead>
+      <tr><th>#</th><th>カテゴリ</th><th>採用サービス</th><th>選定理由</th><th>MVP月額</th><th>移行トリガー</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="num">1</td><td>AI/NLP</td><td><strong>Gemini 2.5 Flash</strong></td><td>無料枠あり(250RPD)。コスパ最良。日本語良好</td><td>$0</td><td>精度不足→GPT-4o-mini</td></tr>
+      <tr><td class="num">2</td><td>DB</td><td><strong>Neon Serverless Postgres</strong></td><td>Vercel公式統合。Prisma対応。東京リージョン。scale-to-zero</td><td>$0</td><td>500MB超→有料($19/月)</td></tr>
+      <tr><td class="num">3</td><td>ホスティング</td><td><strong>Vercel Pro</strong></td><td>Next.js最適化。ISR/Edge/Fluid Compute。商用はPro必須</td><td style="color:#dc2626;font-weight:700;">$20/月</td><td>→下記3パターン参照</td></tr>
+      <tr><td class="num">4</td><td>決済</td><td><strong>Stripe</strong></td><td>日本法人。手数料3.6%+¥30。PayPay対応</td><td>$0</td><td>従量発生時のみ</td></tr>
+      <tr><td class="num">5</td><td>クチコミAPI</td><td><strong>Google Places API (New)</strong></td><td>現採用。無料枠10K req/月。デファクト</td><td>$0</td><td>全レビュー必要→GBP API</td></tr>
+      <tr><td class="num">6</td><td>認証</td><td><strong>Auth.js v5</strong></td><td>OSS完全無料。Next.js公式推奨。Google OAuth対応</td><td>$0</td><td>DX向上→Clerk</td></tr>
+      <tr><td class="num">7</td><td>メール</td><td><strong>Resend</strong></td><td>3,000通/月無料。React Email対応</td><td>$0</td><td>通数超過→有料($20/月)</td></tr>
+      <tr><td class="num">8</td><td>監視</td><td><strong>Vercel Analytics + Sentry</strong></td><td>ネイティブ統合。追加コスト0</td><td>$0</td><td>—</td></tr>
+      <tr><td class="num">9</td><td>DNS/CDN</td><td><strong>Cloudflare (無料)</strong></td><td>DDoS防御+CDN+SSL。完全無料</td><td>$0</td><td>—</td></tr>
+    </tbody>
+    <tfoot>
+      <tr class="total-row"><td colspan="4" style="text-align:right;">MVP期 月額合計</td><td colspan="2"><strong>$20/月（≒¥3,000）— Vercel Pro代のみ</strong></td></tr>
+    </tfoot>
+  </table>
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="stack">コメント</button><div class="cmt-area"><textarea data-cmt="stack" placeholder="採用スタック一覧へのコメント…" oninput="autoSave()"></textarea></div></div>
+</div>
+
+<!-- ===== Kill判定 ===== -->
+<div class="kill-pass">
+  <strong>S4 Kill判定: PASS（続行）</strong><br>
+  全9カテゴリで採用サービス確定。致命的フィルタ落ちなし。
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="kill" style="color:#166534;border-color:#86efac;">コメント</button><div class="cmt-area"><textarea data-cmt="kill" placeholder="Kill判定へのコメント…" oninput="autoSave()"></textarea></div></div>
+</div>
+
+<!-- ===== 競合との差異 ===== -->
+<div class="diff-box">
+  <h3>競合との最大の差異</h3>
+  <p>全4社（口コミコム/Location Connect/MEOチェキ/Gyro-n）が<strong>AWS自社運用型</strong>。当社のみ<strong>Vercelサーバーレス型</strong>。</p>
+  <p>競合が「やらない」のではなく「この価格帯ではAWSの固定費が採算に合わない」。サーバーレス選択が<strong>¥980/月の価格設定を可能にする構造的根拠</strong>。</p>
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="diff">コメント</button><div class="cmt-area"><textarea data-cmt="diff" placeholder="競合との差異へのコメント…" oninput="autoSave()"></textarea></div></div>
+</div>
+
+<!-- ===== マスター確認事項 ===== -->
+<h2>マスター確認事項</h2>
+
+<!-- 確認1 -->
+<div class="confirm-box">
+  <h3>❶ Google Places API — 1リクエスト最大5レビュー制限</h3>
+  <p>「全クチコミを分析」という訴求は、Places APIだけでは実現できません。</p>
+  <p><strong>MVPの対処:</strong> 新着レビューを定期取得（例: 1日1回）→ DB蓄積。時間をかけて履歴を構築する方式。</p>
+  <p><strong>将来:</strong> Google Business Profile API（オーナーのOAuth認証で全レビュー取得可能）へ移行。</p>
+  <p><strong>LP訴求への影響:</strong> 「全クチコミを一括分析」とは書けない。「新着クチコミを自動で分析」が正確な表現。</p>
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="c1">コメント</button><div class="cmt-area"><textarea data-cmt="c1" placeholder="❶ Places API制限へのコメント…" oninput="autoSave()"></textarea></div></div>
+</div>
+
+<!-- 確認2 -->
+<div class="risk">
+  <h3>❷ Gemini無料枠 — クチコミデータがGoogleに利用される</h3>
+  <p>Gemini API無料枠では、入力データ（=顧客のクチコミ）がGoogleのモデル改善に利用されます。</p>
+  <p><strong>対処:</strong> S5コスト発生マップに「Gemini有料API移行」の閾値を含める。有料APIではデータ利用なし。</p>
+  <p><strong>閾値目安:</strong> 有料でも入力$0.30/1Mトークン。クチコミ1件≒200トークンとして、1,000件/月でも$0.06。コスト影響は軽微。むしろ「データを送らない」選択肢（ローカルモデル）は現実的でない。</p>
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="c2">コメント</button><div class="cmt-area"><textarea data-cmt="c2" placeholder="❷ Geminiデータ利用へのコメント…" oninput="autoSave()"></textarea></div></div>
+</div>
+
+<!-- 確認3 + 代替3パターン -->
+<div class="confirm-box" style="border-color: #dc2626;">
+  <h3 style="color: #dc2626;">❸ Vercel Pro $20/月 — 許容しない場合の3パターン</h3>
+  <p>Vercel Hobbyプラン（無料）は<strong>商用利用不可</strong>（利用規約で明記）。飲食店向けSaaSとして提供する時点でProが必要。</p>
+  <p>許容しない場合、以下の3パターンがあります。</p>
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="c3">コメント</button><div class="cmt-area"><textarea data-cmt="c3" placeholder="❸ Vercel Pro全体へのコメント…" oninput="autoSave()"></textarea></div></div>
+
+  <!-- パターンA -->
+  <div class="pattern pattern-a">
+    <h4>パターンA: Railway <span class="tag tag-cost">$5〜15/月</span></h4>
+    <p>Dockerコンテナベースのホスティング。Next.jsをコンテナとしてデプロイ。</p>
+    <table style="font-size: 12px; box-shadow: none;">
+      <tr><td style="width:140px;font-weight:600;">月額</td><td>$5/月 + CPU/メモリ従量。中規模で$8〜15/月</td></tr>
+      <tr><td style="font-weight:600;">デプロイ方法</td><td><code>railway up</code> or GitHub連携（自動デプロイ）</td></tr>
+      <tr><td style="font-weight:600;">失うもの</td><td>ISR（Incremental Static Regeneration）/ Edge Functions / Fluid Compute / Image Optimization API / Vercel Analytics</td></tr>
+      <tr><td style="font-weight:600;">DB影響</td><td>Neon継続可。Vercel統合なしだがConnection String直指定で問題なし</td></tr>
+      <tr><td style="font-weight:600;">監視影響</td><td>Sentry継続可。Vercel Analytics → 別途GA4で代替</td></tr>
+    </table>
+    <div class="pro-con">
+      <div><h5 style="color:#16a34a;">利点</h5><ul>
+        <li>Vercelの1/2〜1/3のコスト</li>
+        <li>Docker標準なのでベンダーロックインが弱い</li>
+        <li>バックエンドサービスを同一プロジェクトに追加しやすい</li>
+      </ul></div>
+      <div><h5 style="color:#dc2626;">リスク</h5><ul>
+        <li>Next.js最適化なし（初回ロード遅延。体感-200〜500ms）</li>
+        <li>エッジ配信なし（東京リージョンのサーバー1台のみ）</li>
+        <li>Next.js App Routerの一部機能で非互換の可能性</li>
+        <li>Image Optimization自前実装が必要（sharp）</li>
+      </ul></div>
+    </div>
+    <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="pa">コメント</button><div class="cmt-area"><textarea data-cmt="pa" placeholder="パターンAへのコメント…" oninput="autoSave()"></textarea></div></div>
+  </div>
+
+  <!-- パターンB -->
+  <div class="pattern pattern-b">
+    <h4>パターンB: Coolify + Oracle Cloud Free Tier <span class="tag tag-ok">$0/月</span> <span class="tag tag-risk">運用コスト高</span></h4>
+    <p>Oracle Cloudの永久無料ARM枠（4 OCPU / 24GB RAM）にCoolify（セルフホストPaaS）を構築。</p>
+    <table style="font-size: 12px; box-shadow: none;">
+      <tr><td style="width:140px;font-weight:600;">月額</td><td><strong>$0</strong>（Oracle Cloud Always Free Tier）</td></tr>
+      <tr><td style="font-weight:600;">スペック</td><td>ARM Ampere A1: 4 OCPU, 24GB RAM, 200GB Block Volume（無料枠上限）</td></tr>
+      <tr><td style="font-weight:600;">Coolifyとは</td><td>オープンソースのセルフホストPaaS。Vercel/Railway相当のデプロイ体験をVPS上で再現</td></tr>
+      <tr><td style="font-weight:600;">デプロイ方法</td><td>GitHub連携 → Coolify経由で自動ビルド+Dockerデプロイ</td></tr>
+      <tr><td style="font-weight:600;">失うもの</td><td>Vercel全機能（ISR/Edge/Fluid Compute/Analytics）+ 自動スケーリング + CDN</td></tr>
+      <tr><td style="font-weight:600;">補完策</td><td>Cloudflare（無料）をフロントに配置してCDN/DDoS防御を確保</td></tr>
+    </table>
+    <div class="pro-con">
+      <div><h5 style="color:#16a34a;">利点</h5><ul>
+        <li><strong>完全$0。</strong> 開発コスト¥0制約を文字通り達成</li>
+        <li>スペックが潤沢（24GB RAM。Vercel Proの数十倍）</li>
+        <li>DB（PostgreSQL）もサーバー内に同居可能（Neon不要）</li>
+        <li>Coolifyがgit push→自動デプロイを提供</li>
+      </ul></div>
+      <div><h5 style="color:#dc2626;">リスク</h5><ul>
+        <li><strong>インフラ管理が全て自分。</strong> OS更新/セキュリティパッチ/障害対応</li>
+        <li>Oracle Cloud Freeは予告なしのインスタンス回収リスクあり（idle時）</li>
+        <li>ARM（aarch64）対応のDockerイメージが必要（Next.jsは対応済み）</li>
+        <li>東京リージョンでFree枠が確保できない可能性（人気で枯渇報告あり）</li>
+        <li>スケーリングは手動。トラフィック急増に弱い</li>
+      </ul></div>
+    </div>
+    <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="pb">コメント</button><div class="cmt-area"><textarea data-cmt="pb" placeholder="パターンBへのコメント…" oninput="autoSave()"></textarea></div></div>
+  </div>
+
+  <!-- パターンC -->
+  <div class="pattern pattern-c">
+    <h4>パターンC: Cloudflare Pages + OpenNext <span class="tag tag-cost">$0〜5/月</span></h4>
+    <p>OpenNextアダプタでNext.jsをCloudflare Pages/Workers上に変換デプロイ。</p>
+    <table style="font-size: 12px; box-shadow: none;">
+      <tr><td style="width:140px;font-weight:600;">月額</td><td>Pages Free: $0（無制限リクエスト）。Workers有料: $5/月（10M req含む）</td></tr>
+      <tr><td style="font-weight:600;">OpenNextとは</td><td>Next.jsをVercel以外にデプロイするためのOSSアダプタ（SST開発。AWS/Cloudflare対応）</td></tr>
+      <tr><td style="font-weight:600;">デプロイ方法</td><td><code>opennextjs-cloudflare</code> → <code>wrangler pages deploy</code></td></tr>
+      <tr><td style="font-weight:600;">CDN</td><td>Cloudflareグローバルネットワーク（東京PoP含む300+拠点）。Vercel以上</td></tr>
+      <tr><td style="font-weight:600;">対応状況</td><td>Next.js App Router対応。Server Actions/ISR/Middleware対応済み。ただし一部エッジケースあり</td></tr>
+      <tr><td style="font-weight:600;">失うもの</td><td>Fluid Compute / Vercel Analytics / Vercel独自の最適化</td></tr>
+    </table>
+    <div class="pro-con">
+      <div><h5 style="color:#16a34a;">利点</h5><ul>
+        <li>Free枠でも無制限リクエスト。ほぼ$0運用可能</li>
+        <li>CDN性能はVercel以上（300+拠点）</li>
+        <li>DDoS防御/WAFがデフォルト</li>
+        <li>Workers KVやD1（SQLite）など追加ストレージも無料枠あり</li>
+      </ul></div>
+      <div><h5 style="color:#dc2626;">リスク</h5><ul>
+        <li><strong>OpenNextは成熟途上。</strong> Vercel前提のNext.js機能で非互換が出る可能性</li>
+        <li>Workers実行時間制限: Free=10ms CPU / Paid=30s。API処理が重いと制限に抵触</li>
+        <li>Gemini API呼び出し（AI分析/返信生成）はCPU時間制限との相性が悪い</li>
+        <li>デバッグが難しい（Vercelのログ/プレビュー機能がない）</li>
+        <li>Prisma + Neon接続がWorkers環境で追加設定必要（@prisma/adapter-neon）</li>
+      </ul></div>
+    </div>
+    <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="pc">コメント</button><div class="cmt-area"><textarea data-cmt="pc" placeholder="パターンCへのコメント…" oninput="autoSave()"></textarea></div></div>
+  </div>
+
+  <!-- 比較表 -->
+  <h4 style="margin:20px 0 8px;">3パターン比較</h4>
+  <table class="compare-table">
+    <thead>
+      <tr><th></th><th>現案: Vercel Pro</th><th>A: Railway</th><th>B: Coolify+Oracle</th><th>C: Cloudflare+OpenNext</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>月額</td><td style="color:#dc2626;font-weight:700;">$20</td><td>$5〜15</td><td style="color:#16a34a;font-weight:700;">$0</td><td>$0〜5</td></tr>
+      <tr><td>Next.js最適化</td><td class="yes">○ 最高</td><td class="partial">△ 基本動作</td><td class="no">× なし</td><td class="partial">△ OpenNext経由</td></tr>
+      <tr><td>CDN/エッジ</td><td class="yes">○ 東京含む</td><td class="no">× 単一リージョン</td><td class="partial">△ Cloudflare併用で可</td><td class="yes">○ 300+拠点</td></tr>
+      <tr><td>運用負荷</td><td class="yes">○ ゼロ</td><td class="yes">○ ほぼゼロ</td><td class="no">× 高い（自分で管理）</td><td class="partial">△ OpenNext固有の問題</td></tr>
+      <tr><td>スケーラビリティ</td><td class="yes">○ 自動</td><td class="partial">△ 手動スケール</td><td class="no">× 手動。上限固定</td><td class="yes">○ 自動</td></tr>
+      <tr><td>AI API呼び出し</td><td class="yes">○ 制限なし</td><td class="yes">○ 制限なし</td><td class="yes">○ 制限なし</td><td class="partial">△ CPU時間制限あり</td></tr>
+      <tr><td>安定性</td><td class="yes">○ 実績豊富</td><td class="yes">○ 安定</td><td class="partial">△ インスタンス回収リスク</td><td class="partial">△ OpenNext成熟途上</td></tr>
+      <tr><td>ベンダーロックイン</td><td class="no">× 高い</td><td class="yes">○ Docker標準</td><td class="yes">○ Docker標準</td><td class="partial">△ Cloudflare固有API</td></tr>
+      <tr style="background:#f8fafc;font-weight:600;"><td>総合判定</td><td>最も安全だが高い</td><td>バランス型</td><td>最安だが運用リスク大</td><td>CDN最強だがAI処理に懸念</td></tr>
+    </tbody>
+  </table>
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="compare">コメント</button><div class="cmt-area"><textarea data-cmt="compare" placeholder="3パターン比較へのコメント…" oninput="autoSave()"></textarea></div></div>
+
+  <p style="font-size:13px;margin-top:16px;line-height:1.7;">
+    <strong>補足:</strong> 当プロダクトはAI分析（Gemini API呼び出し）がコア機能のため、API Routes内で数秒の処理時間が発生します。パターンCのCloudflare Workers CPU時間制限（Free: 10ms / Paid: 30s）はこの処理と相性が悪く、有料プランでも制約になる可能性があります。パターンA（Railway）が現実的な妥協点です。
+  </p>
+</div>
+
+<!-- ===== 次タスク ===== -->
+<div class="section" style="border-left: 4px solid #2563eb;">
+  <h2>次タスク</h2>
+  <table style="box-shadow:none;">
+    <tbody>
+      <tr><td style="width:80px;font-weight:600;">S5 #13</td><td>収益モデル定義（QA: マスターに質問して決定）</td></tr>
+      <tr><td style="font-weight:600;">S5 #14</td><td>料金設計+コスト発生マップ（QA: 各サービスの無料枠超過閾値を算出）</td></tr>
+      <tr><td style="font-weight:600;">S6 #15-17</td><td>MVPスコープ → KPI → Go/No-Go判定</td></tr>
+    </tbody>
+  </table>
+  <div class="cmt-wrap"><button class="cmt-toggle" onclick="toggleCmt(this)" data-id="next">コメント</button><div class="cmt-area"><textarea data-cmt="next" placeholder="次タスクへのコメント…" oninput="autoSave()"></textarea></div></div>
+</div>
+
+<!-- ===== フリーコメント ===== -->
+<div class="free-cmt">
+  <h3>自由記入欄</h3>
+  <textarea data-cmt="free" placeholder="全体を通しての所感・指示・疑問など自由に記入…" oninput="autoSave()"></textarea>
+</div>
+
+<script>
+const SK = 'review-analysis-s4-comments';
+
+function toggleCmt(btn) {
+  const area = btn.nextElementSibling;
+  area.classList.toggle('open');
+  if (area.classList.contains('open')) area.querySelector('textarea').focus();
+}
+
+function gatherComments() {
+  const data = {};
+  document.querySelectorAll('textarea[data-cmt]').forEach(ta => {
+    if (ta.value.trim()) data[ta.dataset.cmt] = ta.value.trim();
+  });
+  return data;
+}
+
+function applyComments(data) {
+  if (!data) return;
+  Object.entries(data).forEach(([id, text]) => {
+    const ta = document.querySelector(`textarea[data-cmt="${id}"]`);
+    if (ta) {
+      ta.value = text;
+      // open the area and mark button
+      const area = ta.closest('.cmt-area');
+      if (area) area.classList.add('open');
+      const btn = area?.previousElementSibling;
+      if (btn) btn.classList.add('has-comment');
+    }
+  });
+}
+
+function updateBadges() {
+  let count = 0;
+  document.querySelectorAll('textarea[data-cmt]').forEach(ta => {
+    const btn = ta.closest('.cmt-area')?.previousElementSibling;
+    if (!btn) return;
+    if (ta.value.trim()) {
+      btn.classList.add('has-comment');
+      if (ta.dataset.cmt !== 'free') count++;
+      const badge = btn.querySelector('.cmt-badge');
+      if (!badge) {
+        const b = document.createElement('span');
+        b.className = 'cmt-badge';
+        b.textContent = '!';
+        btn.prepend(b);
+      }
+    } else {
+      btn.classList.remove('has-comment');
+      const badge = btn.querySelector('.cmt-badge');
+      if (badge) badge.remove();
+    }
+  });
+  const el = document.getElementById('cmtCount');
+  const freeHas = document.querySelector('textarea[data-cmt="free"]')?.value?.trim() ? 1 : 0;
+  el.textContent = (count + freeHas) > 0 ? `コメント ${count + freeHas}件` : '';
+}
+
+function saveAll() {
+  localStorage.setItem(SK, JSON.stringify(gatherComments()));
+  updateBadges();
+  const el = document.getElementById('saveStatus');
+  el.style.display = 'inline';
+  setTimeout(() => el.style.display = 'none', 2500);
+}
+
+function autoSave() {
+  localStorage.setItem(SK, JSON.stringify(gatherComments()));
+  updateBadges();
+}
+
+function exportComments() {
+  const data = gatherComments();
+  if (!Object.keys(data).length) { alert('コメントがありません'); return; }
+
+  const labels = {
+    stack: '採用スタック一覧', kill: 'Kill判定', diff: '競合との差異',
+    c1: '❶ Places API制限', c2: '❷ Geminiデータ利用', c3: '❸ Vercel Pro全体',
+    pa: 'パターンA: Railway', pb: 'パターンB: Coolify+Oracle', pc: 'パターンC: Cloudflare+OpenNext',
+    compare: '3パターン比較', next: '次タスク', free: '自由記入'
+  };
+
+  let md = `# S4実現性検証 — マスターコメント\n\n> ${new Date().toISOString().slice(0,10)}\n\n`;
+  Object.entries(data).forEach(([id, text]) => {
+    md += `## ${labels[id] || id}\n\n${text}\n\n---\n\n`;
+  });
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'review-analysis-s4-comments.md';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// 初期化
+try { applyComments(JSON.parse(localStorage.getItem(SK))); } catch(e) {}
+updateBadges();
+</script>
+
+</body>
+</html>

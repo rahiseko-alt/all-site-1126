@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カードぐにゃーん</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #08090d;
+            --text-primary: #faf5f0;
+            --text-secondary: #8e92a2;
+            --accent: #d4af37;
+            --font-outfit: 'Outfit', sans-serif;
+            --font-playfair: 'Playfair Display', serif;
+        }
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-outfit);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: flex-start; align-items: center;
+            overflow-x: hidden; overflow-y: auto;
+            position: relative; padding-bottom: 80px;
+        }
+        .badge {
+            position: fixed; top: 16px; right: 16px;
+            background: rgba(212,175,55,0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase;
+            padding: 6px 14px; border-radius: 4px;
+            z-index: 100; pointer-events: none;
+        }
+        .glow {
+            position: absolute; width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(212,175,55,0.04) 0%, rgba(8,9,13,0) 70%);
+            top: 400px; left: 50%; transform: translate(-50%, -50%);
+            z-index: 0; pointer-events: none;
+        }
+        #canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1; pointer-events: none;
+        }
+        header {
+            margin-top: 60px; margin-bottom: 40px;
+            text-align: center; z-index: 2; pointer-events: none;
+        }
+        header h1 { font-family: var(--font-playfair); font-size: 42px; font-weight: 400; margin: 0 0 10px 0; letter-spacing: 2px; }
+        header p { color: var(--text-secondary); font-size: 14px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; margin: 0; }
+        .cards-container {
+            display: flex; flex-wrap: wrap; gap: 40px;
+            justify-content: center; align-items: center;
+            max-width: 1200px; z-index: 2; position: relative; padding: 0 20px;
+        }
+        .card-wrapper {
+            position: relative; z-index: 2; border-radius: 24px;
+            overflow: visible; cursor: pointer;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .card-vertical { width: 310px; height: 470px; }
+        .card-horizontal { width: 460px; height: 310px; }
+        .card-wrapper:hover { transform: translateY(-8px); }
+        .card-inner { position: relative; width: 100%; height: 100%; border-radius: 22px; overflow: visible; background: transparent; }
+        .plane { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .plane img { display: none !important; opacity: 0 !important; width: 0 !important; height: 0 !important; position: absolute !important; pointer-events: none !important; }
+        .card-content { position: absolute; bottom: 40px; left: 40px; right: 40px; z-index: 3; pointer-events: none; }
+        .category { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: inline-block; }
+        .title { font-family: var(--font-playfair); font-size: 28px; font-weight: 400; margin: 0 0 12px 0; line-height: 1.2; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .description { font-size: 13px; font-weight: 300; color: var(--text-secondary); line-height: 1.6; margin: 0; opacity: 0.8; }
+        footer { margin-top: 60px; z-index: 2; color: var(--text-secondary); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="badge">BLINDTEST: Hover Only / コア技術 1・6</div>
+    <div class="glow"></div>
+    <div id="canvas"></div>
+
+    <header>
+        <h1>カードぐにゃーん</h1>
+        <p>マウスを乗せるとカードがぐにゃーんと歪む — クリック効果なし</p>
+    </header>
+
+    <div class="cards-container">
+        <div class="card-wrapper card-vertical"
+             data-hover-intensity="1.2">
+            <div class="card-inner">
+                <div class="plane">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=640&auto=format&fit=crop" data-sampler="cardTexture" alt="Card 1" />
+                    <img class="displacement-img" src="" data-sampler="displacementTexture" alt="Noise" />
+                </div>
+                <div class="card-content">
+                    <span class="category">ぐにゃーん</span>
+                    <h2 class="title">Jelly Wave</h2>
+                    <p class="description">コア技術 1（頂点変形）+ コア技術 6（ノイズマップ）のみ</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-wrapper card-horizontal"
+             data-hover-intensity="0.8">
+            <div class="card-inner">
+                <div class="plane">
+                    <img src="https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=640&auto=format&fit=crop" data-sampler="cardTexture" alt="Card 2" />
+                    <img class="displacement-img" src="" data-sampler="displacementTexture" alt="Noise" />
+                </div>
+                <div class="card-content">
+                    <span class="category">ぐにゃーん</span>
+                    <h2 class="title">Soft Jelly</h2>
+                    <p class="description">クリックしても何も起きないことを確認</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>BLINDTEST — webgl-card-distortion-hover</footer>
+
+    <!-- 頂点シェーダー: コア技術 1（ホバーうねり）のみ。クリック波紋なし -->
+    <script id="vs" type="x-shader/x-vertex">
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+
+        attribute vec3 aVertexPosition;
+        attribute vec2 aTextureCoord;
+
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+
+        uniform float uHoverStrength;
+        uniform vec2 uMousePosition;
+        uniform float uHoverTime;
+        uniform float uHoverIntensity;
+
+        varying vec2 vTextureCoord;
+
+        void main() {
+            vTextureCoord = aTextureCoord;
+            vec3 position = aVertexPosition;
+
+            if (uHoverTime >= 0.0) {
+                float hoverDecay = smoothstep(80.0, 0.0, uHoverTime);
+                float hoverInfluence = uHoverStrength * hoverDecay * uHoverIntensity;
+
+                float waveX = sin(aTextureCoord.y * 8.0 + uHoverTime * 0.05) * cos(aTextureCoord.x * 4.0 + uHoverTime * 0.03);
+                float waveY = cos(aTextureCoord.x * 8.0 + uHoverTime * 0.05) * sin(aTextureCoord.y * 4.0 + uHoverTime * 0.03);
+
+                position.x += waveX * 0.12 * hoverInfluence;
+                position.y += waveY * 0.12 * hoverInfluence;
+            }
+
+            gl_Position = uPMatrix * uMVMatrix * vec4(position, 1.0);
+        }
+    </script>
+
+    <!-- フラグメントシェーダー: コア技術 6（ノイズマップ）で歪み。クリック波紋なし -->
+    <script id="fs" type="x-shader/x-fragment">
+        #ifdef GL_ES
+        precision mediump float;
+        #endif
+
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D cardTexture;
+        uniform sampler2D displacementTexture;
+
+        uniform float uHoverStrength;
+        uniform vec2 uMousePosition;
+        uniform float uHoverTime;
+        uniform float uHoverIntensity;
+
+        void main() {
+            vec2 uv = vTextureCoord;
+
+            vec4 displacement = texture2D(displacementTexture, uv);
+
+            vec2 distortedCoord = uv;
+            if (uHoverTime >= 0.0) {
+                float hoverDecay = smoothstep(80.0, 0.0, uHoverTime);
+                float hoverInfluence = uHoverStrength * hoverDecay * uHoverIntensity;
+
+                distortedCoord.x += (displacement.r - 0.5) * 0.05 * hoverInfluence;
+                distortedCoord.y += (displacement.g - 0.5) * 0.05 * hoverInfluence;
+            }
+
+            vec2 borderCoord = distortedCoord;
+
+            vec4 imgColor = texture2D(cardTexture, clamp(distortedCoord, vec2(0.0), vec2(1.0)));
+
+            float shadow = smoothstep(0.9, 0.1, uv.y) * 0.4 + 0.6;
+            vec4 cardColor = vec4(imgColor.rgb * shadow, 1.0);
+
+            vec4 borderColor = vec4(0.83, 0.69, 0.22, 1.0);
+            float borderMask = smoothstep(0.0, 0.015, borderCoord.x) *
+                               smoothstep(1.0, 0.985, borderCoord.x) *
+                               smoothstep(0.0, 0.015, borderCoord.y) *
+                               smoothstep(1.0, 0.985, borderCoord.y);
+
+            gl_FragColor = mix(borderColor, cardColor, borderMask);
+        }
+    </script>
+
+    <script type="module">
+        import { Curtains, Plane } from 'https://cdn.jsdelivr.net/npm/curtainsjs@8.1.3/src/index.mjs';
+
+        function generateNoiseTexture() {
+            const canvas = document.createElement("canvas");
+            canvas.width = 256; canvas.height = 256;
+            const ctx = canvas.getContext("2d");
+            const imgData = ctx.createImageData(256, 256);
+            const data = imgData.data;
+            for (let y = 0; y < 256; y++) {
+                for (let x = 0; x < 256; x++) {
+                    const index = (y * 256 + x) * 4;
+                    const nx = (x / 256) * Math.PI * 2;
+                    const ny = (y / 256) * Math.PI * 2;
+                    data[index]     = Math.floor((Math.sin(nx * 4.0) * Math.cos(ny * 4.0) * 0.5 + 0.5) * 255);
+                    data[index + 1] = Math.floor((Math.cos(nx * 4.0) * Math.sin(ny * 4.0) * 0.5 + 0.5) * 255);
+                    data[index + 2] = 128;
+                    data[index + 3] = 255;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            return canvas.toDataURL("image/png");
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const noiseDataUrl = generateNoiseTexture();
+            document.querySelectorAll(".displacement-img").forEach(img => { img.src = noiseDataUrl; });
+
+            const curtains = new Curtains({
+                container: "canvas",
+                pixelRatio: Math.min(1.5, window.devicePixelRatio),
+                production: true
+            });
+
+            curtains.onError(() => {
+                document.body.style.background = "#08090d";
+                console.warn("WebGL unsupported.");
+            });
+
+            document.querySelectorAll(".plane").forEach((planeElement) => {
+                const wrapperElement = planeElement.closest(".card-wrapper");
+                const hoverIntensity = parseFloat(wrapperElement.getAttribute("data-hover-intensity") || "1.0");
+
+                let hoverStrength = 0;
+                let targetHoverStrength = 0;
+                let hoverTime = -1.0;
+                const mousePosition = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 };
+
+                const params = {
+                    vertexShaderID: "vs",
+                    fragmentShaderID: "fs",
+                    widthSegments: 35,
+                    heightSegments: 35,
+                    uniforms: {
+                        uHoverStrength:  { name: "uHoverStrength",  type: "1f", value: 0 },
+                        uMousePosition:  { name: "uMousePosition",  type: "2f", value: [0.5, 0.5] },
+                        uHoverTime:      { name: "uHoverTime",      type: "1f", value: -1.0 },
+                        uHoverIntensity: { name: "uHoverIntensity", type: "1f", value: hoverIntensity }
+                    }
+                };
+
+                const plane = new Plane(curtains, planeElement, params);
+
+                plane.onReady(() => {
+                    wrapperElement.addEventListener("mouseenter", () => {
+                        targetHoverStrength = 1.0;
+                        hoverTime = 0.0;
+                    });
+                    wrapperElement.addEventListener("mousemove", (e) => {
+                        const rect = wrapperElement.getBoundingClientRect();
+                        mousePosition.targetX = (e.clientX - rect.left) / rect.width;
+                        mousePosition.targetY = (e.clientY - rect.top) / rect.height;
+                    });
+                    wrapperElement.addEventListener("mouseleave", () => {
+                        targetHoverStrength = 0.0;
+                        mousePosition.targetX = 0.5;
+                        mousePosition.targetY = 0.5;
+                    });
+                }).onRender(() => {
+                    hoverStrength += (targetHoverStrength - hoverStrength) * 0.08;
+                    plane.uniforms.uHoverStrength.value = hoverStrength;
+
+                    if (hoverTime >= 0.0) {
+                        hoverTime += 1.0;
+                        if (hoverTime > 100.0) hoverTime = 100.0;
+                    }
+                    if (targetHoverStrength === 0.0 && hoverStrength < 0.01) hoverTime = -1.0;
+                    plane.uniforms.uHoverTime.value = hoverTime;
+
+                    mousePosition.x += (mousePosition.targetX - mousePosition.x) * 0.1;
+                    mousePosition.y += (mousePosition.targetY - mousePosition.y) * 0.1;
+                    plane.uniforms.uMousePosition.value = [mousePosition.x, mousePosition.y];
+                });
+            });
+        });
+    </script>
+</body>
+</html>

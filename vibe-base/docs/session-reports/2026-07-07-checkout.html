@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2026-07-07 Check-out - 技術ポートフォリオ v2 再設計</title>
+<style>
+body{margin:0;background:#f7f5f1;color:#1f2933;font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI",sans-serif;line-height:1.75}
+main{width:min(1040px,100%);margin:0 auto;padding:32px 20px 56px}
+h1{font-size:30px;line-height:1.25;margin:0 0 8px}
+h2{font-size:20px;margin:28px 0 10px;border-bottom:1px solid #ddd6cc;padding-bottom:6px}
+p,li{font-size:14px}
+.meta{color:#66717d;margin:0 0 20px}
+.alert{background:#fff1f1;border-left:5px solid #a34d4d;padding:14px 16px;border-radius:4px}
+.box{background:#fff;border:1px solid #ded8cf;border-radius:8px;padding:14px 16px;margin:12px 0}
+code{font-family:Consolas,monospace;background:#f1f3f4;padding:1px 5px;border-radius:4px}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #ded8cf}
+th,td{border-bottom:1px solid #e8e2da;text-align:left;vertical-align:top;padding:8px 10px;font-size:13px}
+th{background:#f0ece5}
+</style>
+</head>
+<body>
+<main>
+<h1>2026-07-07 Check-out - 技術ポートフォリオ v2 再設計</h1>
+<p class="meta">branch: master / pre-commit HEAD: 6990fd4 / vibe-base 司令塔 / 次セッションは本ファイルを先頭から Read 必須</p>
+
+<section class="alert">
+<strong>最重要</strong>
+<ol>
+<li>技術ポートフォリオ v2 再設計は実装済み。次セッション初手は、マスター目視判断を受けて公開前レビューと微調整を行う。</li>
+<li>Case 02 動画編集は中央の既存本文を削除し、図解パネル単体表示に変更済み。図解は赤=ヒト、青=AIで、9工程に分解した。</li>
+<li>未追跡ファイルが複数残っている。今回コミット対象は意図的に限定し、削除・採用判断は次回へ回す。</li>
+</ol>
+</section>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li><code>docs/deliverables/portfolio.html</code> を「技術一覧」から「相談・見積・実物確認へ進ませる営業資料」へ再設計。</li>
+<li>左ナビを、発注者が課題を想像しやすい表現へ変更。</li>
+<li>共通セクション「このページで判断できること」「導入・伴走の進め方」「サンプル成果物」を追加。</li>
+<li>X自動化を追加し、ネタ収集、投稿、反応分析、補充まで回る継続運用の仕組みとして表現。</li>
+<li>動画編集Case 02は中央本文をカットし、解決課題・実測値・工程図のみを表示する試作へ変更。</li>
+<li>動画図解は、ユーザー指摘を受けて「素材と目的を渡す（ヒト）」と「編集条件を固定する（AI）」を分離。<code>pipeline.mjs init</code> はAI工程だけに表示。</li>
+<li>余計な矢印、点線、チップ風装飾を削り、淡い赤/青の色面と2カラムだけで主語を追える見た目に調整。</li>
+<li>比較用サンプル <code>docs/deliverables/portfolio-video-diagram-samples.html</code> を作成し、本体Case 02と同じ工程思想を反映。</li>
+</ol>
+
+<h2>B. 完了 commit 一覧</h2>
+<table>
+<thead><tr><th>hash</th><th>種別</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>本Check-out commit</td><td>feat(portfolio)</td><td>技術ポートフォリオ v2 営業資料化 + 動画編集図解サンプル追加 + Check-out 引継ぎ更新</td></tr>
+<tr><td><code>6990fd4</code></td><td>chore(memory)</td><td>前回Check-out。ポートフォリオPhase2完遂 + v2再設計起票</td></tr>
+</tbody>
+</table>
+
+<h2>C. 影響波及</h2>
+<div class="box">
+<ul>
+<li><code>portfolio.html</code> は1ファイル完結、<code>items[]</code> / <code>sections[]</code> / <code>renderItem()</code> 構造。</li>
+<li>Case 02のみ特別分岐で <code>videoAutomationSideHTML()</code> を単体表示する。ほかのCaseは従来の3ブロック表示を維持。</li>
+<li>図解サンプルページは判断用の試作。採用範囲は次回、マスター目視で決める。</li>
+</ul>
+</div>
+
+<h2>D. 残作業</h2>
+<table>
+<thead><tr><th>優先度</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>H</td><td>技術ポートフォリオ v2 公開前レビュー。Case 02図解の工程数、密度、余白、文言をマスター目視で確定。</td></tr>
+<tr><td>M</td><td>未追跡ファイル整理。スクショ群、<code>portfolio-strategy-understanding.html</code>、試作HTMLを採用/削除/保留に分ける。</td></tr>
+<tr><td>H</td><td>継続: x-auto-post ガバナンス圏復帰 Step3 物理移設 + Step4 司令塔パス追従。</td></tr>
+<tr><td>H</td><td>継続: hp-customizer 編集エンジン層。</td></tr>
+</tbody>
+</table>
+
+<h2>E. 配備済 subagent / skill / hook</h2>
+<p>新規追加なし。使用スキル: <code>pc-checkin</code>、<code>copywriting</code>、<code>web-design-css-modern</code>、<code>checkout</code>。ブラウザ検証は Playwright MCP を使用。</p>
+
+<h2>F. 本セッション生成レポート</h2>
+<ul>
+<li><code>docs/deliverables/portfolio-video-diagram-samples.html</code> - 動画編集図解の比較・判断用サンプル。</li>
+<li>既存スクショ/未追跡スクショは残存。今回コミットには含めていない。</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li><code>memory.md</code> 冒頭と本HTMLを Read。</li>
+<li><code>http://127.0.0.1:8766/portfolio.html#item-1</code> と <code>portfolio-video-diagram-samples.html</code> を表示し、Case 02図解の最終採否をマスターに確認。</li>
+<li>必要なら図解密度、文言、色面、余白を最終調整。</li>
+<li>未追跡ファイルの採用/削除を確認し、公開前の最終コミットを作る。</li>
+</ol>
+
+<h2>検証</h2>
+<ul>
+<li><code>node --check</code> による <code>portfolio.html</code> 内script構文チェック: PASS。</li>
+<li>HTTP到達: <code>portfolio.html</code> / <code>portfolio-video-diagram-samples.html</code> ともに 200。</li>
+<li>Playwright: desktop / 375px mobile で横溢れなし。</li>
+<li>Case 02: 中央Case本文なし、図解パネルあり、<code>pipeline.mjs init</code> はAI工程のみ。</li>
+<li>行動ログ: <code>MASTER_VAULT_ROOT</code> 未設定のためこの環境では未記入。</li>
+</ul>
+</main>
+</body>
+</html>

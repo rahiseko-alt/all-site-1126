@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>動画編集自動化 図解サンプル</title>
+<style>
+:root{
+  --bg:#f6f3ee;
+  --paper:#fffdf9;
+  --ink:#1f2933;
+  --muted:#64707d;
+  --line:#d9d3c8;
+  --soft:#eee8df;
+  --blue:#2f6f9f;
+  --green:#557b54;
+  --amber:#b56b2a;
+  --red:#a34d4d;
+  --ai:#2f6f9f;
+  --human:#a34d4d;
+  --shadow:0 16px 40px rgba(31,41,51,.08);
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink)}
+body{
+  margin:0;
+  font-family:-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI",sans-serif;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+.page{
+  width:min(1180px,100%);
+  margin:0 auto;
+  padding:34px 22px 52px;
+}
+header{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  align-items:end;
+  padding-bottom:22px;
+  border-bottom:1px solid var(--line);
+}
+.eyebrow{
+  margin:0 0 8px;
+  color:var(--amber);
+  font-size:13px;
+  font-weight:700;
+}
+h1{
+  margin:0;
+  font-size:38px;
+  line-height:1.18;
+  letter-spacing:0;
+}
+.lead{
+  margin:14px 0 0;
+  max-width:760px;
+  color:var(--muted);
+  font-size:15px;
+}
+.status{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:flex-end;
+  align-items:center;
+}
+.pill{
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--paper);
+  padding:7px 11px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.sample-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+  margin-top:24px;
+}
+.sample{
+  display:grid;
+  grid-template-rows:auto auto 1fr;
+  gap:14px;
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--paper);
+  box-shadow:var(--shadow);
+  padding:18px;
+}
+.sample.primary{
+  padding:20px;
+}
+.sample-head{
+  display:flex;
+  gap:12px;
+  justify-content:space-between;
+  align-items:start;
+}
+.sample h2{
+  margin:0;
+  font-size:20px;
+  line-height:1.35;
+  letter-spacing:0;
+}
+.tag{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:5px 9px;
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+}
+.tag.blue{background:var(--blue)}
+.tag.green{background:var(--green)}
+.tag.amber{background:var(--amber)}
+.tag.red{background:var(--red)}
+.tag.human{background:var(--human)}
+.note{
+  margin:0;
+  color:var(--muted);
+  font-size:13.5px;
+}
+.diagram{
+  min-width:0;
+  background:#fffdf9;
+  padding:2px 0;
+}
+.outcome{
+  display:grid;
+  gap:12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#fffaf2;
+  padding:16px 18px;
+  margin-top:22px;
+}
+.outcome h2{
+  margin:0;
+  font-size:20px;
+  line-height:1.35;
+}
+.outcome p{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.75;
+}
+.metric-row{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+.metric{
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--paper);
+  padding:10px 11px;
+}
+.metric b{
+  display:block;
+  font-size:16px;
+  line-height:1.3;
+}
+.metric span{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:11.5px;
+  line-height:1.45;
+}
+.two-tier-flow{
+  display:grid;
+  gap:14px;
+}
+.process-flow{
+  display:grid;
+  gap:6px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+.process-columns-header{
+  display:grid;
+  grid-template-columns:minmax(210px,.72fr) minmax(0,2.05fr);
+  gap:12px;
+  align-items:end;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+.process-columns-header span{
+  min-width:0;
+  padding:0 4px 6px;
+}
+.process-step{
+  display:grid;
+  grid-template-columns:minmax(210px,.72fr) minmax(0,2.05fr);
+  gap:12px;
+  align-items:stretch;
+  min-width:0;
+}
+.baseline-card,
+.tech-card{
+  min-width:0;
+  border:0;
+  border-radius:4px;
+  padding:14px 16px;
+}
+.baseline-card{
+  background:#fff;
+  align-self:stretch;
+}
+.process-step.human .baseline-card{
+  background:#fff1f1;
+}
+.process-step.ai .baseline-card{
+  background:#eef7ff;
+}
+.tech-card{
+  align-self:stretch;
+}
+.process-step.human .tech-card{
+  background:#fff1f1;
+}
+.process-step.ai .tech-card{
+  background:#eef7ff;
+}
+.baseline-card b{
+  display:block;
+  font-size:14px;
+  line-height:1.35;
+}
+.tech-card b{
+  display:block;
+  font-size:14.5px;
+  line-height:1.35;
+}
+.baseline-card span{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.tech-card p{
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:12.5px;
+  line-height:1.65;
+}
+.tech-list{
+  display:grid;
+  gap:4px;
+  margin:8px 0 0;
+  padding-left:1.1em;
+  color:var(--muted);
+  font-size:12.5px;
+  line-height:1.55;
+}
+code{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:0;
+  color:var(--ink);
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  font-size:.92em;
+}
+.feedback-band{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  align-items:center;
+  border:0;
+  border-radius:4px;
+  background:#f4f8f1;
+  padding:12px 14px;
+  color:var(--green);
+  font-size:12px;
+  font-weight:800;
+  text-align:center;
+}
+@media (max-width:55rem){
+  header{grid-template-columns:1fr}
+  .status{justify-content:flex-start}
+  .sample-grid{grid-template-columns:1fr}
+  .metric-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .process-columns-header,
+  .process-step{grid-template-columns:1fr}
+  .process-columns-header span:first-child{display:none}
+}
+@media (max-width:35rem){
+  .page{padding:24px 14px 40px}
+  h1{font-size:28px}
+  .sample{padding:14px}
+  .sample-head{display:grid}
+  .tag{width:max-content}
+  .metric-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div>
+      <p class="eyebrow">動画編集自動化 / 図解比較サンプル</p>
+      <h1>動画編集自動化を、プロセスと結果で分けて見せる</h1>
+      <p class="lead">現行ポートフォリオはそのまま残し、動画素材から見どころを抽出して編集・配布準備する仕組みだけを別表現にした判断用ページです。プロセスは「誰が何をするか」、結果は「手作業がどう減るか」に分けて確認します。</p>
+    </div>
+    <div class="status" aria-label="作成条件">
+      <span class="pill">既存ページ未変更</span>
+      <span class="pill">CSSのみ</span>
+      <span class="pill">比較用サンプル</span>
+    </div>
+  </header>
+
+  <section class="outcome" aria-label="解決する課題">
+    <h2>解決する課題</h2>
+    <p>長尺動画の確認、文字起こし、見どころ探し、短尺候補づくり、字幕・縦横調整、配布前チェックまでを毎回人が行うと、編集前の下準備だけで時間が溶けます。この仕組みでは、AIが発話の読み取り、候補抽出、切り出し案、出力準備までを担当し、人は最初の条件決めと最後の採用判断に集中します。実測では、61分32秒の素材をGroq利用時に76秒で文字起こしし、7本のショート候補を生成、カバー率98.2%まで確認できました。</p>
+    <div class="metric-row" aria-label="実測値">
+      <div class="metric"><b>61分32秒</b><span>処理対象にした長尺素材</span></div>
+      <div class="metric"><b>76秒</b><span>Groq利用時の文字起こし</span></div>
+      <div class="metric"><b>7本</b><span>生成されたショート候補</span></div>
+      <div class="metric"><b>98.2%</b><span>素材カバー率</span></div>
+    </div>
+    <p>さらに、低解像度素材の無意味な拡大エンコードを止めたことで、レンダリング時間は924秒から303秒へ短縮しました。つまり、AIに任せるのは「公開判断」ではなく、確認前の下処理と候補づくりです。得られるものは、公開前に人が選べる短尺候補、字幕・縦横を整えた配布用素材、次回改善に使える運用ログです。</p>
+  </section>
+
+  <section class="sample-grid" aria-label="動画編集自動化の図解サンプル">
+    <article class="sample primary">
+      <div class="sample-head">
+        <h2>1. 統合プロセス図</h2>
+      </div>
+      <p class="note">4の運用ループ型をベースに、上から下へ進む工程図に整理。各工程は左が発注者向けの作業説明、右が対応する技術・実装要素です。</p>
+      <div class="diagram two-tier-flow">
+        <div class="process-columns-header" aria-hidden="true">
+          <span>作業フロー</span>
+          <span>技術説明</span>
+        </div>
+        <ol class="process-flow">
+          <li class="process-step human">
+            <div class="baseline-card"><b>素材と目的を渡す（ヒト）</b><span>動画、用途、尺、NG条件を決める</span></div>
+            <div class="tech-card">
+              <b>この工程は人の判断</b>
+              <p>ここではまだ自動処理を始めない。人が、動画ファイル、使う媒体、目標尺、字幕の有無、縦横、避けたい表現、公開NG条件を決める。AIに任せる前に、何を作ってはいけないかを入力として揃える。</p>
+            </div>
+          </li>
+          <li class="process-step ai">
+            <div class="baseline-card"><b>編集条件を固定する（AI）</b><span>人が決めた条件を後続工程の共通ルールにする</span></div>
+            <div class="tech-card">
+              <b><code>pipeline.mjs init</code> / hooks / <code>state.json</code></b>
+              <p><code>pipeline.mjs init</code> が、人の入力した編集モード、字幕有無、縦横、用途、NG条件を <code>state.json</code> に保存する。以後の <code>transcribe</code>、<code>select</code>、<code>render</code> はこの状態を参照し、工程ごとに条件がずれないようにする。</p>
+              <ul class="tech-list">
+                <li><code>--mode</code>、<code>--sub</code>、<code>--orient</code> 未指定なら停止し、決め打ち実行を防ぐ。</li>
+                <li><code>topic</code> と <code>digest</code> を分け、話題単位カバーとAI編集エージェント型の用途を切り替える。</li>
+                <li>実測素材は <code>61分32秒</code> のインスタライブ動画。処理開始前に編集モード、字幕有無、縦横を固定した。</li>
+              </ul>
+            </div>
+          </li>
+          <li class="process-step ai">
+            <div class="baseline-card"><b>発話と場面を読み取る（AI）</b><span>長い動画を確認しやすい素材へ分解する</span></div>
+            <div class="tech-card">
+              <b><code>FFmpeg</code> 音声抽出 / <code>faster-whisper</code> / <code>Groq whisper-large-v3-turbo</code></b>
+              <p><code>FFmpeg</code> で動画から音声を取り出し、ASRに渡す。ローカルは <code>faster-whisper</code>、クラウドは <code>Groq whisper-large-v3-turbo</code> を使い、鍵や速度要件に応じてフォールバックできる構成にする。word-level のタイムスタンプを保持し、後工程で切り出し位置へ戻せるようにする。</p>
+              <ul class="tech-list">
+                <li><code>transcribe</code> 工程で全文テキスト、単語時刻、発話区間を中間データ化する。</li>
+                <li><code>term-corrections.json</code> で専門用語や固有名詞の補正を入れられる。</li>
+                <li>実測では <code>Groq</code> 自動選択で <code>61分32秒</code> 素材の文字起こしが <code>76秒</code>。</li>
+                <li>文字起こし精度の数値評価は未計測。医学用語・固有名詞は誤変換リスクがあるため <code>term-corrections.json</code> で補正する前提。</li>
+              </ul>
+            </div>
+          </li>
+          <li class="process-step ai">
+            <div class="baseline-card"><b>見どころ候補を作る（AI）</b><span>使えそうな切り出しと構成を複数出す</span></div>
+            <div class="tech-card">
+              <b><code>Claude</code> / <code>claude -p</code> / LLM区間選定 / timestamp逆マッチング</b>
+              <p><code>select</code> 工程で文字起こし全文をLLMに渡し、話題単位またはダイジェスト用の候補区間を選ぶ。<code>Claude</code> や <code>claude -p</code> は、全体理解、台本再構成、候補批評、修正ループの判断役として使う。LLMの出した文章上の候補を、word-level timestampへ逆マッチングして実際の動画区間へ戻す。</p>
+              <ul class="tech-list">
+                <li><code>topic</code> は話題の切れ目ごとに時系列で候補化する。</li>
+                <li><code>digest</code> は面白い箇所を選び、素材音声のまま台本再構成する。</li>
+                <li>実測では <code>61分32秒</code> 素材から <code>7本</code> のショート候補を生成し、カバー率は <code>98.2%</code>。</li>
+                <li>話題分割の調整では <code>TOPIC_MIN_SEC</code> 既定 <code>180s</code>、細切れ候補を <code>13本→7本</code> に整理した記録がある。</li>
+              </ul>
+            </div>
+          </li>
+          <li class="process-step human">
+            <div class="baseline-card"><b>採用・修正を判断する（ヒト）</b><span>公開してよい内容だけを選ぶ</span></div>
+            <div class="tech-card">
+              <b>この工程は人の判断</b>
+              <p>LLMが作った候補をそのまま公開しない。人がプレビューを見て、採用、破棄、修正の判断をする。技術は判断を代替せず、候補、開始秒、終了秒、選定理由を確認しやすく並べるだけに留める。</p>
+              <ul class="tech-list">
+                <li>明らかなNG、準備中、音声テスト、カット相談など本編でない箇所を落とす。</li>
+                <li>採用・破棄の判断を出力対象と切り離し、誤公開を防ぐ。</li>
+                <li>実測では <code>ui/index.html?job=insta-live-herunia</code> で <code>7本</code> の候補を確認する導線を用意した。</li>
+              </ul>
+            </div>
+          </li>
+          <li class="process-step ai">
+            <div class="baseline-card"><b>承認結果を出力対象にする（AI）</b><span>人が選んだ候補だけを次工程へ渡す</span></div>
+            <div class="tech-card">
+              <b>候補選別UI / レビューキュー / 承認ログ</b>
+              <p><code>ui/index.html?job=&lt;id&gt;</code> で人が選んだ候補だけを、レンダリング対象として確定する。候補一覧、開始秒、終了秒、選定理由、採用状態を分けて扱い、未承認の候補が出力工程へ流れないようにする。</p>
+              <ul class="tech-list">
+                <li>候補生成と出力対象を分離し、AIの提案と人の承認を別データとして扱う。</li>
+                <li>承認済み候補だけを <code>render</code> 工程へ渡し、誤公開リスクを下げる。</li>
+              </ul>
+            </div>
+          </li>
+          <li class="process-step ai">
+            <div class="baseline-card"><b>配布できる形へ整える（AI）</b><span>字幕、縦横、説明文、ファイル名を整える</span></div>
+            <div class="tech-card">
+              <b><code>FFmpeg</code> / <code>ASS</code> / <code>libass</code> / 縦横変換 / レンダリング</b>
+              <p><code>render</code> 工程で承認済み候補だけを動画化する。<code>FFmpeg</code> で切り出し、縦型なら <code>render-vertical.mjs</code> で 1080x1920 系のキャンバスへ変換し、字幕ありの場合は <code>ASS</code> / <code>libass</code> で字幕を焼き込む。低解像度素材では無意味な拡大エンコードを避けるガードも入れる。</p>
+              <ul class="tech-list">
+                <li><code>ffprobe</code> で素材解像度を確認し、拡大ガードや画質モードの判断に使う。</li>
+                <li><code>libx264</code>、<code>crf</code>、<code>preset</code> などのエンコード条件を用途に合わせる。</li>
+                <li>低解像度素材 <code>432x766</code> では、拡大ガード実装後に <code>render 924秒→303秒</code>、<code>3.05倍速</code> を確認。</li>
+                <li>拡大ベンチは <code>1080x1920=9.6s</code>、<code>720x1280=5.0s</code>、<code>432x768=3.0s</code> で、無意味な拡大が遅さの主因だった。</li>
+              </ul>
+            </div>
+          </li>
+          <li class="process-step human">
+            <div class="baseline-card"><b>次回条件へ戻す（ヒト）</b><span>採用理由や修正点を運用ルールに戻す</span></div>
+            <div class="tech-card">
+              <b>この工程は人の判断</b>
+              <p>納品して終わりにせず、どの候補が使いやすかったか、何を落としたか、字幕や尺で直したい点は何かを人が判断する。次回に反映したい好みやNG例を、運用ルールとして残す。</p>
+            </div>
+          </li>
+          <li class="process-step ai">
+            <div class="baseline-card"><b>ログを残して改善点を見える化する（AI）</b><span>時間、候補数、失敗箇所を次回改善の材料にする</span></div>
+            <div class="tech-card">
+              <b><code>timing.json</code> / 運用ログ / ルール更新</b>
+              <p>各工程の所要時間、採用された候補、不採用理由、字幕修正、尺の傾向をログとして残す。実走では <code>transcribe</code>、<code>select</code>、<code>render</code> の時間計測や <code>timing.json</code> を使い、遅い工程や品質課題を次の改善対象にする。</p>
+              <ul class="tech-list">
+                <li>採用傾向、NG例、修正履歴を次回の <code>state.json</code> や運用ルールへ戻す。</li>
+                <li>レンダリング時間、ASR時間、候補数を見て、ボトルネックを切り分ける。</li>
+                <li>実走ログでは <code>transcribe 76秒</code>、旧 <code>render 924秒</code>、改善後 <code>render 303秒</code> のように、改善前後を比較できる。</li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+        <div class="feedback-band">
+          <div>人の判断を消さずに、確認結果だけを次回条件へ戻す</div>
+          <div>単発の自動編集ではなく、現場の好みに近づく運用にする</div>
+        </div>
+      </div>
+    </article>
+  </section>
+</main>
+</body>
+</html>

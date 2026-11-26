@@ -1,0 +1,623 @@
+{
+ "meta": {
+  "generated": "2026-07-07",
+  "period": {
+   "start": "2026-06-07T00:00:00+09:00",
+   "end": "2026-07-07T23:59:59+09:00"
+  },
+  "plan": "velvety-spinning-squid.md",
+  "report": "docs/audits/ops-improvement-scan-2026-07.md",
+  "scripts": [
+   "transcript-audit.mjs",
+   "verify-report-numbers.mjs"
+  ]
+ },
+ "summary": {
+  "period": {
+   "start": "2026-06-07T00:00:00+09:00",
+   "end": "2026-07-07T23:59:59+09:00"
+  },
+  "files_scanned": 308,
+  "files_in_window": 306,
+  "files_skipped": 2,
+  "parse_error_lines": 31,
+  "total_lines": 142662,
+  "large_line_meta_only": 5,
+  "runtime_error_lines": 0,
+  "sessions_in_window": 306,
+  "sessions_by_project": {
+   "C--Users-user": 1,
+   "C--Users-user-AppData-Local-Temp": 32,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base": 111,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base--claude-worktrees-busy-raman-e0cab5": 1,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-ai-company-ops": 4,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-code-review-skills": 1,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-google-slides-gen": 1,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-homepage": 36,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-instagram-auto-ops": 3,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-kosespark": 24,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-kosespark--claude-worktrees-agitated-wescoff-4e45ec": 1,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-kosespark-video-shorts": 27,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-learning-suite-kanji": 4,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-medguide-rag": 6,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-meishi-maker": 4,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-n8n": 1,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-new-trimmer-system": 4,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-renai-game": 3,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-shift-ai": 9,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-spire-lite": 1,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-trimmer-system": 14,
+   "C--Users-user-Desktop-ClaudeCode-vibe-base-products-x-auto-post": 17,
+   "C--Users-user-Desktop-ClaudeCode-x-auto-post-repo": 1
+  },
+  "daily_session_counts": {
+   "raw": [
+    {
+     "date": "2026-06-06",
+     "count": 4
+    },
+    {
+     "date": "2026-06-07",
+     "count": 8
+    },
+    {
+     "date": "2026-06-08",
+     "count": 10
+    },
+    {
+     "date": "2026-06-09",
+     "count": 5
+    },
+    {
+     "date": "2026-06-10",
+     "count": 9
+    },
+    {
+     "date": "2026-06-11",
+     "count": 5
+    },
+    {
+     "date": "2026-06-12",
+     "count": 4
+    },
+    {
+     "date": "2026-06-13",
+     "count": 11
+    },
+    {
+     "date": "2026-06-15",
+     "count": 9
+    },
+    {
+     "date": "2026-06-16",
+     "count": 11
+    },
+    {
+     "date": "2026-06-17",
+     "count": 4
+    },
+    {
+     "date": "2026-06-18",
+     "count": 7
+    },
+    {
+     "date": "2026-06-19",
+     "count": 5
+    },
+    {
+     "date": "2026-06-20",
+     "count": 9
+    },
+    {
+     "date": "2026-06-21",
+     "count": 9
+    },
+    {
+     "date": "2026-06-22",
+     "count": 16
+    },
+    {
+     "date": "2026-06-23",
+     "count": 27
+    },
+    {
+     "date": "2026-06-24",
+     "count": 4
+    },
+    {
+     "date": "2026-06-25",
+     "count": 2
+    },
+    {
+     "date": "2026-06-26",
+     "count": 12
+    },
+    {
+     "date": "2026-06-27",
+     "count": 15
+    },
+    {
+     "date": "2026-06-28",
+     "count": 5
+    },
+    {
+     "date": "2026-06-29",
+     "count": 10
+    },
+    {
+     "date": "2026-06-30",
+     "count": 12
+    },
+    {
+     "date": "2026-07-01",
+     "count": 3
+    },
+    {
+     "date": "2026-07-02",
+     "count": 25
+    },
+    {
+     "date": "2026-07-03",
+     "count": 5
+    },
+    {
+     "date": "2026-07-04",
+     "count": 32
+    },
+    {
+     "date": "2026-07-05",
+     "count": 10
+    },
+    {
+     "date": "2026-07-06",
+     "count": 18
+    }
+   ],
+   "median": 9,
+   "mode": 5
+  }
+ },
+ "rejections_summary": {
+  "by_tool": {
+   "freq": {
+    "AskUserQuestion": 117,
+    "ExitPlanMode": 62,
+    "Bash": 18,
+    "unknown": 10,
+    "Agent": 25,
+    "Write": 2,
+    "Glob": 2,
+    "mcp__chrome-devtools__take_screenshot": 1,
+    "Edit": 8,
+    "WebFetch": 1,
+    "PowerShell": 1
+   },
+   "counts_median": 8,
+   "counts_mode": 1
+  },
+  "by_bash_head": {
+   "freq": {
+    "git": 3,
+    "Opus.*スキル\\": 1,
+    "echo": 4,
+    "tail": 1,
+    "for": 1,
+    "node toranomaki-intake.mjs": 1,
+    "node resolve-paths.mjs": 1,
+    "node quality-probe.mjs": 1,
+    "node cf-tl.mjs": 1,
+    "node": 2,
+    "node pipeline.mjs": 1,
+    "node shot-side.mjs": 1
+   },
+   "counts_median": 1,
+   "counts_mode": 1
+  },
+  "by_project": {
+   "freq": {
+    "C--Users-user-Desktop-ClaudeCode-vibe-base": 119,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base--claude-worktrees-busy-raman-e0cab5": 1,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-code-review-skills": 1,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-google-slides-gen": 1,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-homepage": 40,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-instagram-auto-ops": 3,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-kosespark": 24,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-learning-suite-kanji": 4,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-medguide-rag": 3,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-meishi-maker": 3,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-new-trimmer-system": 8,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-renai-game": 4,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-shift-ai": 6,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-spire-lite": 4,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-trimmer-system": 11,
+    "C--Users-user-Desktop-ClaudeCode-vibe-base-products-x-auto-post": 15
+   },
+   "counts_median": 4,
+   "counts_mode": 1
+  }
+ },
+ "tool_totals_main": {
+  "freq": {
+   "Write": 1672,
+   "Bash": 7184,
+   "ToolSearch": 450,
+   "ExitPlanMode": 277,
+   "PowerShell": 484,
+   "Read": 3307,
+   "AskUserQuestion": 378,
+   "Edit": 3459,
+   "Agent": 1250,
+   "Skill": 167,
+   "EnterPlanMode": 28,
+   "mcp__serena__initial_instructions": 30,
+   "Glob": 270,
+   "Grep": 454,
+   "TaskCreate": 178,
+   "TaskUpdate": 294,
+   "WebFetch": 218,
+   "Artifact": 1,
+   "mcp__serena__get_current_config": 1,
+   "WebSearch": 143,
+   "mcp__claude_ai_Gmail__create_draft": 5,
+   "Workflow": 13,
+   "TaskStop": 19,
+   "mcp__palate__refs_search": 4,
+   "mcp__palate__refs_get_tokens": 2,
+   "mcp__palate__refs_match_brief": 1,
+   "mcp__palate__refs_get": 1,
+   "mcp__serena__activate_project": 23,
+   "mcp__serena__get_symbols_overview": 10,
+   "mcp__serena__find_symbol": 30,
+   "mcp__serena__insert_before_symbol": 1,
+   "mcp__serena__replace_symbol_body": 11,
+   "TaskList": 4,
+   "mcp__playwright__browser_navigate": 59,
+   "mcp__Claude_Preview__preview_start": 9,
+   "mcp__Claude_Preview__preview_eval": 18,
+   "mcp__Claude_Preview__preview_console_logs": 6,
+   "mcp__Claude_Preview__preview_snapshot": 2,
+   "mcp__Claude_Preview__preview_click": 1,
+   "mcp__Claude_Preview__preview_screenshot": 21,
+   "mcp__Claude_Preview__preview_resize": 6,
+   "mcp__Claude_Preview__preview_inspect": 1,
+   "mcp__chrome-devtools__new_page": 7,
+   "mcp__chrome-devtools__resize_page": 23,
+   "mcp__chrome-devtools__take_screenshot": 49,
+   "mcp__chrome-devtools__evaluate_script": 11,
+   "SendMessage": 11,
+   "mcp__chrome-devtools__navigate_page": 30,
+   "mcp__chrome-devtools__take_snapshot": 3,
+   "mcp__chrome-devtools__click": 5,
+   "ScheduleWakeup": 11,
+   "Monitor": 5,
+   "TaskOutput": 7,
+   "mcp__chrome-devtools__select_page": 1,
+   "mcp__chrome-devtools__list_pages": 3,
+   "mcp__ccd_session__spawn_task": 2,
+   "TaskGet": 1,
+   "mcp__playwright__browser_resize": 33,
+   "mcp__playwright__browser_take_screenshot": 54,
+   "mcp__playwright__browser_evaluate": 31,
+   "mcp__playwright__browser_close": 2,
+   "mcp__playwright__browser_console_messages": 3,
+   "mcp__serena__replace_content": 30,
+   "SendUserFile": 7,
+   "mcp__Claude_Preview__preview_stop": 3,
+   "mcp__claude-in-chrome__navigate": 1,
+   "mcp__claude-in-chrome__get_page_text": 1,
+   "mcp__playwright__browser_run_code_unsafe": 24,
+   "mcp__playwright__browser_snapshot": 9,
+   "mcp__playwright__browser_type": 4,
+   "mcp__playwright__browser_click": 13,
+   "mcp__duckduckgo__search": 1,
+   "mcp__duckduckgo__fetch_content": 2,
+   "mcp__textlint__lintText": 1,
+   "mcp__textlint__getLintFixedTextContent": 1,
+   "mcp__marp__export_slide": 1,
+   "mcp__Claude_Preview__preview_network": 1,
+   "mcp__Claude_in_Chrome__tabs_context_mcp": 2,
+   "mcp__Claude_in_Chrome__navigate": 17,
+   "mcp__Claude_in_Chrome__get_page_text": 15,
+   "mcp__claude_ai_Canva__authenticate": 1,
+   "mcp__ccd_session__mark_chapter": 2
+  },
+  "counts_median": 9.5,
+  "counts_mode": 1
+ },
+ "token_totals_main": {
+  "input_tokens": 17535103,
+  "output_tokens": 82583758,
+  "cache_read_input_tokens": 9727729257,
+  "cache_creation_input_tokens": 313154453,
+  "total": 10141002571,
+  "cache_read_ratio": 0.9592
+ },
+ "replay_gap_note": "ask-events.json replay_estimate/gap_estimate は推定2系統・合算禁止。拒否のみ実測。",
+ "item_index": {
+  "list1_skill": [
+   [
+    "S-1",
+    "マスキング/シークレットgrep skill",
+    "新規"
+   ],
+   [
+    "S-2",
+    "スクショ実機目視3構図",
+    "既起票:master-instruction-patterns#9"
+   ],
+   [
+    "S-3",
+    "フォーメーション起動",
+    "既起票:#6"
+   ],
+   [
+    "S-4",
+    "統廃合プラン",
+    "既起票:#7"
+   ],
+   [
+    "S-5",
+    "A-1 unstaged機械化(checkout内部)",
+    "新規"
+   ],
+   [
+    "S-6",
+    "検証パネル呼出テンプレ",
+    "既起票:#1(skill側)"
+   ],
+   [
+    "S-8",
+    "path-scoped判定補助",
+    "新規"
+   ]
+  ],
+  "list2_allow": [
+   [
+    "A-1",
+    "sleep",
+    "新規"
+   ],
+   [
+    "A-2",
+    "head",
+    "新規"
+   ],
+   [
+    "A-3",
+    "tail",
+    "新規"
+   ],
+   [
+    "A-4",
+    "test一般化",
+    "新規"
+   ],
+   [
+    "A-5",
+    "date",
+    "新規"
+   ],
+   [
+    "A-6",
+    "pwd",
+    "新規"
+   ],
+   [
+    "A-7",
+    "printf",
+    "新規"
+   ],
+   [
+    "A-8",
+    "which",
+    "新規"
+   ],
+   [
+    "A-9",
+    "awk(要注意)",
+    "新規"
+   ],
+   [
+    "A-10",
+    "sed(要注意)",
+    "新規"
+   ],
+   [
+    "A-11",
+    "export",
+    "新規"
+   ],
+   [
+    "A-12",
+    "for(高リスク非推奨)",
+    "新規"
+   ],
+   [
+    "A-13",
+    "timeout(高リスク非推奨)",
+    "新規"
+   ],
+   [
+    "A-14",
+    "無害env代入値固定",
+    "新規"
+   ],
+   [
+    "A-15",
+    "notepad.exe",
+    "新規"
+   ],
+   [
+    "A-16",
+    "Godot exeパス限定",
+    "新規"
+   ],
+   [
+    "A-17",
+    "WebFetch自社ドメイン集約",
+    "新規"
+   ],
+   [
+    "A-18",
+    "WebFetch github.io",
+    "新規"
+   ],
+   [
+    "A-19",
+    "feed-check 11ドメインbulk",
+    "新規"
+   ],
+   [
+    "A-20",
+    "path-resolver呼出プレフィックス",
+    "既起票:permission-defense-canonical(方針)"
+   ],
+   [
+    "A-21",
+    "一回性Bash43件棚卸し",
+    "新規"
+   ]
+  ],
+  "list3_cron": [
+   [
+    "C-1",
+    "feed-check時刻駆動化",
+    "新規"
+   ],
+   [
+    "C-2",
+    "hook-errors日次スキャン",
+    "既起票:06-17監査指摘"
+   ],
+   [
+    "C-3",
+    "settings棚卸し月次化",
+    "新規"
+   ],
+   [
+    "C-4",
+    "GSAP upstream週次差分",
+    "新規"
+   ],
+   [
+    "C-5",
+    "顧客PII masking hook化",
+    "新規"
+   ],
+   [
+    "C-6",
+    "token-audit週次+異常WARN",
+    "新規"
+   ],
+   [
+    "C-7",
+    "hook propagate自動化",
+    "新規"
+   ]
+  ],
+  "list4_env": [
+   [
+    "E-1",
+    "local allow意味的衝突35件",
+    "新規"
+   ],
+   [
+    "E-2",
+    "シェル丸ごと許可のdeny迂回封鎖",
+    "新規"
+   ],
+   [
+    "E-3",
+    "MCP connector 40.6k固定費",
+    "既起票:CR-A"
+   ],
+   [
+    "E-4",
+    "transcript肥大+token-audit再帰バグ",
+    "新規"
+   ],
+   [
+    "E-5",
+    "subagent出力サイズ制御",
+    "新規"
+   ],
+   [
+    "E-6",
+    "outside-gate例外リスト陳腐化",
+    "新規"
+   ],
+   [
+    "E-7",
+    "Bashヒアドキュメント破損対策",
+    "新規"
+   ],
+   [
+    "E-8",
+    "モノレポ分離完遂",
+    "既起票:GS-46"
+   ],
+   [
+    "E-9",
+    "低cache_read率プロジェクト調査",
+    "新規"
+   ]
+  ],
+  "list5_mechanism": [
+   [
+    "M-1",
+    "commit前verify-agent hook",
+    "既起票:BK-1"
+   ],
+   [
+    "M-2",
+    "plan受入Y/N禁止ゲート",
+    "既起票:BK-2"
+   ],
+   [
+    "M-3",
+    "subagent成果物実在検証ゲート",
+    "新規"
+   ],
+   [
+    "M-4",
+    "output-style新設",
+    "既起票:BK-4/BK-5"
+   ],
+   [
+    "M-5",
+    "持ち越し滞留機械検知",
+    "要判定"
+   ],
+   [
+    "M-6",
+    "Serena発火hook誘導",
+    "新規"
+   ],
+   [
+    "M-7",
+    "verification-before-completion死蔵解消",
+    "要判定"
+   ],
+   [
+    "M-8",
+    "hook故障WARN追跡台帳",
+    "要判定"
+   ]
+  ]
+ },
+ "item_counts": {
+  "by_list": {
+   "list1_skill": 7,
+   "list2_allow": 21,
+   "list3_cron": 7,
+   "list4_env": 9,
+   "list5_mechanism": 8
+  },
+  "total": 52,
+  "triage": {
+   "shinki": 38,
+   "kikihyo": 11,
+   "yohantei": 3
+  }
+ }
+}

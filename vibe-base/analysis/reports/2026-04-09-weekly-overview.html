@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>週次レポート 2026/04/01-09 | ココナラ + GA4 横断分析</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e4e4e7;
+    --muted: #71717a;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 32px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card h2 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .card .value { font-size: 2rem; font-weight: 700; }
+  .card .detail { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .zero { color: var(--red); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-bottom: 32px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--muted); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; }
+  td:first-child, th:first-child { text-align: left; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .tag-action { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .tag-zero { background: rgba(239,68,68,0.15); color: var(--red); }
+  .section { margin-bottom: 40px; }
+  .section h2 { font-size: 1.1rem; margin-bottom: 16px; border-left: 3px solid var(--blue); padding-left: 12px; }
+  .insight {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+  }
+  .insight strong { color: var(--amber); }
+  .bar-container { display: flex; align-items: center; gap: 8px; }
+  .bar {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--blue);
+    min-width: 2px;
+  }
+  .bar-label { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+  .funnel { display: flex; align-items: center; gap: 0; margin: 20px 0; justify-content: center; }
+  .funnel-step {
+    text-align: center;
+    padding: 12px 20px;
+    position: relative;
+  }
+  .funnel-step .f-value { font-size: 1.5rem; font-weight: 700; }
+  .funnel-step .f-label { font-size: 0.7rem; color: var(--muted); }
+  .funnel-arrow { color: var(--muted); font-size: 1.2rem; padding: 0 4px; }
+  .funnel-rate { font-size: 0.7rem; color: var(--amber); position: absolute; top: -8px; right: -16px; }
+  .ga4-empty { text-align: center; padding: 32px; color: var(--muted); font-size: 0.9rem; }
+  footer { color: var(--muted); font-size: 0.75rem; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 16px; }
+</style>
+</head>
+<body>
+
+<h1>Weekly Overview</h1>
+<p class="subtitle">2026/04/01 (火) - 04/09 (水) | ココナラ売上 + GA4 アクセス横断分析</p>
+
+<!-- KPI Cards -->
+<div class="grid">
+  <div class="card">
+    <h2>ココナラ 総売上</h2>
+    <div class="value zero">0 円</div>
+    <div class="detail">販売数: 0件 / 3出品</div>
+  </div>
+  <div class="card">
+    <h2>ココナラ 総閲覧数</h2>
+    <div class="value">43</div>
+    <div class="detail">app50: 21 / dify25: 11 / dsl5: 11</div>
+  </div>
+  <div class="card">
+    <h2>ココナラ 総表示数</h2>
+    <div class="value">119</div>
+    <div class="detail">4/1-4/6 累計（4/6セラーサクセス加入で一括表示）</div>
+  </div>
+  <div class="card">
+    <h2>GA4 外部トラフィック</h2>
+    <div class="value zero">3</div>
+    <div class="detail">全6プロパティ合計 (foodee Referralのみ)</div>
+  </div>
+</div>
+
+<!-- Coconala Detail -->
+<div class="section">
+  <h2>ココナラ出品別サマリ (4/1-4/6)</h2>
+  <p style="color:var(--muted);font-size:0.8rem;margin-bottom:12px;">※ 4/7-4/9 は未入力。表示数は4/6セラーサクセス加入時に4/1-からの累計が一括表示された値</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>出品</th>
+        <th>価格</th>
+        <th>表示数</th>
+        <th>閲覧数</th>
+        <th>販売数</th>
+        <th>お気に入り</th>
+        <th>閲覧率</th>
+        <th>行動</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AI Answer APP</td>
+        <td>50,000円</td>
+        <td>79</td>
+        <td>21</td>
+        <td class="zero">0</td>
+        <td>0</td>
+        <td>26.6%</td>
+        <td><span class="tag tag-action">セラーアクセス加入</span></td>
+      </tr>
+      <tr>
+        <td>Dify DSL</td>
+        <td>5,000円</td>
+        <td>24</td>
+        <td>11</td>
+        <td class="zero">0</td>
+        <td>0</td>
+        <td>45.8%</td>
+        <td><span class="tag tag-action">セラーアクセス加入</span></td>
+      </tr>
+      <tr>
+        <td>Dify AIチャットボット</td>
+        <td>25,000円</td>
+        <td>16</td>
+        <td>11</td>
+        <td class="zero">0</td>
+        <td>0</td>
+        <td>68.8%</td>
+        <td><span class="tag tag-action">動画添付</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Coconala Daily -->
+<div class="section">
+  <h2>ココナラ日別閲覧数</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>曜日</th>
+        <th>app50</th>
+        <th>dify25</th>
+        <th>dsl5</th>
+        <th>合計</th>
+        <th>メモ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>4/1</td><td>火</td><td>3</td><td>-</td><td>-</td><td>3</td><td></td></tr>
+      <tr><td>4/2</td><td>水</td><td style="color:var(--amber);font-weight:700">9</td><td>-</td><td>-</td><td>9</td><td></td></tr>
+      <tr><td>4/3</td><td>木</td><td>1</td><td>-</td><td>-</td><td>1</td><td></td></tr>
+      <tr><td>4/4</td><td>金</td><td>1</td><td>-</td><td>2</td><td>3</td><td></td></tr>
+      <tr><td>4/5</td><td>土</td><td>1</td><td style="color:var(--amber);font-weight:700">9</td><td style="color:var(--amber);font-weight:700">8</td><td style="color:var(--amber);font-weight:700">18</td><td>dify25: 動画添付</td></tr>
+      <tr><td>4/6</td><td>日</td><td>6</td><td>2</td><td>1</td><td>9</td><td>セラーアクセス加入</td></tr>
+      <tr style="color:var(--muted)"><td>4/7</td><td>月</td><td colspan="5">未入力</td></tr>
+      <tr style="color:var(--muted)"><td>4/8</td><td>火</td><td colspan="5">未入力</td></tr>
+      <tr style="color:var(--muted)"><td>4/9</td><td>水</td><td colspan="5">未入力</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Visual bars -->
+  <div style="margin-top:16px">
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">閲覧数バー (日別合計)</div>
+    <div style="display:grid;gap:6px;">
+      <div class="bar-container"><span class="bar-label">4/1</span><div class="bar" style="width:calc(3/18*200px)"></div><span class="bar-label">3</span></div>
+      <div class="bar-container"><span class="bar-label">4/2</span><div class="bar" style="width:calc(9/18*200px)"></div><span class="bar-label">9</span></div>
+      <div class="bar-container"><span class="bar-label">4/3</span><div class="bar" style="width:calc(1/18*200px)"></div><span class="bar-label">1</span></div>
+      <div class="bar-container"><span class="bar-label">4/4</span><div class="bar" style="width:calc(3/18*200px)"></div><span class="bar-label">3</span></div>
+      <div class="bar-container"><span class="bar-label">4/5</span><div class="bar" style="width:calc(18/18*200px);background:var(--amber)"></div><span class="bar-label" style="color:var(--amber)">18</span></div>
+      <div class="bar-container"><span class="bar-label">4/6</span><div class="bar" style="width:calc(9/18*200px)"></div><span class="bar-label">9</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Funnel -->
+<div class="section">
+  <h2>ココナラ ファネル (全出品合計)</h2>
+  <div class="funnel">
+    <div class="funnel-step">
+      <div class="f-value">119</div>
+      <div class="f-label">表示</div>
+    </div>
+    <div class="funnel-arrow">→</div>
+    <div class="funnel-step">
+      <div class="f-value">43</div>
+      <div class="f-label">閲覧</div>
+      <div class="funnel-rate">36.1%</div>
+    </div>
+    <div class="funnel-arrow">→</div>
+    <div class="funnel-step">
+      <div class="f-value">0</div>
+      <div class="f-label">お気に入り</div>
+      <div class="funnel-rate">0%</div>
+    </div>
+    <div class="funnel-arrow">→</div>
+    <div class="funnel-step">
+      <div class="f-value zero">0</div>
+      <div class="f-label">販売</div>
+      <div class="funnel-rate">0%</div>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:0.8rem;color:var(--muted);">※ 表示数は4/1-4/6の累計（4/6セラーサクセス加入で一括表示）</p>
+</div>
+
+<!-- GA4 -->
+<div class="section">
+  <h2>GA4 アクセス (4/1-4/9)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>プロパティ</th>
+        <th>セッション</th>
+        <th>ユーザー</th>
+        <th>PV</th>
+        <th>外部のみ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>foodee</td>
+        <td>10</td>
+        <td>8</td>
+        <td>22</td>
+        <td>3 (Referral)</td>
+      </tr>
+      <tr style="color:var(--muted)">
+        <td>Aiueo LP</td>
+        <td>1</td>
+        <td>1</td>
+        <td>1</td>
+        <td class="zero">0</td>
+      </tr>
+      <tr style="color:var(--muted)">
+        <td>クチコミ分析AI</td>
+        <td>1</td>
+        <td>1</td>
+        <td>1</td>
+        <td class="zero">0</td>
+      </tr>
+      <tr style="color:var(--muted)">
+        <td>Affiliate LP</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td class="zero">0</td>
+      </tr>
+      <tr style="color:var(--muted)">
+        <td>Microscope LP</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td class="zero">0</td>
+      </tr>
+      <tr style="color:var(--muted)">
+        <td>omotenashi-trainer</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td class="zero">0</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Insights -->
+<div class="section">
+  <h2>所見</h2>
+
+  <div class="insight">
+    <strong>1. ココナラ閲覧はLP経由ではない</strong><br>
+    GA4の全LPで外部流入がほぼ0。ココナラの閲覧43件はココナラ内検索 or カテゴリ経由と推定される。LP→ココナラの導線は現時点で機能していない。
+  </div>
+
+  <div class="insight">
+    <strong>2. 4/5（土）に閲覧スパイク: 18件</strong><br>
+    dify25に動画添付した日。dsl5も同日に8閲覧。動画添付のタイミングとの因果は不明だが、週末の閲覧傾向の可能性もある。
+  </div>
+
+  <div class="insight">
+    <strong>3. 閲覧→お気に入り変換率が0%</strong><br>
+    43件閲覧されてお気に入り0。ページを開いても「保存して後で検討」に至っていない。出品ページの冒頭で離脱している可能性。
+  </div>
+
+  <div class="insight">
+    <strong>4. 閲覧率は出品によって大差</strong><br>
+    dify25の閲覧率68.8%（表示16→閲覧11）に対し、app50は26.6%（表示79→閲覧21）。表示数は4/1-4/6の累計値。app50は表示が多いがクリックされにくい（サムネイル or タイトルの訴求力の問題か）。
+  </div>
+
+  <div class="insight">
+    <strong>5. データ欠損: 4/7-4/9 未入力</strong><br>
+    Deta.xlsxの4/7以降が空欄。セラーアクセスのダッシュボードから転記が必要。
+  </div>
+</div>
+
+<footer>
+  生成: 2026-04-09 | データソース: Deta.xlsx (coconala) + GA4 MCP (6 properties) | 外部トラフィックフィルタ適用済み (Direct/Unassigned除外)
+</footer>
+
+</body>
+</html>

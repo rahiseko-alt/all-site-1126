@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>障害者雇用の記録と配慮、自社で回せる仕組みに｜小さな会社のDX屋さん</title>
+<meta name="description" content="2026年7月施行・法定雇用率2.7%。障害者雇用の記録管理を代行に頼らず自社で回せる仕組みに。名古屋の小さなDX屋が1万円から構築・納品します。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   RESET + TOKENS
+================================================================ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --c0:#04070e;      /* near-black */
+  --c1:#0c1a2e;      /* dark navy */
+  --c2:#0f3460;      /* mid navy */
+  --c3:#1a6b5e;      /* teal */
+  --c4:#23c99c;      /* bright teal */
+  --ca:#ff5c35;      /* CTA orange */
+  --ca2:#ff8a5c;     /* CTA hover */
+  --yw:#ffd060;      /* accent yellow */
+  --wt:#e8f1f8;      /* light blue-white */
+  --wt2:#ffffff;
+  --sub:#8fa5bc;
+  --lh:1.75;
+  --r:16px;
+  --r2:10px;
+}
+html{
+  scroll-behavior:auto; /* Lenis takes over */
+  background:var(--c0);
+  color:var(--wt);
+  font-family:'Noto Sans JP',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+body{
+  background:var(--c0);
+  padding-bottom:68px; /* sticky bar */
+  overflow-x:hidden;
+}
+@media(min-width:700px){body{padding-bottom:0}}
+
+/* ================================================================
+   TYPOGRAPHY
+================================================================ */
+.en{font-family:'Inter',sans-serif}
+h2.sec-h{
+  font-size:clamp(1.45rem,5vw,2.2rem);
+  font-weight:900;
+  line-height:1.35;
+  letter-spacing:-.01em;
+}
+.kicker{
+  font-family:'Inter',sans-serif;
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--c4);
+  margin-bottom:12px;
+  display:block;
+}
+p.body-lg{font-size:1rem;line-height:var(--lh);color:var(--sub)}
+
+/* ================================================================
+   LAYOUT UTILS
+================================================================ */
+.wrap{width:100%;max-width:720px;margin:0 auto;padding:0 20px}
+.section{padding:80px 0}
+@media(min-width:700px){.section{padding:110px 0}}
+
+/* ================================================================
+   ===  SECTION 0: STICKY HEADER  ===
+================================================================ */
+.site-header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(4,7,14,0);
+  transition:background .4s,box-shadow .4s;
+}
+.site-header.scrolled{
+  background:rgba(4,7,14,.88);
+  backdrop-filter:blur(12px);
+  box-shadow:0 1px 0 rgba(255,255,255,.06);
+}
+.logo-text{font-size:.82rem;font-weight:700;color:var(--wt);line-height:1.3}
+.logo-text small{display:block;font-weight:400;color:var(--sub);font-size:.72rem}
+.hd-cta{
+  background:var(--ca);color:#fff;
+  border:none;border-radius:8px;padding:9px 16px;
+  font-weight:700;font-size:.82rem;cursor:pointer;
+  text-decoration:none;white-space:nowrap;
+}
+
+/* ================================================================
+   ===  SECTION 1: HERO (pinned scroll stage)  ===
+================================================================ */
+#hero-pin-wrapper{
+  position:relative;
+  height:600vh; /* scroll length for the pinned stage */
+}
+#hero-stage{
+  position:sticky;
+  top:0;
+  height:100dvh;
+  overflow:hidden;
+  background:var(--c0);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Background grid lines – subtle depth */
+#hero-stage::before{
+  content:"";
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(35,201,156,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(35,201,156,.06) 1px, transparent 1px);
+  background-size:60px 60px;
+  animation:gridDrift 20s linear infinite;
+  pointer-events:none;
+}
+@keyframes gridDrift{from{background-position:0 0}to{background-position:60px 60px}}
+
+/* Canvas for particle/chaos */
+#chaos-canvas{
+  position:absolute;inset:0;
+  pointer-events:none;
+  opacity:.6;
+}
+
+/* Hero content layers */
+#hero-center{
+  position:relative;z-index:5;
+  width:100%;max-width:680px;
+  padding:0 20px;
+  text-align:center;
+}
+
+/* Badge */
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,92,53,.18);
+  border:1px solid rgba(255,92,53,.45);
+  border-radius:999px;
+  padding:6px 14px;
+  font-size:.76rem;font-weight:700;color:#ff8a5c;
+  letter-spacing:.04em;
+  margin-bottom:28px;
+}
+.hero-badge svg{width:12px;height:12px;flex:none}
+
+/* Kinetic headline – assembled via clip-path reveal */
+.hero-headline{
+  font-size:clamp(1.6rem,6.5vw,3.1rem);
+  font-weight:900;
+  line-height:1.3;
+  letter-spacing:-.02em;
+  color:var(--wt2);
+  margin-bottom:22px;
+  overflow:visible;
+}
+.hero-headline .hl{color:var(--yw)}
+.hero-headline .hl2{color:var(--c4)}
+
+/* Lines will be revealed individually */
+.headline-line{
+  display:block;
+  overflow:hidden;
+}
+.headline-line-inner{
+  display:block;
+  transform:translateY(110%);
+}
+
+/* Sub */
+.hero-sub{
+  font-size:clamp(.95rem,2.5vw,1.1rem);
+  color:var(--sub);
+  line-height:1.75;
+  margin-bottom:32px;
+  opacity:0;
+}
+.hero-sub b{color:var(--wt)}
+
+/* CTA block */
+.hero-cta-block{opacity:0;transform:translateY(20px)}
+.btn-primary{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--ca);color:#fff;
+  text-decoration:none;
+  font-weight:700;font-size:1.05rem;
+  padding:18px 36px;border-radius:14px;
+  box-shadow:0 12px 32px rgba(255,92,53,.4);
+  transition:transform .15s,box-shadow .15s;
+  border:none;cursor:pointer;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(255,92,53,.5)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary svg{width:18px;height:18px}
+.cta-sub{margin-top:10px;font-size:.78rem;color:var(--sub)}
+
+/* Trust strip */
+.hero-trust{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:16px 24px;
+  margin-top:28px;opacity:0;
+}
+.trust-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:.8rem;color:var(--sub);
+}
+.trust-item svg{width:14px;height:14px;color:var(--c4);flex:none}
+.trust-item b{color:var(--wt)}
+
+/* scroll progress counter (visual)*/
+.scroll-progress-label{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  font-family:'Inter',sans-serif;
+  font-size:.7rem;letter-spacing:.14em;
+  color:rgba(143,165,188,.5);
+  display:flex;align-items:center;gap:8px;
+  opacity:1;
+  transition:opacity .3s;
+}
+.scroll-arrow{
+  width:18px;height:18px;
+  animation:bounce .8s ease-in-out infinite alternate;
+}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(6px)}}
+
+/* --- Floating record fragments (SVG cards) --- */
+.record-card{
+  position:absolute;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:.68rem;
+  color:rgba(255,255,255,.5);
+  white-space:nowrap;
+  pointer-events:none;
+  backdrop-filter:blur(4px);
+  will-change:transform,opacity;
+}
+.record-card.excel{
+  background:rgba(26,107,94,.15);
+  border-color:rgba(35,201,156,.25);
+  color:rgba(35,201,156,.7);
+}
+.record-card.paper{
+  background:rgba(255,208,96,.06);
+  border-color:rgba(255,208,96,.2);
+  color:rgba(255,208,96,.6);
+}
+.record-card.warn{
+  background:rgba(255,92,53,.08);
+  border-color:rgba(255,92,53,.25);
+  color:rgba(255,138,92,.65);
+}
+
+/* "Order" assembled core */
+#order-core{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(.6);
+  width:240px;
+  background:linear-gradient(135deg,rgba(26,107,94,.4),rgba(15,52,96,.6));
+  border:2px solid rgba(35,201,156,.5);
+  border-radius:20px;
+  padding:18px 20px;
+  opacity:0;
+  pointer-events:none;
+  z-index:4;
+}
+#order-core .oc-label{
+  font-size:.65rem;letter-spacing:.12em;color:var(--c4);margin-bottom:10px;font-family:'Inter',sans-serif;font-weight:700;
+}
+.oc-row{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:6px;
+  font-size:.72rem;color:rgba(255,255,255,.7);
+}
+.oc-dot{width:6px;height:6px;border-radius:50%;background:var(--c4);flex:none}
+.oc-bar{
+  flex:1;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.oc-bar-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--c4),var(--c3));
+  border-radius:2px;
+  transition:width .4s ease;
+}
+
+/* ================================================================
+   ===  SECTION 2: PROBLEM  ===
+================================================================ */
+#sec-problem{
+  background:var(--c1);
+  position:relative;overflow:hidden;
+}
+#sec-problem::before{
+  content:"";
+  position:absolute;top:-120px;right:-100px;
+  width:400px;height:400px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,92,53,.12),transparent 70%);
+  pointer-events:none;
+}
+.prob-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:32px 0;
+}
+@media(min-width:700px){.prob-stats{grid-template-columns:repeat(4,1fr)}}
+.pstat{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);
+  padding:18px 14px;
+  text-align:center;
+  opacity:0;transform:translateY(30px);
+}
+.pstat-num{
+  font-family:'Inter',sans-serif;
+  font-size:2rem;font-weight:900;
+  color:var(--ca2);
+  line-height:1;
+  margin-bottom:6px;
+}
+.pstat-num sup{font-size:1rem}
+.pstat-label{font-size:.72rem;color:var(--sub);line-height:1.45}
+
+.prob-pain{
+  background:rgba(255,92,53,.1);
+  border:1px solid rgba(255,92,53,.3);
+  border-radius:var(--r);
+  padding:24px;
+  margin-top:24px;
+  opacity:0;transform:translateY(20px);
+}
+.prob-pain-title{
+  font-size:.78rem;letter-spacing:.12em;color:var(--ca2);
+  font-family:'Inter',sans-serif;font-weight:700;margin-bottom:14px;
+}
+.pain-item{
+  display:flex;align-items:flex-start;gap:10px;
+  margin-bottom:10px;font-size:.9rem;color:rgba(255,255,255,.75);
+  line-height:1.6;
+}
+.pain-icon{flex:none;margin-top:2px;color:var(--ca2)}
+.prob-punchline{
+  margin-top:26px;
+  font-size:clamp(1.1rem,3.5vw,1.5rem);
+  font-weight:900;
+  line-height:1.4;
+  color:var(--wt2);
+  border-left:4px solid var(--ca);
+  padding-left:18px;
+  opacity:0;
+}
+.prob-punchline .hl{color:var(--yw)}
+.cite{font-size:.72rem;color:var(--sub);margin-top:10px;line-height:1.55}
+
+/* ================================================================
+   ===  SECTION 3: SOLUTION  ===
+================================================================ */
+#sec-solution{
+  background:var(--c0);
+  position:relative;
+}
+.sol-intro{margin-bottom:40px}
+.sol-steps{display:flex;flex-direction:column;gap:0}
+.sol-step{
+  display:flex;gap:0;
+  opacity:0;transform:translateX(-30px);
+}
+.sol-step-left{
+  display:flex;flex-direction:column;align-items:center;
+  min-width:48px;
+}
+.step-circle{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--c1);
+  border:2px solid var(--c4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Inter',sans-serif;font-weight:900;font-size:.85rem;color:var(--c4);
+  flex:none;
+  position:relative;z-index:1;
+}
+.step-line{
+  width:2px;flex:1;min-height:28px;
+  background:linear-gradient(var(--c4),rgba(35,201,156,.1));
+  margin:4px 0;
+}
+.sol-step:last-child .step-line{display:none}
+.sol-step-right{
+  padding:0 0 32px 20px;
+  flex:1;
+}
+.step-no-label{
+  font-family:'Inter',sans-serif;
+  font-size:.68rem;letter-spacing:.14em;color:var(--c4);font-weight:700;margin-bottom:6px;
+}
+.step-title{font-size:1.05rem;font-weight:700;color:var(--wt2);margin-bottom:6px}
+.step-desc{font-size:.88rem;color:var(--sub);line-height:1.7}
+.step-highlight{color:var(--wt);font-weight:700}
+
+/* Compare table */
+.cmp-wrapper{
+  margin-top:52px;
+  opacity:0;transform:translateY(30px);
+}
+.cmp-title{font-size:1.05rem;font-weight:700;color:var(--wt2);margin-bottom:18px;text-align:center}
+.cmp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp-table{
+  width:100%;min-width:480px;
+  border-collapse:collapse;
+  font-size:.82rem;
+}
+.cmp-table th,.cmp-table td{
+  padding:12px 10px;
+  text-align:center;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.cmp-table th{
+  background:rgba(255,255,255,.04);
+  color:var(--sub);font-weight:700;
+  font-size:.74rem;letter-spacing:.04em;
+}
+.cmp-table th.us-col{
+  background:rgba(35,201,156,.12);
+  color:var(--c4);
+}
+.cmp-table td.row-label{
+  text-align:left;color:var(--sub);font-size:.78rem;font-weight:700;
+}
+.cmp-table td.us-col{
+  background:rgba(35,201,156,.06);
+  color:var(--c4);font-weight:700;
+}
+.chk-yes{color:var(--c4);font-weight:900}
+.chk-no{color:rgba(255,92,53,.6)}
+.chk-tri{color:var(--yw)}
+
+/* CTA mid */
+.cta-mid{
+  margin-top:40px;text-align:center;
+  opacity:0;transform:translateY(20px);
+}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;
+  border:2px solid var(--ca);
+  color:var(--ca2);
+  padding:15px 32px;border-radius:12px;
+  font-weight:700;font-size:.98rem;
+  text-decoration:none;
+  transition:.15s;
+  cursor:pointer;
+}
+.btn-outline:hover{background:rgba(255,92,53,.12)}
+
+/* ================================================================
+   ===  SECTION 4: TRUST  ===
+================================================================ */
+#sec-trust{background:var(--c1);position:relative}
+.trust-who{
+  display:flex;gap:20px;align-items:flex-start;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r);
+  padding:24px;margin-top:28px;
+  opacity:0;
+}
+.trust-avatar{
+  flex:none;width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--c2),var(--c3));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:1.3rem;color:#fff;
+}
+.trust-info b{display:block;font-size:1rem;color:var(--wt2);margin-bottom:3px}
+.trust-info span{font-size:.8rem;color:var(--sub)}
+.trust-list{
+  margin-top:20px;display:flex;flex-direction:column;gap:10px;
+  opacity:0;transform:translateY(20px);
+}
+.tlist-item{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:.9rem;color:rgba(255,255,255,.75);line-height:1.65;
+}
+.tlist-dot{
+  flex:none;margin-top:5px;width:6px;height:6px;border-radius:50%;
+  background:var(--c4);
+}
+.honest-box{
+  margin-top:24px;
+  background:rgba(255,208,96,.08);
+  border-left:3px solid var(--yw);
+  border-radius:0 var(--r2) var(--r2) 0;
+  padding:16px 18px;
+  font-size:.88rem;color:rgba(255,255,255,.7);line-height:1.7;
+  opacity:0;transform:translateY(16px);
+}
+.honest-box strong{color:var(--yw)}
+
+/* ================================================================
+   ===  SECTION 5: OFFER  ===
+================================================================ */
+#sec-offer{
+  background:var(--c0);
+  position:relative;overflow:hidden;
+}
+#sec-offer::after{
+  content:"";position:absolute;bottom:-100px;left:50%;transform:translateX(-50%);
+  width:600px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(35,201,156,.1),transparent 65%);
+  pointer-events:none;
+}
+.price-card{
+  margin-top:32px;
+  background:linear-gradient(135deg,rgba(12,26,46,.9),rgba(15,52,96,.6));
+  border:1px solid rgba(35,201,156,.35);
+  border-radius:20px;
+  padding:32px 28px;
+  text-align:center;
+  position:relative;
+  opacity:0;transform:scale(.96);
+}
+.price-card::before{
+  content:"";position:absolute;inset:0;border-radius:20px;
+  background:linear-gradient(135deg,rgba(35,201,156,.08),transparent 60%);
+  pointer-events:none;
+}
+.price-label{font-size:.74rem;letter-spacing:.14em;color:var(--c4);font-family:'Inter',sans-serif;font-weight:700;margin-bottom:12px}
+.price-num{
+  font-family:'Inter',sans-serif;
+  font-size:3.2rem;font-weight:900;
+  color:var(--wt2);line-height:1;
+  margin-bottom:4px;
+}
+.price-num small{font-size:1.2rem;font-weight:700}
+.price-num sup{font-size:1.4rem}
+.price-note{font-size:.78rem;color:var(--sub);margin-bottom:22px}
+.price-incl{
+  text-align:left;display:flex;flex-direction:column;gap:8px;
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:20px;margin-top:4px;
+}
+.price-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:.88rem;color:rgba(255,255,255,.75);
+}
+.price-item svg{flex:none;color:var(--c4)}
+.anchor-text{
+  margin-top:14px;font-size:.78rem;color:var(--sub);
+  line-height:1.55;font-style:italic;
+  text-align:center;
+}
+.scarcity-bar{
+  margin-top:22px;
+  background:rgba(255,92,53,.1);
+  border:1px solid rgba(255,92,53,.3);
+  border-radius:12px;padding:16px 18px;
+  font-size:.85rem;color:rgba(255,138,92,.9);line-height:1.6;
+  display:flex;gap:10px;align-items:flex-start;
+  opacity:0;transform:translateY(16px);
+}
+.scarcity-icon{flex:none;color:var(--ca);margin-top:2px}
+
+/* ================================================================
+   ===  SECTION 6: FAQ  ===
+================================================================ */
+#sec-faq{background:var(--c1)}
+.faq-list{margin-top:28px;display:flex;flex-direction:column;gap:10px}
+details.faq-item{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r2);
+  overflow:hidden;
+  transition:border-color .2s;
+}
+details.faq-item[open]{border-color:rgba(35,201,156,.3)}
+summary.faq-q{
+  list-style:none;
+  padding:16px 44px 16px 18px;
+  font-weight:700;font-size:.92rem;
+  color:var(--wt);cursor:pointer;
+  position:relative;
+  line-height:1.5;
+}
+summary.faq-q::-webkit-details-marker{display:none}
+summary.faq-q::after{
+  content:"";position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2323c99c' stroke-width='2.5'%3E%3Cpath d='M5 12h14M12 5l7 7-7 7'/%3E%3C/svg%3E");
+  background-size:contain;background-repeat:no-repeat;
+  transition:transform .25s;
+}
+details.faq-item[open] summary.faq-q::after{transform:translateY(-50%) rotate(90deg)}
+.faq-a{
+  padding:0 18px 16px;
+  font-size:.88rem;color:var(--sub);line-height:1.75;
+}
+.faq-a b{color:var(--wt)}
+
+/* ================================================================
+   ===  SECTION 7: FINAL CTA  ===
+================================================================ */
+#sec-final{
+  background:linear-gradient(160deg,var(--c2),var(--c1));
+  text-align:center;position:relative;overflow:hidden;
+}
+#sec-final::before{
+  content:"";position:absolute;top:-50%;left:50%;transform:translateX(-50%);
+  width:800px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(35,201,156,.15),transparent 60%);
+  pointer-events:none;
+}
+.final-urgency{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,208,96,.12);border:1px solid rgba(255,208,96,.3);
+  border-radius:999px;padding:6px 16px;
+  font-size:.78rem;color:var(--yw);font-weight:700;
+  margin-bottom:24px;
+}
+.final-h{
+  font-size:clamp(1.35rem,5vw,2.1rem);
+  font-weight:900;line-height:1.35;
+  color:var(--wt2);margin-bottom:16px;
+}
+.final-sub{
+  font-size:.96rem;color:var(--sub);
+  margin-bottom:36px;line-height:1.7;
+}
+.final-cta-row{
+  display:flex;flex-direction:column;gap:12px;
+  max-width:360px;margin:0 auto;
+}
+.btn-tel{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;padding:15px 24px;
+  font-weight:700;font-size:1rem;color:var(--wt);
+  text-decoration:none;transition:.15s;
+}
+.btn-tel:hover{background:rgba(255,255,255,.1)}
+.btn-tel svg{width:18px;height:18px;color:var(--c4)}
+.tel-note{font-size:.74rem;color:var(--sub);margin-top:4px}
+.final-disclaimer{
+  margin-top:20px;font-size:.74rem;color:rgba(143,165,188,.6);
+}
+
+/* ================================================================
+   ===  FOOTER  ===
+================================================================ */
+footer{
+  background:var(--c0);
+  border-top:1px solid rgba(255,255,255,.07);
+  padding:36px 0 40px;
+  text-align:center;
+}
+.ft-logo{font-weight:900;font-size:.92rem;color:var(--wt);margin-bottom:6px}
+.ft-sub{font-size:.78rem;color:var(--sub);line-height:1.6}
+.ft-contact{margin-top:12px;font-size:.82rem;color:var(--sub)}
+.ft-contact a{color:var(--c4);text-decoration:none}
+
+/* ================================================================
+   ===  STICKY CTA BAR (mobile)  ===
+================================================================ */
+#sticky-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:90;
+  background:rgba(12,26,46,.95);
+  backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:10px 14px;
+  display:flex;gap:8px;
+}
+#sticky-bar a{
+  flex:1;text-align:center;border-radius:10px;
+  font-weight:700;padding:12px 8px;font-size:.9rem;
+  text-decoration:none;
+}
+.sb-tel{background:rgba(255,255,255,.06);color:var(--wt);border:1px solid rgba(255,255,255,.12)}
+.sb-form{background:var(--ca);color:#fff}
+@media(min-width:700px){#sticky-bar{display:none}}
+
+/* ================================================================
+   ANIMATION UTILITIES
+================================================================ */
+.reveal{opacity:0;transform:translateY(32px)}
+
+/* reduced motion fallback */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  .headline-line-inner{transform:translateY(0) !important}
+  .hero-sub,.hero-cta-block,.hero-trust,
+  .pstat,.prob-pain,.prob-punchline,
+  .sol-step,.cmp-wrapper,.cta-mid,
+  .trust-who,.trust-list,.honest-box,
+  .price-card,.scarcity-bar,
+  .reveal{
+    opacity:1 !important;transform:none !important;
+  }
+  #hero-pin-wrapper{height:auto}
+  #hero-stage{position:relative;height:auto;padding:80px 20px}
+  #chaos-canvas{display:none}
+  .record-card{display:none}
+  #order-core{display:none}
+  .scroll-progress-label{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header" id="site-header">
+  <div class="logo-text">
+    小さな会社のDX屋さん
+    <small>小齊平 恒平（名古屋）</small>
+  </div>
+  <a href="#form" class="hd-cta">無料相談</a>
+</header>
+
+<!-- ===============================================================
+     SECTION 1: HERO — pinned scroll stage
+================================================================ -->
+<div id="hero-pin-wrapper">
+  <div id="hero-stage">
+    <canvas id="chaos-canvas"></canvas>
+
+    <!-- floating record fragments (散乱した記録片) -->
+    <div class="record-card excel" id="rc1" style="left:6%;top:18%">📋 雇用カウント.xlsx</div>
+    <div class="record-card paper" id="rc2" style="right:8%;top:25%">📄 合理的配慮 記録.pdf</div>
+    <div class="record-card warn"  id="rc3" style="left:12%;bottom:28%">⚠️ 提出期限 未確認</div>
+    <div class="record-card excel" id="rc4" style="right:6%;bottom:30%">📊 勤怠管理.xlsx</div>
+    <div class="record-card paper" id="rc5" style="left:3%;top:50%">📝 面談メモ（付箋）</div>
+    <div class="record-card warn"  id="rc6" style="right:3%;top:55%">📁 紙ファイル 行方不明</div>
+    <div class="record-card excel" id="rc7" style="left:28%;top:8%">📋 雇用率 計算シート</div>
+    <div class="record-card paper" id="rc8" style="right:24%;bottom:12%">📄 就労支援機関 連絡先</div>
+
+    <!-- assembled "order" core -->
+    <div id="order-core">
+      <div class="oc-label">■ 記録の仕組み — 整いました</div>
+      <div class="oc-row"><div class="oc-dot"></div><span>雇用カウント</span><div class="oc-bar"><div class="oc-bar-fill" data-target="100"></div></div></div>
+      <div class="oc-row"><div class="oc-dot"></div><span>勤怠・配慮記録</span><div class="oc-bar"><div class="oc-bar-fill" data-target="100"></div></div></div>
+      <div class="oc-row"><div class="oc-dot"></div><span>行政提出データ</span><div class="oc-bar"><div class="oc-bar-fill" data-target="100"></div></div></div>
+    </div>
+
+    <div id="hero-center">
+      <div class="hero-badge">
+        <svg viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="5" opacity=".3"/><circle cx="6" cy="6" r="2.5"/></svg>
+        2026年7月施行・法定雇用率 2.7%
+      </div>
+
+      <h1 class="hero-headline">
+        <span class="headline-line"><span class="headline-line-inner">障害者雇用の</span></span>
+        <span class="headline-line"><span class="headline-line-inner"><span class="hl">記録と配慮</span>、</span></span>
+        <span class="headline-line"><span class="headline-line-inner">まだ<span class="hl2">紙とExcel</span>の</span></span>
+        <span class="headline-line"><span class="headline-line-inner">ままですか？</span></span>
+      </h1>
+
+      <p class="hero-sub">
+        代行に頼らず、<b>自社で回せる</b>記録の仕組みを。<br>
+        名古屋の小さなDX屋が、<b>1万円から</b>構築してお渡しします。<br>導入後も、ともに伴走します。
+      </p>
+
+      <div class="hero-cta-block" id="hero-cta">
+        <a href="#form" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+          無料で相談する
+        </a>
+        <p class="cta-sub">ご相談だけでも歓迎です。しつこい営業はしません。</p>
+        <div class="hero-trust">
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><b>名古屋拠点</b>・直接会えます</span>
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span><b>買い切り</b>・月額なし</span>
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <span>導入後も<b>伴走</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-progress-label" id="scroll-hint">
+      <span>スクロールして続きを見る</span>
+      <svg class="scroll-arrow" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 3v12M4 10l5 5 5-5"/>
+      </svg>
+    </div>
+  </div>
+</div><!-- /hero-pin-wrapper -->
+
+<!-- ===============================================================
+     SECTION 2: PROBLEM
+================================================================ -->
+<section id="sec-problem" class="section">
+  <div class="wrap">
+    <span class="kicker">The Problem</span>
+    <h2 class="sec-h">「義務は分かった。<br>でも、何から手をつければ…」</h2>
+
+    <div class="prob-stats" id="prob-stats">
+      <div class="pstat">
+        <div class="pstat-num en"><span class="count-up" data-to="37.3">0</span><sup>%</sup></div>
+        <div class="pstat-label">「業務の切り出しが<br>難しい」</div>
+      </div>
+      <div class="pstat">
+        <div class="pstat-num en"><span class="count-up" data-to="35.1">0</span><sup>%</sup></div>
+        <div class="pstat-label">「ノウハウが<br>不足している」</div>
+      </div>
+      <div class="pstat">
+        <div class="pstat-num en"><span class="count-up" data-to="28.3">0</span><sup>%</sup></div>
+        <div class="pstat-label">「専任担当を置く<br>余裕がない」</div>
+      </div>
+      <div class="pstat">
+        <div class="pstat-num en"><span class="count-up" data-to="40.4">0</span><sup>%</sup></div>
+        <div class="pstat-label">新基準の採用数を<br>正確把握できている</div>
+      </div>
+    </div>
+
+    <div class="prob-pain" id="prob-pain">
+      <div class="prob-pain-title">▸ DAILY PAIN</div>
+      <div class="pain-item">
+        <svg class="pain-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>雇用カウント・勤怠・合理的配慮の記録が、<strong>紙とExcelで二重管理</strong>になっている</span>
+      </div>
+      <div class="pain-item">
+        <svg class="pain-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>担当者しかデータの在り処が分からず、<strong>属人化</strong>している</span>
+      </div>
+      <div class="pain-item">
+        <svg class="pain-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>行政提出のたびに<strong>集計し直し</strong>で、毎回数時間が消える</span>
+      </div>
+    </div>
+
+    <p class="prob-punchline" id="prob-punchline">
+      この状態のまま、<span class="hl">7月</span>を迎えて<br>本当に大丈夫でしょうか。
+    </p>
+    <p class="cite">※ 課題の割合は中小企業を対象とした調査（ITmedia ビジネスオンライン 2026/6/2 報道）に基づく数値です。</p>
+  </div>
+</section>
+
+<!-- ===============================================================
+     SECTION 3: SOLUTION
+================================================================ -->
+<section id="sec-solution" class="section">
+  <div class="wrap">
+    <div class="sol-intro">
+      <span class="kicker">The Solution</span>
+      <h2 class="sec-h">「記録の仕組み」を、<br>御社専用につくってお渡しします。</h2>
+      <p class="body-lg" style="margin-top:16px">高い専門ソフトも、毎月の利用料もいりません。お使いの Google スプレッドシート / Excel の上で動く、シンプルな記録の仕組みです。</p>
+    </div>
+
+    <div class="sol-steps" id="sol-steps">
+      <div class="sol-step">
+        <div class="sol-step-left">
+          <div class="step-circle">01</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="sol-step-right">
+          <div class="step-no-label">STEP 1 — 無料ヒアリング</div>
+          <div class="step-title">無料ヒアリング＋制度整理</div>
+          <div class="step-desc">御社の人数・業務・現在の記録方法をお聞きします。制度上「やるべきこと」も、<span class="step-highlight">厚労省等の一次情報</span>に基づいて一緒に整理します。</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-step-left">
+          <div class="step-circle">02</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="sol-step-right">
+          <div class="step-no-label">STEP 2 — 構築・納品</div>
+          <div class="step-title">御社専用スプレッドシート＋フォームを構築・納品</div>
+          <div class="step-desc">雇用カウント・勤怠・合理的配慮の記録を、<span class="step-highlight">入力1か所</span>にまとめるスプレッドシート＋かんたん入力フォームを作成してお渡しします。</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-step-left">
+          <div class="step-circle">03</div>
+          <div class="step-line" style="display:none"></div>
+        </div>
+        <div class="sol-step-right">
+          <div class="step-no-label">STEP 3 — レクチャー＋伴走</div>
+          <div class="step-title">使い方レクチャー＋導入後も伴走</div>
+          <div class="step-desc">納品後に使い方をしっかりレクチャー。導入後の初期サポートも含め、<span class="step-highlight">慣れるまでとなりで伴走</span>します。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare table -->
+    <div class="cmp-wrapper" id="cmp-wrapper">
+      <div class="cmp-title">他の選択肢との比較</div>
+      <div class="cmp-scroll">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">比較軸</th>
+              <th>代行（農園等）</th>
+              <th>月額クラウド</th>
+              <th class="us-col">当社の<br>買い切り納品</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">毎月の費用</td>
+              <td>高額（継続）</td>
+              <td>月額あり</td>
+              <td class="us-col chk-yes">なし（買い切り）</td>
+            </tr>
+            <tr>
+              <td class="row-label">記録の在りか</td>
+              <td>外部任せ</td>
+              <td>クラウド上</td>
+              <td class="us-col chk-yes">自社の手元</td>
+            </tr>
+            <tr>
+              <td class="row-label">自社で回せる</td>
+              <td class="chk-no">✕</td>
+              <td class="chk-tri">△</td>
+              <td class="us-col chk-yes">○</td>
+            </tr>
+            <tr>
+              <td class="row-label">導入後の相談</td>
+              <td class="chk-no">ほぼなし</td>
+              <td class="chk-tri">マニュアル対応</td>
+              <td class="us-col chk-yes">直接伴走</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cta-mid" id="cta-mid">
+      <a href="#form" class="btn-outline">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        無料で相談してみる
+      </a>
+      <p class="cta-sub" style="margin-top:8px">まずは現状をお聞かせください</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===============================================================
+     SECTION 4: TRUST
+================================================================ -->
+<section id="sec-trust" class="section">
+  <div class="wrap">
+    <span class="kicker">Who We Are</span>
+    <h2 class="sec-h">名古屋で中小・個人の<br>DXを直接支援しています。</h2>
+
+    <div class="trust-who" id="trust-who">
+      <div class="trust-avatar">恒</div>
+      <div class="trust-info">
+        <b>小齊平 恒平（こせひら こうへい）</b>
+        <span>小さな会社のDX屋さん／名古屋</span>
+      </div>
+    </div>
+
+    <ul class="trust-list" id="trust-list">
+      <li class="tlist-item"><div class="tlist-dot"></div><span>名古屋拠点。直接会って、現場に合わせて作ります。</span></li>
+      <li class="tlist-item"><div class="tlist-dot"></div><span>ホームページ・PC業務・アプリ制作の中小/個人DXを継続支援。</span></li>
+      <li class="tlist-item"><div class="tlist-dot"></div><span>制度は厚労省等の一次情報出典に基づき正確にご案内します。</span></li>
+      <li class="tlist-item"><div class="tlist-dot"></div><span>納品後も伴走。「渡したら終わり」にはしません。</span></li>
+    </ul>
+
+    <div class="honest-box" id="honest-box">
+      <strong>正直にお伝えします：</strong><br>
+      障害者雇用の記録支援は新サービスで、実績の「数」はまだありません。だからこそ最初の数社には特に丁寧に、御社に合う形を一緒に作ります。
+    </div>
+  </div>
+</section>
+
+<!-- ===============================================================
+     SECTION 5: OFFER
+================================================================ -->
+<section id="sec-offer" class="section">
+  <div class="wrap">
+    <span class="kicker">The Offer</span>
+    <h2 class="sec-h">テンプレ納品プラン<br><span style="font-size:.75em;color:var(--c4)">1万円〜</span></h2>
+    <p class="body-lg" style="margin-top:14px">会社規模・管理項目数で変動します。見積もりは無料です。</p>
+
+    <div class="price-card reveal" id="price-card">
+      <div class="price-label">FLAT RATE PLAN</div>
+      <div class="price-num en"><small>¥</small><span class="count-up-price" data-to="10000">0</span><sup>〜</sup></div>
+      <div class="price-note">買い切り一括払い・月額費用なし・隠れ追加費用なし</div>
+      <ul class="price-incl">
+        <li class="price-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          無料ヒアリング＋制度整理
+        </li>
+        <li class="price-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          御社専用スプレッドシート構築
+        </li>
+        <li class="price-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          かんたん入力フォーム作成
+        </li>
+        <li class="price-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          使い方レクチャー
+        </li>
+        <li class="price-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          納品後の初期サポート
+        </li>
+      </ul>
+      <p class="anchor-text">代行・クラウドは月額の継続費用がかかるのが一般的。<br>当社は買い切りで、記録の仕組みが自社の資産になります。</p>
+    </div>
+
+    <div class="scarcity-bar reveal" id="scarcity-bar">
+      <svg class="scarcity-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div>7月施行まで残り時間が限られています。1社ずつ丁寧に対応するため、<strong>同時に受けられる件数に限りがあります。</strong>ご検討の場合はお早めにご相談ください。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===============================================================
+     SECTION 6: FAQ
+================================================================ -->
+<section id="sec-faq" class="section">
+  <div class="wrap">
+    <span class="kicker">FAQ</span>
+    <h2 class="sec-h">よくある質問</h2>
+
+    <div class="faq-list" id="faq-list">
+      <details class="faq-item reveal">
+        <summary class="faq-q">ITに詳しくないのですが、使えますか？</summary>
+        <div class="faq-a">はい、大丈夫です。入力はフォームに沿って打つだけで、専門知識は不要です。使い方レクチャーも含まれているため、はじめてでも安心してお使いいただけます。</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary class="faq-q">毎月の費用はかかりますか？</summary>
+        <div class="faq-a">かかりません。Google スプレッドシートまたは Excel の上で動く買い切りです。ツール自体の利用料はすでにお手元にあるものをそのまま使います。</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary class="faq-q">代行（農園・サテライト）との違いは何ですか？</summary>
+        <div class="faq-a">代行は雇用や業務を外部に委ねる選択肢です。当社のサービスは「<b>自社で雇用し、記録も自社で管理できる仕組みを作る</b>」もの。ノウハウが社内に蓄積されます。</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary class="faq-q">制度が複雑でよく分からないのですが…</summary>
+        <div class="faq-a">無料相談で、制度確認からご一緒します。厚労省等の一次情報出典に基づき、御社に必要なことを分かりやすくご案内します。</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary class="faq-q">名古屋以外でも対応できますか？</summary>
+        <div class="faq-a">はい、オンラインで全国対応しています。近隣エリアは直接訪問も可能です。まずはお気軽にご相談ください。</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary class="faq-q">実績がないとのことですが、大丈夫ですか？</summary>
+        <div class="faq-a">正直にお伝えした通り、本サービスは新しく、件数実績はまだありません。だからこそ最初の数社には特に丁寧に対応します。ホームページ・PC業務・アプリ制作でのDX支援は継続して行っており、現場に合わせて作るノウハウがあります。</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary class="faq-q">本当に1万円からですか？追加費用はありませんか？</summary>
+        <div class="faq-a">1万円〜が基本です。会社規模・管理する項目数によって変動しますが、見積もりは無料で明示します。隠れた追加費用はありません。</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===============================================================
+     SECTION 7: FINAL CTA
+================================================================ -->
+<section id="sec-final" class="section" id="form">
+  <div class="wrap">
+    <div class="final-urgency">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      2026年7月は待ってくれません
+    </div>
+    <h2 class="final-h">まずは無料相談で<br>「今やるべきこと」を<br>一緒に整理しませんか。</h2>
+    <p class="final-sub">ご相談・見積もりは無料。しつこい営業はしません。</p>
+
+    <div class="final-cta-row">
+      <a href="mailto:info@kouheikosehira.com?subject=障害者雇用記録支援の相談" class="btn-primary" style="justify-content:center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        メールで無料相談する
+      </a>
+      <a href="tel:09074379549" class="btn-tel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.06 1.18 2 2 0 012.03 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        090-7437-9549
+      </a>
+      <p class="tel-note" style="text-align:center">平日 9:00〜18:00 ／ info@kouheikosehira.com</p>
+    </div>
+    <p class="final-disclaimer">ご相談・見積もりは無料です。しつこい営業はしません。</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="ft-logo">小さな会社のDX屋さん　小齊平 恒平</div>
+    <div class="ft-sub">
+      ホームページ・PC業務・アプリ制作｜小さな投資で、業績に直結する改善を。
+    </div>
+    <div class="ft-contact">
+      <a href="mailto:info@kouheikosehira.com">info@kouheikosehira.com</a>　／　090-7437-9549
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY BAR (mobile) -->
+<div id="sticky-bar">
+  <a href="tel:09074379549" class="sb-tel">📞 電話する</a>
+  <a href="mailto:info@kouheikosehira.com?subject=障害者雇用記録支援の相談" class="sb-form">メールで無料相談</a>
+</div>
+
+<!-- ================================================================
+     SCRIPTS (defer / bottom)
+================================================================ -->
+<!-- Lenis -->
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
+<!-- GSAP + ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+
+<script>
+/* Defer execution until all scripts are ready */
+window.addEventListener('load', function() {
+
+  /* ── Prefers reduced motion check ─────────────────── */
+  const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (noMotion) return; /* CSS handles fallback */
+
+  /* ── Lenis smooth scroll ───────────────────────────── */
+  const lenis = new Lenis({
+    duration: 1.15,
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothTouch: false,
+  });
+  function lenisRaf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(lenisRaf);
+  }
+  requestAnimationFrame(lenisRaf);
+
+  // Sync GSAP ScrollTrigger with Lenis
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(time => lenis.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  /* ── Header scroll state ────────────────────────────── */
+  const header = document.getElementById('site-header');
+  ScrollTrigger.create({
+    start: '80px top',
+    onEnter: () => header.classList.add('scrolled'),
+    onLeaveBack: () => header.classList.remove('scrolled'),
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     HERO PINNED SCROLL STORYTELLING
+     Timeline driven by scroll progress through 600vh
+  ═══════════════════════════════════════════════════════ */
+
+  const recordCards = [
+    document.getElementById('rc1'),
+    document.getElementById('rc2'),
+    document.getElementById('rc3'),
+    document.getElementById('rc4'),
+    document.getElementById('rc5'),
+    document.getElementById('rc6'),
+    document.getElementById('rc7'),
+    document.getElementById('rc8'),
+  ];
+
+  const orderCore = document.getElementById('order-core');
+  const heroCenter = document.getElementById('hero-center');
+  const scrollHint = document.getElementById('scroll-hint');
+
+  /* Capture original positions */
+  const origPositions = recordCards.map(el => {
+    const r = el.getBoundingClientRect();
+    return { left: r.left, top: r.top };
+  });
+
+  /* Random initial scatter for each card */
+  const scatterOffsets = recordCards.map(() => ({
+    x: (Math.random() - 0.5) * 60,
+    y: (Math.random() - 0.5) * 40,
+    rot: (Math.random() - 0.5) * 18,
+  }));
+
+  /* Set initial scatter */
+  recordCards.forEach((el, i) => {
+    gsap.set(el, {
+      x: scatterOffsets[i].x,
+      y: scatterOffsets[i].y,
+      rotation: scatterOffsets[i].rot,
+      opacity: 0.7,
+    });
+  });
+
+  /* Main hero timeline (scrubbed by scroll) */
+  const heroTL = gsap.timeline({ paused: true });
+
+  /* Phase 0-25%: Cards appear → drift/float (chaos established) */
+  heroTL.to(recordCards, {
+    opacity: 1,
+    duration: .25,
+    stagger: .03,
+  }, 0);
+
+  /* Phase 25-60%: Cards start converging toward center */
+  heroTL.to(recordCards, {
+    x: () => (Math.random() - .5) * 30,
+    y: () => (Math.random() - .5) * 20,
+    rotation: () => (Math.random() - .5) * 6,
+    duration: .3,
+    stagger: .025,
+    ease: 'power1.inOut',
+  }, .25);
+
+  /* Phase 50-80%: Kinetic headline reveal */
+  const lines = document.querySelectorAll('.headline-line-inner');
+  heroTL.to(lines, {
+    y: '0%',
+    duration: .15,
+    stagger: .04,
+    ease: 'power3.out',
+  }, .45);
+
+  heroTL.to('.hero-sub', { opacity: 1, y: 0, duration: .15, ease: 'power2.out' }, .62);
+  heroTL.to('.hero-cta-block', { opacity: 1, y: 0, duration: .15, ease: 'power2.out' }, .69);
+  heroTL.to('.hero-trust', { opacity: 1, duration: .12 }, .75);
+
+  /* Phase 60-85%: Cards fly in toward order core */
+  heroTL.to(recordCards, {
+    x: function(i, el) {
+      const stage = document.getElementById('hero-stage');
+      const sw = stage.offsetWidth / 2;
+      const r = el.getBoundingClientRect();
+      return sw - r.left - r.width / 2;
+    },
+    y: function(i, el) {
+      const stage = document.getElementById('hero-stage');
+      const sh = stage.offsetHeight / 2;
+      const r = el.getBoundingClientRect();
+      return sh - r.top - r.height / 2;
+    },
+    opacity: 0,
+    scale: .4,
+    rotation: 0,
+    duration: .25,
+    stagger: .02,
+    ease: 'power2.in',
+  }, .72);
+
+  /* Phase 80-100%: Order core appears, bars fill */
+  heroTL.to(orderCore, { opacity: 1, scale: 1, duration: .2, ease: 'back.out(1.2)' }, .82);
+
+  heroTL.to(scrollHint, { opacity: 0, duration: .1 }, .35);
+
+  /* Scrub the timeline with scroll */
+  ScrollTrigger.create({
+    trigger: '#hero-pin-wrapper',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 1.5,
+    onUpdate(self) {
+      heroTL.progress(self.progress);
+      /* animate bars as core appears */
+      if (self.progress > .82) {
+        const t = (self.progress - .82) / .18;
+        document.querySelectorAll('.oc-bar-fill').forEach(bar => {
+          bar.style.width = Math.min(100, t * 100) + '%';
+        });
+      }
+    },
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     PROBLEM SECTION ANIMATIONS
+  ═══════════════════════════════════════════════════════ */
+  const pstats = document.querySelectorAll('.pstat');
+  ScrollTrigger.create({
+    trigger: '#sec-problem',
+    start: 'top 75%',
+    onEnter() {
+      gsap.to(pstats, {
+        opacity: 1,
+        y: 0,
+        duration: .6,
+        stagger: .1,
+        ease: 'power2.out',
+      });
+      /* count-up numbers */
+      pstats.forEach(stat => {
+        const el = stat.querySelector('.count-up');
+        if (!el) return;
+        const target = parseFloat(el.dataset.to);
+        gsap.to({ val: 0 }, {
+          val: target,
+          duration: 1.5,
+          ease: 'power2.out',
+          delay: .3,
+          onUpdate: function() {
+            el.textContent = this.targets()[0].val.toFixed(1);
+          }
+        });
+      });
+    },
+    once: true,
+  });
+
+  gsap.from('#prob-pain', {
+    opacity: 0, y: 24, duration: .6,
+    scrollTrigger: { trigger: '#prob-pain', start: 'top 80%' }
+  });
+  gsap.from('#prob-punchline', {
+    opacity: 0, x: -20, duration: .6,
+    scrollTrigger: { trigger: '#prob-punchline', start: 'top 85%' }
+  });
+  gsap.set('#prob-pain', { opacity: 1, y: 0 });
+  gsap.set('#prob-punchline', { opacity: 1 });
+
+  /* Actually reveal on scroll */
+  ScrollTrigger.create({
+    trigger: '#prob-pain',
+    start: 'top 80%',
+    onEnter: () => gsap.to('#prob-pain', { opacity: 1, y: 0, duration: .6 }),
+    once: true,
+  });
+  ScrollTrigger.create({
+    trigger: '#prob-punchline',
+    start: 'top 85%',
+    onEnter: () => gsap.to('#prob-punchline', { opacity: 1, x: 0, duration: .5 }),
+    once: true,
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     SOLUTION SECTION ANIMATIONS
+  ═══════════════════════════════════════════════════════ */
+  const solSteps = document.querySelectorAll('.sol-step');
+  ScrollTrigger.create({
+    trigger: '#sol-steps',
+    start: 'top 80%',
+    onEnter() {
+      gsap.to(solSteps, {
+        opacity: 1, x: 0, duration: .55, stagger: .15, ease: 'power2.out'
+      });
+    },
+    once: true,
+  });
+  ScrollTrigger.create({
+    trigger: '#cmp-wrapper',
+    start: 'top 80%',
+    onEnter: () => gsap.to('#cmp-wrapper', { opacity: 1, y: 0, duration: .6 }),
+    once: true,
+  });
+  ScrollTrigger.create({
+    trigger: '#cta-mid',
+    start: 'top 85%',
+    onEnter: () => gsap.to('#cta-mid', { opacity: 1, y: 0, duration: .5 }),
+    once: true,
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     TRUST SECTION
+  ═══════════════════════════════════════════════════════ */
+  ScrollTrigger.create({
+    trigger: '#trust-who',
+    start: 'top 80%',
+    onEnter: () => gsap.to('#trust-who', { opacity: 1, duration: .5 }),
+    once: true,
+  });
+  ScrollTrigger.create({
+    trigger: '#trust-list',
+    start: 'top 80%',
+    onEnter: () => gsap.to('#trust-list', { opacity: 1, y: 0, duration: .5 }),
+    once: true,
+  });
+  ScrollTrigger.create({
+    trigger: '#honest-box',
+    start: 'top 85%',
+    onEnter: () => gsap.to('#honest-box', { opacity: 1, y: 0, duration: .45 }),
+    once: true,
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     OFFER SECTION
+  ═══════════════════════════════════════════════════════ */
+  ScrollTrigger.create({
+    trigger: '#price-card',
+    start: 'top 80%',
+    onEnter() {
+      gsap.to('#price-card', { opacity: 1, scale: 1, duration: .55, ease: 'back.out(1.1)' });
+      /* price count-up */
+      const priceEl = document.querySelector('.count-up-price');
+      if (priceEl) {
+        gsap.to({ val: 0 }, {
+          val: 10000,
+          duration: 1.2,
+          ease: 'power2.out',
+          onUpdate: function() {
+            priceEl.textContent = Math.floor(this.targets()[0].val).toLocaleString();
+          }
+        });
+      }
+    },
+    once: true,
+  });
+  ScrollTrigger.create({
+    trigger: '#scarcity-bar',
+    start: 'top 85%',
+    onEnter: () => gsap.to('#scarcity-bar', { opacity: 1, y: 0, duration: .45 }),
+    once: true,
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     FAQ REVEAL
+  ═══════════════════════════════════════════════════════ */
+  const faqItems = document.querySelectorAll('.faq-item');
+  ScrollTrigger.create({
+    trigger: '#faq-list',
+    start: 'top 80%',
+    onEnter() {
+      gsap.to(faqItems, {
+        opacity: 1, y: 0, duration: .45, stagger: .07, ease: 'power2.out',
+        onStart() { faqItems.forEach(el => el.style.opacity = '0'); },
+      });
+    },
+    once: true,
+  });
+  /* Set initial state for FAQ */
+  faqItems.forEach(el => {
+    gsap.set(el, { opacity: 0, y: 16 });
+  });
+
+  /* ═══════════════════════════════════════════════════════
+     Canvas subtle particle effect (chaos visual layer)
+  ═══════════════════════════════════════════════════════ */
+  const canvas = document.getElementById('chaos-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2.5 + .5;
+      this.vx = (Math.random() - .5) * .4;
+      this.vy = (Math.random() - .5) * .4;
+      this.alpha = Math.random() * .3 + .05;
+      this.color = Math.random() > .5 ? '35,201,156' : '255,208,96';
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  /* ═══════════════════════════════════════════════════════
+     Floating animation for record cards (idle drift)
+  ═══════════════════════════════════════════════════════ */
+  recordCards.forEach((el, i) => {
+    gsap.to(el, {
+      y: '+=8',
+      duration: 2.2 + i * .3,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+      delay: i * .15,
+    });
+  });
+
+});
+</script>
+</body>
+</html>

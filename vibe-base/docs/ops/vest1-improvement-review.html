@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vest1 未回収改良5件 レビュー</title>
+<style>
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #232733; --border: #2e3345;
+    --text: #e4e6ed; --text-dim: #8b8fa3; --accent: #6c7bf7; --accent-dim: rgba(108,123,247,0.12);
+    --green: #34d399; --green-dim: rgba(52,211,153,0.12);
+    --amber: #fbbf24; --amber-dim: rgba(251,191,36,0.12);
+    --red: #f87171; --red-dim: rgba(248,113,113,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; line-height: 1.7; padding: 40px 24px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 32px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 28px; overflow: hidden; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .card-num { background: var(--accent-dim); color: var(--accent); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+  .card-title { font-size: 1.05rem; font-weight: 600; flex: 1; min-width: 200px; }
+  .card-body { padding: 20px; }
+  .card-body h3 { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; margin-top: 20px; }
+  .card-body h3:first-child { margin-top: 0; }
+
+  /* 素人向け説明ボックス */
+  .plain-box { background: var(--surface2); border-radius: 10px; padding: 16px 20px; margin-bottom: 16px; font-size: 0.9rem; line-height: 1.8; }
+  .plain-box strong { color: var(--text); }
+  .plain-box .example { color: var(--accent); font-size: 0.82rem; margin-top: 8px; }
+
+  /* 5W2Hテーブル */
+  .wh-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  .wh-table th { width: 110px; text-align: left; padding: 8px 12px; font-size: 0.78rem; font-weight: 700; color: var(--accent); background: var(--accent-dim); border-bottom: 1px solid var(--border); vertical-align: top; }
+  .wh-table td { padding: 8px 12px; font-size: 0.84rem; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .wh-table tr:last-child th, .wh-table tr:last-child td { border-bottom: none; }
+
+  /* 比較 */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .compare-col { background: var(--surface2); border-radius: 8px; padding: 16px; }
+  .compare-col-title { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .compare-col-path { font-family: 'Fira Code', monospace; font-size: 0.72rem; color: var(--accent); margin-bottom: 10px; word-break: break-all; }
+  .compare-col ul { font-size: 0.82rem; color: var(--text-dim); padding-left: 16px; }
+  .compare-col ul li { margin-bottom: 4px; }
+  .tag { display: inline-block; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+  .tag-vest1 { background: var(--green-dim); color: var(--green); }
+  .tag-derived { background: var(--amber-dim); color: var(--amber); }
+
+  .verdict { border-top: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .verdict-badge { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 6px; white-space: nowrap; }
+  .verdict-keep { background: var(--green-dim); color: var(--green); }
+  .verdict-upgrade { background: var(--amber-dim); color: var(--amber); }
+  .verdict-text { font-size: 0.85rem; color: var(--text-dim); }
+  .note { background: var(--surface2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 0.82rem; color: var(--text-dim); }
+
+  .summary-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  .summary-table th, .summary-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .summary-table th { color: var(--text-dim); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .summary-table tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>vest1 未回収改良5件 — レビュー</h1>
+<p class="subtitle">派生版（プロダクト内の記入済み）がvest1テンプレートより改良されているか検証する</p>
+
+<!-- ==================== #9 ==================== -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#9</span>
+    <span class="card-title">納品テンプレート集</span>
+  </div>
+  <div class="card-body">
+    <h3>これは何か（素人向け）</h3>
+    <div class="plain-box">
+      <strong>お客さんに商品を渡すときの「渡し方マニュアル」の雛形。</strong><br>
+      ソフトウェアは作っただけでは使えない。「アカウントの作り方」「使い方の説明書」「納品メッセージの文面」など、お客さんに渡すべき書類が複数ある。<br>
+      この雛形があれば、新しい製品でも「コピーして中身を埋めるだけ」で納品書類一式が揃う。
+      <div class="example">例: レストランの開店準備キット。メニュー表の雛形、スタッフ研修資料の雛形、開店チラシの雛形がセットになっているようなもの。</div>
+    </div>
+
+    <h3>5W2H</h3>
+    <table class="wh-table">
+      <tr><th>What</th><td>納品時にクライアントへ渡す書類（セットアップ手順・使い方説明・FAQ等）の雛形集</td></tr>
+      <tr><th>Why</th><td>納品のたびにゼロから書くと抜け漏れが出る。雛形をコピーすれば品質が安定する</td></tr>
+      <tr><th>Who</th><td>エージェントがコピーして記入 → マスターが確認 → クライアントに渡す</td></tr>
+      <tr><th>When</th><td>P2（販売準備フェーズ）の手順書作成タスク（#23-24）</td></tr>
+      <tr><th>Where</th><td>vest1: docs/ops/onboarding-ops-templates.md → 各プロダクトの docs/delivery/ にコピー</td></tr>
+      <tr><th>How</th><td>3種のテンプレ（①セットアップ手順 ②操作マニュアル ③Product Hunt Launch）をコピー → プロダクト固有の内容を記入</td></tr>
+      <tr><th>How much</th><td>1種あたり30分〜1時間。全3種で半日</td></tr>
+    </table>
+
+    <h3>vest1 vs 派生版</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-vest1">vest1（雛形）</span></div>
+        <div class="compare-col-path">docs/ops/onboarding-ops-templates.md</div>
+        <ul>
+          <li>3種のテンプレ（セットアップ / 操作マニュアル / PH Launch）</li>
+          <li>全て空欄の記入枠</li>
+          <li>章構成と項目名だけ定義</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-derived">AI Answer版（記入済み）</span></div>
+        <div class="compare-col-path">products/ai-concierge/docs/delivery/ （7本）</div>
+        <ul>
+          <li>7種に拡大（テナント作成/ヒアリング/納品メッセージ/操作マニュアル/CMS設置/FAQ/受注フロー）</li>
+          <li>全て記入済み。実運用の知見入り</li>
+          <li>雛形の章構成はそのまま使っている</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">
+      <strong>結論:</strong> AI Answer版は「雛形に書き込んだ完成品」であり、雛形自体の構造を改良しているわけではない。<br>
+      雛形の章立て・項目名はそのまま使われている = 雛形が正しく機能している証拠。
+    </div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-keep">現状維持</span>
+    <span class="verdict-text">雛形の構造に問題なし。記入済みの完成品は雛形に還元する対象ではない</span>
+  </div>
+</div>
+
+<!-- ==================== #10-11 ==================== -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#10-11</span>
+    <span class="card-title">障害シナリオ分析テンプレート</span>
+  </div>
+  <div class="card-body">
+    <h3>これは何か（素人向け）</h3>
+    <div class="plain-box">
+      <strong>「壊れたらどうなる？」を事前に全部洗い出すチェックシートの雛形。</strong><br>
+      ソフトウェアは色々な理由で壊れる。ネットが切れる、サーバーが落ちる、無料枠を使い切る、パスワードが消える…。<br>
+      この雛形を使うと「壊れるパターン」「お客さんへの影響」「今の対策」「追加で必要な対策」を表にして漏れなく整理できる。
+      <div class="example">例: ビルの防災計画。「火事が起きたら？」「停電したら？」「水が止まったら？」を全パターン書き出して、それぞれ対策を決めておくのと同じ。</div>
+    </div>
+
+    <h3>5W2H</h3>
+    <table class="wh-table">
+      <tr><th>What</th><td>全障害パスを洗い出す分析シート。7カテゴリ（認証/DB/外部API/AI/ホスティング/ネットワーク/データ整合性）</td></tr>
+      <tr><th>Why</th><td>本番で壊れてから慌てると対応が後手になる。事前に「こうなったらこうする」を決めておく</td></tr>
+      <tr><th>Who</th><td>エージェントが記入 → マスターが確認（致命的なものはP1で対応）</td></tr>
+      <tr><th>When</th><td>P1（開発フェーズ）の#12タスク「CL-3: 壊れたらどうなるか」</td></tr>
+      <tr><th>Where</th><td>vest1: docs/ops/failure-scenario-template.md → 各プロダクトの docs/cl3-failure-scenarios.md にコピー</td></tr>
+      <tr><th>How</th><td>7カテゴリの表をコピー → 各カテゴリのチェック項目を見ながら自分のプロダクトに当てはめて記入</td></tr>
+      <tr><th>How much</th><td>1プロダクトあたり1〜2時間（コード読みながら記入）</td></tr>
+    </table>
+
+    <h3>vest1 vs 派生版（2件）</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-vest1">vest1（雛形）</span></div>
+        <div class="compare-col-path">docs/ops/failure-scenario-template.md</div>
+        <ul>
+          <li>7カテゴリ定義</li>
+          <li>各カテゴリに「チェック項目」と「典型シナリオ」の表</li>
+          <li>分析テーブルのフォーマット（6列）を定義</li>
+          <li>記入例なし</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-derived">派生版2件</span></div>
+        <div class="compare-col-path">クチコミ分析AI版 / デザインの種版</div>
+        <ul>
+          <li>クチコミ分析AI: 7カテゴリ全て記入済み（20件超のシナリオ）</li>
+          <li>デザインの種: 5カテゴリ記入済み（該当しない2カテゴリは省略）</li>
+          <li>両方とも雛形のフォーマット（6列）をそのまま使用</li>
+          <li>カテゴリ追加・列追加等の構造変更なし</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">
+      <strong>結論:</strong> 2件の派生版がどちらも雛形のフォーマットを忠実に使っている = 雛形の設計が適切。<br>
+      記入内容は各プロダクト固有のものであり、雛形に還元する改善点はない。
+    </div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-keep">現状維持</span>
+    <span class="verdict-text">雛形の構造に問題なし。2件の派生版が忠実に使用 = テンプレートが機能している証拠</span>
+  </div>
+</div>
+
+<!-- ==================== #12 ==================== -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#12</span>
+    <span class="card-title">外部サービス確認テンプレート</span>
+  </div>
+  <div class="card-body">
+    <h3>これは何か（素人向け）</h3>
+    <div class="plain-box">
+      <strong>「うちの製品が依存している外部サービス」の健康診断表の雛形。</strong><br>
+      うちの製品はGoogleのAI、Stripeの決済、Vercelのサーバーなど、他社のサービスに乗っかって動いている。<br>
+      それぞれの「無料でどこまで使えるか」「上限を超えたらどうなるか」「最近仕様変更はあったか」を一覧にして管理する。<br>
+      これをやらないと、ある日突然「無料枠使い切りました、サービス止まりました」が起きる。
+      <div class="example">例: 飲食店が「ガス会社」「電力会社」「食材卸」のそれぞれについて、契約内容・料金プラン・緊急連絡先・過去のトラブル履歴をまとめた一覧表を持っているようなもの。</div>
+    </div>
+
+    <h3>5W2H</h3>
+    <table class="wh-table">
+      <tr><th>What</th><td>プロダクトが依存する外部サービス（API/DB/ホスティング等）の仕様・制限・リスクの一覧表の雛形</td></tr>
+      <tr><th>Why</th><td>無料枠超過・仕様変更・障害で突然止まるリスクを事前に把握する</td></tr>
+      <tr><th>Who</th><td>エージェントが記入 → マスターが確認（コスト判断が必要な項目は報告）</td></tr>
+      <tr><th>When</th><td>P1（開発フェーズ）の#7タスク「外部サービス確認」。以降はデプロイ前・障害時に更新</td></tr>
+      <tr><th>Where</th><td>vest1: docs/ops/external-service-check-template.md → 各プロダクトの docs/external-service-check.md にコピー</td></tr>
+      <tr><th>How</th><td>サービスごとに8項目（SDK/旧SDK/エンドポイント/認証/無料枠/リスク/対応/確認日）を調査して記入</td></tr>
+      <tr><th>How much</th><td>1サービスあたり15〜30分。5サービスなら2時間程度</td></tr>
+    </table>
+
+    <h3>vest1 vs 派生版</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-vest1">vest1（雛形）</span></div>
+        <div class="compare-col-path">docs/ops/external-service-check-template.md</div>
+        <ul>
+          <li>調査項目テンプレ（8列）</li>
+          <li>典型的な調査対象8カテゴリ表</li>
+          <li>運用ルール5項目</li>
+          <li>記入例なし</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-derived">foodee版（記入済み）</span></div>
+        <div class="compare-col-path">products/foodee/docs/external-service-check.md</div>
+        <ul>
+          <li>7サービス記入済み（Firebase Auth/Firestore/Vercel/Gemini/YouTube/気象庁/Resend）</li>
+          <li>雛形の8列フォーマットをそのまま使用</li>
+          <li>各サービスに具体的な数値と注釈を追加</li>
+          <li>列追加・構造変更なし</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">
+      <strong>結論:</strong> foodee版は雛形のフォーマットをそのまま使い、中身を埋めただけ。<br>
+      サービス固有の注釈（「アップグレード禁止」等）は運用判断であり、雛形に追加する性質のものではない。
+    </div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-keep">現状維持</span>
+    <span class="verdict-text">雛形の構造に問題なし。foodee版は忠実に使用</span>
+  </div>
+</div>
+
+<!-- ==================== #13 ==================== -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-num">#13</span>
+    <span class="card-title">テスト計画テンプレート</span>
+  </div>
+  <div class="card-body">
+    <h3>これは何か（素人向け）</h3>
+    <div class="plain-box">
+      <strong>「この操作をしたら、こうなるはず」を全部書き出して、1つずつ確認するチェックシートの雛形。</strong><br>
+      ソフトウェアのテストは「ログインボタンを押したらログインできる」「不正な入力をしたらエラーが出る」のような項目を何十個も並べて、1つずつ手で確かめる作業。<br>
+      この雛形があれば、テスト項目の分類（認証/コア機能/エラー処理など7グループ）が決まっているので、抜け漏れなくテストできる。
+      <div class="example">例: 車の出荷前検査シート。「エンジンかかるか」「ブレーキ効くか」「ライト点くか」を項目ごとに○×つけていくのと同じ。</div>
+    </div>
+
+    <h3>5W2H</h3>
+    <table class="wh-table">
+      <tr><th>What</th><td>手動テストケースの計画書。7グループ（認証/ユーザー管理/コア機能/データ操作/外部連携/エラー/レスポンシブ）に分類して網羅的にテストする</td></tr>
+      <tr><th>Why</th><td>「動くはず」を「動いた」に変える。テストせずにリリースすると、お客さんの前でバグが出る</td></tr>
+      <tr><th>Who</th><td>エージェントがテスト項目を記入+実行 → 結果を記録 → マスターに報告</td></tr>
+      <tr><th>When</th><td>P1（開発フェーズ）の#10-11タスク「手動テスト・レスポンシブ確認」</td></tr>
+      <tr><th>Where</th><td>vest1: docs/ops/test-template-guide.md → 各プロダクトの docs/test-plan.md にコピー</td></tr>
+      <tr><th>How</th><td>7グループのテンプレをコピー → 自分のプロダクトの機能に合わせてテスト項目を記入 → 1件ずつ実行して結果を記録</td></tr>
+      <tr><th>How much</th><td>テスト項目作成: 1時間。テスト実行: 機能数×10分程度</td></tr>
+    </table>
+
+    <h3>vest1 vs 派生版</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-vest1">vest1（雛形）</span></div>
+        <div class="compare-col-path">docs/ops/test-template-guide.md</div>
+        <ul>
+          <li>テスト環境表</li>
+          <li>TC-1〜TC-7の7グループ分類</li>
+          <li>テストケーステーブル: <strong>4列</strong>（#/テスト項目/手順/期待結果）</li>
+          <li>レスポンシブ検証ポイント（3デバイス幅）</li>
+          <li>UATテンプレート</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-col-title"><span class="tag tag-derived">デザインの種版（記入済み）</span></div>
+        <div class="compare-col-path">products/design-seed/docs/test-plan.md</div>
+        <ul>
+          <li>4グループ記入済み（認証/コア/Stripe/エラー）</li>
+          <li>テストケーステーブル: <strong>4列</strong>（#/テスト項目/期待結果/<span style="color:var(--amber)">結果</span>）</li>
+          <li>「結果」列を追加したが「手順」列が消えている</li>
+          <li>vest1の7グループ分類に沿って使用</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">
+      <strong>検出された改善点:</strong><br>
+      vest1の4列テーブルには「結果」列がない。テストは「項目を書く」→「実行する」→「結果を記録する」の3段階なのに、雛形が「結果を記録する」欄を用意していなかった。<br><br>
+      <strong>改善案:</strong> 4列 → 5列に拡張<br>
+      <code>| # | テスト項目 | 手順 | 期待結果 | 結果 |</code><br><br>
+      車検シートに例えると: 「ブレーキ」「踏む」「止まる」の3列だけで、「OK/NG」を書く欄がなかったのを追加するだけの話。
+    </div>
+  </div>
+  <div class="verdict">
+    <span class="verdict-badge verdict-upgrade">vest1に「結果」列を追加</span>
+    <span class="verdict-text">4列→5列の軽微な改善。テスト実行後に○×を記録する欄が必要</span>
+  </div>
+</div>
+
+<!-- ==================== サマリー ==================== -->
+<div class="card" style="margin-top: 36px;">
+  <div class="card-header">
+    <span class="card-title">判断サマリー</span>
+  </div>
+  <table class="summary-table">
+    <thead><tr><th>#</th><th>名前</th><th>一言で</th><th>推奨</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">9</td>
+        <td>納品テンプレ集</td>
+        <td style="color:var(--text-dim)">お客さんへの渡し方マニュアルの雛形</td>
+        <td><span class="verdict-badge verdict-keep" style="font-size:0.7rem">現状維持</span></td>
+        <td style="color:var(--text-dim)">雛形の構造改善なし。AI Answer版は記入済み完成品</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">10-11</td>
+        <td>障害シナリオ</td>
+        <td style="color:var(--text-dim)">「壊れたらどうなる？」チェックシート</td>
+        <td><span class="verdict-badge verdict-keep" style="font-size:0.7rem">現状維持</span></td>
+        <td style="color:var(--text-dim)">2件とも雛形を忠実に使用 = 雛形が正しく機能</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">12</td>
+        <td>外部サービス確認</td>
+        <td style="color:var(--text-dim)">依存サービスの健康診断表</td>
+        <td><span class="verdict-badge verdict-keep" style="font-size:0.7rem">現状維持</span></td>
+        <td style="color:var(--text-dim)">foodee版は雛形をそのまま使用</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent); font-weight:700">13</td>
+        <td>テスト計画</td>
+        <td style="color:var(--text-dim)">「この操作でこうなるはず」チェックシート</td>
+        <td><span class="verdict-badge verdict-upgrade" style="font-size:0.7rem">小改善</span></td>
+        <td style="color:var(--text-dim)">「結果」列が欠落していた → 5列に拡張</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="padding:20px;">
+    <div class="note">
+      <strong>総括:</strong> 5件中4件は雛形がそのまま使われている = テンプレートの設計が適切だった証拠。<br>
+      唯一 #13 のテスト計画のみ「結果を記録する欄がない」という欠落が見つかった。
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

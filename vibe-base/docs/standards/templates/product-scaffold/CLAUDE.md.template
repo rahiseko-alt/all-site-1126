@@ -1,0 +1,45 @@
+@../../.claude/rules/permission-defense.md
+@../../.claude/rules/session-lifecycle.md
+@../../.claude/rules/plan-mode.md
+@../../.claude/rules/self-verification.md
+@../../.claude/rules/orchestration-discipline.md
+
+# {{PRODUCT_NAME}} 自治憲法 v0.1
+
+@../../docs/ops/agent-rules.md
+
+## §0. プロダクト定義
+
+| 項目 | 内容 |
+|---|---|
+| 名称 | {{PRODUCT_NAME}} |
+| コンセプト | {{CONCEPT}} |
+| 技術スタック | {{TECH_PRESET}}（`docs/standards/templates/product-scaffold/tech-presets.md` の 5 型から選定） |
+| デプロイ先 | {{DEPLOY_TARGET}} |
+| 現在フェーズ | P0 |
+
+## §1. 最重要ルール
+
+- {{PRODUCT_RULE_1}}（「勝手に変えるな」系の禁止事項をマスター確認のうえ記載。独断記述禁止）
+
+## §2. 技術ルール
+
+- {{TECH_RULES}}（フレームワーク・API・エラー処理方針。サイレントフェイル禁止）
+- **1ファイル原則500行以内（line-count-gate hook で強制）。** 機能追加は新規ファイル優先とし既存からは import 参照のみ。入れ子は3段以内。単一HTML型でも CSS / JS は別ファイルに分離する（分割手順は code-splitting スキル）
+
+## §3. デザイン仕様
+
+- {{DESIGN_SPEC}}（WEB/LP は web-design スキル「金太郎飴脱却」9 項目を適用）
+
+## §4. 運用メモ（司令塔からの戻し）
+
+- （セッション経緯・マスター決定をここに追記）
+
+## §6. 禁止事項
+
+- `main` への `--force` push / シークレットのコミット / `archive/` 無断削除
+- シークレットの貼付禁止（プロンプト・チャット履歴・エラーログ・スクショ含む）
+- Runbook 整備義務（`docs/standards/templates/runbook-template.md` 参照）
+
+---
+v0.1 | 起草 {{DATE}}

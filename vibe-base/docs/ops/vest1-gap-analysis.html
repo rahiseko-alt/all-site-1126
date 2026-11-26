@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vest1 ギャップ分析 v2 — 計測・検証の穴を探す</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--text:#1a1a2e;--sub:#64748b;--border:#e2e8f0;
+--green:#166534;--green-bg:#dcfce7;--red:#991b1b;--red-bg:#fee2e2;
+--yellow:#854d0e;--yellow-bg:#fef9c3;--blue:#1e40af;--blue-bg:#dbeafe;
+--gray:#94a3b8;--gray-bg:#f1f5f9;
+--p0:#3b82f6;--p0-bg:#eff6ff;--p1:#22c55e;--p1-bg:#f0fdf4;
+--p2:#f97316;--p2-bg:#fff7ed;--p3:#6366f1;--p3-bg:#eef2ff;--p4:#f43e5e;--p4-bg:#fff1f2}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);padding:32px 24px;line-height:1.7}
+.container{max-width:1300px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:700;margin-bottom:4px}
+.meta{font-size:.85rem;color:var(--sub);margin-bottom:20px}
+.principle{background:var(--card);border-radius:10px;padding:16px 24px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--red);font-size:.9rem}
+.principle strong{color:var(--red)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px}
+.stat{text-align:center;padding:14px;border-radius:10px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-value{font-size:1.8rem;font-weight:700}
+.stat-label{font-size:.78rem;color:var(--sub)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:24px;padding:14px 20px;background:var(--card);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.06);font-size:.82rem}
+.legend-item{display:flex;align-items:center;gap:5px}
+.section{background:var(--card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:24px;overflow:hidden}
+.phase-header{padding:14px 24px;font-weight:700;font-size:1.05rem;border-bottom:1px solid var(--border);border-left:4px solid}
+.ph-p0{background:var(--p0-bg);color:var(--p0);border-left-color:var(--p0)}
+.ph-p1{background:var(--p1-bg);color:#166534;border-left-color:var(--p1)}
+.ph-p2{background:var(--p2-bg);color:#9a3412;border-left-color:var(--p2)}
+.ph-p3{background:var(--p3-bg);color:#4338ca;border-left-color:var(--p3)}
+.ph-p4{background:var(--p4-bg);color:#be123c;border-left-color:var(--p4)}
+.ph-gap{background:var(--red-bg);color:var(--red);border-left-color:#ef4444}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead th{background:#f8fafc;padding:8px 10px;text-align:left;font-weight:600;color:#475569;border-bottom:2px solid var(--border);white-space:nowrap}
+tbody td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+tbody tr:hover{background:#f8fafc}
+.b{display:inline-block;padding:1px 7px;border-radius:4px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.b-ok{background:var(--green-bg);color:var(--green)}
+.b-miss{background:var(--red-bg);color:var(--red)}
+.b-half{background:var(--yellow-bg);color:var(--yellow)}
+.b-na{background:var(--gray-bg);color:var(--gray)}
+.gap-row{background:#fff5f5}
+.half-row{background:#fffdf0}
+.dim{color:var(--gray)}
+.note{padding:10px 24px;font-size:.82rem;color:var(--sub);background:#f8fafc;border-bottom:1px solid var(--border)}
+@media(max-width:768px){body{padding:16px 8px}table{font-size:.76rem}thead th,tbody td{padding:6px 5px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>vest1 ギャップ分析 v2 — 計測・検証の穴を探す</h1>
+<p class="meta">PC表v9.1 全74タスク | 2026-04-02</p>
+
+<div class="principle">
+  <strong>判定基準:</strong> スキル/SOPは「実行するだけ」。結果が10点でも100点でもお構いなし。<br>
+  精度に貢献するのは <strong>①計測記録テンプレ</strong>（何を測ったか数値で書く表）と <strong>②品質検証テンプレ</strong>（結果を数値で合否判定する表）の2つだけ。
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="b b-ok">✅</span> テンプレあり</div>
+  <div class="legend-item"><span class="b b-half">△</span> 仕組みはあるが記入テンプレなし</div>
+  <div class="legend-item"><span class="b b-miss">❌</span> 必要だが存在しない</div>
+  <div class="legend-item"><span class="b b-na">—</span> 不要（判断/手動/コード作業）</div>
+</div>
+
+<div class="summary">
+  <div class="stat"><div class="stat-value" style="color:var(--green)">12</div><div class="stat-label">計測・検証テンプレあり</div></div>
+  <div class="stat"><div class="stat-value" style="color:var(--yellow)">8</div><div class="stat-label">△ 仕組みはあるが不完全</div></div>
+  <div class="stat"><div class="stat-value" style="color:var(--red)">14</div><div class="stat-label">❌ テンプレなし</div></div>
+  <div class="stat"><div class="stat-value" style="color:var(--gray)">40</div><div class="stat-label">計測不要タスク</div></div>
+</div>
+
+<!-- ==================== P0 ==================== -->
+<div class="section">
+<div class="phase-header ph-p0">P0: 企画（18タスク）</div>
+<table>
+<thead><tr><th>#</th><th>タスク</th><th>計測記録</th><th>品質検証</th><th>現状と穴</th></tr></thead>
+<tbody>
+<tr class="dim"><td>1</td><td>ターゲット1文定義</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>QA回答</td></tr>
+<tr class="dim"><td>2</td><td>差別化ポイント1文定義</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>QA回答</td></tr>
+<tr><td>3</td><td>仮説リスト+致命度分類</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>PC表内に仮説テーブル定義済み（vest1 #1）</td></tr>
+<tr class="half-row"><td>4</td><td>市場検証（客がいるか）</td><td><span class="b b-half">△</span></td><td><span class="b b-miss">❌</span></td><td>TAM/成長率の数値はPC表rationaleに書く。だが<strong>「何を・どこから・何件調べたか」の記録表がない</strong>。検証は「信頼できる出典か」の判定基準なし</td></tr>
+<tr><td>5</td><td>ライバルを調べて比べる</td><td><span class="b b-ok">✅</span></td><td><span class="b b-half">△</span></td><td>feature-comparison.html（vest1 #8）で記録。だが<strong>機能数○○件以上/競合○社以上等の「十分性」基準がない</strong></td></tr>
+<tr class="dim"><td>6</td><td>勝てる土俵を見つける</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>#5の分析から導出</td></tr>
+<tr><td>7</td><td>外部連携を洗い出す</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>external-service-check.md（vest1 #3）</td></tr>
+<tr class="dim"><td>8</td><td>競合が何を使ってるか</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>#5の延長。comparison-sop参照</td></tr>
+<tr class="dim"><td>9</td><td>候補を2つ以上出す</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>#7の表に追記</td></tr>
+<tr class="half-row"><td>10</td><td>フィルタ7項目で全候補を評価</td><td><span class="b b-half">△</span></td><td><span class="b b-miss">❌</span></td><td>7項目の定義はSOPにある。だが<strong>候補×7項目の記入マトリクス表がない</strong>。PASS/FAIL判定の閾値もない</td></tr>
+<tr class="dim"><td>11</td><td>競合と比較する</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>分析作業</td></tr>
+<tr class="dim"><td>12</td><td>採用決定＋理由を記録</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>判断記録</td></tr>
+<tr class="half-row"><td>13</td><td>★リスク予備フィルター</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>risk-diagnosis.mdテンプレはSOP埋込。タグ（アウト/グレー/クリア）は定性的。<strong>数値スコアリングなし</strong></td></tr>
+<tr class="gap-row"><td>14</td><td>どうやって稼ぐか決める</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>収益モデル設計テンプレなし。</strong>モデル種別/単価/コスト構造を記録する表がない</td></tr>
+<tr class="gap-row"><td>15</td><td>いくらで売る+いくらかかる</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>損益計算テンプレなし。</strong>料金/コスト発生閾値/損益分岐点を記入する表がない。pricing-guide.mdは相場参照資料であって記入表ではない</td></tr>
+<tr><td>16</td><td>MVPスコープ</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>design-doc.md §1 PRD（vest1 #2）</td></tr>
+<tr class="dim"><td>17</td><td>KPI+Go/No-Go基準</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>PC表rationaleに数値目標を記録</td></tr>
+<tr class="dim"><td>18</td><td>Go/No-Go判定</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>ゲート判断</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ==================== P1 ==================== -->
+<div class="section">
+<div class="phase-header ph-p1">P1: 開発（17タスク）</div>
+<table>
+<thead><tr><th>#</th><th>タスク</th><th>計測記録</th><th>品質検証</th><th>現状と穴</th></tr></thead>
+<tbody>
+<tr class="dim"><td>0</td><td>外部サービスの申請開始</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>手続き作業</td></tr>
+<tr class="dim"><td>1</td><td>何で作るか決める</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>QA判断</td></tr>
+<tr class="dim"><td>2</td><td>どこで動かすか決める</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>判断記録</td></tr>
+<tr class="dim"><td>3</td><td>DBの想定規模を確認</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>QA回答</td></tr>
+<tr class="dim"><td>4</td><td>コア機能を作る</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>実装作業</td></tr>
+<tr class="half-row"><td>5</td><td>★コア機能レビュー（CL-1）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-1はSOP§10内。チェック項目あり。だが<strong>各項目の結果を記録する表がない</strong>（全項目PASS/FAILをどこに書く？）</td></tr>
+<tr><td>6a</td><td>UI設計書作成</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>design-doc.md（vest1 #2）</td></tr>
+<tr class="gap-row"><td>6a'</td><td>UI模写: 参考サイト計測</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>CSS計測表vest1なし。</strong>ui-clone-sopに17項目定義+css-values.mdに書けとある。だが<strong>17項目が空欄で並んだ記入用テンプレートが存在しない。</strong>毎回エージェントが自己流で作る→項目漏れ・書式バラつき</td></tr>
+<tr class="half-row"><td>6b</td><td>UI実装適用</td><td><span class="b b-na">—</span></td><td><span class="b b-half">△</span></td><td>/ui-cloneスキルが実行。pixelmatch（差分5%/3%）が検証手段。だが<strong>検証結果（セクション別差分%）を記録するテンプレがない。</strong>コミットメッセージに「差分X%」と書くだけ</td></tr>
+<tr><td>7</td><td>外部サービスの最新情報確認</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>external-service-check.md（vest1 #3）</td></tr>
+<tr class="dim"><td>8</td><td>外部APIとつなぐ</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>実装作業</td></tr>
+<tr class="half-row"><td>9</td><td>★API接続レビュー（CL-2）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-1と同じ問題。<strong>結果記録テンプレなし</strong></td></tr>
+<tr class="gap-row"><td>9a</td><td>★即死仮説の実機検証（CL-15）</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>検証記録テンプレなし。</strong>仮説テーブルのresult列を更新するだけ。「何を計測して、実測値がいくつで、基準値といくつ差があるか」を書く表がない。即死仮説は定量で潰すべき</td></tr>
+<tr class="gap-row"><td>9b</td><td>ログ・監視設計</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>設計テンプレなし。</strong>ログ集約先/アラート条件/監視手段を書く表がない。v9.0新設タスク</td></tr>
+<tr class="gap-row"><td>9c</td><td>性能ベースライン計測</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>計測記録テンプレなし。</strong>主要操作×応答時間/エラー率を記録する表がない。P4で比較する元データが構造化されない</td></tr>
+<tr><td>10</td><td>機能テスト</td><td><span class="b b-ok">✅</span></td><td><span class="b b-ok">✅</span></td><td>test-plan.md（vest1 #6）。テストケース+結果列あり</td></tr>
+<tr><td>11</td><td>レスポンシブ確認</td><td><span class="b b-ok">✅</span></td><td><span class="b b-ok">✅</span></td><td>test-plan.md（vest1 #6）</td></tr>
+<tr><td>12</td><td>★壊れたらどうなるか（CL-3）</td><td><span class="b b-ok">✅</span></td><td><span class="b b-half">△</span></td><td>failure-scenario.md（vest1 #4）で記録。CL-3結果の記録は#5と同じ問題</td></tr>
+<tr class="half-row"><td>13</td><td>★セキュリティレビュー（CL-10）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>/security-reviewスキルが実行。CL-10結果の<strong>記録テンプレなし</strong></td></tr>
+<tr class="dim"><td>14</td><td>開発完了 Go/No-Go</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>ゲート判断</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ==================== P2 ==================== -->
+<div class="section">
+<div class="phase-header ph-p2">P2: 公開・販売準備（27タスク）</div>
+<table>
+<thead><tr><th>#</th><th>タスク</th><th>計測記録</th><th>品質検証</th><th>現状と穴</th></tr></thead>
+<tbody>
+<tr class="half-row"><td>1</td><td>LP構成設計</td><td><span class="b b-ok">✅</span></td><td><span class="b b-half">△</span></td><td>lp-design-sopに競合LP分析テーブル（コピー+デザイン）あり。だが<strong>スコアリングなし。</strong>「自社LP vs 競合」の品質比較が感覚的</td></tr>
+<tr class="half-row"><td>2</td><td>★LP実装+品質レビュー（CL-12）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-12にコピー7項目+デザイン4項目あり。だが<strong>各項目の評価結果を記録する表がない。</strong>合格ラインも不明確</td></tr>
+<tr class="dim"><td>3</td><td>動画配信戦略</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>video-production-sop §0に戦略テーブルの書式あり</td></tr>
+<tr class="half-row"><td>4</td><td>★出口動画制作（CL-13）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-13に11項目あるが全てYES/NO。<strong>画質/音質/尺の数値基準なし</strong></td></tr>
+<tr class="gap-row"><td>5-8</td><td>SEO: title/OGP/JSON-LD/canonical</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>SEO設定チェックリストなし。</strong>ページ×設定項目（title/desc/OGP/JSON-LD/canonical）のマトリクス表がない。og-image-template.html（vest1 #13）は画像テンプレのみでmetaタグ確認表ではない</td></tr>
+<tr class="dim"><td>9</td><td>GA4プロパティ作成</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>手動作業</td></tr>
+<tr class="dim"><td>10</td><td>測定ID埋込</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>QA+コード生成</td></tr>
+<tr class="dim"><td>11</td><td>お金を払う導線を置く</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>実装作業</td></tr>
+<tr class="half-row"><td>12</td><td>★リンク・ボタン全確認（CL-4）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-4項目あり。<strong>全リンク/ボタン一覧×結果の記録表なし</strong></td></tr>
+<tr class="gap-row"><td>13</td><td>★法令表記（CL-9）</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>免責/利用規約/プライバシーの穴埋めテンプレなし。</strong>legal-reference.mdは「何を書くべきか」の解説。コピペして{{店舗名}}を埋めれば完成する雛形がない</td></tr>
+<tr class="half-row"><td>14</td><td>★リスク診断（CL-11）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>risk-diagnosis-sop + risk-diagnosis.mdテンプレ（SOP埋込）。定性タグのみ</td></tr>
+<tr class="half-row"><td>15</td><td>★コードレビュー（CL-14）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>/code-reviewスキルが実行。CL-14結果の<strong>記録テンプレなし</strong></td></tr>
+<tr><td>16</td><td>vercel --prod</td><td><span class="b b-ok">✅</span></td><td><span class="b b-ok">✅</span></td><td>deploy-checklist.md（vest1 #11）。チェック項目+状態欄あり</td></tr>
+<tr class="dim"><td>17</td><td>独自ドメイン設定</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>手動作業</td></tr>
+<tr class="dim"><td>18</td><td>PC/スマホ/リンク本番確認</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>手動作業</td></tr>
+<tr><td>19</td><td>★LP嘘チェック（CL-5）</td><td><span class="b b-ok">✅</span></td><td><span class="b b-ok">✅</span></td><td>仮説テーブル×LP主張の3区分照合（✅/⏳/❌）。判定基準明確</td></tr>
+<tr class="half-row"><td>20</td><td>★パイロットテスト（CL-8）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-8項目あり。<strong>テスト環境×機能の結果マトリクスなし</strong></td></tr>
+<tr class="dim"><td>21</td><td>申し込みの入口を作る</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>実装作業</td></tr>
+<tr><td>22</td><td>自動返信と通知を設定</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>email-template.md（vest1 #7）</td></tr>
+<tr class="half-row"><td>23</td><td>★申し込み→通知確認（CL-6）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-6項目あり。<strong>結果記録テンプレなし</strong></td></tr>
+<tr><td>24</td><td>環境構築手順書</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>onboarding.md（vest1 #5）</td></tr>
+<tr><td>25</td><td>納品物テンプレート</td><td><span class="b b-ok">✅</span></td><td><span class="b b-na">—</span></td><td>vest1 #9, #10, #12</td></tr>
+<tr class="half-row"><td>26</td><td>★E2Eテスト（CL-7）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>CL-7項目あり。<strong>工程×結果×所要時間の記録表なし</strong></td></tr>
+<tr class="dim"><td>27</td><td>Go/No-Go判定</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>ゲート判断</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ==================== P3 ==================== -->
+<div class="section">
+<div class="phase-header ph-p3">P3: 集客（7タスク）</div>
+<table>
+<thead><tr><th>#</th><th>タスク</th><th>計測記録</th><th>品質検証</th><th>現状と穴</th></tr></thead>
+<tbody>
+<tr class="gap-row"><td>1</td><td>どこで集めるか決める</td><td><span class="b b-miss">❌</span></td><td><span class="b b-na">—</span></td><td><strong>チャネル比較記録テンプレなし。</strong>チャネル×リーチ×コスト×相性を書く表がない</td></tr>
+<tr class="half-row"><td>2</td><td>★入口動画制作（CL-13）</td><td><span class="b b-half">△</span></td><td><span class="b b-half">△</span></td><td>P2#4と同じ。CL-13は全てYES/NO</td></tr>
+<tr class="gap-row"><td>3</td><td>施策を5本以上下書き</td><td><span class="b b-miss">❌</span></td><td><span class="b b-na">—</span></td><td><strong>施策管理テンプレなし。</strong>施策名/チャネル/URL/UTM/実行日/結果を記録する表がない</td></tr>
+<tr class="dim"><td>4</td><td>最低1本を公開</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>手動作業</td></tr>
+<tr class="dim"><td>5</td><td>やったことを記録</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>QA回答（#3の表に追記）</td></tr>
+<tr class="dim"><td>6</td><td>他のチャネルも検討</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>分析作業</td></tr>
+<tr class="dim"><td>7</td><td>結論を記録</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>QA回答</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ==================== P4 ==================== -->
+<div class="section">
+<div class="phase-header ph-p4">P4: 計測（5タスク）</div>
+<table>
+<thead><tr><th>#</th><th>タスク</th><th>計測記録</th><th>品質検証</th><th>現状と穴</th></tr></thead>
+<tbody>
+<tr class="gap-row"><td>1</td><td>アクセス数を記録</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>計測ダッシュボードテンプレなし。</strong>PV/直帰率/流入元を記録し、P1#9cのベースラインと比較する表がない</td></tr>
+<tr class="gap-row"><td>2</td><td>売上の数字を記録</td><td><span class="b b-miss">❌</span></td><td><span class="b b-miss">❌</span></td><td><strong>収益記録テンプレなし。</strong>P0#17のKPI/Go-No-Go基準と実績を突き合わせる表がない</td></tr>
+<tr class="dim"><td>3</td><td>ボトルネック改善</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>改善実装作業</td></tr>
+<tr class="dim"><td>4</td><td>文言や画面を改善</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>改善実装作業</td></tr>
+<tr class="dim"><td>5</td><td>Continue/Pivot/Retire</td><td><span class="b b-na">—</span></td><td><span class="b b-na">—</span></td><td>ゲート判断</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ==================== ギャップまとめ ==================== -->
+<div class="section">
+<div class="phase-header ph-gap">❌ ギャップ一覧（PC表順）</div>
+<div class="note"><strong>赤=テンプレなし（精度に直結）。</strong>黄=仕組みはあるが記入テンプレが不完全（CLの結果記録問題は共通）。</div>
+<table>
+<thead><tr><th>#</th><th>PC表</th><th>必要なもの</th><th>何が足りないか</th></tr></thead>
+<tbody>
+<tr style="background:#fff5f5"><td>1</td><td>P0#14-15</td><td>収益モデル+損益計算テンプレ</td><td>「どう稼ぐ/いくらで売る/いくらかかる」を1枚に書く記入表</td></tr>
+<tr style="background:#fff5f5"><td>2</td><td>P1#6a'</td><td>CSS計測表（vest1）</td><td>17項目が空欄で並んだ記入テンプレ。今は毎回自己流で作る</td></tr>
+<tr style="background:#fff5f5"><td>3</td><td>P1#9a</td><td>即死仮説 検証記録テンプレ</td><td>仮説ID×計測項目×基準値×実測値×合否を記録する表</td></tr>
+<tr style="background:#fff5f5"><td>4</td><td>P1#9b</td><td>ログ・監視設計テンプレ</td><td>ログ集約先/アラート条件/死活監視を書く設計表</td></tr>
+<tr style="background:#fff5f5"><td>5</td><td>P1#9c</td><td>性能ベースライン計測表</td><td>主要操作×応答時間/エラー率の記録表</td></tr>
+<tr style="background:#fff5f5"><td>6</td><td>P2#5-8</td><td>SEO設定チェックリスト</td><td>ページ×title/OGP/JSON-LD/canonicalの設定確認マトリクス</td></tr>
+<tr style="background:#fff5f5"><td>7</td><td>P2#13</td><td>免責/利用規約/プライバシー テンプレ</td><td>{{店舗名}}等を埋めれば完成する穴埋め雛形</td></tr>
+<tr style="background:#fff5f5"><td>8</td><td>P3#1,3</td><td>集客施策管理表</td><td>施策名/チャネル/URL/UTM/実行日/結果の記録表</td></tr>
+<tr style="background:#fff5f5"><td>9</td><td>P4#1-2</td><td>P4計測ダッシュボード</td><td>KPI目標 vs 実績 × 期間の突き合わせ表</td></tr>
+<tr style="background:#fffdf0"><td>—</td><td>全CL共通</td><td>CL結果記録テンプレ</td><td>CL-1〜15の各項目×PASS/FAIL×修正内容を記録する共通表。今はrationale欄に自由記述するだけ</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</body>
+</html>

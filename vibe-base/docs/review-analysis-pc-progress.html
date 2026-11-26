@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>クチコミ分析AI — PC進捗表 (Session 34)</title>
+<style>
+  :root {
+    --bg: #fafaf9; --card: #fff; --border: #d6d3d1; --text: #1c1917; --muted: #78716c;
+    --p0: #7c3aed; --p1: #2563eb; --p2: #059669; --p25: #d97706; --p3: #dc2626; --p4: #6366f1;
+    --kill: #ef4444; --pass: #22c55e; --warn: #f59e0b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans JP','Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; padding:2rem; max-width:1200px; margin:0 auto; }
+  h1 { font-size:1.6rem; font-weight:800; }
+  h2 { font-size:1.2rem; font-weight:800; margin:2rem 0 0.5rem; }
+  .subtitle { color:var(--muted); font-size:0.85rem; margin-bottom:0.5rem; }
+  .note { background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:0.8rem 1rem; font-size:0.82rem; margin:1rem 0; }
+  .note strong { color:#92400e; }
+
+  .phase { background:var(--card); border:1px solid var(--border); border-radius:12px; margin:1.5rem 0; overflow:hidden; }
+  .phase-header { padding:0.8rem 1.2rem; color:#fff; font-weight:800; font-size:1rem; display:flex; justify-content:space-between; }
+  .phase-header .count { font-weight:400; font-size:0.8rem; opacity:0.85; }
+  .phase-desc { padding:0.6rem 1.2rem; background:#f5f5f4; font-size:0.8rem; color:var(--muted); border-bottom:1px solid var(--border); }
+
+  table { width:100%; border-collapse:collapse; font-size:0.78rem; }
+  th { background:#f5f5f4; text-align:left; padding:0.5rem 0.6rem; font-weight:700; border-bottom:2px solid var(--border); white-space:nowrap; }
+  td { padding:0.5rem 0.6rem; border-bottom:1px solid #e7e5e4; vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fafaf9; }
+
+  .badge { display:inline-block; padding:1px 6px; border-radius:3px; font-size:0.68rem; font-weight:700; }
+  .badge-qa { background:#dbeafe; color:#1e40af; }
+  .badge-auto { background:#d1fae5; color:#065f46; }
+  .badge-manual { background:#fef3c7; color:#92400e; }
+  .badge-review { background:#fce7f3; color:#9d174d; }
+  .badge-gate { background:#fee2e2; color:#991b1b; }
+  .star { color:var(--kill); font-weight:800; }
+  .kill-tag { display:inline-block; padding:1px 5px; background:#fef2f2; border:1px solid #fecaca; border-radius:3px; font-size:0.65rem; color:#dc2626; font-weight:600; }
+  .pass-tag { display:inline-block; padding:1px 5px; background:#dcfce7; border:1px solid #bbf7d0; border-radius:3px; font-size:0.65rem; color:#166534; font-weight:700; }
+
+  .s-ok { color:var(--pass); font-weight:800; }
+  .s-partial { color:var(--warn); font-weight:800; }
+  .s-none { color:var(--kill); font-weight:800; }
+  tr.current-task { background:#fefce8; }
+
+  .funnel { display:flex; gap:0; margin:1rem 0; overflow-x:auto; }
+  .funnel-stage { text-align:center; padding:0.8rem 1rem; color:#fff; font-weight:700; font-size:0.8rem; flex:1; min-width:110px; }
+  .funnel-stage:nth-child(1) { background:#a78bfa; border-radius:6px 0 0 6px; }
+  .funnel-stage:nth-child(2) { background:#8b5cf6; }
+  .funnel-stage:nth-child(3) { background:#7c3aed; }
+  .funnel-stage:nth-child(4) { background:#6d28d9; }
+  .funnel-stage:nth-child(5) { background:#5b21b6; }
+  .funnel-stage:nth-child(6) { background:#4c1d95; border-radius:0 6px 6px 0; }
+  .funnel-stage small { display:block; font-weight:400; font-size:0.65rem; opacity:0.85; margin-top:2px; }
+  .kill-label { display:block; font-size:0.6rem; color:#fecaca; margin-top:3px; }
+  .done-label { display:block; font-size:0.6rem; color:#bbf7d0; margin-top:3px; }
+
+  .hypo-section { background:#faf5ff; border:1px solid #e9d5ff; border-radius:8px; padding:1rem; margin:0.8rem 1.2rem; }
+  .hypo-section h4 { font-size:0.85rem; font-weight:700; color:var(--p0); margin-bottom:0.5rem; }
+
+  .confirmed { background:#f0fff4; border:1px solid #c6f6d5; border-radius:8px; padding:1rem; margin:0.8rem 1.2rem; }
+  .confirmed h4 { font-size:0.85rem; font-weight:700; color:#22543d; margin-bottom:0.5rem; }
+  blockquote { border-left:3px solid #dd6b20; padding-left:12px; margin:8px 0; color:#555; font-style:italic; font-size:0.82rem; }
+
+  .spec { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.2rem; margin:1.5rem 0; }
+  .spec h3 { margin-top:0; font-size:1rem; }
+  .steps { display:flex; gap:0.4rem; flex-wrap:wrap; margin:0.5rem 0; }
+  .step { display:flex; align-items:center; gap:0.3rem; padding:0.3rem 0.6rem; background:#f5f5f4; border-radius:5px; font-size:0.75rem; font-weight:600; }
+  .step-num { width:18px; height:18px; display:flex; align-items:center; justify-content:center; background:var(--text); color:#fff; border-radius:50%; font-size:0.65rem; flex-shrink:0; }
+
+  .footer { text-align:center; padding:2rem 0; color:var(--muted); font-size:0.75rem; }
+  hr { border:none; border-top:1px solid var(--border); margin:2rem 0; }
+  @media(max-width:768px) { body{padding:1rem;} }
+</style>
+</head>
+<body>
+
+<h1>クチコミ分析AI — プロダクトサイクル進捗表</h1>
+<p class="subtitle">最終更新: 2026-03-19 | Session 34 | 照合者: Opus</p>
+
+<div class="note">
+  <strong>注1:</strong> Session 28照合でP1「完了11/11」P2「完了12/12」の自治憲法申告が虚偽と判明。実物確認に基づき再評価済み<br>
+  <strong>注2:</strong> Session 32でマスター指示によりP0全項目を×に差し戻し。Session 33でP0を現行17タスクフレームワークで再実施中
+</div>
+
+<!-- ===== P0 ===== -->
+<div class="phase">
+  <div class="phase-header" style="background:var(--p0);">
+    <span>P0: 企画 — 6段階のふるい落とし ← 現在S5から</span>
+    <span class="count">17タスク + 仮説テーブル | ○12 ×5</span>
+  </div>
+  <div class="phase-desc">
+    各段階で「ダメならここで止める」判定がある。やめになったら、その先のタスクは全部スキップ。最終ゲートはS6#17。
+  </div>
+
+  <div style="padding:0.8rem 1.2rem;">
+    <div class="funnel">
+      <div class="funnel-stage">S1<small>思い付きを言葉にする</small><span class="done-label">✓ Session 33</span></div>
+      <div class="funnel-stage">S2<small>客がいるか調べる</small><span class="done-label">✓ Session 33</span></div>
+      <div class="funnel-stage">S3<small>ライバルを調べる</small><span class="done-label">✓ Session 33</span></div>
+      <div class="funnel-stage">S4<small>外部連携を選んで<br>作れるか確かめる</small><span class="done-label">✓ Session 34</span></div>
+      <div class="funnel-stage">S5<small>儲かるか確かめる</small><span class="kill-label">← 現在地</span></div>
+      <div class="funnel-stage">S6<small>やることを決める</small><span class="kill-label">Gate: Go/No-Go</span></div>
+    </div>
+  </div>
+
+  <!-- S1 確定事項 -->
+  <div class="confirmed">
+    <h4>S1 確定事項（Session 33 マスター承認済み）</h4>
+    <p><strong>#1 ターゲット:</strong></p>
+    <blockquote>Googleクチコミ対応の必要性は感じているが、面倒で後回しにしており、金を払ってまでやるか迷っている1〜5店舗の飲食個人店オーナー</blockquote>
+    <ul style="font-size:0.8rem; margin-left:1.2rem;">
+      <li>心理: 興味はあるが消極的。キッカケがあれば試してもいい</li>
+      <li>刺さるトリガー: 安さ × ラクさ × AI（「なんか凄そう」のミーハー心含む）</li>
+    </ul>
+    <p style="margin-top:10px"><strong>#2 差別化:</strong></p>
+    <blockquote>AIがクチコミを全部やってくれる。無料から試せる。</blockquote>
+    <ul style="font-size:0.8rem; margin-left:1.2rem;">
+      <li>集客フック: 「AIで何か分からないけど良いんでしょ？無料なら試してみよう」のハードルの低さ</li>
+      <li>裏の差別化（訴求には使わない）: QSCA・テーマ抽出・改善提案の深さは継続理由・有料転換の根拠</li>
+    </ul>
+  </div>
+
+  <!-- 仮説テーブル -->
+  <div class="hypo-section">
+    <h4>仮説テーブル — 「これが嘘なら商売にならない」を全部並べる</h4>
+    <p style="font-size:0.75rem; color:var(--muted); margin-bottom:0.5rem;">S1#3で作成 → P2#13でLP記載と突き合わせ → P4で結果を確認</p>
+    <table>
+      <thead>
+        <tr><th style="width:5%">ID</th><th style="width:25%">仮説</th><th style="width:12%">発見</th><th style="width:12%">検証</th><th style="width:6%">結果</th><th style="width:40%">備考</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>H1</td><td>個人飲食店オーナーはGoogleクチコミ対応の必要性を感じている</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>前提中の前提。P4 Stage1で検証</td></tr>
+        <tr><td>H2</td><td>必要性は感じているが面倒・後回しにしている（潜在需要が存在する）</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>「やらなきゃ」と思いつつ動いてない層が十分いるか</td></tr>
+        <tr><td>H3</td><td>「AIがやってくれる」の1フレーズで興味を引ける（ミーハー心）</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>LP CTR/ウェイトリスト登録率で検証</td></tr>
+        <tr><td>H4</td><td>無料なら試す心理的ハードルを越えられる</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>フリーミアム転換率で検証</td></tr>
+        <tr><td>H5</td><td>月¥980なら「払ってもいい」の閾値内に収まる</td><td>S1マスター回答+競合調査</td><td>—</td><td>⏳</td><td>Hoshitorn無料→¥7,000の間</td></tr>
+        <tr><td>H6</td><td>ラクして済む便利さが習慣化すれば、¥980払ってでも続けたくなる</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>無料→有料の転換動機は「手放せない便利さ」</td></tr>
+        <tr><td>H7</td><td>Google Places APIで十分なクチコミデータを取得できる</td><td>P1実装済み</td><td>S4調査</td><td>⏳</td><td><strong>S4で判明: 1リクエスト最大5レビュー制限。ページネーション不可。</strong> MVPは新着蓄積方式。将来GBP API(OAuth)で全件取得へ</td></tr>
+        <tr><td>H8</td><td>Gemini 2.5 Flashで日本語クチコミの分析精度が実用レベルに達する</td><td>P1実装済み</td><td>—</td><td>⏳</td><td>精度の定量評価なし</td></tr>
+        <tr><td>H9</td><td>無料枠内（Gemini/Neon/Vercel）で初期ユーザーを捌ける</td><td>技術選定時</td><td>S4調査</td><td>⏳</td><td>Gemini 250RPD/Neon 500MB/Places 10K req/Resend 3K通。S5で閾値算出要</td></tr>
+        <tr><td>H10</td><td>ターゲットはスマホからクチコミ管理したい</td><td>一般的推定</td><td>—</td><td>—</td><td>手をつけてない。UI設計に影響</td></tr>
+        <tr><td>H11</td><td>通知なしでもツールとして成立する</td><td>競合調査（全競合が通知あり）</td><td>—</td><td>⏳</td><td>致命的ギャップとして指摘済み。MVP判断要</td></tr>
+        <tr><td>H12</td><td>UXの摩擦1つで離脱する（認証含め全操作がワンタップ級の簡便さ必須）</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>失敗体験が離脱に直結</td></tr>
+        <tr><td>H13</td><td>ターゲットはAIが間違えると思っていない（AI出力の誤りは信頼喪失に直結）</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>返信案の品質管理が生命線</td></tr>
+        <tr><td>H14</td><td>GBP未確認オーナーは「自分の店に勝手にクチコミが付いている」こと自体を知らない</td><td>S1マスター回答</td><td>—</td><td>⏳</td><td>煽りフック:「あなたの店、知らないうちに★2.8かもしれません」</td></tr>
+        <tr><td colspan="6" style="text-align:center; color:var(--muted); font-size:0.72rem;">
+          結果: ✓ 確かめた / ✗ ハズレ / ⏳ まだ / — 手をつけてない
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- P0タスク表 -->
+  <table>
+    <thead>
+      <tr>
+        <th style="width:3%">#</th>
+        <th style="width:10%">ステージ</th>
+        <th style="width:20%">タスク</th>
+        <th style="width:6%">種別</th>
+        <th style="width:5%">状態</th>
+        <th style="width:12%">Kill判定</th>
+        <th style="width:44%">根拠</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td><td>S1</td><td>ターゲット1文定義</td>
+        <td><span class="badge badge-qa">QA</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 33マスター確定。上記参照</td>
+      </tr>
+      <tr>
+        <td>2</td><td>S1</td><td>差別化ポイント1文定義</td>
+        <td><span class="badge badge-qa">QA</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 33マスター確定。上記参照</td>
+      </tr>
+      <tr>
+        <td>3</td><td>S1</td><td>仮説リスト初版作成</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 33作成。上記仮説テーブル参照</td>
+      </tr>
+      <tr>
+        <td>4</td><td>S2</td><td>客がいるか・増えてるか・届くか</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td><span class="pass-tag">PASS: 続行</span></td><td>Session 33完了。TAM47-52億/SAM21-23億/SOM1,200-3,500万。やめ判定=続行</td>
+      </tr>
+      <tr>
+        <td>5</td><td>S3</td><td>ライバルを調べて比べる（大手＋方向性が近い競合）</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td><span class="pass-tag">PASS: 隙間あり</span></td><td>Session 33完了。HTML比較表（30機能+料金+勢力図）</td>
+      </tr>
+      <tr>
+        <td>6</td><td>S3</td><td>勝てる土俵を見つける（空白地帯特定）</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td><span class="pass-tag">PASS</span></td><td>Session 33完了。空白=「深いAI分析×個人店価格×セルフサービス」</td>
+      </tr>
+      <tr>
+        <td>7</td><td>S4</td><td>この商品に必要な外部連携を洗い出す</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 34完了。9カテゴリ(AI/DB/ホスティング/決済/API/認証/メール/監視/DNS)</td>
+      </tr>
+      <tr>
+        <td>8</td><td>S4</td><td>競合が何を使ってるか調べる</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 34完了。4社技術スタック比較。全競合AWS。口コミコムのみVertex AI</td>
+      </tr>
+      <tr>
+        <td>9</td><td>S4</td><td>各カテゴリで候補を2つ以上出す</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 34完了。全9カテゴリで2-3候補列挙</td>
+      </tr>
+      <tr>
+        <td>10</td><td>S4</td><td>フィルタ6項目で全候補を評価</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 34完了。9採用候補×6項目。致命的不合格なし。Places API 5件制限は機能制約</td>
+      </tr>
+      <tr>
+        <td>11</td><td>S4</td><td>競合と比較する（無謀じゃないか？）</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td style="color:var(--muted);">—</td><td>Session 34完了。5差異分析。Vercelサーバーレスが¥980の根拠</td>
+      </tr>
+      <tr>
+        <td>12</td><td>S4</td><td>採用決定＋理由を記録</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td>
+        <td><span class="pass-tag">PASS: Kill該当なし</span></td><td>Session 34完了。<strong>Vercel: ユーザー0人=Hobby → 無料ユーザー発生時Pro($20/月)</strong> マスター確定</td>
+      </tr>
+      <tr class="current-task">
+        <td>13</td><td>S5</td><td>どうやって稼ぐか決める（収益モデル定義）</td>
+        <td><span class="badge badge-qa">QA</span></td><td class="s-none">×</td>
+        <td style="color:var(--muted);">—</td><td>「自社SaaS課金」のみ。モデル種別+単価の正式記録なし</td>
+      </tr>
+      <tr class="current-task">
+        <td>14</td><td>S5</td><td>いくらで売る+いくらかかる（料金設計+コスト発生マップ）</td>
+        <td><span class="badge badge-qa">QA</span></td><td class="s-none">×</td>
+        <td><span class="kill-tag">やめ: 儲からない（損益分岐不可）</span></td><td>コスト発生マップ（閾値+金額）なし。損益分岐点未算出</td>
+      </tr>
+      <tr>
+        <td>15</td><td>S6</td><td>最小限どこまで作るか決める（MVPスコープ）</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td>
+        <td style="color:var(--muted);">—</td><td>仮説ベースのスコープ定義不可。機能境界が曖昧</td>
+      </tr>
+      <tr>
+        <td>16</td><td>S6</td><td>数字の目標と「やめる基準」を決める（KPI+Go/No-Go）</td>
+        <td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td>
+        <td style="color:var(--muted);">—</td><td>数値あるが根拠なし。タイムボックスなし</td>
+      </tr>
+      <tr style="background:#fef2f2;">
+        <td>17</td><td>S6</td><td><strong>Go/No-Go判定</strong></td>
+        <td><span class="badge badge-gate">ゲート</span></td><td class="s-none">×</td>
+        <td><span class="badge badge-gate">Gate</span></td><td>旧GO(3/10)は旧フレームワーク下。現行基準でS1-S5再検証後に再判定要</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== P1 ===== -->
+<div class="phase">
+  <div class="phase-header" style="background:var(--p1);">
+    <span>P1: 開発</span>
+    <span class="count">12タスク | ○6 △4 ×2</span>
+  </div>
+  <table>
+    <thead>
+      <tr><th style="width:3%">#</th><th style="width:12%">項目</th><th style="width:22%">タスク</th><th style="width:6%">種別</th><th style="width:5%">状態</th><th>根拠</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>技術選定</td><td>何で作るか決める（フレームワーク）</td><td><span class="badge badge-qa">QA</span></td><td class="s-ok">○</td><td>Next.js 16 + React 19 + TypeScript 自治憲法§2</td></tr>
+      <tr><td>2</td><td>技術選定</td><td>どこで動かすか決める（インフラ）</td><td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td><td>Vercel + Neon Postgres 自治憲法§2</td></tr>
+      <tr><td>3</td><td>技術選定</td><td>DBの想定規模を確認</td><td><span class="badge badge-qa">QA</span></td><td class="s-ok">○</td><td>Prisma v6 + SQLite→Postgres移行計画記録済み</td></tr>
+      <tr><td>4</td><td>実装</td><td>コア機能を作る</td><td><span class="badge badge-auto">自動</span></td><td class="s-ok">○</td><td>Google Places API連携含む全機能実装済み</td></tr>
+      <tr><td>5</td><td>実装</td><td><span class="star">&#9733;</span> コア機能レビュー</td><td><span class="badge badge-review">レビュー</span></td><td class="s-partial">△</td><td>エージェント実装。Opus未レビュー</td></tr>
+      <tr><td>6</td><td>実装</td><td>画面を作る（UI実装）</td><td><span class="badge badge-qa">QA</span></td><td class="s-ok">○</td><td>ライトテーマ+オレンジアクセント</td></tr>
+      <tr><td>7</td><td>実装</td><td>使ってる外部サービスの最新情報を確認</td><td><span class="badge badge-auto">自動</span></td><td class="s-partial">△</td><td>Gemini/Google Places/Neon使用。最新情報の正式確認記録なし</td></tr>
+      <tr><td>8</td><td>実装</td><td>外部APIとつなぐ</td><td><span class="badge badge-qa">QA</span></td><td class="s-ok">○</td><td>Google Places API + Gemini API連携済み</td></tr>
+      <tr><td>9</td><td>実装</td><td><span class="star">&#9733;</span> API接続レビュー</td><td><span class="badge badge-review">レビュー</span></td><td class="s-none">×</td><td>未実施</td></tr>
+      <tr><td>10</td><td>ローカル確認</td><td>動くか手元で試す（機能テスト）</td><td><span class="badge badge-manual">手動</span></td><td class="s-partial">△</td><td>エージェント報告あり。マスター/Opus未確認</td></tr>
+      <tr><td>11</td><td>ローカル確認</td><td>スマホでも崩れないか確認</td><td><span class="badge badge-manual">手動</span></td><td class="s-partial">△</td><td>エージェント報告あり。マスター/Opus未確認</td></tr>
+      <tr><td>12</td><td>障害検証</td><td><span class="star">&#9733;</span> 壊れたらどうなるか調べて試す</td><td><span class="badge badge-review">レビュー</span></td><td class="s-none">×</td><td>v4.1で追加。未実施</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== P2 ===== -->
+<div class="phase">
+  <div class="phase-header" style="background:var(--p2);">
+    <span>P2: デプロイ</span>
+    <span class="count">14タスク | ○4 △5 ×5</span>
+  </div>
+  <table>
+    <thead>
+      <tr><th style="width:3%">#</th><th style="width:12%">項目</th><th style="width:22%">タスク</th><th style="width:6%">種別</th><th style="width:5%">状態</th><th>根拠</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>SEO基盤</td><td>title/description</td><td><span class="badge badge-auto">自動</span></td><td class="s-partial">△</td><td>LP側は設定済み。アプリ側未確認</td></tr>
+      <tr><td>2</td><td>SEO基盤</td><td>OGP設定</td><td><span class="badge badge-auto">自動</span></td><td class="s-partial">△</td><td>LP側は設定済み。アプリ側未確認</td></tr>
+      <tr><td>3</td><td>SEO基盤</td><td>JSON-LD</td><td><span class="badge badge-auto">自動</span></td><td class="s-partial">△</td><td>LP側は設定済み。アプリ側未確認</td></tr>
+      <tr><td>4</td><td>SEO基盤</td><td>canonical</td><td><span class="badge badge-auto">自動</span></td><td class="s-partial">△</td><td>未確認</td></tr>
+      <tr><td>5</td><td>Analytics</td><td>GA4プロパティ作成</td><td><span class="badge badge-manual">手動</span></td><td class="s-ok">○</td><td>GA4設定済み</td></tr>
+      <tr><td>6</td><td>Analytics</td><td>測定ID埋込</td><td><span class="badge badge-qa">QA</span></td><td class="s-ok">○</td><td>LP側確認済み</td></tr>
+      <tr><td>7</td><td>収益導線</td><td>お金を払う導線を置く</td><td><span class="badge badge-qa">QA</span></td><td class="s-partial">△</td><td>Waitlist formのみ。Stripe未実装（Stage3で実装予定）</td></tr>
+      <tr><td>8</td><td>収益導線</td><td><span class="star">&#9733;</span> リンク・ボタン・フォーム全部押して確認</td><td><span class="badge badge-review">レビュー</span></td><td class="s-none">×</td><td>7項目チェックリスト未実施</td></tr>
+      <tr><td>9</td><td>収益導線</td><td>法令表記（特商法/プライバシー/利用規約）</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td>特商法/プライバシー/利用規約なし</td></tr>
+      <tr><td>10</td><td>本番デプロイ</td><td>vercel --prod</td><td><span class="badge badge-manual">手動</span></td><td class="s-ok">○</td><td>デプロイ済み</td></tr>
+      <tr><td>11</td><td>本番デプロイ</td><td>独自ドメイン設定</td><td><span class="badge badge-manual">手動</span></td><td class="s-ok">○</td><td>app.review.kouheikosehira.com / review.kouheikosehira.com</td></tr>
+      <tr><td>12</td><td>本番確認</td><td>PC/スマホ/リンク全部本番で確認</td><td><span class="badge badge-manual">手動</span></td><td class="s-partial">△</td><td>エージェント報告あり。Opus未確認</td></tr>
+      <tr><td>13</td><td>表示内容検証</td><td><span class="star">&#9733;</span> LPに嘘がないか仮説テーブルと突き合わせ</td><td><span class="badge badge-review">レビュー</span></td><td class="s-none">×</td><td>仮説テーブル未作成</td></tr>
+      <tr><td>14</td><td>実環境検証</td><td><span class="star">&#9733;</span> お客さんの環境で動くか？（パイロットテスト）</td><td><span class="badge badge-review">レビュー</span></td><td class="s-none">×</td><td>v5で追加。未実施</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== P2.5 ===== -->
+<div class="phase">
+  <div class="phase-header" style="background:var(--p25);">
+    <span>P2.5: 販売準備</span>
+    <span class="count">7タスク | ×7</span>
+  </div>
+  <table>
+    <thead>
+      <tr><th style="width:3%">#</th><th style="width:12%">項目</th><th style="width:22%">タスク</th><th style="width:6%">種別</th><th style="width:5%">状態</th><th>根拠</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>受注導線</td><td>申し込み/問い合わせの入口を作る</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>2</td><td>受注導線</td><td>自動返信と通知を設定する</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>3</td><td>受注導線</td><td><span class="star">&#9733;</span> 申し込み→通知、ちゃんと届くか確認</td><td><span class="badge badge-review">レビュー</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>4</td><td>納品体制</td><td>お客さんの環境を作る手順書</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>5</td><td>納品体制</td><td>納品物のテンプレート</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>6</td><td>通しテスト</td><td>申し込みから納品まで通しで動かす（E2E）</td><td><span class="badge badge-review">レビュー</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>7</td><td>ゲート</td><td><strong>売っていいか判定（販売準備Go/No-Go）</strong></td><td><span class="badge badge-gate">ゲート</span></td><td class="s-none">×</td><td></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== P3 ===== -->
+<div class="phase">
+  <div class="phase-header" style="background:var(--p3);">
+    <span>P3: 集客</span>
+    <span class="count">6タスク | ×6</span>
+  </div>
+  <table>
+    <thead>
+      <tr><th style="width:3%">#</th><th style="width:12%">項目</th><th style="width:22%">タスク</th><th style="width:6%">種別</th><th style="width:5%">状態</th><th>根拠</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>チャネル選定</td><td>どこで集めるか決める（SNS/SEO/広告等）</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>2</td><td>初期施策</td><td>施策を5本以上下書き</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>3</td><td>初期施策</td><td>最低1本を公開</td><td><span class="badge badge-manual">手動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>4</td><td>初期施策</td><td>やったことを記録</td><td><span class="badge badge-qa">QA</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>5</td><td>追加チャネル</td><td>他のチャネルも検討</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>6</td><td>追加チャネル</td><td>結論を記録</td><td><span class="badge badge-qa">QA</span></td><td class="s-none">×</td><td></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== P4 ===== -->
+<div class="phase">
+  <div class="phase-header" style="background:var(--p4);">
+    <span>P4: 計測</span>
+    <span class="count">5タスク | ×5</span>
+  </div>
+  <table>
+    <thead>
+      <tr><th style="width:3%">#</th><th style="width:12%">項目</th><th style="width:22%">タスク</th><th style="width:6%">種別</th><th style="width:5%">状態</th><th>根拠</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>初回計測</td><td>アクセス数を記録</td><td><span class="badge badge-qa">QA</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>2</td><td>成果確認</td><td>売上の数字を記録</td><td><span class="badge badge-qa">QA</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>3</td><td>改善実行</td><td>詰まってるところを直す（ボトルネック改善）</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>4</td><td>改善実行</td><td>文言や画面を改善</td><td><span class="badge badge-auto">自動</span></td><td class="s-none">×</td><td></td></tr>
+      <tr><td>5</td><td>次サイクル</td><td><strong>数字を見て次どうするか決める（Continue/Pivot/Retire）</strong></td><td><span class="badge badge-gate">ゲート</span></td><td class="s-none">×</td><td></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- ○ではない項目一覧 -->
+<h2>○ではない項目一覧</h2>
+<div class="phase">
+  <table>
+    <thead>
+      <tr><th>Phase</th><th>#</th><th>タスク</th><th>状態</th><th>備考</th></tr>
+    </thead>
+    <tbody>
+      <tr class="current-task"><td>P0</td><td>13-17</td><td>S5〜S6全項目</td><td class="s-none">×</td><td>S1-S4完了(Session 33-34)。S5から順次実施</td></tr>
+      <tr><td>P1</td><td>5</td><td><span class="star">&#9733;</span> コア機能レビュー</td><td class="s-partial">△</td><td>Opus未レビュー</td></tr>
+      <tr><td>P1</td><td>7</td><td>外部サービス最新情報確認</td><td class="s-partial">△</td><td>正式確認記録なし</td></tr>
+      <tr><td>P1</td><td>9</td><td><span class="star">&#9733;</span> API接続レビュー</td><td class="s-none">×</td><td>未実施</td></tr>
+      <tr><td>P1</td><td>10</td><td>機能テスト</td><td class="s-partial">△</td><td>マスター/Opus未確認</td></tr>
+      <tr><td>P1</td><td>11</td><td>レスポンシブ確認</td><td class="s-partial">△</td><td>マスター/Opus未確認</td></tr>
+      <tr><td>P1</td><td>12</td><td><span class="star">&#9733;</span> 壊れたらどうなるか調べて試す</td><td class="s-none">×</td><td>未実施</td></tr>
+      <tr><td>P2</td><td>1-4</td><td>SEO基盤</td><td class="s-partial">△</td><td>LP側のみ。アプリ側未確認</td></tr>
+      <tr><td>P2</td><td>7</td><td>収益導線配置</td><td class="s-partial">△</td><td>Waitlistのみ</td></tr>
+      <tr><td>P2</td><td>8</td><td><span class="star">&#9733;</span> 導線検証</td><td class="s-none">×</td><td>未実施</td></tr>
+      <tr><td>P2</td><td>9</td><td>法令表記</td><td class="s-none">×</td><td>未実施</td></tr>
+      <tr><td>P2</td><td>12</td><td>PC/SP/リンク確認</td><td class="s-partial">△</td><td>Opus未確認</td></tr>
+      <tr><td>P2</td><td>13</td><td><span class="star">&#9733;</span> LP表示内容検証</td><td class="s-none">×</td><td>仮説テーブル作成済み。突き合わせ未実施</td></tr>
+      <tr><td>P2</td><td>14</td><td><span class="star">&#9733;</span> パイロットテスト</td><td class="s-none">×</td><td>v5で追加。未実施</td></tr>
+      <tr><td>P2.5</td><td>1-7</td><td>全項目</td><td class="s-none">×</td><td>未着手</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- タスク完了の7ステップ -->
+<div class="spec">
+  <h3>タスク完了の7ステップ</h3>
+  <div class="steps">
+    <div class="step"><span class="step-num">1</span>コードの実装</div>
+    <div class="step"><span class="step-num">2</span>ローカル動作確認</div>
+    <div class="step"><span class="step-num">3</span>本番デプロイ</div>
+    <div class="step"><span class="step-num">4</span>本番URL確認</div>
+    <div class="step"><span class="step-num">5</span>PC表仮記入</div>
+    <div class="step"><span class="step-num">6</span>マスター最終承認</div>
+    <div class="step"><span class="step-num">7</span>memory.md記録</div>
+  </div>
+</div>
+
+<!-- 種別定義 -->
+<div class="spec">
+  <h3>種別定義</h3>
+  <div style="display:flex; gap:1.2rem; flex-wrap:wrap; margin-top:0.3rem; font-size:0.8rem;">
+    <div><span class="badge badge-auto">自動</span> AIがやる → マスターがOK出す</div>
+    <div><span class="badge badge-qa">QA</span> AIが聞く → マスターが答える → 記録</div>
+    <div><span class="badge badge-manual">手動</span> マスターが自分でやる</div>
+    <div><span class="badge badge-review">レビュー</span> AIがチェックリストを出す → マスターが確認</div>
+    <div><span class="badge badge-gate">ゲート</span> 全部終わったらマスターがGo/No-Go判定</div>
+  </div>
+</div>
+
+<div class="footer">
+  クチコミ分析AI PC進捗表 | ひな形 v5準拠 | Session 34 | 2026-03-19
+</div>
+
+</body>
+</html>

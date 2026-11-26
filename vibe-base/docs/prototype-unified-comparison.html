@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>クチコミ分析AI 競合比較+実現性検証（統合プロトタイプ）</title>
+<style>
+  body { font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; margin: 0; background: #f8f9fa; color: #1e293b; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  p.sub { color: #666; font-size: 13px; margin-top: 0; }
+
+  /* --- タブ --- */
+  .tab-bar {
+    position: sticky; top: 0; z-index: 100; background: #1e293b;
+    display: flex; padding: 0 20px; box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  .tab-btn {
+    padding: 14px 28px; border: none; background: none; color: #94a3b8;
+    font-size: 14px; font-weight: 700; cursor: pointer; border-bottom: 3px solid transparent;
+    transition: all .15s; letter-spacing: .5px;
+  }
+  .tab-btn:hover { color: #e2e8f0; }
+  .tab-btn.active { color: #fff; border-bottom-color: #ea580c; }
+  .tab-btn .badge {
+    display: inline-block; font-size: 10px; font-weight: 800; padding: 1px 7px;
+    border-radius: 10px; margin-left: 6px; vertical-align: middle;
+  }
+  .badge-s3 { background: #2563eb; color: #fff; }
+  .badge-s4 { background: #7c3aed; color: #fff; }
+  .tab-panel { display: none; padding: 20px; }
+  .tab-panel.active { display: block; }
+
+  /* --- 共通表 --- */
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); font-size: 13px; margin-bottom: 16px; }
+  th, td { border: 1px solid #d0d0d0; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #2c3e50; color: #fff; font-weight: 600; font-size: 11px; }
+  th.ours { background: #ea580c; }
+  tr.cat td { background: #34495e; color: #fff; font-weight: 700; font-size: 13px; }
+  tr:nth-child(even):not(.cat) { background: #f4f6f8; }
+  tr:hover:not(.cat) { background: #eaf0f6; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .partial { color: #d97706; font-weight: 700; }
+  .unique { background: #ecfdf5; }
+  .gap { background: #fef2f2; }
+  .num { text-align: center; width: 30px; color: #888; }
+  .comp { text-align: center; width: 70px; font-size: 14px; }
+  .dev { text-align: center; width: 50px; }
+  .dev input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
+  .prog { text-align: center; width: 80px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .prog-live { color: #16a34a; }
+  .prog-new { color: #2563eb; background: #dbeafe; }
+  .prog-no { color: #bbb; }
+  .note { font-size: 12px; color: #666; min-width: 120px; cursor: text; }
+  .note:empty::before { content: 'メモ...'; color: #ccc; font-style: italic; }
+  .note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+  .mono-note { font-size: 11px; color: #444; min-width: 80px; cursor: text; text-align: left; }
+  .mono-note:empty::before { content: '記入...'; color: #ccc; font-style: italic; }
+  .mono-note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+
+  /* --- S3共通 --- */
+  .legend { margin: 12px 0 16px; font-size: 12px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+  .toolbar { margin: 16px 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .toolbar button { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .toolbar button:hover { background: #1d4ed8; }
+  .toolbar .status { font-size: 13px; color: #16a34a; font-weight: 600; display: none; }
+  .product-def { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .product-def h2 { margin: 0 0 12px; font-size: 16px; }
+  .def-table { width: 100%; border-collapse: collapse; box-shadow: none; }
+  .def-table th { background: #f1f5f9; color: #334155; width: 30px; text-align: center; font-size: 16px; padding: 10px; }
+  .def-table td:nth-child(2) { width: 220px; font-weight: 600; font-size: 13px; padding: 10px; }
+  .def-table td:nth-child(3) { font-size: 13px; padding: 10px; cursor: text; }
+  .def-table td:nth-child(3):focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+  .score-table { margin-top: 20px; width: auto; font-size: 13px; }
+  .score-table th { background: #2c3e50; color: #fff; padding: 6px 16px; }
+  .score-table td { padding: 6px 16px; text-align: center; }
+  .summary { margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .summary-box { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 14px 18px; flex: 1; min-width: 200px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .summary-box h3 { margin: 0 0 8px; font-size: 14px; }
+  .summary-box ul { margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.8; }
+  .pos-section { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; margin: 24px 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .pos-section h2 { margin: 0 0 8px; }
+  .pos-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; font-size: 13px; flex-wrap: wrap; }
+  .pos-controls select { padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+  .pos-controls .auto-tag { background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .pos-empty { color: #94a3b8; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
+
+  /* ====================== S4 固有 ====================== */
+  .s4-section {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .s4-section h2 { margin: 0 0 12px; font-size: 16px; padding-bottom: 6px; border-bottom: 2px solid #7c3aed; }
+  .s4-section h3 { font-size: 13px; margin: 14px 0 6px; color: #4338ca; }
+  .s4-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+  .s4-tag-adopt { background: #7c3aed; color: #fff; }
+  .s4-tag-alt { background: #e2e8f0; color: #475569; }
+  .s4-tag-free { background: #dcfce7; color: #15803d; }
+  .s4-tag-paid { background: #fee2e2; color: #991b1b; }
+  .s4-adopted { background: #f5f3ff; }
+
+  .task-badge {
+    display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 10px;
+    border-radius: 20px; background: #7c3aed; color: #fff; margin-right: 4px;
+  }
+
+  /* 技術スタック比較 */
+  .tech-table th { background: #334155; font-size: 11px; }
+  .tech-table th.ours { background: #ea580c; }
+  .tech-table td { font-size: 12px; }
+  .tech-table td:first-child { font-weight: 700; white-space: nowrap; background: #f8fafc; }
+
+  /* フィルタ表 */
+  .filter-table th { background: #4338ca; font-size: 10px; }
+  .filter-table td { font-size: 11px; }
+  .filter-ok { color: #16a34a; font-weight: 700; }
+  .filter-warn { color: #d97706; font-weight: 700; }
+  .filter-ng { color: #dc2626; font-weight: 700; }
+
+  /* 採用決定 */
+  .decision-table th { background: #4338ca; }
+  .decision-table td { font-size: 12px; }
+
+  /* Kill判定 */
+  .kill-box {
+    background: #fff; border: 3px solid #16a34a; border-radius: 12px; padding: 20px; margin: 20px 0;
+    text-align: center;
+  }
+  .kill-box.fail { border-color: #dc2626; }
+  .kill-box h2 { border: none; color: #16a34a; margin: 0 0 6px; font-size: 16px; }
+  .kill-box.fail h2 { color: #dc2626; }
+  .kill-box .verdict { font-size: 24px; font-weight: 900; }
+  .kill-box .reason { font-size: 12px; color: #666; margin-top: 6px; }
+
+  /* 差異分析 */
+  .diff-table th { background: #334155; font-size: 11px; }
+  .diff-table td { font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- ===== タブバー ===== -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('s3')">
+    S3: 機能比較 <span class="badge badge-s3">30項目</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('s4')">
+    S4: 実現性検証 <span class="badge badge-s4">6タスク</span>
+  </button>
+</div>
+
+<!-- ============================================================
+     S3: 機能比較（既存テンプレートと同じ構造）
+     ============================================================ -->
+<div class="tab-panel active" id="panel-s3">
+
+<h1>クチコミ分析AI 機能別 競合比較表</h1>
+<p class="sub">2026-03-18 作成 | 競合: 口コミコム / Location Connect / MEOチェキ / Gyro-n Review</p>
+
+<div class="product-def">
+  <h2>開発の方向性</h2>
+  <table class="def-table">
+    <tr><th>①</th><td>一言でどんなクチコミ管理ツールか？</td><td contenteditable="true" data-def="def1">個人飲食店が30秒でGoogleクチコミを分析・返信できるAIツール</td></tr>
+    <tr><th>②</th><td>狙うポジション</td><td contenteditable="true" data-def="def2">「深いAI分析 × 個人店価格(¥980) × セルフサービス」の空白地帯</td></tr>
+    <tr><th>③</th><td>①②の意図 vs 実装計画の過不足</td><td contenteditable="true" data-def="def3">通知機能なし（競合全社にあり）が致命的ギャップ。MVP判断要(H11)</td></tr>
+  </table>
+</div>
+
+<div class="pos-section">
+  <h2>ポジショニング勢力図</h2>
+  <p style="font-size:12px;color:#64748b;margin:0 0 8px;">カテゴリ別スコアの分散が大きい＝各社が戦略的に差をつけている軸</p>
+  <div class="pos-controls">
+    <label>X軸: <select id="axisX"></select></label>
+    <label>Y軸: <select id="axisY"></select></label>
+    <span class="auto-tag" id="autoTag">自動選出</span>
+  </div>
+  <div id="posChartArea"><p class="pos-empty">（省略: 本番では自動生成）</p></div>
+</div>
+
+<div class="toolbar">
+  <button onclick="save()">保存</button>
+  <span class="status" id="saveStatus">保存しました</span>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#16a34a"></span> ○</span>
+  <span><span class="dot" style="background:#d97706"></span> △</span>
+  <span><span class="dot" style="background:#dc2626"></span> ×</span>
+  <span><span class="dot" style="background:#ecfdf5;border:1px solid #a7f3d0"></span> 独自</span>
+  <span><span class="dot" style="background:#fef2f2;border:1px solid #fca5a5"></span> ギャップ</span>
+</div>
+
+<!-- 機能比較表（抜粋: 実データから代表行のみ） -->
+<table id="compTable">
+<thead>
+  <tr>
+    <th style="width:30px">#</th>
+    <th>機能</th>
+    <th class="comp ours">自社</th>
+    <th class="comp">口コミコム</th>
+    <th class="comp">Loc.Con</th>
+    <th class="comp">MEOチェキ</th>
+    <th class="comp">Gyro-n</th>
+    <th class="dev">開発</th>
+    <th>進捗</th>
+    <th>備考</th>
+  </tr>
+</thead>
+<tbody>
+<tr class="cat"><td colspan="10">クチコミ収集</td></tr>
+<tr>
+  <td class="num">1</td><td>Google Maps自動取得</td>
+  <td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="1" checked></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Places API (New)</td>
+</tr>
+<tr class="gap">
+  <td class="num">2</td><td>リアルタイム通知</td>
+  <td class="comp no">×</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="2"></td><td class="prog prog-no">未着手</td><td class="note" contenteditable="true">H11: 致命的ギャップ</td>
+</tr>
+<tr class="cat"><td colspan="10">AI分析</td></tr>
+<tr class="unique">
+  <td class="num">3</td><td>QSCA軸テーマ分析</td>
+  <td class="comp yes">○</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td><td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="3" checked></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">独自: 飲食特化</td>
+</tr>
+<tr>
+  <td class="num">4</td><td>AI返信案生成</td>
+  <td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td><td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="4" checked></td><td class="prog prog-live">稼働中</td><td class="note" contenteditable="true">Gemini 2.5 Flash</td>
+</tr>
+<tr class="cat"><td colspan="10">料金（実数値）</td></tr>
+<tr>
+  <td class="num">5</td><td>月額基本料</td>
+  <td class="comp" style="font-weight:700;color:#ea580c">¥980</td><td class="comp">¥18,000〜</td><td class="comp">¥7,000〜</td><td class="comp">¥3,278〜</td><td class="comp">¥1,485〜</td>
+  <td class="dev"></td><td class="prog"></td><td class="note" contenteditable="true"></td>
+</tr>
+
+<tr class="cat"><td colspan="10">（本番では全30機能+料金5+マネタイズ4行を記載）</td></tr>
+</tbody>
+</table>
+
+<div class="summary">
+  <div class="summary-box" style="border-left: 4px solid #dc2626;">
+    <h3>致命的ギャップ</h3>
+    <ul><li>リアルタイム通知（競合全社対応）</li><li>複数サイト対応（食べログ等）</li></ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #16a34a;">
+    <h3>独自の武器</h3>
+    <ul><li>QSCA軸テーマ分析</li><li>¥980/月（個人店価格）</li></ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #2563eb;">
+    <h3>差別化機会</h3>
+    <ul><li>深いAI分析 × セルフサービス</li><li>認証不要で即分析開始</li></ul>
+  </div>
+</div>
+
+</div><!-- /panel-s3 -->
+
+<!-- ============================================================
+     S4: 実現性検証（新規追加セクション）
+     ============================================================ -->
+<div class="tab-panel" id="panel-s4">
+
+<h1>クチコミ分析AI S4: 実現性検証</h1>
+<p class="sub">Kill条件: 開発コスト¥0が不可 → 中止</p>
+
+<!-- #7 外部連携洗い出し -->
+<div class="s4-section">
+  <h2><span class="task-badge">#7</span> 外部連携洗い出し</h2>
+  <table>
+    <tr><th>カテゴリ</th><th>用途</th><th>現在の採用</th><th>必須度</th></tr>
+    <tr class="cat"><td colspan="4">コア機能</td></tr>
+    <tr><td>AI/LLM</td><td>感情分析 + 返信案生成</td><td>Gemini 2.5 Flash</td><td>必須</td></tr>
+    <tr><td>レビュー取得API</td><td>Googleクチコミ自動取得</td><td>Google Places API (New)</td><td>必須</td></tr>
+    <tr><td>データベース</td><td>店舗/レビュー/分析永続化</td><td>Neon PostgreSQL + Prisma v6</td><td>必須</td></tr>
+    <tr class="cat"><td colspan="4">インフラ</td></tr>
+    <tr><td>ホスティング</td><td>アプリ+LP配信</td><td>Vercel</td><td>必須</td></tr>
+    <tr><td>認証</td><td>ユーザーログイン</td><td>未実装（OAuth scaffolded）</td><td>MVP必須</td></tr>
+    <tr class="cat"><td colspan="4">収益化（Stage 3）</td></tr>
+    <tr><td>決済</td><td>サブスク課金</td><td>未実装（Stripe予定）</td><td>Stage 3</td></tr>
+    <tr class="cat"><td colspan="4">補助</td></tr>
+    <tr><td>アナリティクス</td><td>行動計測</td><td>GA4</td><td>必須</td></tr>
+    <tr><td>メール</td><td>通知</td><td>未実装</td><td>Stage 2</td></tr>
+  </table>
+</div>
+
+<!-- #8 競合の技術スタック比較 -->
+<div class="s4-section">
+  <h2><span class="task-badge">#8</span> 競合の技術スタック比較</h2>
+  <p style="font-size:11px;color:#666;margin:0 0 10px;">S3の競合4社が使う外部サービスを調査。出典: Ruby Association, Google Cloud Blog, Green求人, PR Times等</p>
+  <table class="tech-table">
+    <tr>
+      <th>カテゴリ</th>
+      <th>口コミコム (mov)</th>
+      <th>Location Connect</th>
+      <th>MEOチェキ</th>
+      <th>Gyro-n Review</th>
+      <th class="ours">自社</th>
+    </tr>
+    <tr><td>バックエンド</td><td>Ruby on Rails</td><td>Rails + Python</td><td>非公開</td><td>Java + Scala</td><td>Next.js 16</td></tr>
+    <tr><td>フロントエンド</td><td>Vue.js</td><td>React + TS</td><td>非公開</td><td>JS/TS</td><td>React 19 + TS</td></tr>
+    <tr><td>DB</td><td>PostgreSQL + ES + Redis</td><td>MySQL</td><td>非公開</td><td>非公開</td><td>Neon PostgreSQL</td></tr>
+    <tr><td>クラウド</td><td>AWS + GCP</td><td>AWS + GCP</td><td>非公開</td><td>AWS</td><td>Vercel</td></tr>
+    <tr><td>AI/LLM</td><td>Vertex AI + OpenAI</td><td>非公開</td><td>「生成AI」</td><td>非公開(学習型)</td><td>Gemini 2.5 Flash</td></tr>
+    <tr><td>Google API</td><td>GBP API</td><td>GBP API</td><td>GBP API</td><td>GBP API + Yext</td><td>Places API (New)</td></tr>
+    <tr><td>連携サイト数</td><td>31サイト</td><td>GBP + Yahoo</td><td>GBP中心</td><td>Yext ~30サイト</td><td>Google 1サイト</td></tr>
+    <tr><td>決済</td><td>営業課金</td><td>営業課金</td><td>クレカ/請求書</td><td>クレカ/振込</td><td>Stripe(予定)</td></tr>
+    <tr><td>規模</td><td>1億+件</td><td>5万+店</td><td>6万+店</td><td>1,000+社</td><td>0 (MVP前)</td></tr>
+  </table>
+</div>
+
+<!-- #9 候補比較 -->
+<div class="s4-section">
+  <h2><span class="task-badge">#9</span> カテゴリ別候補比較</h2>
+
+  <h3>AI/LLM</h3>
+  <table>
+    <tr><th></th><th>候補</th><th>無料枠</th><th>日本語</th><th>速度</th><th>超過コスト</th></tr>
+    <tr class="s4-adopted"><td><span class="s4-tag s4-tag-adopt">採用</span></td><td>Gemini 2.5 Flash</td><td class="yes">15RPM / 1,500RPD</td><td>高い</td><td>~1秒</td><td>$0.15/1Mトークン</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>OpenAI GPT-4o-mini</td><td class="partial">$5/月クレジット</td><td>高い</td><td>~1.5秒</td><td>$0.15/1Mトークン</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>Claude 3.5 Haiku</td><td class="no">なし(API)</td><td>非常に高い</td><td>~1秒</td><td>$0.80/1Mトークン</td></tr>
+  </table>
+
+  <h3>レビュー取得API</h3>
+  <table>
+    <tr><th></th><th>候補</th><th>無料枠</th><th>取得データ</th><th>認証方式</th><th>制約</th></tr>
+    <tr class="s4-adopted"><td><span class="s4-tag s4-tag-adopt">採用</span></td><td>Google Places API (New)</td><td class="yes">$200/月クレジット</td><td>公開レビュー5件+評価</td><td>APIキーのみ</td><td>5件上限。返信投稿不可</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>Google Business Profile API</td><td class="yes">無料</td><td>全レビュー+返信投稿</td><td>OAuth 2.0必須</td><td>UX摩擦大(H12)</td></tr>
+  </table>
+
+  <h3>データベース</h3>
+  <table>
+    <tr><th></th><th>候補</th><th>無料枠</th><th>リージョン</th><th>Prisma</th><th>特徴</th></tr>
+    <tr class="s4-adopted"><td><span class="s4-tag s4-tag-adopt">採用</span></td><td>Neon PostgreSQL</td><td class="yes">0.5GB / 190h</td><td>ap-southeast-1</td><td class="yes">○</td><td>サーバーレス。Vercel統合良好</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>Supabase PostgreSQL</td><td class="yes">500MB / 2PJ</td><td>ap-northeast-1</td><td class="yes">○</td><td>Auth同梱。LP側で既使用</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>Turso (LibSQL)</td><td class="yes">9GB / 500M読取</td><td>ap-northeast-1</td><td class="no">×</td><td>Prisma非対応が障壁</td></tr>
+  </table>
+
+  <h3>ホスティング / 認証 / 決済 / メール</h3>
+  <table>
+    <tr><th>カテゴリ</th><th></th><th>候補</th><th>無料枠</th><th>ポイント</th></tr>
+    <tr class="s4-adopted"><td rowspan="2">ホスティング</td><td><span class="s4-tag s4-tag-adopt">採用</span></td><td>Vercel</td><td class="yes">Hobby無料</td><td>Next.jsネイティブ。東京。帯域100GB</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>Cloudflare Pages</td><td class="yes">無制限</td><td>Next.js部分対応(@opennextjs)</td></tr>
+    <tr class="s4-adopted"><td rowspan="2">認証</td><td><span class="s4-tag s4-tag-adopt">採用</span></td><td>NextAuth.js (Auth.js v5)</td><td class="yes">無料(OSS)</td><td>外部依存ゼロ。DB自前管理</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>Supabase Auth</td><td class="yes">50K MAU</td><td>LP側と統合可</td></tr>
+    <tr class="s4-adopted"><td rowspan="2">決済</td><td><span class="s4-tag s4-tag-adopt">採用</span></td><td>Stripe</td><td class="yes">初期¥0</td><td>3.6%。日本法人。SaaS標準</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>LemonSqueezy</td><td class="yes">初期¥0</td><td>5%+$0.50。税処理自動</td></tr>
+    <tr class="s4-adopted"><td rowspan="2">メール</td><td><span class="s4-tag s4-tag-adopt">採用</span></td><td>Resend</td><td class="yes">3,000通/月</td><td>React Email対応</td></tr>
+    <tr><td><span class="s4-tag s4-tag-alt">候補</span></td><td>SendGrid</td><td class="yes">100通/日</td><td>SDK有</td></tr>
+  </table>
+</div>
+
+<!-- #10 フィルタ6項目 -->
+<div class="s4-section">
+  <h2><span class="task-badge">#10</span> フィルタ6項目評価</h2>
+  <table class="filter-table">
+    <tr>
+      <th>採用サービス</th>
+      <th>①端末互換</th>
+      <th>②日本語/JP</th>
+      <th>③無料枠充足</th>
+      <th>④障害時影響</th>
+      <th>⑤代替手段</th>
+      <th>⑥利用規約</th>
+    </tr>
+    <tr><td><strong>Gemini 2.5 Flash</strong></td><td class="filter-ok">○</td><td class="filter-ok">○</td><td class="filter-ok">○ 1,500RPD</td><td class="filter-warn">△ 分析停止</td><td class="filter-ok">○ GPT-4o-mini</td><td class="filter-ok">○</td></tr>
+    <tr><td><strong>Places API</strong></td><td class="filter-ok">○</td><td class="filter-ok">○</td><td class="filter-ok">○ $200/月</td><td class="filter-warn">△ 取得停止</td><td class="filter-warn">△ GBP API</td><td class="filter-ok">○</td></tr>
+    <tr><td><strong>Neon PostgreSQL</strong></td><td class="filter-ok">○</td><td class="filter-ok">○</td><td class="filter-ok">○ 0.5GB</td><td class="filter-ng">× 全停止</td><td class="filter-ok">○ Supabase</td><td class="filter-ok">○</td></tr>
+    <tr><td><strong>Vercel</strong></td><td class="filter-ok">○</td><td class="filter-ok">○ 東京</td><td class="filter-ok">○ 100GB</td><td class="filter-ng">× 全停止</td><td class="filter-ok">○ Cloudflare</td><td class="filter-ok">○</td></tr>
+    <tr><td><strong>NextAuth.js</strong></td><td class="filter-ok">○</td><td class="filter-ok">○</td><td class="filter-ok">○ 無料OSS</td><td class="filter-ok">○ 外部無</td><td class="filter-ok">○</td><td class="filter-ok">○ MIT</td></tr>
+    <tr><td><strong>Stripe</strong></td><td class="filter-ok">○</td><td class="filter-ok">○ JPY</td><td class="filter-ok">○ 初期¥0</td><td class="filter-warn">△ 決済停止</td><td class="filter-warn">△ Lemon</td><td class="filter-ok">○</td></tr>
+  </table>
+  <p style="font-size:11px;color:#666;margin-top:8px;"><strong>結果:</strong> フィルタ落ち=0件。全候補5/6以上で○。④の単一障害点(Neon/Vercel)は競合も同構造（AWS障害で3社停止）</p>
+</div>
+
+<!-- #11 競合との選択差異 -->
+<div class="s4-section">
+  <h2><span class="task-badge">#11</span> 競合との選択差異分析</h2>
+  <table class="diff-table">
+    <tr><th>差異</th><th>競合の選択</th><th>自社の選択</th><th>なぜ違うか</th><th>差別化の可能性</th></tr>
+    <tr><td><strong>クラウド</strong></td><td>AWS (3社)</td><td>Vercel</td><td>¥0制約。AWSは従量課金で保証不可</td><td>Edge Functions → レスポンス速度</td></tr>
+    <tr><td><strong>レビュー取得</strong></td><td>GBP API (全社)</td><td>Places API</td><td>OAuth不要 → UX簡素化(H12)</td><td>「店名入力だけで即分析」</td></tr>
+    <tr><td><strong>連携サイト</strong></td><td>31サイト(最大)</td><td>Google 1サイト</td><td>MVPスコープ最小化</td><td>個人店はGoogle評価が最重要</td></tr>
+    <tr><td><strong>AI</strong></td><td>Vertex+OpenAI</td><td>Gemini単体</td><td>無料枠最大(1,500RPD)</td><td>AIコスト¥0 → 価格破壊の源泉</td></tr>
+    <tr><td><strong>決済</strong></td><td>営業課金(大手)</td><td>Stripe(セルフ)</td><td>営業不要のセルフサービス</td><td>¥980少額課金に最適</td></tr>
+  </table>
+</div>
+
+<!-- #12 採用決定 -->
+<div class="s4-section">
+  <h2><span class="task-badge">#12</span> 採用決定 + 理由記録</h2>
+  <table class="decision-table">
+    <tr><th>カテゴリ</th><th>採用</th><th>選定理由</th><th>移行トリガー</th></tr>
+    <tr><td>AI/LLM</td><td><strong>Gemini 2.5 Flash</strong></td><td>無料枠最大。日本語十分</td><td>枠超過 or 精度不足 → GPT-4o-mini</td></tr>
+    <tr><td>レビュー取得</td><td><strong>Places API (New)</strong></td><td>認証不要。UX摩擦ゼロ</td><td>5件制限が障壁 → GBP API</td></tr>
+    <tr><td>DB</td><td><strong>Neon PostgreSQL</strong></td><td>0.5GB無料。Vercel統合良好</td><td>超過 → Neon Pro ($19/月)</td></tr>
+    <tr><td>ホスティング</td><td><strong>Vercel (Hobby)</strong></td><td>Next.jsネイティブ。東京。無料</td><td>帯域超過 → Pro ($20/月)</td></tr>
+    <tr><td>認証</td><td><strong>NextAuth.js v5</strong></td><td>無料OSS。外部依存ゼロ</td><td>なし</td></tr>
+    <tr><td>決済</td><td><strong>Stripe</strong></td><td>初期¥0。JPYサブスク対応</td><td>なし (Stage 3)</td></tr>
+    <tr><td>メール</td><td><strong>Resend</strong></td><td>3,000通/月無料。React Email</td><td>なし (Stage 2)</td></tr>
+  </table>
+</div>
+
+<!-- Kill判定 -->
+<div class="kill-box">
+  <h2>S4 Kill条件チェック</h2>
+  <div class="verdict" style="color:#16a34a;">PASS — 開発コスト¥0は達成可能</div>
+  <div class="reason">全カテゴリで無料枠がStage 1 (~100店舗) をカバー。フィルタ落ち=0件。全候補で代替手段あり。</div>
+</div>
+
+</div><!-- /panel-s4 -->
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`#panel-${id}`).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => { if (b.textContent.includes(id.toUpperCase())) b.classList.add('active'); });
+  // URL hash
+  history.replaceState(null, '', `#${id}`);
+}
+// hash restore
+if (location.hash === '#s4') switchTab('s4');
+
+const SK = 'review-analysis-unified-state';
+function save() { const el = document.getElementById('saveStatus'); el.style.display = 'inline'; setTimeout(() => el.style.display = 'none', 2500); }
+</script>
+
+</body>
+</html>

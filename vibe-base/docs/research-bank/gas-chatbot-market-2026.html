@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チャットボット×GAS連携 市場調査 2026</title>
+<style>
+:root{--bg:#f8f9fb;--card:#fff;--bd:#e2e8f0;--tx:#1a1a2e;--sub:#64748b;--ac:#2563eb;--gn:#16a34a;--or:#ea580c;--rd:#dc2626;--pp:#7c3aed}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;padding:32px 24px}
+.c{max-width:1100px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:800;margin-bottom:4px}
+.meta{font-size:.82rem;color:var(--sub);margin-bottom:24px;display:flex;gap:16px;flex-wrap:wrap}
+.meta strong{color:var(--tx)}
+.sec{background:var(--card);border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sec h2{font-size:1.15rem;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--bd)}
+.sec h3{font-size:.95rem;font-weight:700;margin:14px 0 6px;color:var(--ac)}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--bd)}
+th{background:#f8fafc;font-weight:600;color:var(--sub);white-space:nowrap}
+tr:hover td{background:#f9fafb}
+.price{font-weight:700;color:var(--or)}
+.sales{font-weight:700;color:var(--ac)}
+.insight{background:#fffce8;border-left:4px solid #eab308;padding:12px 16px;margin:12px 0;border-radius:0 8px 8px 0;font-size:.85rem}
+.warn{background:#fef2f2;border-left:4px solid var(--rd);padding:12px 16px;margin:12px 0;border-radius:0 8px 8px 0;font-size:.85rem}
+.opportunity{background:#f0fdf4;border-left:4px solid var(--gn);padding:12px 16px;margin:12px 0;border-radius:0 8px 8px 0;font-size:.85rem}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}
+.kv-item{background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:14px;text-align:center}
+.kv-item .val{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.kv-item .label{font-size:.72rem;color:var(--sub);margin-top:2px}
+ul,ol{margin:6px 0 10px 20px;font-size:.85rem}
+li{margin-bottom:4px}
+p{font-size:.85rem;margin-bottom:8px}
+.tag{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:4px;font-weight:600;margin-right:4px}
+.tag-blue{background:#dbeafe;color:var(--ac)}
+.tag-green{background:#dcfce7;color:var(--gn)}
+.tag-orange{background:#ffedd5;color:var(--or)}
+.tag-red{background:#fee2e2;color:var(--rd)}
+.tag-purple{background:#f3e8ff;color:var(--pp)}
+.src{font-size:.72rem;color:var(--sub);margin-top:4px}
+.src a{color:var(--ac);text-decoration:none}
+.src a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="c">
+
+<h1>チャットボット × GAS連携 市場調査</h1>
+<div class="meta">
+  <span>調査日: <strong>2026-04-04</strong></span>
+  <span>対象: <strong>ココナラ・クラウドワークス・ランサーズ</strong></span>
+  <span>タグ: <span class="tag tag-blue">market</span><span class="tag tag-orange">competitor</span><span class="tag tag-green">pricing</span></span>
+  <span>reusableFor: <strong>GWS-Eval商品ピボット / GAS系出品戦略 / マネタイズ大作戦ポートフォリオ設計</strong></span>
+</div>
+
+<!-- ============================================================ -->
+<!-- S1: 市場概況 -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>1. 市場概況 — GAS出品・案件の全体像</h2>
+
+  <div class="kv">
+    <div class="kv-item"><div class="val">1,152件</div><div class="label">ココナラ GAS関連出品数</div></div>
+    <div class="kv-item"><div class="val">493件</div><div class="label">ランサーズ GAS関連出品数</div></div>
+    <div class="kv-item"><div class="val">常時掲載</div><div class="label">CW GASスキル案件（JS描画で件数取得不可）</div></div>
+    <div class="kv-item"><div class="val">3,000〜60,000円</div><div class="label">ココナラ価格帯</div></div>
+    <div class="kv-item"><div class="val">10,000〜50,000円</div><div class="label">ランサーズ価格帯</div></div>
+    <div class="kv-item"><div class="val">5万〜100万円</div><div class="label">CW案件予算帯</div></div>
+  </div>
+
+  <h3>GAS市場の主流カテゴリ（出品数ベース）</h3>
+  <table>
+    <tr><th>カテゴリ</th><th>割合</th><th>典型例</th></tr>
+    <tr><td><strong>スプレッドシート自動化</strong></td><td>最多（推定60%超）</td><td>転記・集計・通知・レポート自動生成</td></tr>
+    <tr><td><strong>外部サービス連携</strong></td><td>多い</td><td>Slack/ChatWork/LINE通知、SNS自動投稿</td></tr>
+    <tr><td><strong>フォーム・ワークフロー</strong></td><td>一定数</td><td>申請承認、予約管理、請求書自動発行</td></tr>
+    <tr><td><strong>スクレイピング</strong></td><td>少数</td><td>Web情報取得→スプシ記録</td></tr>
+    <tr><td><strong>チャットbot構築</strong></td><td>極少数</td><td>LINE Bot、ChatWork Bot、FAQ Bot</td></tr>
+  </table>
+
+  <div class="insight">
+    <strong>発見:</strong> GAS市場は「スプレッドシート自動化」が圧倒的主流。「チャットbot×GAS」はGAS出品者の一部がオプションとして提供するのみで、専門出品はほぼ存在しない。一方、チャットbot市場（ココナラ カテゴリ772: 462件）はDify/LINE Bot中心で、GASは裏方扱い。<strong>両カテゴリの交差点が空白地帯。</strong>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- S2: ココナラ詳細 -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>2. ココナラ — GAS出品の競合環境</h2>
+
+  <h3>トップ出品者（販売実績順）</h3>
+  <table>
+    <tr><th>#</th><th>出品者</th><th>価格</th><th>販売実績</th><th>評価</th><th>内容</th></tr>
+    <tr><td>1</td><td>n00518</td><td class="price">3,000円</td><td class="sales">889件</td><td>5.0</td><td>GAS汎用自動化</td></tr>
+    <tr><td>2</td><td>室内森林浴届け隊</td><td class="price">3,000円</td><td class="sales">410件</td><td>5.0</td><td>Excel/スプシ効率化</td></tr>
+    <tr><td>3</td><td>IROHA</td><td class="price">60,000円</td><td class="sales">73件</td><td>4.9</td><td>スプシ機能+UIデザイン</td></tr>
+    <tr><td>4</td><td>エイトさん</td><td class="price">5,000円</td><td class="sales">63件</td><td>4.9</td><td>GAS業務自動化</td></tr>
+    <tr><td>5</td><td>デジタルまつごろう</td><td class="price">6,000円</td><td class="sales">47件</td><td>5.0</td><td>GAS自動化</td></tr>
+    <tr><td>6</td><td>まさる</td><td class="price">5,000〜8,000円</td><td class="sales">34件+複数出品</td><td>5.0</td><td>Meta広告/Threads/汎用GAS（多角展開型）</td></tr>
+    <tr><td>7</td><td>さなね</td><td class="price">10,000円</td><td class="sales">32件</td><td>5.0</td><td>GAS自動化ツール</td></tr>
+  </table>
+
+  <h3>価格帯分布</h3>
+  <table>
+    <tr><th>価格帯</th><th>件数感</th><th>傾向</th></tr>
+    <tr><td class="price">3,000円</td><td>多い</td><td>最低価格帯。薄利多売モデル。n00518が889件で独走</td></tr>
+    <tr><td class="price">5,000〜8,000円</td><td>最多</td><td>ボリュームゾーン。汎用GAS自動化の標準価格</td></tr>
+    <tr><td class="price">10,000〜15,000円</td><td>中程度</td><td>やや専門性のある出品。保守込みなど</td></tr>
+    <tr><td class="price">20,000〜40,000円</td><td>少数</td><td>高機能・カスタム開発</td></tr>
+    <tr><td class="price">50,000円〜</td><td>極少数</td><td>デザイン込み/システム一式構築</td></tr>
+  </table>
+
+  <h3>GAS×bot関連の出品状況</h3>
+  <table>
+    <tr><th>タイプ</th><th>出品状況</th><th>価格例</th></tr>
+    <tr><td>LINE Bot + GAS</td><td>たま＠SE等がDify併用で出品。GAS単独は少数</td><td>5,000〜50,000円</td></tr>
+    <tr><td>ChatWork Bot + GAS</td><td>オプション扱い。専門出品ほぼなし</td><td>+5,000円（オプション）</td></tr>
+    <tr><td>Slack通知 + GAS</td><td>自動化出品の付随機能</td><td>含まれる場合が多い</td></tr>
+    <tr><td>Google Chat Bot</td><td>Workspace必須のため出品なし</td><td>—</td></tr>
+  </table>
+
+  <p class="src">出典: <a href="https://coconala.com/categories/230?keyword=gas">coconala.com/categories/230?keyword=gas</a>（2026-04-04取得）</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- S3: ランサーズ詳細 -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>3. ランサーズ — GAS出品の競合環境</h2>
+
+  <div class="kv">
+    <div class="kv-item"><div class="val">493件</div><div class="label">GAS関連出品数</div></div>
+    <div class="kv-item"><div class="val">10,000〜50,000円</div><div class="label">主要価格帯</div></div>
+  </div>
+
+  <h3>主要出品（実績順）</h3>
+  <table>
+    <tr><th>タイトル</th><th>価格</th><th>実績</th></tr>
+    <tr><td>複数GAS作業まとめて対応</td><td class="price">10,000円〜</td><td class="sales">79件</td></tr>
+    <tr><td>VBA・GAS自動化（毎月3社限定）</td><td class="price">30,000円〜</td><td class="sales">57件</td></tr>
+    <tr><td>GAS複雑作業全て自動化</td><td class="price">10,000円〜</td><td class="sales">52件</td></tr>
+    <tr><td>Python×GAS業務効率化</td><td class="price">20,000円〜</td><td class="sales">13件</td></tr>
+  </table>
+
+  <h3>bot関連出品</h3>
+  <table>
+    <tr><th>タイプ</th><th>価格</th><th>備考</th></tr>
+    <tr><td>LINE/ChatWork/Slack自動通知</td><td class="price">15,000円〜</td><td>GASエンジニアが出品</td></tr>
+    <tr><td>LINE/ChatWork/Gmail通知送信</td><td class="price">9,980円〜</td><td>1種類あたり</td></tr>
+    <tr><td>スプシベースFAQチャットbot</td><td class="price">10,000円〜</td><td>GAS+Sheets</td></tr>
+    <tr><td>医療向けLINE予約システム</td><td class="price">50,000円〜</td><td>業種特化</td></tr>
+    <tr><td>ChatWorkチャットbot導入</td><td class="price">50,000円〜</td><td>初期費用</td></tr>
+  </table>
+
+  <p class="src">出典: <a href="https://www.lancers.jp/menu/tag/GAS">lancers.jp/menu/tag/GAS</a>（2026-04-04取得）</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- S4: CW詳細 -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>4. クラウドワークス — GAS受託案件</h2>
+
+  <p>※ CWはJS描画のため出品一覧を直接取得できず。検索結果+既存リサーチからの推定。</p>
+
+  <h3>GAS関連案件の傾向</h3>
+  <table>
+    <tr><th>案件タイプ</th><th>予算帯</th><th>備考</th></tr>
+    <tr><td>スプレッドシート自動化（転記・集計）</td><td class="price">1万〜5万円</td><td>最多。固定報酬</td></tr>
+    <tr><td>フォーム連携・ワークフロー</td><td class="price">5万〜10万円</td><td>請求書自動発行等</td></tr>
+    <tr><td>LINE通知ツール開発（GAS or Python）</td><td class="price">5万〜10万円</td><td>bot系。ポイ活通知等</td></tr>
+    <tr><td>GAS×ChatGPT連携</td><td class="price">5万〜30万円</td><td>AI系。成長中</td></tr>
+    <tr><td>LINE Bot開発（ChatGPT API活用）</td><td class="price">50万〜100万円</td><td>大型。GAS以外も含む</td></tr>
+  </table>
+
+  <h3>GAS副業の収入実態</h3>
+  <table>
+    <tr><th>稼働</th><th>月収</th><th>備考</th></tr>
+    <tr><td>週末+平日夜 5-10h/月</td><td class="price">3〜5万円</td><td>副業レベル</td></tr>
+    <tr><td>ココナラ出品（プラチナ級）</td><td class="price">約10万円/月</td><td>手数料22%控除後。年120件超の受注</td></tr>
+    <tr><td>ツール販売（買い切り）</td><td class="price">8,000円/件×N件</td><td>自動化ツール販売。月数万〜十数万の実例</td></tr>
+  </table>
+
+  <p class="src">出典: <a href="https://crowdworks.jp/public/jobs/skill/321">crowdworks.jp GASスキル案件</a> / <a href="https://techgym.jp/fukugyo/gas/">テックジム GAS副業ガイド</a></p>
+</div>
+
+<!-- ============================================================ -->
+<!-- S5: 空白地帯分析 -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>5. 空白地帯分析 — 「チャットbot × GAS」の交差点</h2>
+
+  <h3>現状の市場構造</h3>
+  <table>
+    <tr><th></th><th>GAS自動化市場</th><th>チャットbot市場</th></tr>
+    <tr><td><strong>ココナラ</strong></td><td>1,152件（カテゴリ230）</td><td>462件（カテゴリ772）</td></tr>
+    <tr><td><strong>主要技術</strong></td><td>GAS + Sheets</td><td>Dify / LINE API / ChatGPT API</td></tr>
+    <tr><td><strong>GASの役割</strong></td><td>主役（自動化の本体）</td><td>裏方（オプション+5,000円）</td></tr>
+    <tr><td><strong>bot要素</strong></td><td>通知送信（Slack/LINE/CW）が付随</td><td>AI応答・RAG・FAQ</td></tr>
+    <tr><td><strong>単価</strong></td><td>3,000〜15,000円が主流</td><td>5,000〜50,000円</td></tr>
+  </table>
+
+  <div class="opportunity">
+    <strong>空白地帯:</strong> 「GASをバックエンドにしたチャットbot専門サービス」は現時点でほぼ存在しない。GAS出品者はbot機能をオプション扱い、チャットbot出品者はGASを意識していない。<br>
+    <strong>具体的に:</strong>
+    <ul>
+      <li>LINE Bot + GAS + Sheets（予約管理/FAQ/通知）を<strong>パッケージ商品化</strong>している出品者はたま＠SE（Dify併用）のみ</li>
+      <li>ChatWork Bot + GAS 専門出品 = <strong>ゼロ</strong></li>
+      <li>Google Chat Bot = <strong>Workspace制限で市場なし</strong></li>
+      <li>Slack Bot + GAS 専門出品 = <strong>ほぼゼロ</strong>（通知機能として含まれるのみ）</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <strong>注意:</strong> 空白＝チャンスとは限らない。空白の理由が「需要がない」可能性もある。<br>
+    <strong>需要の証拠:</strong>
+    <ul>
+      <li>CWに「LINE通知ツール開発（GAS or Python）」5-10万円の案件が存在</li>
+      <li>ココナラで「GAS連携」オプションが+5,000円で売れている</li>
+      <li>たま＠SE のDify+GAS+LINE出品が63件販売（需要あり）</li>
+      <li>ランサーズの「スプシベースFAQチャットbot」に実績あり</li>
+    </ul>
+    需要は存在する。ただし現状は「GAS自動化のついで」or「チャットbotのついで」として消化されており、専門カテゴリとして成立するかは未証明。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- S6: マネタイズ大作戦との位置づけ -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>6. マネタイズ大作戦における位置づけ</h2>
+
+  <h3>現行ポートフォリオ</h3>
+  <table>
+    <tr><th>プロダクト</th><th>ポジション</th><th>単価帯</th><th>状態</th></tr>
+    <tr><td><strong>AI Answer</strong></td><td>松 — AIカスタマーサポート</td><td>高（受託）</td><td>P2未着手</td></tr>
+    <tr><td><strong>Dify-Service</strong></td><td>竹/梅 — Difyチャットbot構築代行</td><td>5,000〜55,000円</td><td>P1進行中</td></tr>
+    <tr><td><strong>GWS-Eval（ピボット前）</strong></td><td>CW受託+テンプレ商品</td><td>10万円</td><td>クライアント案件キル</td></tr>
+  </table>
+
+  <h3>ピボット後の位置づけ案</h3>
+
+  <div class="insight">
+    <strong>前提:</strong> マネタイズ大作戦のタイムライン（4月1円→5月5万→...）から逆算すると、4月中に出品可能な状態にする必要がある。GAS×botの「パッケージ商品」は、Dify-Serviceの梅（DSL納品5,000円）と同じ速度感で立ち上げられる候補。
+  </div>
+
+  <table>
+    <tr><th>切り口</th><th>内容</th><th>Dify-Serviceとの違い</th></tr>
+    <tr>
+      <td><strong>A. LINE Bot + GAS パッケージ</strong></td>
+      <td>LINE公式アカウント自動応答 + Sheets記録 + GAS通知。予約bot/FAQ bot/通知botのテンプレート販売</td>
+      <td>Dify不要。GAS+LINE APIで完結。より軽量・安価</td>
+    </tr>
+    <tr>
+      <td><strong>B. ChatWork/Slack Bot + GAS 業務自動化</strong></td>
+      <td>ChatWork/Slackに定期通知・集計bot。日報・勤怠・タスク通知</td>
+      <td>AIなし。定型通知に特化。企業向け</td>
+    </tr>
+    <tr>
+      <td><strong>C. GAS WebApp + チャット通知 パッケージ</strong></td>
+      <td>Webフォーム（投稿/アンケート/集計）+ チャット通知。旧GWS-Evalの技術を流用</td>
+      <td>Difyは使わない。Google Workspace完結</td>
+    </tr>
+  </table>
+
+  <h3>Dify-Serviceとの棲み分け</h3>
+  <table>
+    <tr><th></th><th>Dify-Service</th><th>GAS×Bot（新）</th></tr>
+    <tr><td><strong>AI要素</strong></td><td>あり（RAG/LLM）</td><td>なし or 軽量（ChatGPT API経由）</td></tr>
+    <tr><td><strong>技術基盤</strong></td><td>Dify + Docker</td><td>GAS + Google Workspace</td></tr>
+    <tr><td><strong>顧客のインフラ</strong></td><td>VPS or Dify Cloud</td><td>Googleアカウントのみ</td></tr>
+    <tr><td><strong>導入ハードル</strong></td><td>中（Docker知識 or Cloud契約）</td><td>低（GASコピーで即動作）</td></tr>
+    <tr><td><strong>月額コスト</strong></td><td>あり（VPS/API）</td><td>なし（GAS無料枠内）</td></tr>
+    <tr><td><strong>売り文句</strong></td><td>「AI搭載チャットbot」</td><td>「無料で動くbot自動化」</td></tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- S7: 競合の価格戦略 -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>7. 参考: 関連する既存調査</h2>
+  <ul>
+    <li><strong>chatbot-market-2026.html</strong>（3/28）— 3プラットフォーム横断チャットbot市場。出品数・価格帯・購入者像</li>
+    <li><strong>coconala-ai-chatbot-market-2026.html</strong>（3/31）— ココナラAIチャットbot特化。AI Concierge出品戦略向け</li>
+    <li><strong>coconala-dify-competitor-2026.html</strong> — Dify競合分析。たま＠SE/けうまる等の詳細</li>
+    <li><strong>dify-cost-structure-2026.html</strong> — Difyコスト構造。Sandbox/Professional/セルフホストの比較</li>
+  </ul>
+  <p>本調査はこれらを補完する位置づけ。「GAS」軸での市場切り口は本ファイルが初。</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- S8: ソース一覧 -->
+<!-- ============================================================ -->
+<div class="sec">
+  <h2>8. ソース一覧</h2>
+  <table>
+    <tr><th>データ</th><th>ソース</th><th>取得日</th></tr>
+    <tr><td>ココナラ GAS出品数 1,152件</td><td><a href="https://coconala.com/categories/230?keyword=gas">coconala.com/categories/230</a></td><td>2026-04-04</td></tr>
+    <tr><td>ランサーズ GAS出品数 493件</td><td><a href="https://www.lancers.jp/menu/tag/GAS">lancers.jp/menu/tag/GAS</a></td><td>2026-04-04</td></tr>
+    <tr><td>CW GASスキル案件</td><td><a href="https://crowdworks.jp/public/jobs/skill/321">crowdworks.jp/public/jobs/skill/321</a></td><td>2026-04-04（JS描画のため件数未取得）</td></tr>
+    <tr><td>GAS副業収入実態</td><td><a href="https://techgym.jp/fukugyo/gas/">テックジム GAS副業ガイド</a></td><td>2026-04-04</td></tr>
+    <tr><td>ココナラ手数料22%</td><td><a href="https://coconala-support.zendesk.com/hc/ja/articles/218832757">ココナラヘルプ</a></td><td>2026-04-04</td></tr>
+    <tr><td>ココナラ チャットbot市場 462件</td><td><a href="https://coconala.com/categories/772">coconala.com/categories/772</a></td><td>2026-03-28（既存調査）</td></tr>
+  </table>
+</div>
+
+</div>
+</body>
+</html>

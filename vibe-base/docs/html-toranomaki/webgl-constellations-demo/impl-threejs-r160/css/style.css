@@ -1,0 +1,31 @@
+body {
+	margin: 0;
+	background-color: #000;
+	color: #fff;
+	font-family: sans-serif;
+	overflow: hidden;
+}
+#canvas-container {
+	width: 100vw;
+	height: 100vh;
+}
+#info {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	z-index: 100;
+	display: block;
+	pointer-events: none;
+	color: #aaa;
+}
+#info a {
+	color: #08f;
+	pointer-events: auto;
+}
+.lil-gui {
+	--background-color: rgba(20, 20, 25, 0.9);
+	--text-color: #e0e0e0;
+	--title-background-color: #2c2c35;
+	font-family: sans-serif;
+}

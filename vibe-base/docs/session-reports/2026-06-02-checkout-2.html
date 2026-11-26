@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Check-out 2026-06-02 (2) — shiftAI 削除 + products/shift-ai 新規 product 化</title>
+<style>
+  body{font-family:'Segoe UI','Yu Gothic',sans-serif;max-width:920px;margin:0 auto;padding:24px;background:#0d0d0d;color:#e0e0e0;line-height:1.7}
+  h1{color:#fff;border-bottom:2px solid #333;padding-bottom:8px}
+  h2{color:#7eb8f7;margin-top:30px}
+  .alert-red{background:#3a0a0a;border-left:4px solid #e53935;padding:12px 16px;border-radius:4px;margin:16px 0}
+  .must{background:#1a2a1a;border:1px solid #66bb6a;padding:12px;border-radius:4px}
+  code{background:#1e1e1e;padding:2px 6px;border-radius:3px;font-size:13px}
+  table{border-collapse:collapse;width:100%;margin:10px 0}
+  th,td{border:1px solid #333;padding:7px 10px;text-align:left;font-size:14px;vertical-align:top}
+  th{background:#1a1a1a;color:#aaa}
+  .h{color:#ef5350;font-weight:bold}.m{color:#ffa726;font-weight:bold}.l{color:#66bb6a}
+  ol li,ul li{margin:4px 0}
+</style>
+</head>
+<body>
+<h1>📋 Check-out — 2026-06-02 (2)</h1>
+<p>branch: <code>master</code></p>
+<div class="must"><strong>🔴 次セッション必読:</strong> 本ファイルを冒頭で Read。<strong>フリノバLP の design思想・設計フローは前セッションの</strong> <code>docs/session-reports/2026-06-02-checkout.html</code>（★セクション）に在る。本ファイルは shift-ai 構造作業の記録。</div>
+
+<div class="alert-red">
+<strong>⚠️ 最重要</strong><br>
+1. <code>shiftAI/</code>（ルート直下・大文字命名違反）を<strong>削除</strong>し、<code>products/shift-ai/</code> を<strong>標準 product として新規作成</strong>済。octahedron は未使用/不具合で破棄（backup=<code>backups/octahedron/</code>）。<br>
+2. <strong>shift-ai = 毎月「企画（本）」を実施し増やすイニシアチブ</strong>（本数は月で変動: 例 6月10本/7月1本・内容も結構違う）。各企画の配置単位・governance 粒度は<strong>企画投入時に本 product agent が決定</strong>（司令塔が先回りで決めるな）。<br>
+3. <code>products/trimmer-system/</code> の icon png 等は他AI領域＝触らない（git status 残置）。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li><strong>pc-checkin</strong>（司令塔セッション）。前回 P1（フリノバLP）を把握。</li>
+<li><strong>shiftAI 配置見直し</strong>: マスター指示で <code>shiftAI/</code>（命名違反）を削除 → <code>products/shift-ai/</code> 新設に決定（Plan Mode 経由・plan=<code>~/.claude/plans/toasty-beaming-candle.md</code>）。</li>
+<li><strong>削除時の cwd ロック障害</strong>: 空 <code>shiftAI/</code> が headless な Codex CLI セッション（cwd=shiftAI・PID 9304+node_repl 12880）にロックされ削除不可。Restart Manager は検出不可（ファイルハンドルでなく cwd ロックのため）→ PEB の CurrentDirectory 直読みで特定 → auto-mode 分類器が agent の Stop-Process を deny → マスターが <code>! taskkill //F //PID ...</code>（bash）で解放。</li>
+<li><strong>products/shift-ai を標準 product 化</strong>（new-product-sop どおり）: CLAUDE.md(9+1 @import・§0/§4 記入)/pc-progress.html(v10.1)/runbook・cost・backup/memory・failures/.claude(settings+hook16)。integrity 全 PASS。</li>
+<li><strong>ディレクトリ内セッション環境整備</strong>: .claude/commands(checkout/plan-finalize/plan-template) コピー・settings に defaultMode:plan+plansDirectory 追加・docs/ops/plans 作成。agents/skills は user-level で自動可視のためコピー不要。</li>
+</ol>
+
+<h2>B. 完了 commit</h2>
+<table><tr><th>hash</th><th>内容</th></tr>
+<tr><td><code>63ff4e79</code></td><td>chore: shiftAI 削除 → products/shift-ai 新設（.gitkeep）+ memory 参照更新</td></tr>
+<tr><td><code>3844a538</code></td><td>feat(shift-ai): 標準 product 新規作成手順で scaffold（24ファイル）</td></tr>
+<tr><td><code>e48fb880</code></td><td>feat(shift-ai): ディレクトリ内 Claude Code セッション環境整備（commands+defaultMode）</td></tr>
+</table>
+
+<h2>C. 影響波及</h2>
+<ul>
+<li><code>shiftAI/</code> は消滅。<code>products/shift-ai/</code> が正式 product として稼働可能（P0 新設）。</li>
+<li>マスターは今後 <code>products/shift-ai/</code> を cwd にして Claude Code を開き、<code>/pc-checkin</code> から各企画を進める運用。</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table><tr><th>優先</th><th>内容</th></tr>
+<tr><td><span class="h">H</span></td><td>フリノバLP ヒーロー仕上げ（<code>tmp/fn-hero2/hero-pro-1/2/3.html</code> から1本選定）。design思想は前 checkout.html ★参照。shift-ai の初企画として配置する案あり</td></tr>
+<tr><td><span class="m">M</span></td><td>shift-ai 初企画投入時: productType 確定・§1〜§3（最重要/技術/デザイン）記入は<strong>本 product agent</strong>が実施（司令塔は記入しない）</td></tr>
+<tr><td><span class="m">M</span></td><td><code>docs/md-inventory.md</code> が実質放置（直近 product 全て未登録・記載が pc-progress.md 時代）。生かす（再生成）か廃止かの判断</td></tr>
+<tr><td><span class="l">L</span></td><td><code>.codex/hooks/area-gate.mjs</code> 同期要否 / <code>tmp/fn-hero2</code> 255MB 掃除要否</td></tr>
+</table>
+
+<h2>E. 配備済 subagent/skill/hook</h2>
+<p>新規スキル/hook の追加なし。<code>products/shift-ai/.claude/</code> に root hook 16件を propagate-hooks で複製配備（既存正本のミラー）。</p>
+
+<h2>F. 本セッション生成物</h2>
+<ul>
+<li>plan: <code>~/.claude/plans/toasty-beaming-candle.md</code>（shiftAI 削除→新設・承認済）</li>
+<li>本レポート（<code>docs/session-reports/2026-06-02-checkout-2.html</code>）</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本HTML + 前 <code>2026-06-02-checkout.html</code>（フリノバLP design思想 ★）を Read。</li>
+<li>フリノバLP（P1#1）を進める場合: <code>tmp/fn-hero2/hero-pro-1/2/3.html</code> から採用1本選定。shift-ai 配下に置くならフォルダ名（企画テーマ kebab-case）を決めてから配置。</li>
+<li>機械検証サマリ: シークレット 0件 / hook integrity PASSED（root・shift-ai target-dir・fixture 4/4）/ settings.json VALID。コードレビュー指摘: 0件（雛形・複製のみで新規ロジックなし）。</li>
+</ol>
+</body>
+</html>

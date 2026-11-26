@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<!--
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  vest1: 機能別競合比較表テンプレート
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ## これは何か
+
+  うちの製品と競合3〜5社を並べて「どの機能がある/ない」「いくらか」を比較する表の雛形。
+  家電を買うときに価格.comで「機能・価格・スペック」を横並びで比較するのと同じ。
+  企画フェーズ（P0）で「うちの強み・弱み」を客観的に把握するために使う。
+
+  ## 5W2H
+
+  What:    自社 vs 競合3〜5社の機能・価格・コストを横並びで比較するHTML表
+  Why:     競合との差別化ポイントを客観的に把握する。「多分勝てる」ではなく数字で判断
+  Who:     エージェントが調査+記入 → マスターが確認・戦略判断
+  When:    P0（企画フェーズ）の#5-12タスク（競合比較）
+  Where:   vest1: docs/standards/templates/feature-comparison.html → 各プロダクトにコピー
+  How:     {プロダクト名}と競合名を置換 → 機能行を追加 → 価格・コスト試算を記入
+  How much: 競合調査込みで3〜5時間。表の記入だけなら1時間
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>{プロダクト名} 機能別競合比較表</title>
+<style>
+  body { font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; margin: 20px; background: #f8f9fa; color: #1e293b; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  p.sub { color: #666; font-size: 13px; margin-top: 0; }
+
+  /* --- 比較表 --- */
+  table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); font-size: 14px; }
+  th, td { border: 1px solid #d0d0d0; padding: 7px 10px; text-align: left; }
+  th { background: #2c3e50; color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 2; }
+  th.ours { background: #ea580c; }
+  tr.cat td { background: #34495e; color: #fff; font-weight: 700; font-size: 14px; }
+  tr:nth-child(even):not(.cat) { background: #f4f6f8; }
+  tr:hover:not(.cat) { background: #eaf0f6; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .partial { color: #d97706; font-weight: 700; }
+  .unique { background: #ecfdf5; }
+  .gap { background: #fef2f2; }
+  .num { text-align: center; width: 30px; color: #888; }
+  .comp { text-align: center; width: 70px; font-size: 15px; }
+  .dev { text-align: center; width: 50px; }
+  .dev input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
+  .prog { text-align: center; width: 80px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .prog-live { color: #16a34a; }
+  .prog-new { color: #2563eb; background: #dbeafe; }
+  .prog-fix { color: #7c3aed; background: #ede9fe; }
+  .prog-wip { color: #d97706; background: #FFF3E0; }
+  .prog-skip { color: #6b7280; background: #f3f4f6; }
+  .prog-no { color: #bbb; }
+  .note { font-size: 12px; color: #666; min-width: 140px; cursor: text; }
+  .note:empty::before { content: 'メモ...'; color: #ccc; font-style: italic; }
+  .note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+  .mono-note { font-size: 12px; color: #444; min-width: 100px; cursor: text; text-align: left; }
+  .mono-note:empty::before { content: '記入...'; color: #ccc; font-style: italic; }
+  .mono-note:focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+
+  /* --- 凡例 --- */
+  .legend { margin: 12px 0 16px; font-size: 13px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+  /* --- ツールバー --- */
+  .toolbar { margin: 16px 0; display: flex; gap: 12px; align-items: center; }
+  .toolbar button { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .toolbar button:hover { background: #1d4ed8; }
+  .toolbar .btn-cluster { background: #7c3aed; }
+  .toolbar .btn-cluster:hover { background: #6d28d9; }
+  .toolbar .status { font-size: 13px; color: #16a34a; font-weight: 600; display: none; }
+  .toolbar .export-link { font-size: 12px; color: #64748b; cursor: pointer; text-decoration: underline; margin-left: 8px; }
+  .toolbar .export-link:hover { color: #2563eb; }
+
+  /* --- クラスタリング結果 --- */
+  .cluster-result { background: #fff; border: 2px solid #7c3aed; border-radius: 8px; padding: 20px; margin: 16px 0; display: none; }
+  .cluster-result h3 { margin: 0 0 12px; color: #7c3aed; }
+  .cluster-group { margin: 8px 0; padding: 10px; background: #f8f7ff; border-radius: 6px; }
+  .cluster-group strong { font-size: 14px; }
+  .cluster-group .items { font-size: 12px; color: #555; margin-top: 4px; }
+  .cluster-group .var-tag { font-size: 11px; color: #7c3aed; margin-left: 8px; }
+  .cluster-actions { margin-top: 12px; display: flex; gap: 8px; }
+  .cluster-actions button { padding: 8px 20px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .cluster-actions .btn-apply { background: #7c3aed; color: #fff; }
+  .cluster-actions .btn-cancel { background: #e2e8f0; color: #475569; }
+
+  /* --- プロダクト定義 --- */
+  .product-def { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .product-def h2 { margin: 0 0 12px; font-size: 16px; }
+  .def-table { width: 100%; border-collapse: collapse; box-shadow: none; }
+  .def-table th { background: #f1f5f9; color: #334155; width: 30px; text-align: center; font-size: 16px; padding: 10px; }
+  .def-table td:nth-child(2) { width: 220px; font-weight: 600; font-size: 13px; padding: 10px; }
+  .def-table td:nth-child(3) { font-size: 13px; padding: 10px; cursor: text; }
+  .def-table td:nth-child(3):empty::before { content: 'クリックして入力...'; color: #ccc; font-style: italic; }
+  .def-table td:nth-child(3):focus { outline: 2px solid #2563eb; outline-offset: -2px; background: #eff6ff; }
+
+  /* --- スコア集計 --- */
+  .score-table { margin-top: 20px; width: auto; font-size: 14px; }
+  .score-table th { background: #2c3e50; color: #fff; padding: 6px 16px; }
+  .score-table td { padding: 6px 16px; text-align: center; }
+
+  /* --- ポジショニング勢力図 --- */
+  .pos-section { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 20px; margin: 24px 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .pos-section h2 { margin: 0 0 8px; }
+  .pos-controls { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; font-size: 13px; flex-wrap: wrap; }
+  .pos-controls select { padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+  .pos-controls .auto-tag { background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .pos-empty { color: #94a3b8; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
+  .pos-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 12px; }
+  .pos-legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .pos-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  /* --- サマリー --- */
+  .summary { margin-top: 24px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .summary-box { background: #fff; border: 1px solid #d0d0d0; border-radius: 8px; padding: 16px 20px; flex: 1; min-width: 220px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .summary-box h3 { margin: 0 0 8px; font-size: 15px; }
+  .summary-box ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+  使い方:
+  1. docs/{product-name}-feature-comparison.html にコピー
+  2. {プロダクト名} {自社} {product-name} をプロダクト名に置換
+  3. 競合A〜D を実際の競合名に置換（列数は増減可）
+  4. 競合選定: 大手＋方向性が近い競合（規模不問）→ comparison-sop.md §3
+  5. カテゴリ行（tr.cat）と機能行を追加していく
+  6. 料金行は ○/△/× ではなく実数値を記入
+  7. マネタイズ動線カテゴリは競合の実態を事実として記録
+  8. 全データ入力後、ポジショニング勢力図が自動生成される
+     → カテゴリ別スコアの分散から市場の軸構造を導出
+     → 「開発の方向性」欄と照合してブレがないか確認
+
+  フロー:
+  勢力図を見る → 狙うポジションを言語化 → 項目チェック
+  → 自社を含む勢力図を確認 → 意図とのブレを検知
+================================================================ -->
+
+<h1>{プロダクト名} 機能別 競合比較表</h1>
+<p class="sub">YYYY-MM-DD 作成 | 競合: {競合A} / {競合B} / {競合C} / {競合D}</p>
+
+<!-- ===== 開発の方向性（3指標） ===== -->
+<div class="product-def">
+  <h2>開発の方向性</h2>
+  <table class="def-table">
+    <tr>
+      <th>①</th>
+      <td>一言でどんな{商品カテゴリ}か？</td>
+      <td contenteditable="true" data-def="def1"></td>
+    </tr>
+    <tr>
+      <th>②</th>
+      <td>狙うポジション</td>
+      <td contenteditable="true" data-def="def2"></td>
+    </tr>
+    <tr>
+      <th>③</th>
+      <td>①②の意図 vs 実装計画の過不足</td>
+      <td contenteditable="true" data-def="def3"></td>
+    </tr>
+  </table>
+</div>
+
+<!-- ===== ポジショニング勢力図 ===== -->
+<div class="pos-section">
+  <h2>ポジショニング勢力図</h2>
+  <p style="font-size:12px;color:#64748b;margin:0 0 8px;">
+    カテゴリ別スコアの分散が大きい＝各社が戦略的に差をつけている軸。自動で上位2軸を選出。
+  </p>
+  <div class="pos-controls">
+    <label>X軸: <select id="axisX"></select></label>
+    <label>Y軸: <select id="axisY"></select></label>
+    <span class="auto-tag" id="autoTag">自動選出</span>
+  </div>
+  <div id="posChartArea">
+    <p class="pos-empty">機能表にデータを入力すると自動生成されます</p>
+  </div>
+  <div class="pos-legend" id="posLegend"></div>
+</div>
+
+<!-- ===== ツールバー ===== -->
+<div class="toolbar">
+  <button onclick="save()">保存</button>
+  <button class="btn-cluster" onclick="runClustering()">カテゴリ自動分類</button>
+  <span class="status" id="saveStatus">保存しました</span>
+  <span class="export-link" onclick="exportMd()">Markdown書出</span>
+</div>
+<div class="cluster-result" id="clusterResult"></div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#16a34a"></span> ○ 対応</span>
+  <span><span class="dot" style="background:#d97706"></span> △ 部分対応</span>
+  <span><span class="dot" style="background:#dc2626"></span> × 未対応</span>
+  <span><span class="dot" style="background:#ecfdf5;border:1px solid #a7f3d0"></span> 自社独自</span>
+  <span><span class="dot" style="background:#fef2f2;border:1px solid #fca5a5"></span> 致命的ギャップ</span>
+</div>
+
+<!-- ===== 機能比較表 ===== -->
+<table id="compTable">
+<thead>
+  <tr>
+    <th style="width:30px">#</th>
+    <th>機能</th>
+    <th class="comp ours">{自社}</th>
+    <th class="comp">{競合A}</th>
+    <th class="comp">{競合B}</th>
+    <th class="comp">{競合C}</th>
+    <th class="comp">{競合D}</th>
+    <th class="dev">開発</th>
+    <th>進捗</th>
+    <th>備考</th>
+  </tr>
+</thead>
+<tbody>
+
+<!-- カテゴリ行の例 -->
+<tr class="cat"><td colspan="10">{カテゴリ名}</td></tr>
+
+<!-- 通常行の例 -->
+<tr>
+  <td class="num">1</td>
+  <td>{機能名}</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="1"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+
+<!-- 自社独自の例（緑背景） -->
+<!--
+<tr class="unique">
+  <td class="num">2</td>
+  <td>{自社だけの機能}</td>
+  <td class="comp yes">○</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="comp no">×</td>
+  <td class="dev"><input type="checkbox" data-id="2"></td>
+  <td class="prog prog-live">稼働中</td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+-->
+
+<!-- 致命的ギャップの例（赤背景） -->
+<!--
+<tr class="gap">
+  <td class="num">3</td>
+  <td>{競合全社にあるが自社にない}</td>
+  <td class="comp no">×</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="comp yes">○</td>
+  <td class="dev"><input type="checkbox" data-id="3"></td>
+  <td class="prog prog-no">未着手</td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+-->
+
+<!-- 料金行の例（○/△/×ではなく実数値） -->
+<!--
+<tr class="cat"><td colspan="10">料金詳細（実数値）</td></tr>
+<tr>
+  <td class="num">N</td>
+  <td>月額基本料</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥3,300</td>
+  <td class="comp">¥0</td>
+  <td class="comp">¥5,500</td>
+  <td class="comp">¥4,400</td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+-->
+
+<!-- マネタイズ動線（競合の実態を事実として記録。自社の設計は S5 で行う） -->
+<!--
+<tr class="cat"><td colspan="10">マネタイズ動線（競合の実態）</td></tr>
+<tr>
+  <td class="num">N</td>
+  <td>無料プランの範囲（何が無料か）</td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">N</td>
+  <td>有料化トリガー（何で制限/飢えさせるか）</td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">N</td>
+  <td>低額プラン→上位プランの誘導要素</td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+<tr>
+  <td class="num">N</td>
+  <td>課金ゲート種別（機能/容量/店舗数/期間）</td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="mono-note" contenteditable="true"></td>
+  <td class="dev"></td>
+  <td class="prog"></td>
+  <td class="note" contenteditable="true"></td>
+</tr>
+-->
+
+</tbody>
+</table>
+
+<!-- スコア集計（JS自動計算） -->
+<table class="score-table" id="scoreTable">
+<thead>
+  <tr><th></th><th>○ 対応</th><th>△ 部分</th><th>× 未対応</th><th>対応率</th></tr>
+</thead>
+<tbody id="scoreBody">
+</tbody>
+</table>
+
+<!-- サマリー3種 -->
+<div class="summary">
+  <div class="summary-box" style="border-left: 4px solid #dc2626;">
+    <h3>致命的ギャップ（競合全社にあり/自社にない）</h3>
+    <ul id="gapList">
+      <!-- 調査後に記入 -->
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #16a34a;">
+    <h3>自社独自の武器（競合全社にない）</h3>
+    <ul id="uniqueList">
+      <!-- 調査後に記入 -->
+    </ul>
+  </div>
+  <div class="summary-box" style="border-left: 4px solid #2563eb;">
+    <h3>差別化機会</h3>
+    <ul id="oppList">
+      <!-- 調査後に記入 -->
+    </ul>
+  </div>
+</div>
+
+<script>
+const PRODUCT_KEY = '{product-name}';
+const SK = PRODUCT_KEY + '-state';
+const COMP_COLORS = ['#ea580c','#3b82f6','#16a34a','#8b5cf6','#ec4899','#64748b','#f59e0b','#06b6d4'];
+
+// ========== 保存・復元 ==========
+function gatherState() {
+  const checks = {}, notes = {}, defs = {};
+  document.querySelectorAll('input[data-id]').forEach(cb => { checks[cb.dataset.id] = cb.checked; });
+  document.querySelectorAll('.note[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) notes[i] = el.textContent.trim(); });
+  document.querySelectorAll('.mono-note[contenteditable]').forEach((el, i) => { if (el.textContent.trim()) notes['m'+i] = el.textContent.trim(); });
+  document.querySelectorAll('[data-def]').forEach(el => { defs[el.dataset.def] = el.textContent.trim(); });
+  return { checks, notes, defs, axisX: document.getElementById('axisX').value, axisY: document.getElementById('axisY').value };
+}
+function applyState(state) {
+  if (!state) return;
+  if (state.checks) Object.entries(state.checks).forEach(([id, v]) => { const cb = document.querySelector(`input[data-id="${id}"]`); if (cb) cb.checked = v; });
+  if (state.notes) { const els = document.querySelectorAll('.note[contenteditable]'); const mels = document.querySelectorAll('.mono-note[contenteditable]'); Object.entries(state.notes).forEach(([i, text]) => { if (i.startsWith('m')) { if (mels[+i.slice(1)]) mels[+i.slice(1)].textContent = text; } else { if (els[+i]) els[+i].textContent = text; } }); }
+  if (state.defs) Object.entries(state.defs).forEach(([key, text]) => { const el = document.querySelector(`[data-def="${key}"]`); if (el) el.textContent = text; });
+}
+function save() { localStorage.setItem(SK, JSON.stringify(gatherState())); const el = document.getElementById('saveStatus'); el.style.display = 'inline'; setTimeout(() => el.style.display = 'none', 2500); }
+function loadState() { try { applyState(JSON.parse(localStorage.getItem(SK))); } catch(e) {} }
+function autoSave() { localStorage.setItem(SK, JSON.stringify(gatherState())); }
+document.querySelectorAll('input[data-id]').forEach(cb => cb.addEventListener('change', autoSave));
+document.querySelectorAll('.note[contenteditable], .mono-note[contenteditable], [data-def]').forEach(el => el.addEventListener('blur', autoSave));
+
+// ========== スコア集計 ==========
+function getCompHeaders() { return Array.from(document.querySelectorAll('#compTable thead th.comp')); }
+function isFuncRow(cells) { let ok = false; cells.forEach(c => { if ('○△×'.includes(c.textContent.trim())) ok = true; }); return ok; }
+
+function calcScores() {
+  const headers = getCompHeaders();
+  const scores = {};
+  headers.forEach(th => { scores[th.textContent.trim()] = { yes:0, partial:0, no:0 }; });
+  document.querySelectorAll('#compTable tbody tr:not(.cat)').forEach(row => {
+    const cells = row.querySelectorAll('.comp');
+    if (!cells.length || !isFuncRow(cells)) return;
+    cells.forEach((cell, i) => {
+      const name = headers[i]?.textContent?.trim();
+      if (!name || !scores[name]) return;
+      const t = cell.textContent.trim();
+      if (t === '○') scores[name].yes++; else if (t === '△') scores[name].partial++; else if (t === '×') scores[name].no++;
+    });
+  });
+  const tbody = document.getElementById('scoreBody');
+  tbody.innerHTML = '';
+  Object.entries(scores).forEach(([name, s]) => {
+    const total = s.yes + s.partial + s.no;
+    const rate = total ? Math.round((s.yes + s.partial * 0.5) / total * 100) + '%' : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><strong>${name}</strong></td><td class="yes">${s.yes}</td><td class="partial">${s.partial}</td><td class="no">${s.no}</td><td style="font-weight:700">${rate}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ========== ポジショニング勢力図（バブルチャート・実装スコア軸） ==========
+function getCategoryScores() {
+  const headers = getCompHeaders();
+  const compNames = headers.map(th => th.textContent.trim());
+  const compCount = compNames.length;
+  const rawCats = [];
+  let currentCat = null, catRows = [];
+
+  document.querySelectorAll('#compTable tbody tr').forEach(row => {
+    if (row.classList.contains('cat')) {
+      if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+      currentCat = row.textContent.trim();
+      catRows = [];
+    } else {
+      const cells = row.querySelectorAll('.comp');
+      if (cells.length && isFuncRow(cells)) catRows.push(cells);
+    }
+  });
+  if (currentCat && catRows.length) rawCats.push({ name: currentCat, rows: [...catRows] });
+
+  const categories = rawCats.map(cat => {
+    const n = cat.rows.length;
+    const scores = [];
+    for (let ci = 0; ci < compCount; ci++) {
+      let sum = 0;
+      cat.rows.forEach(cells => { const t = cells[ci]?.textContent?.trim(); if (t === '○') sum += 1; else if (t === '△') sum += 0.5; });
+      scores.push(sum);
+    }
+    const normed = scores.map(s => n ? s / n : 0);
+    const mean = normed.reduce((a, b) => a + b, 0) / normed.length;
+    const variance = normed.reduce((a, b) => a + (b - mean) ** 2, 0) / normed.length;
+    return { name: cat.name, scores, maxScore: n, variance };
+  });
+
+  const overallScores = [];
+  for (let ci = 0; ci < compCount; ci++) {
+    let sum = 0;
+    rawCats.forEach(cat => { cat.rows.forEach(cells => { const t = cells[ci]?.textContent?.trim(); if (t === '○') sum += 1; else if (t === '△') sum += 0.5; }); });
+    overallScores.push(sum);
+  }
+  const totalFeatures = rawCats.reduce((a, c) => a + c.rows.length, 0);
+  return { compNames, categories, overallScores, totalFeatures };
+}
+
+function populateAxisSelectors(catData) {
+  const selX = document.getElementById('axisX'), selY = document.getElementById('axisY');
+  selX.innerHTML = ''; selY.innerHTML = '';
+  const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+  sorted.forEach(cat => {
+    const label = `${cat.name} (${cat.maxScore}項目)`;
+    selX.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+    selY.appendChild(Object.assign(document.createElement('option'), { value: cat.name, textContent: label }));
+  });
+  if (sorted.length >= 2) { selX.value = sorted[0].name; selY.value = sorted[1].name; }
+  try { const state = JSON.parse(localStorage.getItem(SK)); if (state?.axisX && sorted.find(c => c.name === state.axisX)) selX.value = state.axisX; if (state?.axisY && sorted.find(c => c.name === state.axisY)) selY.value = state.axisY; } catch(e) {}
+}
+
+function renderChart(catData) {
+  const area = document.getElementById('posChartArea');
+  const legendEl = document.getElementById('posLegend');
+  const autoTag = document.getElementById('autoTag');
+  if (!catData.categories.length) { area.innerHTML = '<p class="pos-empty">データなし</p>'; return; }
+
+  const axisXName = document.getElementById('axisX').value;
+  const axisYName = document.getElementById('axisY').value;
+  const catX = catData.categories.find(c => c.name === axisXName);
+  const catY = catData.categories.find(c => c.name === axisYName);
+  if (!catX || !catY) return;
+
+  const sorted = [...catData.categories].sort((a, b) => b.variance - a.variance);
+  autoTag.style.display = (sorted.length >= 2 && axisXName === sorted[0].name && axisYName === sorted[1].name) ? 'inline' : 'none';
+
+  const W = 600, H = 440, PAD = 70;
+  const cW = W - PAD * 2, cH = H - PAD * 2;
+  const maxX = catX.maxScore || 1, maxY = catY.maxScore || 1;
+  let svg = `<svg width="${W}" height="${H}" style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;">`;
+
+  for (let v = 0; v <= maxX; v++) { const x = PAD + (v / maxX) * cW; svg += `<line x1="${x}" y1="${PAD}" x2="${x}" y2="${PAD+cH}" stroke="${v===0?'#cbd5e1':'#f1f5f9'}"/><text x="${x}" y="${PAD+cH+16}" text-anchor="middle" font-size="10" fill="#94a3b8">${v}</text>`; }
+  for (let v = 0; v <= maxY; v++) { const y = PAD + ((maxY - v) / maxY) * cH; svg += `<line x1="${PAD}" y1="${y}" x2="${PAD+cW}" y2="${y}" stroke="${v===0?'#cbd5e1':'#f1f5f9'}"/><text x="${PAD-8}" y="${y+4}" text-anchor="end" font-size="10" fill="#94a3b8">${v}</text>`; }
+  svg += `<rect x="${PAD}" y="${PAD}" width="${cW}" height="${cH}" fill="none" stroke="#cbd5e1"/>`;
+  svg += `<text x="${PAD+cW/2}" y="${H-8}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">${axisXName}（${maxX}項目中の実装スコア）</text>`;
+  svg += `<text x="16" y="${PAD+cH/2}" text-anchor="middle" font-size="12" font-weight="600" fill="#475569" transform="rotate(-90,16,${PAD+cH/2})">${axisYName}（${maxY}項目中）</text>`;
+
+  const oS = catData.overallScores;
+  const total = catData.totalFeatures || 1;
+  const minO = Math.min(...oS), maxO = Math.max(...oS), oRange = maxO - minO || 1;
+  const bubbleR = oS.map(s => 14 + ((s - minO) / oRange) * 28);
+  const order = catData.compNames.map((_, i) => i).sort((a, b) => bubbleR[b] - bubbleR[a]);
+
+  order.forEach(i => {
+    const vx = catX.scores[i], vy = catY.scores[i];
+    const cx = PAD + (vx / maxX) * cW, cy = PAD + ((maxY - vy) / maxY) * cH;
+    const color = COMP_COLORS[i % COMP_COLORS.length], r = bubbleR[i], isOurs = i === 0;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="${isOurs ? 3 : 1.5}"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}"/>`;
+    const lx = cx + r + 5, ly = cy - 4;
+    svg += `<text x="${lx}" y="${ly}" font-size="11" font-weight="${isOurs ? '700' : '500'}" fill="${color}">${catData.compNames[i]}</text>`;
+    svg += `<text x="${lx}" y="${ly + 13}" font-size="9" fill="#94a3b8">${oS[i]}/${total}項目</text>`;
+  });
+  svg += '</svg>';
+  area.innerHTML = svg;
+
+  let legHtml = catData.compNames.map((n, i) => `<span><span class="pos-dot" style="background:${COMP_COLORS[i%COMP_COLORS.length]}"></span>${n} (${oS[i]}/${total})</span>`).join('');
+  legHtml += '<span style="color:#94a3b8;margin-left:12px;">○=1点 △=0.5点 | バブル大＝総合実装数が多い</span>';
+  legendEl.innerHTML = legHtml;
+}
+
+function updateMap() { const d = getCategoryScores(); if (d.categories.length >= 2) { populateAxisSelectors(d); renderChart(d); } }
+document.getElementById('axisX').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+document.getElementById('axisY').addEventListener('change', () => { renderChart(getCategoryScores()); autoSave(); });
+
+// ========== カテゴリ自動分類（ピアソン相関+凝集型クラスタリング） ==========
+function runClustering() {
+  const headers = getCompHeaders();
+  const compCount = headers.length;
+  if (compCount < 2) { alert('競合が2社以上必要です'); return; }
+
+  // 全機能行を収集（カテゴリ問わず）
+  const items = [];
+  document.querySelectorAll('#compTable tbody tr:not(.cat)').forEach(row => {
+    const cells = row.querySelectorAll('.comp');
+    if (!cells.length || !isFuncRow(cells)) return;
+    const numCell = row.querySelector('.num, td:first-child');
+    const nameCell = row.children[1];
+    const id = numCell?.textContent?.trim() || String(items.length + 1);
+    const name = nameCell?.textContent?.trim() || '?';
+    const vals = [];
+    for (let ci = 0; ci < compCount; ci++) {
+      const t = cells[ci]?.textContent?.trim();
+      vals.push(t === '○' ? 1 : t === '△' ? 0.5 : 0);
+    }
+    items.push({ id, name, vals, row });
+  });
+
+  if (items.length < 4) { alert('4項目以上必要です'); return; }
+
+  // ピアソン相関
+  function pearson(a, b) {
+    const n = a.length, ma = a.reduce((s,v) => s+v, 0)/n, mb = b.reduce((s,v) => s+v, 0)/n;
+    let num = 0, da = 0, db = 0;
+    for (let i = 0; i < n; i++) { num += (a[i]-ma)*(b[i]-mb); da += (a[i]-ma)**2; db += (b[i]-mb)**2; }
+    da = Math.sqrt(da); db = Math.sqrt(db);
+    return (da && db) ? num / (da * db) : 0;
+  }
+
+  const corr = {};
+  items.forEach((a, i) => items.forEach((b, j) => { corr[i+','+j] = pearson(a.vals, b.vals); }));
+
+  // 凝集型クラスタリング（平均連結法）
+  let clusters = {};
+  items.forEach((_, i) => { clusters[i] = [i]; });
+
+  function cdist(c1, c2) {
+    let t = 0, n = 0;
+    c1.forEach(i => c2.forEach(j => { t += corr[i+','+j]; n++; }));
+    return n ? t / n : 0;
+  }
+
+  // 目標クラスタ数: 項目数に応じて自動決定（5-10）
+  const target = Math.max(5, Math.min(10, Math.round(items.length / 5)));
+
+  while (Object.keys(clusters).length > target) {
+    let best = null, bsim = -999;
+    const keys = Object.keys(clusters);
+    for (let a = 0; a < keys.length; a++) {
+      for (let b = a + 1; b < keys.length; b++) {
+        const s = cdist(clusters[keys[a]], clusters[keys[b]]);
+        if (s > bsim) { bsim = s; best = [keys[a], keys[b]]; }
+      }
+    }
+    clusters[best[0]] = clusters[best[0]].concat(clusters[best[1]]);
+    delete clusters[best[1]];
+  }
+
+  // 結果を表示
+  const container = document.getElementById('clusterResult');
+  let html = '<h3>カテゴリ自動分類の結果</h3><p style="font-size:12px;color:#666;">ピアソン相関+凝集型クラスタリング。カテゴリ名は仮称。確認後「適用」で表に反映。</p>';
+
+  const groups = Object.values(clusters).map(members => {
+    members.sort((a, b) => a - b);
+    // 分散計算
+    const avg = new Array(compCount).fill(0);
+    members.forEach(idx => { items[idx].vals.forEach((v, ci) => { avg[ci] += v; }); });
+    avg.forEach((_, ci) => { avg[ci] /= members.length; });
+    const mean = avg.reduce((s,v) => s+v, 0) / avg.length;
+    const variance = avg.reduce((s,v) => s + (v - mean) ** 2, 0) / avg.length;
+    return { members, variance };
+  });
+  groups.sort((a, b) => a.members[0] - b.members[0]);
+
+  groups.forEach((g, gi) => {
+    const itemList = g.members.map(idx => `#${items[idx].id} ${items[idx].name}`).join('、');
+    html += `<div class="cluster-group"><strong>グループ${gi+1}</strong> <span class="var-tag">分散: ${g.variance.toFixed(3)}</span><div class="items">${itemList}</div></div>`;
+  });
+
+  html += '<div class="cluster-actions"><button class="btn-apply" onclick="applyClustering()">適用</button><button class="btn-cancel" onclick="document.getElementById(\'clusterResult\').style.display=\'none\'">キャンセル</button></div>';
+  container.innerHTML = html;
+  container.style.display = 'block';
+  container._groups = groups;
+  container._items = items;
+}
+
+function applyClustering() {
+  const container = document.getElementById('clusterResult');
+  const groups = container._groups;
+  const items = container._items;
+  if (!groups || !items) return;
+
+  const tbody = document.querySelector('#compTable tbody');
+  // カテゴリ行を全て除去
+  tbody.querySelectorAll('.cat').forEach(el => el.remove());
+
+  // 各グループの順にカテゴリ行を挿入して行を並べ替え
+  groups.forEach((g, gi) => {
+    const catRow = document.createElement('tr');
+    catRow.className = 'cat';
+    const colSpan = document.querySelector('#compTable thead tr').children.length;
+    catRow.innerHTML = `<td colspan="${colSpan}">グループ${gi+1}（${g.members.length}項目）</td>`;
+    tbody.appendChild(catRow);
+    g.members.forEach(idx => { tbody.appendChild(items[idx].row); });
+  });
+
+  // 料金行・マネタイズ行は末尾に残す（すでにtbodyの末尾にある）
+  container.style.display = 'none';
+  calcScores();
+  updateMap();
+  autoSave();
+}
+
+// ========== Markdown書出 ==========
+function exportMd() {
+  let md = `# ${PRODUCT_KEY} 開発指示チェックリスト\n\n> ${new Date().toISOString().slice(0,19).replace('T',' ')}\n\n`;
+  const d1 = document.querySelector('[data-def="def1"]')?.textContent?.trim();
+  const d2 = document.querySelector('[data-def="def2"]')?.textContent?.trim();
+  const d3 = document.querySelector('[data-def="def3"]')?.textContent?.trim();
+  if (d1||d2||d3) { md += '## 開発の方向性\n\n'; if(d1) md += `1. **一言定義:** ${d1}\n`; if(d2) md += `2. **狙うポジション:** ${d2}\n`; if(d3) md += `3. **意図 vs 実装:** ${d3}\n`; md += '\n'; }
+  md += '## チェック済み（開発対象）\n\n'; let unc = '\n## 未チェック\n\n';
+  document.querySelectorAll('input[data-id]').forEach(cb => {
+    const row = cb.closest('tr'), cells = row.children, id = cb.dataset.id;
+    const name = cells[1]?.textContent, self = cells[2]?.textContent?.trim();
+    const note = cells[cells.length-1]?.textContent?.trim()||'';
+    const icon = self==='○'?'(済)':self==='△'?'(部分)':'(未)';
+    const line = `- [${cb.checked?'x':' '}] #${id} ${name} ${icon}${note?' — '+note:''}\n`;
+    if (cb.checked) md += line; else if (self==='×'||self==='△') unc += line;
+  });
+  const blob = new Blob([md+unc], {type:'text/markdown'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = PRODUCT_KEY + '-dev-checklist.md'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ========== 初期化 ==========
+loadState();
+calcScores();
+updateMap();
+</script>
+
+</body>
+</html>

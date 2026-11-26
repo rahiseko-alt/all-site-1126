@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-06-10 Check-out — 司令塔（memory改革確定 + 反復指示カタログ）</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", sans-serif; line-height: 1.7; max-width: 920px; margin: 0 auto; padding: 24px; color: #1a1a1a; background: #fafafa; }
+  h1 { font-size: 1.5rem; border-bottom: 3px solid #2563eb; padding-bottom: 8px; }
+  h2 { font-size: 1.2rem; margin-top: 28px; color: #1e3a8a; border-left: 4px solid #2563eb; padding-left: 10px; }
+  .meta { color: #555; font-size: 0.9rem; }
+  .alert { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+  .ok { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.92rem; }
+  th, td { border: 1px solid #d1d5db; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #eff6ff; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: 0.88em; }
+  .h { color: #b91c1c; font-weight: bold; } .m { color: #b45309; } .l { color: #6b7280; }
+</style>
+</head>
+<body>
+<h1>Check-out 2026-06-10 — 司令塔セッション</h1>
+<p class="meta">branch: master / 次セッションは<strong>本ファイルを先頭から Read してから</strong>着手すること。</p>
+
+<div class="ok">
+<strong>状態:</strong> 重大未解決なし。本セッション成果は全コミット済み・機械検証 EXIT 0。シークレット混入 0 件。
+</div>
+
+<h2>alert（最重要）</h2>
+<div class="alert">
+<strong>純増停止ルールが発効:</strong> 今後マスターから<strong>反復</strong>指示・行動規範を受けたら、新規 <code>feedback_*.md</code> / <code>.claude/rules/*.md</code> を作らず <code>docs/ops/master-instruction-patterns.md</code> Part2 に<strong>追記</strong>せよ（逐語保全・要約禁止）。MEMORY.md P1.5 にトリガー配備済。
+</div>
+
+<h2>A. 本セッション TL;DR</h2>
+<ol>
+<li>memory.md 改革の検証後修正 plan を完遂（E-1 ゲートの変数バグ <code>VIBE_BASE_ROOT→PRODUCTS</code> 修正・一度も機能していなかった退行防止を復旧）。</li>
+<li>memory.md 圧迫の<strong>真の終了条件</strong>を達成・確定: product memory.md 19件を純減475行・全件15行以下、旧内容は <code>archive/*-memory-202606.md</code> に退避（情報欠落なし）。コミット永続化。</li>
+<li>5件枠→3件枠の表記統一（checkout/pc-checkin skill + .bak）、旧パス <code>memory/project_dead-products</code> を <code>docs/ops/dead-products-registry.md</code> へ追従、learning-suite-kanji のデッド ADR リンク解消。</li>
+<li>renai-game memory.md の標準化漏れを修正（5件枠→3件枠）。その後 renai-game エージェント自身の正当追記で17行化（E-1超過はマスター承認で放置・確定）。</li>
+<li>過去108セッション・マスター発話1332件をサブ3体並列で精読し、<strong>反復指示パターン約27種</strong>を逐語保全で抽出 → <code>docs/ops/master-instruction-patterns.md</code> 新設（仕組み化バックログ付き）。</li>
+<li>ルール帳簿の統合を公式準拠で検討。断線調査の結果「pointer→canonical 二段は19 product自動注入を膨張させる正当コスト」と判明し温存。安全な案1（カタログを単一追記先に確定・純増停止）のみ実施。</li>
+</ol>
+
+<h2>B. 完了 commit 一覧（本セッション分）</h2>
+<table>
+<tr><th>hash</th><th>種別</th><th>内容</th></tr>
+<tr><td><code>20049905</code></td><td>refactor(memory)</td><td>memory.md群 context圧迫解消（純減475行・全product15行以下・退避9件）</td></tr>
+<tr><td><code>49f29460</code></td><td>chore(memory)</td><td>renai-game P1確定（17行・E-1超過は承認放置）</td></tr>
+<tr><td><code>d6f2a8fd</code></td><td>docs(ops)</td><td>マスター反復指示カタログ+仕組み化バックログ新設</td></tr>
+<tr><td><code>f256e677</code></td><td>docs(ops)</td><td>カタログを feedback単一追記先に確定（純増停止ルール）</td></tr>
+</table>
+<p class="meta">※ 同branchに別product（new-trimmer / ocean）セッションのコミットが交錯。本セッション成果は上記4件 + 検証後修正plan関連。</p>
+
+<h2>C. 影響波及（必読）</h2>
+<ul>
+<li><code>scripts/check-in-verify.sh</code> E-1 ゲートが今後実際に全product走査するようになった。次回 Check-in の <code>bash scripts/check-in-verify.sh</code> で renai-game(17行) が <strong>FAIL(E-1) を出す</strong>が、これはマスター承認済みの放置（WARN扱いで進行可）。</li>
+<li>新ルール: 反復指示はカタログへ追記（B-2.5 / MEMORY.md P1.5）。</li>
+</ul>
+
+<h2>D. 残作業</h2>
+<table>
+<tr><th>優先</th><th>項目</th></tr>
+<tr><td class="m">M</td><td>ルール帳簿 <strong>案2（path-scoped 単層化・context再設計）</strong>。着手は要 Plan Mode + 断線マップ先行。pointer→canonical 二段を畳むと自動注入が膨張するトレードオフあり。</td></tr>
+<tr><td class="l">L</td><td>散在 <code>feedback_*.md</code>（~30個）を、参照された時にカタログへ吸収・消し込み（一括移管はしない・Refactor-on-Write）。</td></tr>
+<tr><td class="l">L</td><td>カタログ Part1 の最優先3機構（commit前verify hook / plan-finalize受入条件ゲート / output-style）はマスター指示待ち。</td></tr>
+</table>
+
+<h2>E. 配備済 skill / hook / 資産（本セッション）</h2>
+<ul>
+<li><code>docs/ops/master-instruction-patterns.md</code> — マスター反復指示の単一正本（新設）。<code>.claude/rules/self-verification.md</code> から参照。</li>
+<li>MEMORY.md P1.5 にトリガー1行追加（純増停止の発火保証）。</li>
+</ul>
+
+<h2>G. 次セッション初手</h2>
+<ol>
+<li>本ファイルを Read。</li>
+<li><code>bash scripts/check-in-verify.sh</code> 実行。renai-game E-1 FAIL は承認済み放置なので無視可（他にNGが出たら停止）。</li>
+<li>反復指示を受けたら <code>docs/ops/master-instruction-patterns.md</code> へ追記（新規ファイルを作らない）。</li>
+<li>機械検証: 本セッション最終 EXIT 0 / シークレット0件 / コードレビュー: 割愛（コード変更はE-1 shell修正のみ・実走PASS済）。</li>
+</ol>
+
+</body>
+</html>

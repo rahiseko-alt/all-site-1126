@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ScrollSmoother Demo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  
+<div id="smooth-wrapper">
+  <div id="smooth-content">
+    <div style="height:50vh; display:flex; align-items:center; justify-content:center;"><h2>Scroll Down</h2></div>
+    <div class="demo-panel" data-speed="1.2" style="margin: 100px auto;">
+      <div style="text-align:center; padding: 40px;">
+        <h3>なめらかなパララックス</h3>
+        <p>このガラスパネルはスクロール速度よりもわずかに速く動く(`data-speed="1.2"`)ように設定されており、組み込みのパララックス効果を生み出しています。</p>
+      </div>
+    </div>
+    <div style="height:100vh;"></div>
+  </div>
+</div>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/gsap.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/ScrollSmoother.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/SplitText.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/MorphSVGPlugin.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/DrawSVGPlugin.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/ScrambleTextPlugin.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/Draggable.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.15.0/dist/InertiaPlugin.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

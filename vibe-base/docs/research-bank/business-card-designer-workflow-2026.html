@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロの名刺デザイン作業フロー（国内/海外/縦型） — Research Bank</title>
+<style>
+:root{
+  --bg:#0f1117; --surface:#1a1d27; --surface2:#242836; --border:#2e3348;
+  --text:#e4e4e7; --text2:#9ca3af; --accent:#6366f1; --accent2:#818cf8;
+  --ok:#10b981; --warn:#f59e0b; --danger:#ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+h1{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em;}
+h1 span{color:var(--accent2);}
+h2{font-size:1.2rem;margin:2.5rem 0 1rem;padding-bottom:.4rem;border-bottom:2px solid var(--accent);color:var(--accent2);}
+h3{font-size:1rem;margin:1.5rem 0 .6rem;color:var(--text);}
+p{margin:.6rem 0;}
+a{color:var(--accent2);word-break:break-all;}
+.meta{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0 1.5rem;font-size:.85rem;color:var(--text2);display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.4rem 1.5rem;}
+.meta b{color:var(--text);}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.82rem;background:var(--surface);border-radius:8px;overflow:hidden;}
+th{background:var(--surface2);color:var(--accent2);padding:.6rem .7rem;text-align:left;font-weight:600;}
+td{padding:.55rem .7rem;border-top:1px solid var(--border);vertical-align:top;}
+tr:hover td{background:var(--surface2);}
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.7rem;font-weight:600;background:rgba(244,114,182,.15);color:#f472b6;}
+ul,ol{margin:.6rem 0 .6rem 1.4rem;}
+li{margin:.35rem 0;}
+.callout{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1rem 0;}
+.callout.ok{border-left-color:var(--ok);}
+.callout.warn{border-left-color:var(--warn);}
+.callout.danger{border-left-color:var(--danger);}
+.num{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent2);}
+.note{font-size:.78rem;color:var(--text2);margin-top:.4rem;}
+.verdict{display:inline-block;padding:.15rem .45rem;border-radius:3px;font-size:.7rem;font-weight:700;}
+.v-main{background:rgba(16,185,129,.18);color:var(--ok);}
+.v-minor{background:rgba(245,158,11,.18);color:var(--warn);}
+.v-no{background:rgba(239,68,68,.18);color:var(--danger);}
+</style>
+</head>
+<body>
+
+<h1>プロの名刺デザイン <span>作業フロー</span> ／ 国内・海外・縦型</h1>
+<p class="note">「カード／ブロック分解アプローチ」は業界主流か？を判定するための横断リサーチ</p>
+
+<div class="meta">
+  <div><b>調査日:</b> 2026-05-29</div>
+  <div><b>調査軸:</b> 3本</div>
+  <div><b>ソース数:</b> 86（重複排除後）</div>
+  <div><b>タグ:</b> <span class="tag">design</span></div>
+  <div><b>関連プロダクト:</b> 横断（名刺・印刷物全般）</div>
+  <div><b>メソドロジー:</b> 計画→収集→分析→報告</div>
+  <div style="grid-column:1/-1"><b>再利用:</b> 名刺制作 / LP・印刷物制作のプロセス設計 / クライアントヒアリング設計 / デザイン方法論の意思決定</div>
+</div>
+
+<!-- ============= 結論 ============= -->
+<div class="callout ok">
+<b>結論（最重要・So What）</b><br>
+プロは「<b>コンテンツ先決め → 構造（グリッド） → 余白を構造内で配分 → 詳細</b>」の順で作る。<br>
+日本では <b>「カード分解」という用語は登場しない</b>。代わりに <b>「4原則（近接・整列・反復・コントラスト）」「3列グリッド」「ラフ3案 → 修正2回」</b>が共通言語。<br>
+欧米では <b>"Grid System" "Modular Grid"（Müller-Brockmann / Vignelli）</b> が40年以上の業界標準で、本質的に「ブロックを格子に配置してから中身を詰める」=ユーザー提案と同義。<br>
+<b>結論: 提案は名前こそ違うが、業界標準の「Modular Grid + 4原則」と本質一致。横型では強く機能、縦型では「ブロック分解」より「<b>段分解＋中央軸</b>」に読み替える必要あり。</b>
+</div>
+
+<!-- ============= 軸1 ============= -->
+<h2>軸1. 国内プロの作業フロー（5〜9 ステップ定型）</h2>
+
+<table>
+<tr><th>#</th><th>ステップ</th><th>実務内容</th><th>所要</th></tr>
+<tr><td>1</td><td>ヒアリング</td><td>業種・ターゲット・目的・既存ブランド・掲載情報・雰囲気軸・予算・納期</td><td>1回 30〜60分</td></tr>
+<tr><td>2</td><td>情報整理・優先順位付け</td><td>伝えるべき情報を絞り、重要度ランク化</td><td>同日内</td></tr>
+<tr><td>3</td><td>サムネイル（発散）</td><td>親指大で複数案を素早く出す。素材整理・方向性明確化</td><td>0.5〜1日</td></tr>
+<tr><td>4</td><td>ラフ（収束）</td><td>原寸 91×55mm で <b>3案</b>。3列グリッドで大枠ブロック配置</td><td>0.5〜1日</td></tr>
+<tr><td>5</td><td>初稿制作</td><td>Illustrator で清書。多くは <span class="num">5営業日</span>以内</td><td>1〜5営業日</td></tr>
+<tr><td>6</td><td>修正</td><td><b>2回が多数派</b>。文字組・行間・色の微調整</td><td>1〜3日</td></tr>
+<tr><td>7</td><td>校了</td><td>第三者校正・連絡先最終確認</td><td>同日内</td></tr>
+<tr><td>8</td><td>入稿前チェック（13項目）</td><td>CMYK化・アウトライン化・塗り足し3mm・解像度300dpi・トンボ・8pt以上</td><td>1〜2時間</td></tr>
+<tr><td>9</td><td>入稿〜納品</td><td>24時間〜3営業日で発送</td><td>1〜3営業日</td></tr>
+</table>
+<p class="note">→ 完全新規1案で <b>着手から3日</b> 実例あり（usamicreate）。全体納期目安 <b>3〜10営業日</b>。</p>
+
+<h3>ヒアリング項目（9項目・順序固定）</h3>
+<ol>
+<li>業種・職種・事業内容</li>
+<li>ターゲット（誰に渡すか）</li>
+<li>名刺で達成したい目的（覚えてもらう / 信頼感 / 受注 / 紹介経由）</li>
+<li>既存ブランド有無（ロゴ・CIカラー・既存名刺）</li>
+<li>掲載情報の列挙（氏名・肩書・住所・TEL・メール・URL・QR・SNS）</li>
+<li>印刷区分（片面/両面）・タイプ（縦×縦/縦×横/横×横）・サイズ</li>
+<li>雰囲気の軸（シンプル⇔複雑 / 単色⇔カラフル / 暗⇔明 / 日常⇔高級 / 遊⇔厳粛 / 未来⇔伝統 / 女性的⇔男性的）</li>
+<li>予算</li>
+<li>納期</li>
+</ol>
+
+<div class="callout">
+<b>順序論の判定（複数ソース一致）:</b><br>
+国内主流は「<b>コンテンツ先決め</b>」。design-benkyo / 名刺スタイリスト / ricoh / fujiplus / canva / adobe.com の6社が「情報整理 → 優先順位付け → デザイン制作」と明示。<br>
+ただしサムネイル段階では「コンテンツと構造を同時に粗く決め、ラフでブロックが確定する2段階モデル」。
+</div>
+
+<h3>「カード分解」用語の登場有無</h3>
+<p><b>登場せず。</b>代わりに以下が共通言語:</p>
+<ul>
+<li><b>近接・整列・反復・コントラスト</b>（4原則・ricoh / fujiplus）— 関連項目を「塊化」する原理</li>
+<li><b>3列グリッド</b>（hanjou・印刷名刺の標準）</li>
+<li><b>視線の流れ</b>（横型=Z法則、縦型=N法則）</li>
+</ul>
+
+<h3>ツール使用率（質的）</h3>
+<table>
+<tr><th>ツール</th><th>印刷名刺現場での位置</th><th>根拠</th></tr>
+<tr><td>Illustrator</td><td>ほぼ標準</td><td>321web「プロの現場ではかならず Illustrator」</td></tr>
+<tr><td>Figma</td><td>増加中・入稿は Ai 経由が安全</td><td>bitbeans / wwg「仕上がりは Ai と変わらない」</td></tr>
+<tr><td>Canva</td><td>非デザイナー / テンプレ層</td><td>各種テンプレ運用</td></tr>
+<tr><td>InDesign</td><td>名刺単体では非主流</td><td>多ページ案件用途</td></tr>
+<tr><td>Affinity</td><td>少数</td><td>国内記事ヒット少</td></tr>
+</table>
+<p class="note">※ 定量シェアは公開統計なし。質的合意。</p>
+
+<!-- ============= 軸2 ============= -->
+<h2>軸2. 海外プロの方法論と業界呼称（Modular Grid が40年の標準）</h2>
+
+<table>
+<tr><th>方法論</th><th>提唱者</th><th>年代</th><th>名刺への適用度</th></tr>
+<tr><td>Grid System / Rastersysteme</td><td>Josef Müller-Brockmann（スイス派）</td><td>1961 / 1981 英訳</td><td><span class="verdict v-main">主流</span> 書籍冒頭「from business cards to exhibition stands」と明記</td></tr>
+<tr><td>Modular Grid</td><td>Müller-Brockmann 体系化、Vignelli 実務展開</td><td>1960s–70s</td><td><span class="verdict v-main">主流</span> Knoll 1967 で名刺・レターヘッド・タグ全てに同一グリッド</td></tr>
+<tr><td>Swiss Style / International Typographic Style</td><td>Müller-Brockmann, Hofmann, Ruder, Max Bill</td><td>1950s〜</td><td><span class="verdict v-main">主流</span> 「modern graphic design の基礎」</td></tr>
+<tr><td>Unigrid System</td><td>Massimo Vignelli</td><td>1977</td><td><span class="verdict v-main">主流</span> 印刷物全般の system 化</td></tr>
+<tr><td>Identity / Brand System</td><td>Paul Rand, Pentagram, Mother Design</td><td>1960s〜</td><td><span class="verdict v-main">主流</span> 名刺は system の1 application</td></tr>
+<tr><td>Atomic Design</td><td>Brad Frost</td><td>2013記事 / 2016書籍</td><td><span class="verdict v-minor">UI主</span> 印刷物への系統的適用記事は未発見</td></tr>
+<tr><td>Content-First Design</td><td>Zeldman, Mark Boulton, Karen McGrane</td><td>2008〜</td><td><span class="verdict v-minor">Web主</span> 名刺は情報固定で論争不成立</td></tr>
+</table>
+
+<div class="callout">
+<b>Vignelli の有名な比喩</b><br>
+"design begins with architecture (grids, proportion, hierarchy) not aesthetics"<br>
+"The grid is like underwear: you wear it, but it's not to be exposed"<br>
+→ <b>構造（グリッド）を先に決めるのが業界の絶対前提</b>。複数ソース（Creative Bloq / Pixartprinting / Medium）で繰り返し引用される教義。
+</div>
+
+<h3>余白設計のタイミング（複数ソース一致）</h3>
+<p><b>「余白は構造定義（grid 設定）と同時に決まる積極的要素」で一致。</b></p>
+<ul>
+<li>Smashing Magazine: 「white space was used as a dynamic component in layout design」</li>
+<li>LinkedIn: 「Use a grid system ... in deciding where to allow for negative space」</li>
+<li>Printing Peach: 「Proper alignment of elements can naturally create negative space」</li>
+<li>Lupton (Thinking with Type): 「The grid creates the conditions under which spontaneity and expression become possible」</li>
+</ul>
+<p>→ 「最後にバランス調整で空ける」のではなく、<b>grid／module を切った瞬間に余白配分が確定する</b>。</p>
+
+<h3>縦型の海外での扱い</h3>
+<ul>
+<li><b>位置づけ:</b> 「less conventional / more modern」「young, trendy brands or creative individuals」(Brandly Blog)</li>
+<li><b>業界例:</b> salons / artists / photographers</li>
+<li><b>日本との関係:</b> 「Japanese cards more commonly utilize both horizontal and vertical layouts to accommodate different writing systems」<br>→ <b>日本では文字体系（縦書き漢字）由来の必然</b>、欧米では <b>選択的スタイル</b> という非対称性</li>
+<li><b>設計注意:</b> 「Keep your important details toward the center」（縦型は裁ち落とし事故が増えるため center-bias 推奨）</li>
+</ul>
+
+<!-- ============= 軸3 ============= -->
+<h2>軸3. 縦型名刺特有の差分（「段分解＋中央軸」が正解）</h2>
+
+<h3>横型 vs 縦型のフロー差分</h3>
+<table>
+<tr><th>工程</th><th>横型</th><th>縦型</th><th>差分の本質</th></tr>
+<tr><td>情報の流れ</td><td>左→右（西洋型）</td><td>上→下（日本型・看板型）</td><td>視線軸90°回転</td></tr>
+<tr><td>氏名配置</td><td>中央〜左寄せ</td><td><b>中央配置がほぼ定石</b></td><td>縦軸の中心に「人物の名前」を据える儀礼性</td></tr>
+<tr><td>文字組</td><td>カーニング自由</td><td><b>ベタ組み厳守＋行間広め</b></td><td>縦組みは詰まりやすい（モリサワ）</td></tr>
+<tr><td>数字</td><td>算用数字</td><td><b>漢数字 or 縦中横（2桁単位）</b></td><td>DTP工数追加</td></tr>
+<tr><td>英文</td><td>そのまま自然</td><td>縦書きと衝突 → <b>混在ルール必須</b></td><td>混在処理が必要</td></tr>
+<tr><td>ロゴ位置</td><td>左上が主流</td><td><b>右上が主流</b></td><td>縦組みの起点と一致</td></tr>
+<tr><td>余白の役割</td><td>装飾的</td><td><b>儀礼的（和の「間」）</b></td><td>埋めずに残す</td></tr>
+</table>
+
+<h3>業界統計</h3>
+<p>横型 <span class="num">71%</span> / 縦型 <span class="num">29%</span>（グラフィック調べ）。縦型はマイノリティだが士業・伝統工芸・経営者・神職・和食店では多数派。</p>
+
+<h3>業種別の縦書き氏名配置傾向</h3>
+<table>
+<tr><th>業種</th><th>定番配置</th><th>備考</th></tr>
+<tr><td>士業（弁護士・税理士・司法書士）</td><td>中央＋両端揃え</td><td>誠実・知的</td></tr>
+<tr><td>茶道・華道</td><td>中央＋大余白</td><td>「間」重視</td></tr>
+<tr><td>経営者</td><td>中央＋最大級サイズ</td><td>人物本位</td></tr>
+<tr><td>神職</td><td>中央＋明朝体＋市松柄</td><td>名刺ファースト等に専用テンプレ</td></tr>
+<tr><td>和食店</td><td>屋号上＋店主名中央＋住所下</td><td>3段構造</td></tr>
+<tr><td>クリエイター</td><td>右寄せ・自由配置</td><td>個性表現</td></tr>
+</table>
+
+<h3>ふりがな（ルビ）配置ルール</h3>
+<ul>
+<li><b>縦書きでは右側に配置</b>（小林敏「ルビの配置方法」・上毎印刷）</li>
+<li><b>肩付き or 中付き</b>を全体で統一（混在禁止）</li>
+<li>姓名は<b>グループルビ</b>が多数（読み流しやすさ）</li>
+<li>サイズ: 親文字の天地左右 1/2、面積 1/4 が基本</li>
+<li>名刺の慣行として親文字より<b>薄いグレー or 細ウェイト</b>にする例多（モリサワコラム）</li>
+</ul>
+
+<h3>縦書きに電話番号を載せる3択</h3>
+<ol>
+<li>漢数字（〇三・一二三四・五六七八）— 最格式</li>
+<li>算用数字＋縦中横（2桁ごと回転）— <b>DTP実務の主流</b></li>
+<li>算用数字を縦に流す＋区切り記号統一 — モダン</li>
+</ol>
+
+<h3>縦型の数値定石（三栄印刷ほか）</h3>
+<ul>
+<li>ロゴ位置: 左角または右角 <span class="num">4〜6mm</span></li>
+<li>フォントサイズ: 氏名 <span class="num">18pt</span> / 会社名 <span class="num">12〜14pt</span> / 肩書 <span class="num">6〜10pt</span> / 住所 <span class="num">6pt</span></li>
+<li>段階配置: 「会社・部署 → 名前 → 住所」の先頭位置を順に下げる（斜め下流型）</li>
+</ul>
+
+<div class="callout warn">
+<b>「ブロック／カード分解」の縦型適合度</b><br>
+<b>縦型ではブロック分解は機能限定的。「段分解」が正解。</b>
+<ul>
+<li>横並びブロック（左右に箱を並べる）= <b>縦軸を破壊するため禁忌</b></li>
+<li>縦並びブロック（上下に積層）= 機能する</li>
+<li>「右上=社 / 中央=名 / 左下=連絡」の <b>対角3点ブロック</b> = 古典定石として機能</li>
+<li>均等9マスグリッド = 中央軸の儀礼性が消えるため非推奨</li>
+</ul>
+<b>機能する条件:</b> ①ブロックは縦積みのみ ②中央軸を貫く要素（氏名・ロゴ）はブロックから独立 ③対角3点配置を採用
+</div>
+
+<!-- ============= 統合分析 ============= -->
+<h2>統合分析 — マスター提案「カード配置」の業界位置と本件への適用</h2>
+
+<h3>① 提案の正体（業界用語にマッピング）</h3>
+<table>
+<tr><th>マスター提案</th><th>業界用語（海外）</th><th>業界用語（国内）</th><th>関係</th></tr>
+<tr><td>カードで全体構成を決めて→中身を決める</td><td>Modular Grid / Grid System / Compositional Grid</td><td>3列グリッド + 4原則（近接・整列）</td><td><b>本質一致</b>（呼び名が違うだけ）</td></tr>
+<tr><td>余白も含めて構造を先に決める</td><td>"Grid creates conditions for spontaneity"（Lupton）</td><td>「ラフでブロック確定 → 仕上げで mm 調整」</td><td><b>業界40年の標準</b></td></tr>
+<tr><td>今後の改修もカード単位で</td><td>Identity System / Brand System の1 application 設計</td><td>テンプレ思想</td><td><b>主流</b></td></tr>
+</table>
+
+<h3>② 提案の妥当性判定</h3>
+<div class="callout ok">
+<b>横型・LP・印刷物全般 → 強く支持（業界標準）</b><br>
+Müller-Brockmann / Vignelli が確立した「構造ファースト」と完全一致。Vignelli は Knoll で名刺〜タグ〜箱を同一グリッドで設計した。
+</div>
+<div class="callout warn">
+<b>縦型名刺 → 条件付き支持</b><br>
+「ブロック分解」を縦型でやる場合、<b>段分解＋中央軸</b>に読み替えが必要。横並びブロックは縦軸を破壊する。<br>
+具体的には: <b>①積層ブロック ②氏名/ロゴは中央軸貫通要素として独立 ③対角3点配置（右上=社・中央=名・左下=連絡）</b>を採用。
+</div>
+
+<h3>③ 本件名刺への適用方針</h3>
+<table>
+<tr><th>カード</th><th>含むもの</th><th>役割</th><th>位置</th></tr>
+<tr><td>①氏名カード</td><td>縦書き氏名2字 + ふりがな</td><td>中央軸貫通の主役要素</td><td>上1/3〜中央</td></tr>
+<tr><td>②肩書スロット</td><td>肩書1行（マスター後入れ）</td><td>氏名カードと連絡先カードの接続部</td><td>top 62.4mm 付近・高さ3.9mm</td></tr>
+<tr><td>③連絡先カード</td><td>メール + 電話</td><td>2行中央寄せ</td><td>top 66〜70mm</td></tr>
+<tr><td>④QRカード</td><td>QR画像のみ</td><td>下1/3の中央</td><td>top 74.55mm</td></tr>
+</table>
+<p>縦積み・中央軸・対角3点配置の <b>3条件すべて満たす</b> 構造。提案は本件の縦型名刺で機能する。</p>
+
+<h3>④ 国内実務に合わせる場合の追加ポイント</h3>
+<ul>
+<li><b>4原則の言語化:</b> カード = 「近接・整列の塊化」と説明すれば国内実務者に伝わる</li>
+<li><b>3列グリッドの当てはめ:</b> 横方向は 5mm / 45mm / 5mm の3列で全カードの左右余白を統一</li>
+<li><b>ラフ3案文化:</b> カード分解を採用しても「ラフは3案提示」の慣行は維持（クライアントに選んでもらう要素を残す）</li>
+<li><b>修正2回想定:</b> カード単位で書けば修正局所化＝2回内に収まる構造が組める</li>
+</ul>
+
+<!-- ============= ソース ============= -->
+<h2>ソース一覧（86・重複排除後）</h2>
+
+<h3>軸1: 国内プロのフロー（40ソース）</h3>
+<ol>
+<li><a href="https://www.opd.jp/meishi-hearing/">名刺制作ヒアリングシート — 印刷デザイン本舗</a></li>
+<li><a href="https://meishistylist.com/130214-4">名刺デザインのプロセスまとめ — 名刺スタイリスト</a></li>
+<li><a href="https://www.interviewz.io/blog/graphic-design-hearingu-sheet/">グラフィックデザインのヒアリングシート — interviewz</a></li>
+<li><a href="https://bdesign.top/ordermade-meishi-hearing/">ヒアリングシート — bdesign</a></li>
+<li><a href="https://rmari.com/hearingsheet/">美容サロン専門ヒアリング — R.Mari</a></li>
+<li><a href="https://graciasmeishi.com/logosheet/">ロゴ・ヒアリング — Gracias名刺作成.com</a></li>
+<li><a href="https://design-benkyo.com/meishi-design-flow/">名刺デザインのコツ — design-benkyo</a></li>
+<li><a href="https://design-benkyo.com/design-rough-ideas/">ラフ描きのコツ — design-benkyo</a></li>
+<li><a href="https://www.sezax.co.jp/monthly_up/vol_130.html">サムネ・ラフ・カンプ — セザックス</a></li>
+<li><a href="http://gd-amaoto.com/blog-entry-68.html">ラフって、何？ — 雨音</a></li>
+<li><a href="https://mu-on.jp/2022/02/06/%E3%83%A9%E3%83%95%E3%81%AE%E8%80%83%E3%81%88%E6%96%B9/">ラフの考え方 — MUON（2022）</a></li>
+<li><a href="https://usamicreate.com/blog/design/card_design_process/">名刺制作プロセス — usamicreate</a></li>
+<li><a href="https://www.hanjou.co.jp/marketing-blog/3736/">名刺デザインの作り方完全ガイド — ハンジョウ</a></li>
+<li><a href="https://www.hanjou.co.jp/marketing-blog/3811/">名刺デザインの依頼の進め方 — ハンジョウ</a></li>
+<li><a href="https://note.com/meishiryohin/n/n251aa1b050a6">名刺良品 note</a></li>
+<li><a href="https://www.meishi-first.jp/column_select.php?id=220">デザインの基本 — 名刺ファースト</a></li>
+<li><a href="https://www.meishi-first.jp/column_select.php?id=158">名刺とグラフィックデザイン — 名刺ファースト</a></li>
+<li><a href="https://www.buroki-design.com/blog/design_thing/designthing0008/">名刺デザインの細かいこと — BUROKI</a></li>
+<li><a href="https://hitori-koho.com/businesscard-kihon">名刺の基本レイアウト — ひとり広報</a></li>
+<li><a href="https://www.studiokeya.com/menumeishipro54.html">余白が美しい名刺 — 桶屋</a></li>
+<li><a href="https://www.canva.com/ja_jp/learn/business-card-layout/">名刺レイアウト5ポイント — Canva</a></li>
+<li><a href="https://tsutafu.yamazakura.jp/shop/pages/blog-0011.aspx">名刺レイアウトのコツ — 山櫻 TSUTAFU</a></li>
+<li><a href="https://www.wave-inc.co.jp/weblog/?p=5753">名刺の基本レイアウト — WAVE</a></li>
+<li><a href="https://fujiplus.jp/idea4u/2020/07/2203.html">何をどこに配置するか — フジプラス（2020）</a></li>
+<li><a href="https://www.ricoh.co.jp/magazines/direct-marketing/column/th00004/">レイアウトの基本編 — リコー</a></li>
+<li><a href="https://www.adobe.com/jp/creativecloud/roc/blog/design/quiz-challenge/business-card.html">名刺デザインクイズ — Adobe</a></li>
+<li><a href="https://321web.link/illustrator-card/">Illustratorで名刺作成 — 321web</a></li>
+<li><a href="https://note.com/atooshi_design/n/n566544950bf5">Illustratorで名刺デザイン — アトオシ</a></li>
+<li><a href="https://dezasuta.com/columns/business_card-design/">名刺の作り方とコツ — デザインいい感じで！</a></li>
+<li><a href="https://bitbeans.com/blog/designer_tool/">Adobe vs Figma — Bit Beans（2024）</a></li>
+<li><a href="https://wwg.co.jp/blog/t63688">IllustratorとFigma比較 — WWG</a></li>
+<li><a href="https://raksul.com/guide/create-data/data-check-guide/">入稿前チェックリスト — ラクスル</a></li>
+<li><a href="https://note.com/sakkun0809/n/n7e942b83c691">入稿チェックリスト20 — さっくん</a></li>
+<li><a href="https://news.btool.jp/articles/731">入稿チェックリスト15 — BUSINESS名刺印刷所</a></li>
+<li><a href="https://www.adprint.jp/dataintro/basic.aspx">入稿前のチェック項目 — アドプリント</a></li>
+<li><a href="https://www.meishiryohin.com/guide/data-index">入稿データ作成ガイド — 名刺良品</a></li>
+<li><a href="https://www.designmeishi.net/meishidatabase/231_design_trend_2025/">名刺デザイントレンド2025 — デザイン名刺.net</a></li>
+<li><a href="https://note.com/kayo_design/n/na0efccee4a9b">名刺をデザインした話 — フクダカヨコ</a></li>
+<li><a href="https://note.com/harahiroshi/n/n7a29bbbf0ae3">デザインラフ公開 — ハラヒロシ</a></li>
+<li><a href="https://kodachi.jp/blog/%E7%8F%BE%E5%A0%B4%E3%81%AE%E3%83%97%E3%83%AD%E3%81%8C%E6%95%99%E3%81%88%E3%82%8B%EF%BC%81%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%81%AE%E3%83%96%E3%83%A9%E3%83%83%E3%82%B7%E3%83%A5%E3%82%A2/">ブラッシュアップ術 — 木立</a></li>
+</ol>
+
+<h3>軸2: 海外プロの方法論（30ソース）</h3>
+<ol start="41">
+<li><a href="https://www.pentagram.com/about/michael-bierut">Pentagram — Michael Bierut</a></li>
+<li><a href="https://www.pentagram.com/work/how-to">Pentagram — How To</a></li>
+<li><a href="https://www.fastcompany.com/3038742/a-peek-at-the-creative-process-of-pentagram-partner-michael-bierut">Fast Company — Michael Bierut on B&W</a></li>
+<li><a href="https://www.itsnicethat.com/features/michael-bierut-logo-design">It's Nice That — Michael Bierut on Logo Design</a></li>
+<li><a href="https://niggli.ch/en/products/rastersysteme-fur-die-visuelle-gestaltung">Niggli — Grid Systems in Graphic Design</a></li>
+<li><a href="https://archive.org/details/GridSystemsInGraphicDesignJosefMullerBrockmann">Internet Archive — Grid Systems PDF</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Swiss_Style_(design)">Wikipedia — Swiss Style</a></li>
+<li><a href="https://www.smashingmagazine.com/2007/04/designing-with-grid-based-approach/">Smashing — Grid-Based Approach（2007）</a></li>
+<li><a href="https://www.smashingmagazine.com/2009/07/lessons-from-swiss-style-graphic-design/">Smashing — Lessons from Swiss Style（2009）</a></li>
+<li><a href="https://www.smashingmagazine.com/2017/12/building-better-ui-designs-layout-grids/">Smashing — Layout Grids（2017）</a></li>
+<li><a href="https://www.creativebloq.com/graphic-design/massimo-vignelli-61411897">Creative Bloq — Massimo Vignelli</a></li>
+<li><a href="https://www.pixartprinting.co.uk/blog/massimo-vignelli/">Pixartprinting — Vignelli</a></li>
+<li><a href="https://medium.com/@rashi01mehra/massimo-vignelli-designing-with-clarity-discipline-and-timelessness-e83681340033">Medium — Vignelli</a></li>
+<li><a href="http://www.thegridsystem.org/thinking-with-type/">thegridsystem.org — Thinking With Type</a></li>
+<li><a href="https://kissmeimpolish.com/work/aiga-identity-system/">Kiss Me I'm Polish — AIGA Identity</a></li>
+<li><a href="https://www.aiga.org/design/design-practice/branding">AIGA — Branding</a></li>
+<li><a href="https://atomicdesign.bradfrost.com/">Atomic Design — Brad Frost</a></li>
+<li><a href="https://alistapart.com/blog/post/content-first-design/">A List Apart — Content-First Design</a></li>
+<li><a href="https://zeldman.com/2008/05/06/content-precedes-design/">Zeldman — Content Precedes Design（2008）</a></li>
+<li><a href="https://ixdf.org/literature/topics/content-first">IxDF — Content-First</a></li>
+<li><a href="https://www.linkedin.com/advice/0/how-can-you-use-negative-space-business-card-design-fgdec">LinkedIn — Negative Space in Business Card</a></li>
+<li><a href="https://printingpeach.com/printing-blog/mastering-the-art-of-negative-space-in-your-print-designs-2/">Printing Peach — Negative Space</a></li>
+<li><a href="https://www.dochipo.com/white-space-in-graphic-design/">Dochipo — White Space</a></li>
+<li><a href="https://www.brandly.com/blog/vertical-business-card-designs/">Brandly — Vertical Business Cards</a></li>
+<li><a href="https://www.cozycornerdesign-ca.com/blog/The-Art-and-culture-of-Japanese-Business-Cards.html">Cozy Corner — Japanese Business Cards</a></li>
+<li><a href="https://www.asianbusinesscards.com/blog/meishi-the-japanese-business-card-business-etiquette/">Asian Business Cards — Meishi</a></li>
+<li><a href="https://visme.co/blog/layout-design/">Visme — Types of Grids</a></li>
+<li><a href="https://blog.designcrowd.com/article/932/a-designers-guide-to-using-grid-layout-in-projects">DesignCrowd — Grid Layout</a></li>
+<li><a href="https://www.bizcardcolorado.com/resources/the-ideas-collection/understanding-grid-systems-in-design/">BizCard Colorado — Grid Systems</a></li>
+<li><a href="https://elements.envato.com/learn/swiss-style-graphic-design">Envato — Swiss Style</a></li>
+</ol>
+
+<h3>軸3: 縦型名刺・組版（16ソース）</h3>
+<ol start="71">
+<li><a href="https://www.sanei-print.co.jp/blog/2017/05/18/208">縦型名刺レイアウトルール — 三栄Navi（2017）</a></li>
+<li><a href="https://www.graphic.jp/feature/business_card_direction">縦型と横型どっち — グラフィック</a></li>
+<li><a href="https://card.hankoya.com/card/create/direction.html">縦型横型 — スピード名刺館</a></li>
+<li><a href="https://printbahn.com/column/vertical-writing">縦書きと横書き — プリントバーン</a></li>
+<li><a href="https://www.designmeishi.net/meishidatabase/tate_yoko/">縦横どっち — デザイン名刺.net</a></li>
+<li><a href="https://washi-hakata.com/2025/05/26/professionals/">士業の名刺 — 和紙はかた（2025）</a></li>
+<li><a href="https://www.meishi-first.jp/priesthood.php">神職向け名刺 — 名刺ファースト</a></li>
+<li><a href="https://hitori-koho.com/businesscard-yokotate">和風名刺の作り方 — ひとり広報</a></li>
+<li><a href="https://jomai.jp/archives/4902">日本語組版のルビ — 上毎印刷</a></li>
+<li><a href="https://florian.rivoal.net/ruby/ruby-rules-ja.pdf">ルビ配置ルール — 小林敏 PDF</a></li>
+<li><a href="https://note.morisawa.co.jp/n/n837f79c34e98">ルビの種類とつけ方 — モリサワ</a></li>
+<li><a href="https://www.morisawa.co.jp/culture/japanese-typesetting/01/">日本語組版 — モリサワ</a></li>
+<li><a href="https://creators-plus.jp/illustrator-letter-vertical/">Illustratorで縦書き — Creators+</a></li>
+<li><a href="https://dtptransit.design/illustrator/tcy.html">縦中横 — DTP Transit</a></li>
+<li><a href="https://design.raksul.com/products/business_card?orientation=portrait">縦型テンプレ — ラクスル</a></li>
+<li><a href="https://tsutafu.yamazakura.jp/shop/pages/collection-vertical.aspx">縦型コレクション — 山櫻 TSUTAFU</a></li>
+</ol>
+
+<p class="note" style="margin-top:1.5rem">※ 合計86ソース。「カード分解」用語は国内ソースで直接登場せず、本件提案は海外用語「Modular Grid」「Compositional Grid」と本質一致と判定。</p>
+
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>dmobile お乗り換えのご案内｜eSIMキャンペーン実施中</title>
+<meta name="description" content="このページはdmobile正規代理店 小齊平 恒平のご案内ページです（dmobile公式サイトではありません）。eSIMならSIM発行手数料4,400円が0円（2026年12月31日まで）。今の電話番号のままdmobileへ乗り換え。料金プラン、診断・お見積り、お手続きの流れを順番にご案内します。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<style>
+:root{
+--accent:#0f5e68;
+--accent-dark:#0a4750;
+--accent-soft:#e7f1f0;
+--yellow:#ffe600;
+--orange:#dd8a1d;
+--teal:#3f8f83;
+--blue:#3a6ea5;
+--bg:#ffffff;
+--bg-alt:#f4f6f5;
+--surface:#ffffff;
+--ink:#1f2328;
+--muted:#5b6670;
+--line:#e3e7ea;
+--footer-bg:#22262b;
+--footer-ink:#e8eaed;
+--wrap:1100px;
+}
+@media (prefers-color-scheme: dark){
+:root{
+--bg:#101214;
+--bg-alt:#16181b;
+--surface:#1b1e22;
+--accent-soft:#17302f;
+--ink:#f2f4f6;
+--muted:#a7b0b8;
+--line:#33383e;
+--footer-bg:#0b0c0e;
+--footer-ink:#cfd4d9;
+}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+margin:0;
+font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif;
+background:var(--bg);
+color:var(--ink);
+line-height:1.7;
+-webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent-dark)}
+@media (prefers-color-scheme: dark){ a{color:var(--accent)}}
+.container{max-width:var(--wrap);margin:0 auto;padding:0 20px}
+section{scroll-margin-top:24px}
+
+/* ---------- Agency notice bar ---------- */
+.notice-bar{
+background:#17323a;color:#eef4f4;
+font-size:13px;line-height:1.65;
+}
+.notice-bar .container{padding-top:9px;padding-bottom:9px}
+.notice-bar strong{color:#fff}
+.notice-bar a{color:#ffd94d;font-weight:700}
+
+/* ---------- Hero / Campaign ---------- */
+.hero{
+position:relative;overflow:hidden;
+background:var(--bg);
+border-bottom:1px solid var(--line);
+}
+.hero-deco{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-deco span{position:absolute;display:block}
+.hero-deco .t1{
+top:-16px;right:-14px;width:200px;height:210px;
+background:var(--accent);opacity:.9;
+clip-path:polygon(0 0,100% 38%,0 100%);
+}
+.hero-deco .t2{
+top:36%;right:-34px;width:160px;height:180px;
+background:var(--orange);opacity:.85;
+clip-path:polygon(0 0,100% 50%,0 100%);
+}
+.hero-deco .t3{
+bottom:-24px;right:5%;width:160px;height:150px;
+background:var(--blue);opacity:.8;
+clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+.hero-deco .t4{
+bottom:-30px;right:24%;width:90px;height:84px;
+background:var(--teal);opacity:.45;
+clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+.hero-inner{
+position:relative;z-index:1;
+max-width:680px;padding:52px 0 60px;
+}
+.campaign-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.campaign-tags .label{
+border:2px solid var(--accent);color:var(--accent);
+border-radius:999px;padding:3px 16px;
+font-size:13.5px;font-weight:900;letter-spacing:.14em;
+}
+.campaign-tags .until{
+background:var(--ink);color:var(--bg);
+border-radius:999px;padding:5px 13px;
+font-size:13px;font-weight:900;
+}
+.hero h1{
+font-size:clamp(27px,5.4vw,42px);font-weight:900;
+line-height:1.45;margin:20px 0 4px;letter-spacing:.01em;
+}
+.hero h1 .esim{font-size:1.22em;color:var(--accent)}
+.hero h1 .marker{
+background:linear-gradient(transparent 62%, var(--yellow) 62%);
+padding:0 2px;
+}
+.price-row{
+display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+margin:10px 0 4px;
+}
+.price-row .strike{font-size:clamp(24px,5vw,34px);font-weight:700;color:var(--muted);text-decoration:line-through;text-decoration-thickness:3px}
+.price-row .arrow{font-size:clamp(24px,5vw,34px);font-weight:900;color:var(--accent)}
+.price-row .zero{font-size:clamp(84px,15vw,124px);font-weight:900;color:var(--accent);line-height:1;letter-spacing:-.02em}
+.price-row .yen{font-size:clamp(32px,7vw,48px);font-weight:900;color:var(--accent)}
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+@media (max-width:640px){
+.hero-ctas .btn{width:100%}
+}
+
+/* ---------- Buttons ---------- */
+.btn{
+display:inline-block;text-align:center;text-decoration:none;
+font-size:16px;font-weight:900;padding:14px 34px;border-radius:999px;
+}
+.btn:active{transform:scale(.99)}
+.btn-main{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(15,94,104,.28)}
+.btn-main:hover{background:var(--accent-dark)}
+.btn-outline{background:var(--surface);color:var(--accent);border:2px solid var(--accent)}
+.btn-black{background:#191919;color:#fff}
+@media (prefers-color-scheme: dark){.btn-black{background:#000;border:1px solid var(--line)}}
+.btn .ext{font-size:13px;font-weight:700;opacity:.85}
+
+/* ---------- Sections ---------- */
+.section{padding:64px 0 72px}
+.section.alt{background:var(--bg-alt)}
+.sec-head{position:relative;text-align:center;margin:0 0 36px;padding-top:30px}
+.sec-bg{
+position:absolute;left:50%;top:-16px;transform:translateX(-50%);
+font-size:clamp(62px,11vw,108px);font-weight:900;letter-spacing:.05em;
+color:var(--accent-soft);line-height:1;white-space:nowrap;
+user-select:none;z-index:0;
+}
+.sec-head h2{
+position:relative;z-index:1;
+font-size:clamp(26px,4.4vw,34px);font-weight:900;
+color:var(--ink);margin:0;line-height:1.35;
+}
+.center-row{text-align:center;margin-top:28px}
+
+/* ---------- Plans ---------- */
+.plans{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:640px){.plans{grid-template-columns:1fr 1fr}}
+@media (min-width:1100px){.plans{grid-template-columns:repeat(4,1fr)}}
+.plan{
+background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+box-shadow:0 3px 14px rgba(0,0,0,.05);
+display:flex;flex-direction:column;
+}
+.plan.recommend{box-shadow:0 0 0 2.5px var(--accent),0 6px 18px rgba(15,94,104,.14)}
+.plan .band{height:8px}
+.plan .band.x{background:var(--blue)}
+.plan .band.l{background:var(--orange)}
+.plan .band.m{background:var(--accent)}
+.plan .band.s{background:var(--teal)}
+.plan .inner{padding:18px 18px 20px;position:relative;flex:1}
+.plan .tag{
+position:absolute;top:14px;right:14px;
+background:var(--accent);color:#fff;font-size:11.5px;font-weight:900;
+padding:2px 10px;border-radius:999px;letter-spacing:.05em;
+}
+.plan .name{font-size:18px;font-weight:900}
+.plan .name small{font-size:11.5px;color:var(--muted);font-weight:700;margin-left:6px;letter-spacing:.1em}
+.plan .price{margin:4px 0 0}
+.plan .price .num{font-size:34px;font-weight:900;color:var(--ink);letter-spacing:-.01em}
+.plan .price .unit{font-size:12.5px;color:var(--muted);font-weight:500}
+.plan .desc{font-size:13.5px;color:var(--muted);margin-top:4px;line-height:1.6}
+.notes{margin:22px 0 0}
+.note{font-size:13px;color:var(--muted);line-height:1.8;margin:4px 0;padding-left:1em;text-indent:-1em}
+.note::before{content:"・"}
+
+/* ---------- Plan diagnosis ---------- */
+.diag-card{
+background:var(--surface);border:1px solid var(--line);border-radius:16px;
+box-shadow:0 8px 26px rgba(0,0,0,.07);
+padding:28px 24px 26px;
+max-width:900px;margin:0 auto;
+}
+.diag-q{margin:0 0 26px}
+.diag-q:last-of-type{margin-bottom:8px}
+.diag-q-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.diag-q-no{
+flex:none;background:var(--accent);color:#fff;border-radius:6px;
+font-size:12px;font-weight:900;padding:2px 9px;letter-spacing:.05em;
+}
+.diag-q-head h3{font-size:16.5px;font-weight:900;margin:0;line-height:1.5}
+.diag-opts{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:640px){.diag-opts{grid-template-columns:1fr 1fr}}
+.diag-opt{
+font-family:inherit;text-align:left;cursor:pointer;
+background:var(--bg);color:var(--ink);
+border:1.5px solid var(--line);border-radius:10px;
+padding:13px 15px;font-size:14.5px;line-height:1.55;
+display:flex;gap:10px;align-items:flex-start;width:100%;
+}
+.diag-opt b{display:block;font-size:15px}
+.diag-opt span{color:var(--muted);font-size:13px;display:block}
+.diag-opt .dot{
+flex:none;width:20px;height:20px;border-radius:50%;margin-top:2px;
+border:2px solid var(--line);background:var(--surface);position:relative;
+}
+.diag-opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+.diag-opt.selected .dot{border-color:var(--accent)}
+.diag-opt.selected .dot::after{
+content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent);
+}
+.diag-opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.diag-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.diag-go{
+font-family:inherit;background:var(--accent);color:#fff;border:none;cursor:pointer;
+font-size:16px;font-weight:900;padding:14px 36px;border-radius:999px;
+box-shadow:0 6px 18px rgba(15,94,104,.28);
+}
+.diag-go:hover{background:var(--accent-dark)}
+.diag-go:active{transform:scale(.99)}
+.diag-reset{
+font-family:inherit;background:transparent;color:var(--muted);border:none;cursor:pointer;
+font-size:14px;font-weight:700;padding:10px 6px;text-decoration:underline;
+}
+.diag-error{
+display:none;margin:16px 0 0;font-size:14px;font-weight:700;color:#b3261e;
+background:#fdecea;border:1px solid #f0c6c2;border-radius:8px;padding:10px 14px;
+}
+@media (prefers-color-scheme: dark){.diag-error{background:#3a1d1a;border-color:#6e3733;color:#f2b8b2}}
+.diag-error.show{display:block}
+.diag-result{
+display:none;margin-top:26px;border:2px solid var(--accent);border-radius:12px;
+padding:22px 20px;background:var(--bg);
+}
+.diag-result.show{display:block}
+.diag-result .r-label{
+font-size:12.5px;font-weight:900;color:var(--accent);letter-spacing:.1em;margin:0 0 4px;
+}
+.diag-result .r-name{font-size:26px;font-weight:900;margin:0;line-height:1.35}
+.diag-result .r-name small{font-size:13px;color:var(--muted);font-weight:700;margin-left:8px;letter-spacing:.08em}
+.diag-result .r-price{margin:2px 0 0}
+.diag-result .r-price .num{font-size:32px;font-weight:900;letter-spacing:-.01em}
+.diag-result .r-price .unit{font-size:12.5px;color:var(--muted)}
+.diag-result .r-desc{font-size:15px;font-weight:700;margin:6px 0 0}
+.diag-result .r-reasons{margin:14px 0 0;padding:0;list-style:none}
+.diag-result .r-reasons li{
+font-size:14px;line-height:1.7;padding-left:22px;position:relative;margin:4px 0;
+}
+.diag-result .r-reasons li::before{
+content:"";position:absolute;left:2px;top:9px;width:9px;height:9px;
+border-radius:50%;background:var(--accent);
+}
+.diag-result .r-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.diag-result .r-note{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.7}
+
+/* ---------- Fee comparison ---------- */
+.compare-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.compare-table th,.compare-table td{
+padding:11px 10px;text-align:right;border-bottom:1px solid var(--line);
+font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.compare-table th:first-child,.compare-table td:first-child{text-align:left;white-space:normal}
+.compare-table thead th{font-size:13px;color:var(--muted);border-bottom:2px solid var(--line)}
+.compare-table .row-diff td{font-weight:900;color:var(--accent);border-bottom:none;font-size:16px}
+.compare-table .row-diff td:first-child{color:var(--ink)}
+.compare-verdict{
+margin:16px 0 0;font-size:16px;font-weight:900;line-height:1.6;
+background:var(--accent-soft);border-radius:10px;padding:13px 16px;
+}
+@media (max-width:480px){
+.compare-table{font-size:13px}
+.compare-table .row-diff td{font-size:14px}
+}
+
+/* ---------- Estimate (inside diagnosis) ---------- */
+.money-note{
+display:none;margin-top:10px;font-size:13.5px;line-height:1.7;
+background:var(--accent-soft);border-radius:8px;padding:11px 14px;
+}
+.money-note.show{display:block}
+.money-note b{color:var(--accent-dark)}
+@media (prefers-color-scheme: dark){.money-note b{color:var(--accent)}}
+.bill-field label{display:block;font-size:14px;font-weight:700;margin-bottom:6px}
+.bill-field .yen-wrap{position:relative;max-width:320px}
+.bill-field input{
+font-family:inherit;font-size:17px;color:var(--ink);
+background:var(--bg);border:1.5px solid var(--line);border-radius:10px;
+padding:12px 64px 12px 14px;width:100%;
+}
+.bill-field .yen-wrap span{
+position:absolute;right:14px;top:50%;transform:translateY(-50%);
+font-size:14px;color:var(--muted);font-weight:700;pointer-events:none;
+}
+.bill-field input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.bill-field .hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.est-block{margin-top:22px}
+.est-block h4{font-size:16px;font-weight:900;margin:0 0 8px}
+.est-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.est-table th,.est-table td{
+padding:10px 10px;text-align:right;border-bottom:1px solid var(--line);
+font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.est-table th:first-child,.est-table td:first-child{text-align:left;white-space:normal;font-weight:500}
+.est-table .row-total td{font-weight:900;border-bottom:2px solid var(--line);font-size:15.5px}
+.est-table .row-total td:first-child{color:var(--ink)}
+.est-warn{
+display:none;margin-top:12px;font-size:13.5px;line-height:1.7;font-weight:700;
+background:#fdf3e3;border:1px solid #e8cf9e;border-radius:8px;padding:10px 14px;color:#7a5410;
+}
+@media (prefers-color-scheme: dark){.est-warn{background:#33270f;border-color:#6b5518;color:#e8cf9e}}
+.est-warn.show{display:block}
+
+/* ---------- Flow steps (cards) ---------- */
+.flow-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:640px){.flow-grid{grid-template-columns:1fr 1fr}}
+@media (min-width:1100px){.flow-grid{grid-template-columns:repeat(4,1fr)}}
+.flow-grid li{
+background:var(--surface);border:1px solid var(--line);border-radius:12px;
+padding:20px 18px;box-shadow:0 3px 12px rgba(0,0,0,.04);
+}
+.flow-grid .f-no{
+display:flex;align-items:center;justify-content:center;
+width:40px;height:40px;border-radius:50%;
+background:var(--accent);color:#fff;
+font-weight:900;font-size:17px;margin-bottom:12px;
+}
+.flow-grid b{display:block;font-size:15.5px;line-height:1.5;margin-bottom:6px}
+.flow-grid .f-desc{font-size:13.5px;color:var(--muted);line-height:1.7;display:block}
+
+/* ---------- FAQ ---------- */
+.faq-list{display:grid;gap:20px;max-width:900px;margin:0 auto}
+.faq{
+border:1.5px solid var(--accent);border-radius:12px;
+padding:24px 22px 18px;position:relative;background:var(--surface);
+}
+.faq .q-label{
+position:absolute;top:-11px;left:18px;background:var(--bg);
+padding:0 8px;color:var(--accent);font-size:13px;font-weight:900;letter-spacing:.04em;
+}
+.faq h3{font-size:16.5px;font-weight:900;color:var(--accent);margin:0 0 6px}
+.faq p{font-size:14.5px;margin:0;line-height:1.75}
+
+/* ---------- Apply ---------- */
+.apply-sec{background:var(--accent-soft)}
+.apply-sec h2{
+font-size:clamp(25px,4.4vw,34px);font-weight:900;
+color:var(--ink);margin:0 0 10px;line-height:1.35;
+}
+.apply-lead{font-size:14.5px;margin:0 0 22px;max-width:640px;line-height:1.8}
+.apply-btn{display:block;width:100%;max-width:560px;padding:18px 20px;font-size:17px}
+
+/* ---------- Back to top ---------- */
+.to-top{
+position:fixed;right:16px;bottom:16px;z-index:55;
+width:46px;height:46px;border-radius:10px;
+background:var(--surface);border:1px solid var(--line);
+box-shadow:0 4px 14px rgba(0,0,0,.14);
+display:flex;align-items:center;justify-content:center;
+color:var(--accent);text-decoration:none;
+}
+
+/* ---------- Footer ---------- */
+footer{background:var(--footer-bg);color:var(--footer-ink)}
+.footer-main{
+display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;
+padding:38px 0 8px;
+}
+.footer-main .site-name{color:#fff;font-size:16px;font-weight:700;text-decoration:none;padding-top:6px}
+.footer-nav{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding-top:8px}
+.footer-nav a{color:var(--footer-ink);text-decoration:none;font-size:13.5px}
+.footer-nav a:hover{color:#fff}
+.footer-contact{padding:14px 0 0;font-size:13.5px;line-height:1.9}
+.footer-contact .tel{font-size:21px;font-weight:900;color:#fff;letter-spacing:.03em;text-decoration:none}
+.footer-bottom{
+border-top:1px solid rgba(255,255,255,.14);
+margin-top:22px;padding:16px 0 26px;
+font-size:12px;opacity:.8;line-height:1.8;text-align:center;
+}
+</style>
+</head>
+<body id="top">
+
+<!-- 運営者の明示：正規代理店・小齊平 恒平のページ -->
+<div class="notice-bar">
+<div class="container">このページは、<strong>小齊平 恒平（dmobile 正規代理店）</strong>が運営するご案内ページです。dmobile公式サイトではありません。公式情報は<a href="https://www.dmobile.jp/" target="_blank" rel="noopener">dmobile公式サイト</a>をご確認ください。</div>
+</div>
+
+<!-- キャンペーン：冒頭に大きく -->
+<div class="hero">
+<div class="hero-deco" aria-hidden="true"><span class="t1"></span><span class="t2"></span><span class="t3"></span><span class="t4"></span></div>
+<div class="container">
+<div class="hero-inner">
+<div class="campaign-tags">
+<span class="label">期間限定キャンペーン</span>
+<span class="until">2026年12月31日まで</span>
+</div>
+<h1><span class="esim">eSIM</span>なら<br /><span class="marker">SIM発行手数料</span>が</h1>
+<div class="price-row">
+<span class="strike">4,400円</span>
+<span class="arrow">→</span>
+<span><span class="zero">0</span><span class="yen">円</span></span>
+</div>
+<div class="hero-ctas">
+<a class="btn btn-outline" href="#faq">今の番号のまま乗り換え</a>
+<a class="btn btn-outline" href="#flow">ご自宅でお手続きが完結</a>
+<a class="btn btn-outline" href="#plans">選べるプランは4つだけ</a>
+<a class="btn btn-main" href="#apply">お申し込み・お問い合わせ</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 料金プラン -->
+<section class="section alt" id="plans">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">PLANS</span><h2>料金プラン</h2></div>
+
+<div class="plans">
+<div class="plan">
+<div class="band x"></div>
+<div class="inner">
+<div class="name">Xコース<small>DATA</small></div>
+<p class="price"><span class="num">5,720</span> <span class="unit">円／月（税込）</span></p>
+<p class="desc">1日4GB使える、データ派の方に</p>
+</div>
+</div>
+
+<div class="plan">
+<div class="band l"></div>
+<div class="inner">
+<div class="name">Lコース<small>CALL</small></div>
+<p class="price"><span class="num">5,720</span> <span class="unit">円／月（税込）</span></p>
+<p class="desc">1日2GB＋24時間かけ放題つき、通話派の方に</p>
+</div>
+</div>
+
+<div class="plan recommend">
+<div class="band m"></div>
+<div class="inner">
+<span class="tag">バランス型</span>
+<div class="name">Mコース<small>BALANCE</small></div>
+<p class="price"><span class="num">3,520</span> <span class="unit">円／月（税込）</span></p>
+<p class="desc">1日1GB＋10分かけ放題つき、バランス型</p>
+</div>
+</div>
+
+<div class="plan">
+<div class="band s"></div>
+<div class="inner">
+<div class="name">Sコース<small>LIGHT</small></div>
+<p class="price"><span class="num">1,078</span> <span class="unit">円／月（税込）</span></p>
+<p class="desc">月3GB、あまり使わない方に</p>
+</div>
+</div>
+</div>
+
+<div class="center-row">
+<a class="btn btn-main" href="https://www.dmobile.jp/" target="_blank" rel="noopener">プランの詳細は公式サイトで見る <span class="ext">（dmobile.jp）</span></a>
+</div>
+
+<div class="notes">
+<p class="note">お支払いはクレジットカードが原則です。口座振替はX・L・Mコースのみご利用できます（登録料550円）。</p>
+<p class="note">通話料は国内通話22円／30秒です（かけ放題の対象範囲を除きます）。</p>
+<p class="note">かけ放題オプション（24時間／10分／5分）は、付けられるコースが決まっています。詳細は公式サイトでご確認ください。</p>
+</div>
+</div>
+</section>
+
+<!-- プラン診断・簡単お見積り -->
+<section class="section" id="diagnosis">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">CHECK</span><h2>プラン診断と簡単お見積り</h2></div>
+
+<div class="diag-card">
+<div class="diag-q" data-q="call">
+<div class="diag-q-head"><span class="diag-q-no">Q1</span><h3>電話は、どのくらいかけますか？</h3></div>
+<div class="diag-opts" role="group" aria-label="電話の使い方">
+<button type="button" class="diag-opt" data-value="long" aria-pressed="false"><span class="dot"></span><span><b>長電話が多い</b><span>1回の通話が長くなりがちで、24時間かけ放題があると安心</span></span></button>
+<button type="button" class="diag-opt" data-value="short" aria-pressed="false"><span class="dot"></span><span><b>10分以内で終わることが多い</b><span>連絡は短めの通話が中心</span></span></button>
+<button type="button" class="diag-opt" data-value="rare" aria-pressed="false"><span class="dot"></span><span><b>ほとんどかけない</b><span>電話は受ける方が多く、使うのはデータ中心</span></span></button>
+</div>
+</div>
+
+<div class="diag-q" data-q="style">
+<div class="diag-q-head"><span class="diag-q-no">Q2</span><h3>外出先での使い方に近いのは、どれですか？</h3></div>
+<div class="diag-opts" role="group" aria-label="外出先での使い方">
+<button type="button" class="diag-opt" data-value="video" aria-pressed="false"><span class="dot"></span><span><b>動画やSNSをよく見る</b><span>データ量にゆとりがほしい</span></span></button>
+<button type="button" class="diag-opt" data-value="daily" aria-pressed="false"><span class="dot"></span><span><b>LINE・Web・地図が中心</b><span>通話もデータもほどほどに使う</span></span></button>
+<button type="button" class="diag-opt" data-value="callmain" aria-pressed="false"><span class="dot"></span><span><b>電話での連絡が中心</b><span>仕事や家族との連絡でよくかける</span></span></button>
+<button type="button" class="diag-opt" data-value="wifi" aria-pressed="false"><span class="dot"></span><span><b>Wi-Fi中心で、外では最低限</b><span>月額はできるだけ抑えたい</span></span></button>
+</div>
+</div>
+
+<div class="diag-q" data-q="sim">
+<div class="diag-q-head"><span class="diag-q-no">Q3</span><h3>SIMの種類は、どちらにしますか？</h3></div>
+<div class="diag-opts" role="group" aria-label="SIMの種類">
+<button type="button" class="diag-opt" data-value="esim" aria-pressed="false"><span class="dot"></span><span><b>eSIM</b><span>SIM発行手数料 0円（キャンペーン中）</span></span></button>
+<button type="button" class="diag-opt" data-value="physical" aria-pressed="false"><span class="dot"></span><span><b>物理SIM（カード）</b><span>SIM発行手数料 4,400円（初回のみ）</span></span></button>
+</div>
+<p class="money-note" id="simNote" aria-live="polite"></p>
+</div>
+
+<div class="diag-q" data-q="pay">
+<div class="diag-q-head"><span class="diag-q-no">Q4</span><h3>お支払い方法は、どちらにしますか？</h3></div>
+<div class="diag-opts" role="group" aria-label="お支払い方法">
+<button type="button" class="diag-opt" data-value="credit" aria-pressed="false"><span class="dot"></span><span><b>クレジットカード</b><span>追加の登録料はかかりません</span></span></button>
+<button type="button" class="diag-opt" data-value="bank" aria-pressed="false"><span class="dot"></span><span><b>口座振替</b><span>登録料 550円（初回のみ）／X・L・Mコースのみ</span></span></button>
+</div>
+<p class="money-note" id="payNote" aria-live="polite"></p>
+</div>
+
+<div class="diag-q bill-field">
+<label for="billInput">今の月額料金（税込）を入力してください</label>
+<div class="yen-wrap"><input type="number" id="billInput" inputmode="numeric" min="0" step="1" placeholder="例：7,000" /><span>円／月</span></div>
+<p class="hint">診断結果とあわせて、おすすめプランとの差額を月額・年額でお出しします。</p>
+</div>
+
+<div class="diag-actions">
+<button type="button" class="diag-go" id="diagGo">診断してお見積りを見る</button>
+<button type="button" class="diag-reset" id="diagReset">選び直す</button>
+</div>
+<p class="diag-error" id="diagError" role="alert"></p>
+
+<div class="diag-result" id="diagResult" aria-live="polite">
+<p class="r-label">あなたへのおすすめは</p>
+<p class="r-name"><span id="rName"></span><small id="rEn"></small></p>
+<p class="r-price"><span class="num" id="rPrice"></span> <span class="unit">円／月（税込）</span></p>
+<p class="r-desc" id="rDesc"></p>
+<ul class="r-reasons" id="rReasons"></ul>
+
+<div class="est-block">
+<h4>簡単お見積り</h4>
+<table class="est-table">
+<tbody>
+<tr><td id="eSimLabel">SIM発行手数料（初回のみ）</td><td id="eSimFee"></td></tr>
+<tr id="eBankRow"><td>口座振替の登録料（初回のみ）</td><td id="eBankFee"></td></tr>
+<tr class="row-total"><td>初期費用の合計（初回のみ）</td><td id="eInitial"></td></tr>
+<tr><td>月額（おすすめプラン）</td><td id="eMonthly"></td></tr>
+</tbody>
+</table>
+<p class="est-warn" id="estWarn"></p>
+</div>
+
+<div class="est-block">
+<h4>今の料金との比較</h4>
+<table class="compare-table">
+<thead>
+<tr><th scope="col"></th><th scope="col">月額</th><th scope="col">年額（×12）</th></tr>
+</thead>
+<tbody>
+<tr><td>今の料金</td><td id="cNowM"></td><td id="cNowY"></td></tr>
+<tr><td id="cPlanName"></td><td id="cPlanM"></td><td id="cPlanY"></td></tr>
+<tr class="row-diff"><td>差額</td><td id="cDiffM"></td><td id="cDiffY"></td></tr>
+</tbody>
+</table>
+<p class="compare-verdict" id="compareVerdict"></p>
+</div>
+
+<div class="r-ctas">
+<a class="btn btn-main" href="#apply">お申し込み・お問い合わせ</a>
+</div>
+<p class="r-note">お見積りは、このページに載せている月額料金・SIM発行手数料・口座振替の登録料をもとにした目安です。端末代・オプション料・通話料は含みません。年額は月額×12か月で計算しています。データ量の細かい条件などの詳細は、公式サイトでご確認ください。</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- お手続きの流れ -->
+<section class="section" id="flow">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">FLOW</span><h2>お手続きの流れ</h2></div>
+<ol class="flow-grid">
+<li><span class="f-no">1</span><b>診断でコースとSIMの種類を決める</b><span class="f-desc">上のプラン説明を見て、診断の質問に答えます。おすすめのコースとお見積りが出ますので、コースをご自身で選ぶ必要はありません。</span></li>
+<li><span class="f-no">2</span><b>今の携帯会社でMNP予約番号を取る</b><span class="f-desc">今のキャリアへお電話いただき、予約番号を取得します。申込の際に入力しますので、お手元にご用意ください。</span></li>
+<li><span class="f-no">3</span><b>ボタンからお申し込み・本人確認をする</b><span class="f-desc">このページ下部の「お申し込み・お問い合わせ」ボタンからお手続きガイドを開き、ガイドの案内に沿ってお申し込みください。必要事項は申込ページで直接ご入力いただきます。本人確認はご本人にしかできません。</span></li>
+<li><span class="f-no">4</span><b>開通手続きと設定をして、使い始める</b><span class="f-desc">お電話やメッセージで順番にご案内しますので、その案内に沿って回線の切り替え、eSIMの設定、APN設定まで進めます。</span></li>
+</ol>
+</div>
+</section>
+
+<!-- よくある質問 -->
+<section class="section" id="faq">
+<div class="container">
+<div class="sec-head"><span class="sec-bg" aria-hidden="true">Q&amp;A</span><h2>よくある質問</h2></div>
+<div class="faq-list">
+<div class="faq">
+<span class="q-label">Question 01</span>
+<h3>お申し込みから利用開始までどれくらいかかりますか？</h3>
+<p>SIMの種類やお申込み内容によって異なります。eSIMは最短当日〜翌営業日、SIMカードは到着後、開通手続きを行うことでご利用いただけます。開通・設定の際は、お電話やメッセージで順番にご案内します。</p>
+</div>
+<div class="faq">
+<span class="q-label">Question 02</span>
+<h3>プランを申し込む際に必要な書類はありますか？</h3>
+<p>本人確認書類（運転免許証、マイナンバーカードなど）が必要です。お申し込み内容によっては、補足書類をご提出いただく場合があります。</p>
+</div>
+<div class="faq">
+<span class="q-label">Question 03</span>
+<h3>現在利用中の電話番号をそのまま使えますか？</h3>
+<p>はい、MNP（携帯電話番号ポータビリティ）をご利用いただくことで、現在の電話番号をそのまま引き継ぐことが可能です。</p>
+</div>
+</div>
+<div class="center-row">
+<a class="btn btn-black" href="https://www.dmobile.jp/" target="_blank" rel="noopener">公式サイトで詳しく見る</a>
+</div>
+</div>
+</section>
+
+<!-- お申し込み・お問い合わせ -->
+<section class="section apply-sec" id="apply">
+<div class="container">
+<h2>お申し込み・お問い合わせ</h2>
+<p class="apply-lead">お申し込みも、お問い合わせも、下のボタン1つから進めます。ボタンからは、お手続きガイドが開きます。ガイドの案内に沿ってお申し込みください。</p>
+<a class="btn btn-main apply-btn" href="/guide" target="_blank" rel="noopener">お申し込み・お問い合わせ</a>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<div class="footer-main">
+<a class="site-name" href="#top">dmobile お乗り換えのご案内</a>
+<nav class="footer-nav" aria-label="フッターメニュー">
+<a href="#plans">料金プラン</a>
+<a href="#diagnosis">診断・お見積り</a>
+<a href="#flow">お手続きの流れ</a>
+<a href="#faq">よくある質問</a>
+<a href="#apply">お申し込み・お問い合わせ</a>
+<a href="https://www.dmobile.jp/" target="_blank" rel="noopener">公式サイト</a>
+</nav>
+</div>
+<div class="footer-contact">
+<div>dmobile お客様相談窓口</div>
+<a class="tel" href="tel:05033106875">050-3310-6875</a>
+<div>平日10時〜17時</div>
+</div>
+<div class="footer-bottom">料金・条件は2026年10月時点の内容です。最新の条件は公式サイトでご確認ください。</div>
+</div>
+</footer>
+
+<!-- ページ先頭へ戻る -->
+<a class="to-top" id="toTop" href="#top" aria-label="ページの先頭へ戻る"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg></a>
+
+<script>
+(function(){
+// ページ先頭へ戻るボタン：少しスクロールしたら表示します
+var toTop = document.getElementById("toTop");
+function update(){
+if (toTop) toTop.classList.toggle("show", window.scrollY > 400);
+}
+update();
+var ticking = false;
+window.addEventListener("scroll", function(){
+if (!ticking){
+ticking = true;
+window.requestAnimationFrame(function(){ update(); ticking = false;});
+}
+}, { passive: true});
+})();
+</script>
+
+<script>
+(function(){
+// プラン診断・簡単お見積り・料金比較：このページ内だけで計算します（保存・送信はしません）
+// 金額の根拠は、このページの料金プラン欄と注記に載せている料金のみです。
+var PLANS = {
+X: { name: "Xコース", en: "DATA", price: 5720, desc: "1日4GB使える、データ派の方に"},
+L: { name: "Lコース", en: "CALL", price: 5720, desc: "1日2GB＋24時間かけ放題つき、通話派の方に"},
+M: { name: "Mコース", en: "BALANCE", price: 3520, desc: "1日1GB＋10分かけ放題つき、バランス型"},
+S: { name: "Sコース", en: "LIGHT", price: 1078, desc: "月3GB、あまり使わない方に"}
+};
+var SIM_FEE = { esim: 0, physical: 4400};
+var BANK_FEE = 550;
+var answers = { call: null, style: null, sim: null, pay: null};
+
+var MONEY_NOTES = {
+sim: {
+esim: "<b>eSIMのお金：</b>SIM発行手数料は、キャンペーンで通常4,400円が0円です（2026年12月31日まで）。初期費用はこの分がかかりません。カードの郵送を待たずに設定できますが、対応機種が必要です。",
+physical: "<b>物理SIMのお金：</b>SIM発行手数料4,400円が初回のみかかります。月額に上乗せされるものではなく、最初に1回だけのお支払いです。SIMカードは郵送で届きます。"
+},
+pay: {
+credit: "<b>クレジットカードのお金：</b>追加の登録料はかかりません。毎月のお支払いはプランの月額のみで、初期費用はSIM発行手数料だけです。全コースでご利用いただけます。",
+bank: "<b>口座振替のお金：</b>登録料550円が初回のみかかります（月額への上乗せではありません）。ご利用いただけるのはX・L・Mコースのみで、Sコースはクレジットカード払いのみです。診断結果がSコースの場合は、クレジットカード払いで計算します。"
+}
+};
+
+function yen(n){ return n.toLocaleString("ja-JP") + "円";}
+
+var groups = document.querySelectorAll(".diag-q[data-q]");
+Array.prototype.forEach.call(groups, function(group){
+var key = group.getAttribute("data-q");
+var opts = group.querySelectorAll(".diag-opt");
+Array.prototype.forEach.call(opts, function(opt){
+opt.addEventListener("click", function(){
+Array.prototype.forEach.call(opts, function(o){
+o.classList.remove("selected");
+o.setAttribute("aria-pressed", "false");
+});
+opt.classList.add("selected");
+opt.setAttribute("aria-pressed", "true");
+answers[key] = opt.getAttribute("data-value");
+hideError();
+document.getElementById("diagResult").classList.remove("show");
+if (key === "sim" || key === "pay"){
+var note = document.getElementById(key === "sim"? "simNote": "payNote");
+note.innerHTML = MONEY_NOTES[key][answers[key]];
+note.classList.add("show");
+}
+});
+});
+});
+
+var errorEl = document.getElementById("diagError");
+function hideError(){ errorEl.classList.remove("show"); errorEl.textContent = "";}
+function showError(msg){ errorEl.textContent = msg; errorEl.classList.add("show");}
+
+function recommend(a){
+if (a.call === "long") return "L";
+if (a.style === "video") return "X";
+if (a.style === "callmain") return "L";
+if (a.style === "wifi") return "S";
+return "M";
+}
+
+function reasonsFor(key){
+var reasons = [];
+if (key === "X"){
+reasons.push("データは「1日4GB使える」と載せているコースで、動画やSNSをよく見る使い方に合います。");
+reasons.push("電話はデータ中心とのことで、かけ放題に寄せすぎない選び方です。");
+} else if (key === "L"){
+reasons.push("「24時間かけ放題つき」と載せているコースで、長めの通話や電話での連絡が多い使い方に合います。");
+reasons.push("データも1日2GB使えるので、日常の利用はまかなえます。");
+} else if (key === "M"){
+reasons.push("「1日1GB＋10分かけ放題つき」のバランス型で、短めの通話と日常のデータ利用の両方に合います。");
+reasons.push("4コースの中では、月額と内容のバランスが取りやすいコースです。");
+} else if (key === "S"){
+reasons.push("「月3GB」と載せているコースで、Wi-Fi中心で外では最低限だけ使う方に合います。");
+reasons.push("4コースの中で月額が最も安く、あまり使わない方の無駄を抑えられます。");
+}
+return reasons;
+}
+
+var billInput = document.getElementById("billInput");
+billInput.addEventListener("input", function(){
+document.getElementById("diagResult").classList.remove("show");
+});
+
+document.getElementById("diagGo").addEventListener("click", function(){
+var missing = [];
+if (!answers.call) missing.push("Q1（電話の使い方）");
+if (!answers.style) missing.push("Q2（外出先での使い方）");
+if (!answers.sim) missing.push("Q3（SIMの種類）");
+if (!answers.pay) missing.push("Q4（お支払い方法）");
+var now = parseInt(billInput.value, 10);
+if (isNaN(now) || now <= 0) missing.push("今の月額料金");
+if (missing.length){
+showError(missing.join("・") + " が未入力です。すべてお答えください。");
+return;
+}
+hideError();
+
+var key = recommend(answers);
+var plan = PLANS[key];
+
+document.getElementById("rName").textContent = plan.name;
+document.getElementById("rEn").textContent = plan.en;
+document.getElementById("rPrice").textContent = plan.price.toLocaleString("ja-JP");
+document.getElementById("rDesc").textContent = plan.desc;
+var ul = document.getElementById("rReasons");
+ul.innerHTML = "";
+reasonsFor(key).forEach(function(text){
+var li = document.createElement("li");
+li.textContent = text;
+ul.appendChild(li);
+});
+
+var simFee = SIM_FEE[answers.sim];
+var bankUsable =!(key === "S");
+var bankFee = (answers.pay === "bank" && bankUsable)? BANK_FEE: 0;
+var initial = simFee + bankFee;
+document.getElementById("eSimLabel").textContent =
+answers.sim === "esim"? "SIM発行手数料（eSIM／初回のみ）": "SIM発行手数料（物理SIM／初回のみ）";
+document.getElementById("eSimFee").textContent = answers.sim === "esim"? "0円（キャンペーン）": yen(simFee);
+var bankRow = document.getElementById("eBankRow");
+if (answers.pay === "bank"){
+bankRow.style.display = "";
+document.getElementById("eBankFee").textContent = bankUsable? yen(bankFee): "対象外のため 0円";
+} else {
+bankRow.style.display = "none";
+}
+document.getElementById("eInitial").textContent = yen(initial);
+document.getElementById("eMonthly").textContent = yen(plan.price);
+var warn = document.getElementById("estWarn");
+if (answers.pay === "bank" &&!bankUsable){
+warn.textContent = "口座振替はSコースではご利用いただけないため、このお見積りはクレジットカード払いで計算しています（登録料はかかりません）。";
+warn.classList.add("show");
+} else {
+warn.textContent = "";
+warn.classList.remove("show");
+}
+
+var diffM = now - plan.price;
+var diffY = diffM * 12;
+document.getElementById("cNowM").textContent = yen(now);
+document.getElementById("cNowY").textContent = yen(now * 12);
+document.getElementById("cPlanName").textContent = "dmobile " + plan.name;
+document.getElementById("cPlanM").textContent = yen(plan.price);
+document.getElementById("cPlanY").textContent = yen(plan.price * 12);
+document.getElementById("cDiffM").textContent = (diffM > 0? "−": diffM < 0? "＋": "±") + yen(Math.abs(diffM));
+document.getElementById("cDiffY").textContent = (diffY > 0? "−": diffY < 0? "＋": "±") + yen(Math.abs(diffY));
+var verdict = document.getElementById("compareVerdict");
+if (diffM > 0) verdict.textContent = plan.name + "なら、月 " + yen(diffM) + "・年 " + yen(diffY) + " お安くなります。";
+else if (diffM < 0) verdict.textContent = plan.name + "は、今より月 " + yen(-diffM) + "・年 " + yen(-diffY) + " 高くなります。内容（データ量・かけ放題）もあわせてご検討ください。";
+else verdict.textContent = plan.name + "は、今の料金と同額です。";
+
+var result = document.getElementById("diagResult");
+result.classList.add("show");
+result.scrollIntoView({ behavior: "smooth", block: "nearest"});
+});
+
+document.getElementById("diagReset").addEventListener("click", function(){
+answers = { call: null, style: null, sim: null, pay: null};
+Array.prototype.forEach.call(document.querySelectorAll(".diag-opt"), function(o){
+o.classList.remove("selected");
+o.setAttribute("aria-pressed", "false");
+});
+["simNote", "payNote"].forEach(function(id){
+var el = document.getElementById(id);
+el.innerHTML = "";
+el.classList.remove("show");
+});
+billInput.value = "";
+hideError();
+document.getElementById("diagResult").classList.remove("show");
+document.getElementById("diagnosis").scrollIntoView({ behavior: "smooth"});
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<title>Local Storage Directory</title>
+	<meta name="description" 						   content="play">
+	<meta name="author"                       		   content="ertdfgcvb.xyz">
+	<meta name="viewport" 							   content="width=device-width, initial-scale=1">
+	<meta name="mobile-web-app-capable" 			   content="yes">
+	<meta name="apple-mobile-web-app-capable" 		   content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="theme-color" 						   content="black">
+	<meta name="msapplication-navbutton-color" 		   content="black">
+	<meta name="msapplication-config" 				   content="none"/>
+	<meta name="msapplication-TileColor" 			   content="black"/>
+	<meta name="msapplication-square70x70logo" 		   content="/ico/icon_192.png"/>
+	<meta name="msapplication-square150x150logo" 	   content="/ico/icon_192.png"/>
+	<meta name="msapplication-TileImage" 			   content="/ico/icon_192.png"/>
+	<link rel="apple-touch-icon" 		   			   href="/ico/icon_192.png" />
+	<link rel="icon"    				   			   href="/ico/icon_32.png" />
+	<style type="text/css" media="screen">
+		body {
+			margin: 2em 4em 6em 5em;
+			font-size: 1.2em;
+			font-family: "Times New Roman", Times, serif;
+		}
+		a {
+			text-decoration: none;
+			color: royalblue;
+		}
+		a:visited {
+			color: grey;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+		.main {
+			max-width: 42em;
+		}
+		.grid {
+			display: grid;
+  			grid-template-columns: auto auto auto auto auto;
+  			grid-gap: 0;
+  			margin-bottom: 3em;
+		}
+		.grid div {
+			border-top: solid 1px rgb(240, 240, 240);
+			padding: 0.25em 1em 0.5em 0;
+		}
+
+	</style>
+</head>
+<body>
+<div class="main">
+	<div class="local">
+		<h4>Your programs stored locally (browser’s local storage)</h4>
+	</div>
+	<div class="remote">
+		<h4>Your programs stored on the playground</h4>
+	</div>
+
+</div>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<script type="module">
+
+	// Duplicate storage.js object...
+	// TODO: find a better way to share this object
+	const storage = {
+		store : function(key, obj) {
+			try {
+				localStorage.setItem(key, JSON.stringify(obj))
+				return true
+			} catch (e) {
+				return false
+			}
+		},
+		restore : function(key, target = {}) {
+			const obj = JSON.parse(localStorage.getItem(key))
+			Object.assign(target, obj)
+			return target
+		},
+		clear : function(key) {
+			localStorage.removeItem(key)
+		}
+	}
+
+	// Duplicate key from the module io_storage.js
+	const LOCAL_STORAGE_KEY_PREFIX = 'local_'
+	// Duplicate key from the module play.js
+	const LOCAL_STORAGE_KEY_REMOTE_INFO = 'remoteInfo'
+
+
+	renderLocalInfo(document.querySelector('.local'))
+	renderRemoteInfo(document.querySelector('.remote'))
+
+	// ---- Local info -----
+	function renderLocalInfo(target) {
+
+		// 1.
+		// Retrieve objects stored locally.
+		// For performance (and manageability) reasons each program is stored
+		// in its own key instead of a big grouped object.
+		// Each key has a prefix to facilitate filtering.
+		const r = new RegExp(LOCAL_STORAGE_KEY_PREFIX)
+		const sortedList = Object.keys(localStorage).filter(k => {
+			if (k.match(r)) return k
+		}).map(k => {
+			return storage.restore(k)
+		}).sort((a, b) => {
+			return a.meta.time < b.meta.time ? 1 : -1
+		})
+
+
+		// 2.
+		// Output
+		const grid = document.createElement('div')
+		grid.classList.add('grid')
+		grid.innerHTML += '<div>date</div>'
+		grid.innerHTML += '<div>time</div>'
+		grid.innerHTML += '<div>author</div>'
+		grid.innerHTML += '<div>title</div>'
+		grid.innerHTML += '<div>link</div>'
+
+		sortedList.forEach(entry => {
+			const base = '/#/local/' + entry.base
+			grid.innerHTML += '<div>' + formatDate(entry.meta.time) + '</div>'
+			grid.innerHTML += '<div>' + formatTime(entry.meta.time) + '</div>'
+			grid.innerHTML += '<div>' + entry.meta.author + '</div>'
+			grid.innerHTML += '<div>' + entry.meta.title + '</div>'
+			grid.innerHTML += '<div><a href="' + base + '" target=_blank>' + base + '</a></div>'
+			//grid.innerHTML += '<div>' + '</div>'
+		})
+		target.appendChild(grid)
+	}
+
+
+	// ---- Remote info -----
+	function renderRemoteInfo(target) {
+
+		// 1.
+		// Retrieve objects stored locally.
+		// Remote info is contained in a single key
+		const remoteInfo = storage.restore(LOCAL_STORAGE_KEY_REMOTE_INFO)
+		const sortedList = Object.keys(remoteInfo).map(k => {
+			return remoteInfo[k]
+		}).sort((a, b) => {
+			return a.meta.time < b.meta.time ? 1 : -1
+		})
+
+		// 2.
+		// Output
+		const grid = document.createElement('div')
+		grid.classList.add('grid')
+		grid.innerHTML += '<div>date</div>'
+		grid.innerHTML += '<div>time</div>'
+		grid.innerHTML += '<div>author</div>'
+		grid.innerHTML += '<div>title</div>'
+		grid.innerHTML += '<div>permalink</div>'
+
+		sortedList.forEach(entry => {
+			const base = '/#/' + entry.base
+			grid.innerHTML += '<div>' + formatDate(entry.meta.time) + '</div>'
+			grid.innerHTML += '<div>' + formatTime(entry.meta.time) + '</div>'
+			grid.innerHTML += '<div>' + entry.meta.author + '</div>'
+			grid.innerHTML += '<div>' + entry.meta.title + '</div>'
+			grid.innerHTML += '<div><a href="' + base + '" target=_blank>' + base + '</a></div>'
+			//grid.innerHTML += '<div>' + '</div>'
+		})
+
+		target.appendChild(grid)
+	}
+
+	function formatDate(time) {
+		const date = new Date(time)
+		const y = date.getFullYear()
+		const m = (''+(date.getMonth() + 1)).padStart(2, '0')
+		const d = (''+date.getDate()).padStart(2, '0')
+		return (y + '/' + m + '/' + d)
+	}
+
+	function formatTime(time) {
+		const date = new Date(time)
+		const h = (''+date.getHours()).padStart(2, '0')
+		const m = (''+date.getMinutes()).padStart(2, '0')
+		const s = (''+date.getSeconds()).padStart(2, '0')
+		return (h + ':' + m + ':' + s)
+	}
+
+</script>
+</body>
+</html

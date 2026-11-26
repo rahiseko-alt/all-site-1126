@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+.DS_Store
+
+# playground share API storage (local dev)
+data/
+

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>About / Manual — ASCII play</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="black">
+	<link rel="icon" href="/ico/icon_32.png">
+	<link rel="stylesheet" href="/css/simple_console.css">
+	<style type="text/css" media="screen">
+		body {
+			margin: 2em 4em 6em 5em;
+			font-size: 1.2em;
+			font-family: "Times New Roman", Times, serif;
+			line-height: 1.35;
+		}
+		.main { max-width: 42em; }
+		a { text-decoration: none; color: royalblue; }
+		a:visited { color: grey; }
+		a:hover { text-decoration: underline; }
+		h4 { margin: 2.5em 0 0.6em 0; }
+		pre, code, .mono {
+			font-family: "Simple Console", monospace;
+			font-size: 0.85em;
+		}
+		pre {
+			background: rgb(248, 248, 248);
+			padding: 0.8em 1em;
+			overflow-x: auto;
+			line-height: 1.2;
+			tab-size: 4;
+		}
+		table { border-collapse: collapse; width: 100%; }
+		td, th {
+			text-align: left;
+			vertical-align: top;
+			border-top: solid 1px rgb(240, 240, 240);
+			padding: 0.25em 1em 0.4em 0;
+		}
+		.note { color: grey; }
+		@media screen and (max-width: 600px) {
+			body { margin: 1em; font-size: 1.05em; }
+		}
+	</style>
+</head>
+<body>
+<div class="main">
+
+<p class="note">This page is a reproduction of the ASCII play manual, written for this site.
+The runtime is the open-source <a href="https://github.com/ertdfgcvb/play.core">play.core</a>
+by ertdfgcvb (Apache License 2.0). It is an homage to
+<a href="https://play.ertdfgcvb.xyz">play.ertdfgcvb.xyz</a>.</p>
+
+<h4>Play: About</h4>
+<p>A live-coding environment in the browser whose only output is text. Each frame,
+a small program decides which character goes into every cell of a grid.</p>
+<p>The interface is deliberately reduced to three things: the output, the code and
+a menu. No line numbers, no panels, no settings dialog — everything else is done
+in code.</p>
+<p>Feedback is given with the browser’s own <code>alert</code> and
+<code>confirm</code> dialogs. Small commands (“bangs”) can be typed straight into
+the editor. Programs can be saved in the browser’s local storage, or uploaded
+to the server to get a permalink. Uploading needs no account.</p>
+
+<h4>Play: Background</h4>
+<p>The model is close to a GLSL fragment shader: instead of pixels there are
+character cells, and a function is called for each of them. A maximised browser
+window holds roughly 5,000 to 8,000 characters, drawn at up to 30 frames per
+second.</p>
+<p>By default the output is real DOM text: it can be selected, copied and is
+rendered by the browser’s text engine. A canvas renderer is available too.</p>
+
+<h4>API: Modules</h4>
+<p>A program is an ES6 module. There are no globals; the runner looks for these
+exports, all of them optional:</p>
+<table>
+	<tr><td class="mono">boot</td><td>called once, before the first frame</td></tr>
+	<tr><td class="mono">pre</td><td>called once per frame, before <code>main</code></td></tr>
+	<tr><td class="mono">main</td><td>called once per cell, per frame; returns the cell’s content</td></tr>
+	<tr><td class="mono">post</td><td>called once per frame, after <code>main</code></td></tr>
+	<tr><td class="mono">settings</td><td>object overriding the runner defaults</td></tr>
+	<tr><td class="mono">data</td><td>any object, passed to every function</td></tr>
+</table>
+<p>The smallest program:</p>
+<pre>export function main() {
+	return '?'
+}</pre>
+
+<h4>API: Function signatures and parameters</h4>
+<pre>export function boot(context, buffer, data) {}
+export function pre(context, cursor, buffer, data) {}
+export function main(coord, context, cursor, buffer, data) {}
+export function post(context, cursor, buffer, data) {}</pre>
+<table>
+	<tr><th colspan="2">coord</th></tr>
+	<tr><td class="mono">x, y</td><td>column and row of the cell, origin top left</td></tr>
+	<tr><td class="mono">index</td><td><code>y * cols + x</code>, the cell’s index in the buffer</td></tr>
+	<tr><th colspan="2">context</th></tr>
+	<tr><td class="mono">frame</td><td>frame number</td></tr>
+	<tr><td class="mono">time</td><td>time in milliseconds</td></tr>
+	<tr><td class="mono">cols, rows</td><td>size of the grid</td></tr>
+	<tr><td class="mono">width, height</td><td>size of the container element in pixels</td></tr>
+	<tr><td class="mono">metrics</td><td><code>aspect</code>, <code>cellWidth</code>, <code>lineHeight</code>, <code>fontFamily</code>, <code>fontSize</code>, <code>_update()</code></td></tr>
+	<tr><td class="mono">settings</td><td>the active settings</td></tr>
+	<tr><td class="mono">runtime</td><td><code>cycle</code> (local run counter) and <code>fps</code> (measured)</td></tr>
+	<tr><th colspan="2">cursor</th></tr>
+	<tr><td class="mono">x, y</td><td>hovered cell, fractional</td></tr>
+	<tr><td class="mono">pressed</td><td>pointer is down</td></tr>
+	<tr><td class="mono">p</td><td>previous frame’s <code>{x, y, pressed}</code></td></tr>
+	<tr><th colspan="2">buffer</th></tr>
+	<tr><td colspan="2">A flat array with the state of every cell, accessed with
+	<code>buffer[coord.index]</code>. It is not cleared between frames — only on
+	start and resize — which is what simulations rely on. Writing to it in
+	<code>pre</code> or <code>post</code> is expected.</td></tr>
+</table>
+
+<h4>API: The return object in main()</h4>
+<p><code>main</code> returns either a single character or an object:</p>
+<pre>return {
+	char            : 'A',
+	color           : 'black',
+	backgroundColor : 'white',
+	fontWeight      : 400   // 300, 400 or 700 online; other values snap
+}</pre>
+<p>An object is merged into the existing cell. The number <code>0</code> is
+printed as “0”; any other falsy value results in an empty cell.</p>
+
+<h4>API: Boot</h4>
+<p><code>boot</code> runs once and does not know about later resizes. To keep
+your own per-cell data, detect a change of <code>cols</code> / <code>rows</code>
+in <code>pre</code> and rebuild it there.</p>
+
+<h4>API: Settings</h4>
+<p>Priority: runner defaults &lt; run arguments &lt; the program’s
+<code>settings</code>.</p>
+<table>
+	<tr><td class="mono">element</td><td class="mono">null</td><td>output element; created if null</td></tr>
+	<tr><td class="mono">cols</td><td class="mono">0</td><td>number of columns, 0 = auto</td></tr>
+	<tr><td class="mono">rows</td><td class="mono">0</td><td>number of rows, 0 = auto</td></tr>
+	<tr><td class="mono">once</td><td class="mono">false</td><td>render a single frame</td></tr>
+	<tr><td class="mono">fps</td><td class="mono">30</td><td>maximum frame rate</td></tr>
+	<tr><td class="mono">renderer</td><td class="mono">'text'</td><td><code>'canvas'</code> or <code>'text'</code></td></tr>
+	<tr><td class="mono">allowSelect</td><td class="mono">false</td><td>allow text selection on the output</td></tr>
+	<tr><td class="mono">restoreState</td><td class="mono">false</td><td>keep time / frame / cycle across re-runs (local storage)</td></tr>
+	<tr><td class="mono">backgroundColor</td><td class="mono">''</td><td>CSS, document default white</td></tr>
+	<tr><td class="mono">color</td><td class="mono">''</td><td>CSS, document default black</td></tr>
+	<tr><td class="mono">fontFamily</td><td class="mono">''</td><td>CSS, document default 'Simple Console'</td></tr>
+	<tr><td class="mono">fontSize</td><td class="mono">''</td><td>CSS, document default '1em'</td></tr>
+	<tr><td class="mono">fontWeight</td><td class="mono">''</td><td>CSS, document default 400</td></tr>
+	<tr><td class="mono">letterSpacing</td><td class="mono">''</td><td>CSS, document default 'initial'</td></tr>
+	<tr><td class="mono">lineHeight</td><td class="mono">''</td><td>CSS, document default '19px'</td></tr>
+	<tr><td class="mono">canvasOffset</td><td class="mono">{x:0, y:0}</td><td>canvas renderer only, or 'auto'</td></tr>
+	<tr><td class="mono">canvasSize</td><td class="mono">{width:0, height:0}</td><td>canvas renderer only, in pixels</td></tr>
+</table>
+
+<h4>API: Data</h4>
+<pre>export const data = {
+	counter : 0
+}
+
+export function main(coord, context, cursor, buffer, data) {
+	return data.counter
+}</pre>
+<p>The exported object is handed to every function as the last argument, and can
+also be changed from outside the runner.</p>
+
+<h4>Live coding: Hotkeys</h4>
+<p>Cmd on Mac, Ctrl elsewhere.</p>
+<table>
+	<tr><td>Run</td><td class="mono">Cmd+Enter</td></tr>
+	<tr><td>Immediate mode on / off</td><td class="mono">Cmd+I</td></tr>
+	<tr><td>Toggle view</td><td class="mono">Cmd+Period</td></tr>
+	<tr><td>Fullscreen (output only)</td><td class="mono">Cmd+Shift+F</td></tr>
+	<tr><td>Copy a frame (focus on the output)</td><td class="mono">Cmd+Shift+C</td></tr>
+	<tr><td>Save locally</td><td class="mono">Cmd+S</td></tr>
+	<tr><td>Share (upload)</td><td class="mono">Cmd+Shift+U</td></tr>
+</table>
+<p>In the editor, Cmd/Ctrl+D (Sublime-style multiple selection) is handy.</p>
+
+<h4>Live coding: Bangs</h4>
+<p>Type one of these anywhere — a comment is a good place. It runs about 200 ms
+after typing, no Enter needed.</p>
+<table>
+	<tr><td class="mono">?help</td><td>open this manual (<span class="mono">?abc</span> does the same)</td></tr>
+	<tr><td class="mono">?lsd</td><td>open the local storage directory</td></tr>
+	<tr><td class="mono">?immediate on|off</td><td>immediate mode</td></tr>
+	<tr><td class="mono">?video night|day</td><td>editor theme</td></tr>
+	<tr><td class="mono">?new</td><td>new document (unsaved changes are lost)</td></tr>
+	<tr><td class="mono">?save</td><td>save locally</td></tr>
+	<tr><td class="mono">?fullscreen</td><td>fullscreen, Esc to leave</td></tr>
+</table>
+<p>For programs saved locally, <span class="mono">!immediate on</span> and
+<span class="mono">!video night</span> are read when the program is loaded.</p>
+
+<h4>Live coding: Save and upload</h4>
+<p><b>Save</b> stores the program in this browser’s local storage under a
+timestamp, which becomes its URL: <span class="mono">/#/local/&lt;timestamp&gt;</span>.
+Saving again from that URL overwrites it. All local programs are listed in the
+<a href="/lsd.html">L.S.D.</a></p>
+<p><b>Share</b> uploads the program and redirects to a new permalink,
+<span class="mono">/#/&lt;number&gt;</span>. Every upload creates a new permalink.
+An upload needs an <span class="mono">@author</span> (other than “ertdfgcvb”), a
+<span class="mono">@title</span> and at least one line of code:</p>
+<pre>/**
+@author Your name
+@title  Your title
+@desc   Optional description
+*/</pre>
+
+<h4>Source: Built-in modules</h4>
+<p>Import them from <span class="mono">/src/modules/</span>, e.g.
+<span class="mono">import { map } from '/src/modules/num.js'</span>.</p>
+<table>
+	<tr><td class="mono">camera.js</td><td>webcam init and helpers</td></tr>
+	<tr><td class="mono">canvas.js</td><td>canvas wrapper, readable as a pixel buffer</td></tr>
+	<tr><td class="mono">color.js</td><td>palettes and color helpers</td></tr>
+	<tr><td class="mono">drawbox.js</td><td>styled text boxes</td></tr>
+	<tr><td class="mono">exportframe.js</td><td>export frames as images (canvas renderer)</td></tr>
+	<tr><td class="mono">image.js</td><td>image loader and helpers</td></tr>
+	<tr><td class="mono">num.js</td><td>GLSL functions: map, fract, clamp, sign, mix, smoothstep, smootherstep</td></tr>
+	<tr><td class="mono">sdf.js</td><td>signed distance functions (after Inigo Quilez)</td></tr>
+	<tr><td class="mono">sort.js</td><td>sort a character set by brightness</td></tr>
+	<tr><td class="mono">vec2.js / vec3.js</td><td>vector helpers on plain objects, non-mutating</td></tr>
+	<tr><td class="mono">buffer.js, filedownload.js, load.js, string.js</td><td>internal helpers</td></tr>
+</table>
+
+<h4 data-msg="start here">Source: Examples</h4>
+<p>47 programs in five groups — basics, sdf, demos, camera, contributed — listed
+in the menu. Each one is a single file in <span class="mono">/src/programs/</span>
+and opens at <span class="mono">/#/src/&lt;group&gt;/&lt;name&gt;</span>.
+<a href="/#/src/basics/simple_output">Simple output</a> is a good place to start.</p>
+
+<h4>Source: Standalone version</h4>
+<pre>import { run } from '/src/run.js'
+import * as program from './program.js'
+
+run(program, { element: document.querySelector('pre') })
+	.then(context => console.log('first frame done'))
+	.catch(err => console.warn(err))</pre>
+<p>Several instances can live on one page; see
+<a href="/tests/playcore/single.html">single.html</a> and
+<a href="/tests/playcore/multi.html">multi.html</a>.</p>
+
+<h4>Notes: On performance</h4>
+<p>The text renderer draws the buffer row by row. Every change of color,
+background or weight along a row adds an inline element, so programs with a lot
+of horizontal style changes get slow; vertical changes are cheap. Keeping the
+grid small helps too.</p>
+
+<h4>Notes: Technical</h4>
+<p>The editor content is encoded with <code>TextEncoder</code>, turned into a
+<code>Blob</code> URL and imported dynamically. The only preprocessing is a
+rewrite of import paths to this origin.</p>
+<p>Output uses two iframes: a new program is built in the hidden one and swapped
+in after its first frame. A broken program therefore leaves the last working one
+on screen; errors are reported back and marked in the editor.</p>
+<p>The runner waits for <code>document.fonts.ready</code> plus three animation
+frames before measuring the font (WebKit bug 217047). Other WebKit issues:
+218275 and 218284 (no line numbers / no error events from modules),
+240213 (<code>measureText</code> rounding), 225695 (line-height rounding).</p>
+
+<h4>Font: Simple Console</h4>
+<p>The original playground is set in LL Simple Console by Lineto. Its license
+allows use only on ertdfgcvb.xyz and its subdomains; downloading or using it on
+other websites is not permitted. This site therefore does <b>not</b> include it
+and uses a locally installed monospace font as a stand-in until an LL Simple
+license is obtained.</p>
+
+<h4>Font: Character set</h4>
+<p class="mono">!"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@<br>
+ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`<br>
+abcdefghijklmnopqrstuvwxyz{|}~<br>
+░▒▓█▀▄▌▐ ┌┐└┘├┤┬┴┼─│ ═║╔╗╚╝ ·•○●◦◘◙</p>
+
+<h4>Resources: Artists, books and references</h4>
+<p>ASCII and ANSI art, text-mode demos, concrete poetry, and the shader community
+(<a href="https://www.shadertoy.com">Shadertoy</a>,
+<a href="https://iquilezles.org">Inigo Quilez</a>).</p>
+
+<h4>Resources: Contributors</h4>
+<p>The contributed examples carry their authors’ names in their headers.</p>
+
+<h4>Resources: Changelog</h4>
+<p>Playground 1.1 / Runner 1.1.</p>
+
+<h4>Resources: Repository</h4>
+<p><a href="https://github.com/ertdfgcvb/play.core">github.com/ertdfgcvb/play.core</a>
+— core files, examples and demos. Apache License 2.0. Vendored here at commit
+<span class="mono">b2d30ac</span>.</p>
+
+</div>
+</body>
+</html>

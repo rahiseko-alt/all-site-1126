@@ -1,0 +1,27 @@
+/*
+"Simple Console" — PROVISIONAL STAND-IN
+
+The original playground uses LL Simple Console (Lineto), which is licensed
+only for ertdfgcvb.xyz and must not be copied. Until an LL Simple license is
+obtained, the family name "Simple Console" is mapped to locally installed
+monospace fonts so that layout, metrics and code paths stay identical.
+
+This is NOT a 100% reproduction of the glyphs. Replace the src: lines below
+with the licensed LL Simple webfont files (weights 300 / 400 / 700) once
+the license is acquired.
+*/
+@font-face {
+	font-family: "Simple Console";
+	font-weight: 300;
+	src: local("Consolas"), local("Menlo-Regular"), local("DejaVu Sans Mono"), local("Courier New");
+}
+@font-face {
+	font-family: "Simple Console";
+	font-weight: 400;
+	src: local("Consolas"), local("Menlo-Regular"), local("DejaVu Sans Mono"), local("Courier New");
+}
+@font-face {
+	font-family: "Simple Console";
+	font-weight: 700;
+	src: local("Consolas Bold"), local("Consolas-Bold"), local("Menlo-Bold"), local("DejaVu Sans Mono Bold"), local("Courier New Bold");
+}

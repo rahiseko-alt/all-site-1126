@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vern LLC</title>
+<meta name="description" content="Vern LLC — Verstand und Vernunft.">
+<link rel="stylesheet" href="./main.css">
+<style>
+* {
+	--line-height: clamp(13px, 2.7vh, 19px);
+	--display-mode: cols;
+	--font-size-change: 1;
+	--c-vern: 14ch;
+	--c-kant: 34ch;
+	--c-card: 15ch;
+	--c-toys: 17ch;
+}
+html, body {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	position: fixed;
+	overscroll-behavior: none;
+	touch-action: none;
+}
+body {
+	font-size: clamp(0.72em, min(0.72vw + 0.55vh, 1em), 1em);
+	box-sizing: border-box;
+	margin: 0;
+	font-family: "Simple Console", ui-monospace, Menlo, Consolas, monospace;
+	color: #1D1E1F;
+	font-weight: 400;
+	line-height: var(--line-height);
+	background-color: #F7F5F0;
+}
+pre {
+	background-color: inherit;
+	line-height: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	cursor: default !important;
+}
+body.intro-lock {
+	overflow: hidden;
+}
+#main-pre {
+	opacity: 1;
+}
+#hero-stage {
+	position: fixed;
+	inset: 0;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	background-color: #F7F5F0;
+	z-index: 50;
+	pointer-events: none;
+}
+#hero-pre {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #F7F5F0;
+	color: #1D1E1F;
+	line-height: var(--line-height);
+	transform-origin: 50% 50%;
+	will-change: transform;
+}
+#hero-black {
+	position: absolute;
+	inset: 0;
+	background-color: #F7F5F0;
+	opacity: 0;
+	will-change: opacity;
+}
+a {
+	text-decoration: none;
+	color: #1D1E1F;
+	display: inline-block;
+	touch-action: manipulation;
+}
+main {
+	display: block;
+	position: absolute;
+	left: clamp(2ch, 4vw, 5ch);
+	top: clamp(2ch, 3vh, 3ch);
+	width: min(46ch, calc(100vw - 6ch));
+	margin: 0;
+}
+main div {
+	box-sizing: border-box;
+	width: 100%;
+}
+.invisible { visibility: hidden; }
+</style>
+</head>
+<body>
+<!-- Press 'f' to toggle fullscreen. Single portrait card on play.core engine. -->
+<main class="invisible">
+	<div>
+		Vern LLC<br>
+		Verstand und Vernunft.<br>
+		<br>
+		<br>
+		Alle unsere Erkenntniß hebt von<br>
+		den Sinnen an, geht von da zum<br>
+		Verstande, und endigt bey der<br>
+		Vernunft, über welche nichts<br>
+		Höheres in uns angetroffen wird.<br>
+		<br>
+		Der Verstand ist das Vermögen<br>
+		der Regeln; die Vernunft das<br>
+		Vermögen der Principien.<br>
+		<br>
+		<br>
+		業務改善支援<br>
+		├ AIエージェント構築<br>
+		├ AI定着支援（導入支援・講師）<br>
+		└ Web集客支援（診断・ホームページ、LP制作）<br>
+		<br>
+		<br>
+		Email for inquiries or just to say:<br>
+		<a data-flap=1 href="#" class="tiroir">ciao</a>
+	</div>
+</main>
+<pre id="main-pre" aria-hidden="true"></pre>
+<div id="hero-stage" aria-hidden="true">
+	<pre id="hero-pre"></pre>
+	<div id="hero-black"></div>
+</div>
+<script type="module">
+import { run } from './engine/run.js'
+import * as heroProgram from './hero-program.js?v=pure-hero'
+import * as mainProgram from './program.js?v=vern-services'
+
+const url = new URL(location)
+const params = url.searchParams
+const mode = (params.get('mode') || '').toLowerCase()
+const color = (params.get('color') || '').toLowerCase()
+const word = (url.hash.substr(1) || params.get('word') || '').toLowerCase()
+
+const mainPre = document.querySelector('#main-pre')
+const mainEl2 = document.querySelector('main')
+const heroStage = document.querySelector('#hero-stage')
+const heroPre = document.querySelector('#hero-pre')
+const heroBlack = document.querySelector('#hero-black')
+
+function fitPre() {
+	mainPre.style.width = innerWidth + 'px'
+	mainPre.style.height = innerHeight + 'px'
+}
+fitPre()
+addEventListener('resize', fitPre)
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPre)
+
+heroStage.style.display = 'none'
+
+// Run main site directly
+run(mainProgram, { element: mainPre }, { word, mode, color })
+
+// Greeting rotation (the "tiroir"): the mailto subject and label swap
+// every 9 seconds, shuffled, exactly as on the original site.
+const phrases = [
+  'Hi', 'Yo', 'Ciao', 'Viva', 'Salut', 'Hello', 'Grüezi', 'Cheers', 'Prosit',
+  'Oooooh', 'Olà olà', 'Bonjour', 'Namaste', 'Guten Tag', 'Shaba-daba',
+  'Go to hell', 'Buona notte', 'Buenas dias', 'Hasta la victoria',
+  'I love you', 'I hate you', 'I love my cat', 'I love my dog', 'I want to be your slave',
+  'Life is life', 'I liked my dinner', 'Gilgamesh is my father', 'I don’t want to write you',
+  'It’s time for a new haircut', 'Sex or fox are better than fax', 'It’s common to say it’s common',
+  'Aaaah is not the same as ooooh', 'Blue is my favourite color', 'Pink is my favourite color',
+  'Gray is my favourite color', 'Ocra is my favourite color', 'Two has three letters',
+  'Three has five letters', 'Five has four letters', 'Four has four letters',
+  'π is close to, but not exactly 3.1415', 'Slick worms eat silk', 'Sheep sings while ship sinks',
+  'Gold is fish and golf is dish', 'I saw a cat sleeping in a box', 'The fly flies and the flies fly'
+]
+for (let i = phrases.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * i)
+  ;[phrases[i], phrases[j]] = [phrases[j], phrases[i]]
+}
+let c = 0
+const e = document.querySelector('.tiroir')
+function swap() {
+  c = ++c % phrases.length
+  e.href = 'mailto:andreas@ertdfgcvb.xyz?subject=' + phrases[c]
+  e.innerText = phrases[c]
+}
+if (e) { swap(); setInterval(swap, 9000) }
+
+// 'f' key toggles fullscreen, as on the original.
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'f' && document.body.requestFullscreen)
+    document.body.requestFullscreen().catch(() => {})
+})
+</script>
+</body>
+</html>

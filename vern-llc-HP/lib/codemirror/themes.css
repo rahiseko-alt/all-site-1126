@@ -1,0 +1,50 @@
+/* -------------------------------------------------------------------------- */
+/* Playground editor themes: day / night (switched with ?video day|night)     */
+/* -------------------------------------------------------------------------- */
+.CodeMirror pre.CodeMirror-line { padding: 0 1ch; }
+
+*, *:before, *:after { opacity: 1 !important; }
+
+.cm-s-day                    { color: black; background: white; }
+.cm-s-day span.cm-comment    { color: darkgray; }
+.cm-s-day span.cm-keyword    { color: royalblue; }
+.cm-s-day span.cm-string     { color: orangered; }
+.cm-s-day span.cm-builtin    { color: orangered; }
+.cm-s-day span.cm-special    { color: cyan; }
+.cm-s-day span.cm-variable   { color: black; }
+.cm-s-day span.cm-variable-2 { color: black; }
+.cm-s-day span.cm-number,
+.cm-s-day span.cm-atom       { color: royalblue; }
+.cm-s-day span.cm-meta       { color: royalblue; }
+.cm-s-day span.cm-link       { color: cyan; }
+.cm-s-day .CodeMirror-matchingbracket { outline: 1px solid grey; color: darkgray !important; }
+.cm-s-day .CodeMirror-activeline-background        { background: rgb(248,248,248); }
+.cm-s-day .CodeMirror-selected                     { background: rgb(239,239,239); }
+.cm-s-day .CodeMirror-focused .CodeMirror-selected { background: rgb(239,239,239); }
+.cm-s-day .CodeMirror-line::selection,
+.cm-s-day .CodeMirror-line > span::selection,
+.cm-s-day .CodeMirror-line > span > span::selection { background: rgb(239,239,239); }
+.cm-s-day .CodeMirror-linenumber { font-size: 0.8em; padding-top: 0.2em; }
+.cm-s-day .syntax-error { background-color: rgba(255, 99, 71, 0.15); }
+
+.cm-s-night                    { color: silver; background: black; }
+.cm-s-night span.cm-comment    { color: grey; }
+.cm-s-night span.cm-keyword    { color: orangered; }
+.cm-s-night span.cm-string     { color: orange; }
+.cm-s-night span.cm-builtin    { color: orange; }
+.cm-s-night span.cm-special    { color: green; }
+.cm-s-night span.cm-variable   { color: silver; }
+.cm-s-night span.cm-variable-2 { color: silver; }
+.cm-s-night span.cm-number,
+.cm-s-night span.cm-atom       { color: mediumpurple; }
+.cm-s-night span.cm-meta       { color: mediumpurple; }
+.cm-s-night span.cm-link       { color: green; }
+.cm-s-night .CodeMirror-matchingbracket { outline: 1px solid grey; color: silver !important; }
+.cm-s-night .CodeMirror-activeline-background        { background: rgb(28,28,28); }
+.cm-s-night .CodeMirror-selected                     { background: rgb(128,128,128); }
+.cm-s-night .CodeMirror-focused .CodeMirror-selected { background: rgb(128,128,128); }
+.cm-s-night .CodeMirror-line::selection,
+.cm-s-night .CodeMirror-line > span::selection,
+.cm-s-night .CodeMirror-line > span > span::selection { background: rgb(128,128,128); }
+.cm-s-night .CodeMirror-linenumber { font-size: 0.8em; padding-top: 0.2em; }
+.cm-s-night .syntax-error { background-color: rgba(255, 99, 71, 0.35); }

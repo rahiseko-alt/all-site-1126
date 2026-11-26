@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<title>Play</title>
+	<meta name="description"                           content="play">
+	<meta name="author"                                content="ertdfgcvb.xyz">
+	<meta name="viewport"                              content="width=device-width, initial-scale=1">
+	<meta name="mobile-web-app-capable"                content="yes">
+	<meta name="apple-mobile-web-app-capable"          content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="theme-color"                           content="black">
+	<meta name="msapplication-navbutton-color"         content="black">
+	<meta name="msapplication-config"                  content="none">
+	<meta name="msapplication-TileColor"               content="black">
+	<link rel="apple-touch-icon"      sizes="192x192"  href="/ico/icon_192.png">
+	<link rel="icon" type="image/png" sizes="512x512"  href="/ico/icon_512.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="/ico/icon_192.png">
+	<link rel="icon" type="image/png" sizes="32x32"    href="/ico/icon_32.png">
+	<meta name="twitter:card"        content="summary">
+	<meta name="twitter:site"        content="@andreasgysin">
+	<meta name="twitter:title"       content="Play">
+	<meta name="twitter:description" content="An ASCII Art playground">
+	<meta name="twitter:image"       content="https://play.ertdfgcvb.xyz/ico/icon_512.png">
+	<link rel="stylesheet" type="text/css" href="/css/simple_console.css">
+	<link rel="stylesheet" type="text/css" href="/lib/codemirror/cm.css">
+	<style type="text/css" media="screen">
+		body {
+			font-family: "Simple Console", monospace;
+			line-height: 1.2;
+			margin: 0;
+		}
+		* {
+			font-size: inherit;
+			font-weight: inherit;
+			line-height: inherit;
+			box-sizing: border-box;
+		}
+		.hidden {
+			display: none;
+		}
+		/*
+		::-webkit-scrollbar { display: none; }
+		* { scrollbar-width: none; }
+		*/
+
+		/* -- main output --------------------------------------------------- */
+
+		/* The background is set to an opaque color to avoid an image overlap
+		   when the update takes some frames (double <iframe> buffering) */
+		.output iframe {
+			background-color: white;
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+			padding: 0px;
+			position: absolute;
+			border: 0px none;
+		}
+
+		.output iframe.bring-to-front {
+			/* iframe swap */
+			z-index: 10;
+			/*display: block;*/
+		}
+
+		/* -- editor -------------------------------------------------------- */
+
+		.editor {
+			overflow-y: hidden;
+			height:100vh;
+		}
+		.editor .error-label {
+			position: absolute;
+			width: 100%;
+			background-color: tomato;
+			z-index: 10;
+			color: white;
+			padding: 0 1ch;
+			min-height: 3.6em; /* line height x 3 */
+		}
+		.editor .CodeMirror {
+			height: 100%;
+			font-family: inherit;
+			font-size: inherit;
+			font-weight: inherit;
+			line-height: inherit;
+		}
+		.editor .CodeMirror-lines {
+			padding-top: 0;
+		}
+
+		/* -- main grid layout ---------------------------------------------- */
+
+		.grid {
+			display: grid;
+			width:100%;
+			position: relative;
+		}
+		.cell1,
+		.cell3 {
+			height: 100vh;
+		}
+		.cell1,
+		.cell2,
+		.cell3 {
+			position: relative;
+		}
+		.cell1 {
+			/*min-width: 40ch;*/
+		}
+		.cell2 {
+			/*max-width: 80ch;*/
+		}
+		.grid.one{
+			grid-template-columns: 1fr;
+		}
+		.grid.one .cell2,
+		.grid.one .cell3 {
+			display: none;
+		}
+		.grid.two{
+			grid-template-columns: 1fr 1fr;
+		}
+		.grid.two .cell3 {
+			display: none;
+		}
+		.grid.three{
+			grid-template-columns: 1fr 1fr auto;
+		}
+
+		/* -- menu ---------------------------------------------------------- */
+
+		.menu {
+			font-weight: 100;
+			background-color: black;
+			color:white;
+			padding: 0 1ch 0  1ch;
+			overflow-y: scroll;
+			border-left: 1px solid #222222;
+		}
+		.menu-grid {
+			display:grid;
+			grid-template-columns: 1fr auto;
+			grid-template-rows: auto;
+			/*max-width: 31ch;*/
+		}
+		.menu-grid:last-child {
+			padding-bottom: 1.2em;
+		}
+		.level2,
+		.hotkey {
+			color: #666;
+		}
+		.action-button {
+			cursor: pointer;
+		}
+		.action-button:hover:before{
+			content:">";
+		}
+		.row-wrap{
+ 			display: contents;
+		}
+		.program-cathegory {
+			color: #666;
+			padding-left: 2ch;
+			display: block;
+		}
+		.project-grid a {
+			color: pink !important;
+			padding-left: 4ch;
+		}
+		.ruler {
+			grid-column: span 2;
+		}
+		.ruler:before {
+			content: "-----------------------------";
+		}
+		.menu-grid a {
+			color: inherit;
+			text-decoration: none;
+		}
+		.menu-grid a:hover:before{
+			content:">";
+		}
+
+		/* -- Vertical screen / mobile -------------------------------------- */
+
+		@media screen and (max-width: 786px) {
+			.grid {
+				display: block;
+			}
+			.editor {
+				height: auto;
+			}
+			.menu-grid {
+				max-width: 30ch;
+			}
+			.cell3 {
+				overflow-x: hidden;
+				overflow-y: visible;
+				height: auto;
+			}
+			.hotkey {
+				padding-right: 1ch;
+			}
+		}
+	</style>
+</head>
+<body>
+
+	<div class="grid three">
+		<div id="output" class="cell1 output">
+			<iframe id="targetA" class="bring-to-front"></iframe>
+			<iframe id="targetB"></iframe>
+		</div>
+
+		<div id="editor" class="cell2 editor">
+			<div class="error-label hidden"></div>
+		</div>
+
+		<div id="menu" class="cell3 menu">
+			<nav class="menu-grid">
+
+				<div class="ruler"></div> <!-- --------------------------- -->
+
+				<div>ASCII play</div>
+				<div class="level2">a project by</div>
+
+				<div></div>
+				<div class="level2">
+					<a href="https://ertdfgcvb.xyz">ertdfgcvb</a>
+				</div>
+
+
+				<div class="ruler"></div> <!-- --------------------------- -->
+
+				<a href="abc.html" target="_blank" style="grid-column: span 2">About/Manual</a>
+
+				<div class="ruler"></div> <!-- --------------------------- -->
+
+				<div class="row-wrap">
+					<div class="action-button" data-action="run">Run</div>
+					<div class="hotkey">Cmd+Enter</div>
+				</div>
+
+				<div class="row-wrap">
+					<div class="action-button" data-action="toggleImmediateMode">Immediate mode</div>
+					<div class="hotkey">Cmd+I</div>
+				</div>
+
+				<div class="row-wrap">
+					<div class="action-button" data-action="toggleView">Toggle view</div>
+					<div class="hotkey">Cmd+Period</div>
+				</div>
+
+				<div class="row-wrap">
+					<div class="action-button" data-action="fullscreen">Fullscreen</div>
+					<div class="hotkey">Cmd+Shift+F</div>
+				</div>
+
+				<div class="row-wrap">
+					<div class="action-button" data-action="copyContent">Copy a frame</div>
+					<div class="hotkey">Cmd+Shift+C</div>
+				</div>
+
+				<div class="ruler"></div> <!-- --------------------------- -->
+
+				<div class="row-wrap">
+					<div class="action-button" data-action="saveLocal">Save</div>
+					<div class="hotkey">Cmd+S</div>
+				</div>
+
+				<div class="row-wrap">
+					<div class="action-button" data-action="saveRemote">Share</div>
+					<div class="hotkey">Cmd+Shift+U</div>
+				</div>
+
+				<div style="grid-column: span 2" class="action-button" data-action="saveScriptToFile">Download script</div>
+
+				<a href="lsd.html" target="_blank" style="grid-column: span 2">L.S.D.</a>
+
+				<div class="ruler"></div> <!-- --------------------------- -->
+
+				<div style="grid-column: span 2">Examples</div>
+
+				<div class="project-grid" style="grid-column: span 2">
+					<!-- [PROJECT-GRID] -->
+	<div class='program-cathegory'>basics</div>
+	<div><a href='/#/src/basics/10print'>10 PRINT</a></div>
+	<div><a href='/#/src/basics/coordinates_index'>Coordinates: index</a></div>
+	<div><a href='/#/src/basics/coordinates_xy'>Coordinates: x, y</a></div>
+	<div><a href='/#/src/basics/cursor'>Cursor</a></div>
+	<div><a href='/#/src/basics/how_to_draw_a_circle'>How to draw a circle</a></div>
+	<div><a href='/#/src/basics/how_to_draw_a_square'>How to draw a square</a></div>
+	<div><a href='/#/src/basics/how_to_log'>How to log</a></div>
+	<div><a href='/#/src/basics/name_game'>Name game</a></div>
+	<div><a href='/#/src/basics/performance_test'>Perfomance test</a></div>
+	<div><a href='/#/src/basics/rendering_to_canvas'>Canvas renderer</a></div>
+	<div><a href='/#/src/basics/sequence_export'>Sequence export</a></div>
+	<div><a href='/#/src/basics/simple_output'>Simple output</a></div>
+	<div><a href='/#/src/basics/time_frames'>Time: frames</a></div>
+	<div><a href='/#/src/basics/time_milliseconds'>Time: milliseconds</a></div>
+	<div class='program-cathegory'>sdf</div>
+	<div><a href='/#/src/sdf/balls'>Balls</a></div>
+	<div><a href='/#/src/sdf/circle'>Circle</a></div>
+	<div><a href='/#/src/sdf/cube'>Wireframe cube</a></div>
+	<div><a href='/#/src/sdf/rectangles'>Rectangles</a></div>
+	<div><a href='/#/src/sdf/two_circles'>Two circles</a></div>
+	<div class='program-cathegory'>demos</div>
+	<div><a href='/#/src/demos/box_fun'>Box fun</a></div>
+	<div><a href='/#/src/demos/chromaspiral'>Chroma Spiral</a></div>
+	<div><a href='/#/src/demos/donut'>Donut</a></div>
+	<div><a href='/#/src/demos/doom_flame'>Doom Flame</a></div>
+	<div><a href='/#/src/demos/doom_flame_full_color'>Doom Flame (full color)</a></div>
+	<div><a href='/#/src/demos/dyna'>Dyna</a></div>
+	<div><a href='/#/src/demos/gol_double_res'>Golgol</a></div>
+	<div><a href='/#/src/demos/hotlink'>Hotlink</a></div>
+	<div><a href='/#/src/demos/mod_xor'>Mod Xor</a></div>
+	<div><a href='/#/src/demos/moire_explorer'>Moiré explorer</a></div>
+	<div><a href='/#/src/demos/numbers'>Numbers</a></div>
+	<div><a href='/#/src/demos/plasma'>Plasma</a></div>
+	<div><a href='/#/src/demos/sinsin_checker'>Sin Sin</a></div>
+	<div><a href='/#/src/demos/sinsin_wave'>Sin Sin</a></div>
+	<div><a href='/#/src/demos/spiral'>Spiral</a></div>
+	<div><a href='/#/src/demos/wobbly'>Wobbly</a></div>
+	<div class='program-cathegory'>camera</div>
+	<div><a href='/#/src/camera/camera_double_res'>Camera double resolution</a></div>
+	<div><a href='/#/src/camera/camera_gray'>Camera grayscale</a></div>
+	<div><a href='/#/src/camera/camera_rgb'>Camera RGB</a></div>
+	<div class='program-cathegory'>contributed</div>
+	<div><a href='/#/src/contributed/color_waves'>Color Waves</a></div>
+	<div><a href='/#/src/contributed/emoji_wave'>Emoji Wave</a></div>
+	<div><a href='/#/src/contributed/equal_tea_talk'>EQUAL TEA TALK, #65</a></div>
+	<div><a href='/#/src/contributed/ernst'>oeö</a></div>
+	<div><a href='/#/src/contributed/game_of_life'>GOL</a></div>
+	<div><a href='/#/src/contributed/pathfinder'>Pathfinder</a></div>
+	<div><a href='/#/src/contributed/sand_game'>Sand game</a></div>
+	<div><a href='/#/src/contributed/slime_dish'>Slime Dish</a></div>
+	<div><a href='/#/src/contributed/stacked_sin_waves'>Stacked sin waves</a></div>
+				</div>
+
+			</nav>
+		</div>
+	</div>
+
+	<script src="/lib/codemirror/cm.js"></script>
+	<script type="module">
+
+		// -- Editor -----------------------------------------------------------
+		const EDITOR_ELEMENT = document.querySelector('#editor')
+		const editor = CodeMirror(EDITOR_ELEMENT, {
+			autoCloseBrackets       : true,
+			direction               : 'ltr',
+			indentUnit              : 4,
+			indentWithTabs          : true,
+			inputStyle              : 'contenteditable',
+			keyMap                  : 'sublime',
+			lineNumbers             : false,
+			mode                    : 'javascript',
+			showCursorWhenSelecting : true,
+			smartIndent             : true,
+			styleActiveLine         : true,
+			tabMode                 : 'shift',
+			tabSize                 : 4,
+			theme                   : 'day',
+			value                   : "/**\nLoading module...\n*/",
+			viewportMargin          : Infinity,
+		    matchBrackets           : true,
+		    extraKeys: {
+          		'Cmd-Enter': (cm) => {
+          			// Override Cmd-Enter on Mac
+          		},
+        	},
+		})
+
+		// -- Playground -------------------------------------------------------
+		import * as playground from '/src/play.js?20220625075245'
+		playground.boot(editor)
+
+		// -- Buttons ----------------------------------------------------------
+		document.querySelectorAll('.action-button').forEach(el => {
+			el.addEventListener('click', e => {
+				const fn = e.target.dataset.action
+				if (typeof playground[fn] == 'function') playground[fn]()
+			})
+		})
+
+		// Replace Cmd with Ctrl on non Mac systems
+		const isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
+		if (!isMacLike) {
+			document.querySelectorAll('.hotkey').forEach(el => {
+				el.innerHTML = el.innerHTML.replace('Cmd','Ctrl')
+			})
+		}
+
+		// -- Hotkeys ----------------------------------------------------------
+		// Assume all keys are pressed in combination with Cmd or Ctrl ("Meta")
+		// so only the key is mapped here.
+
+		// Key map
+		const keys = {
+			// Run the code
+			Meta_Enter : function() {
+				playground.run()
+			},
+			// Toggle the editor views
+			Meta_Period : function() {
+				playground.toggleView()
+			},
+			// Save a local version (localstorage)
+			Meta_S : function() {
+				playground.saveLocal()
+			},
+			// Upload a new version or a new base on the server
+			Meta_Shift_U : function() {
+				playground.saveRemote()
+			},
+			Meta_Shift_F : function() {
+				playground.fullscreen()
+			},
+			Meta_I : function() {
+				playground.toggleImmediateMode()
+			},
+			Meta_Shift_C : function() {
+				playground.copyContent()
+			},
+		}
+
+		// Translation map for certain coded keys (period, arrows, etc.)
+		const codedKeys = new Map()
+		codedKeys.set('.', 'Period')
+		codedKeys.set('Enter', 'Enter') // Avoid uppercase
+
+		// Keyboard events
+		addEventListener('keydown', e => {
+			// Flatten Meta / Command / Control
+			const meta  = e.metaKey || e.ctrlKey //|| e.altKey
+			const shift = e.shiftKey
+			const code  = e.code
+			const key   = codedKeys.has(e.key) ? codedKeys.get(e.key) : e.key.toUpperCase()
+
+			// Build a keyCombo string like 'Meta_Shift_U'
+			let keyCombo = ''
+			if (meta)  keyCombo += 'Meta_'
+			if (shift) keyCombo += 'Shift_'
+					   keyCombo += key
+			if (typeof keys[keyCombo] == 'function') {
+				e.preventDefault()
+				keys[keyCombo]()
+			}
+		})
+
+
+	</script>
+</body>
+</html>
+
+
+
+
+

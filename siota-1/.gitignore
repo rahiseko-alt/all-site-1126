@@ -1,0 +1,93 @@
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Node / JS
+node_modules/
+dist/
+build/
+.npm
+.yarn/
+
+# Cloudflare Wrangler のローカル状態（local KV の中身・dev のビルドキャッシュ）
+.wrangler/
+worker/.wrangler/
+
+# Supabase CLI のローカル実行状態（`supabase start`）
+supabase/.branches/
+supabase/.temp/
+
+# Playwright
+test/e2e-results.json
+playwright-report/
+test-results/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Environment and Secrets (Level A rule: Never commit secrets)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# 鍵をこの名前で手元に降ろす手順が runbook に在る（docs/deferred.md #32）。
+# `*.key` は **`.srkey` に当たらない**——glob の `*.key` は「`.key` で終わる」なので、
+# `.srkey` は一致しない。実測: `git check-ignore -v .srkey` が 0 件を返していた。
+# **機械強制は別に在る**（`npm run check` の no-secrets が毎回止める）。ここは二重化。
+.cftoken
+.sbtoken
+.srkey
+*.cert
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# IDE / Editor
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.swp
+*.swo
+.screens/
+.human/
+
+# 特定の AI だけが読む設定は置かない（正は AGENTS.md ひとつ）。
+# `.claude/` 自体を除外すると、配下のファイルは `!` で戻せない
+# （git の仕様——親ディレクトリが除外されていると個別ファイルの再対象化は効かない）。
+# だから**中身を全部除外**し、`settings.json` だけを戻す（`AGENTS.md` D-15 追記）。
+.claude/*
+!.claude/settings.json
+.codex/
+*.claude.json
+
+# 「いまやる番」を今回のセッションで読んだ印（checkin.mjs が書く・作業用）
+.plan-read
+
+# セッション開始時点の「いまやる番」の値（checkin.mjs が書く・checkout.mjs の7項目目が読む・作業用）
+.plan-next-baseline
+.plan-doing
+# 触った場所に当たる失敗記録を、このセッションで画面に出した印（failure-match.mjs）
+.failure-matched
+
+# 毒見を一部だけ走らせた回の記録（作業用）。全体の記録は poison-run-result*.md が正。
+docs/ops/poison-run-partial.md
+
+# 1件ずつ壊すのを一部だけ走らせた回の記録（作業用）。全体の記録は mutate-run-result.md が正。
+# CI は台帳へ移すために `git add -f` で一時的にコミットする（.github/workflows/ci.yml）。
+docs/ops/mutate-run-partial.md
+
+# 毒見（配信物が空）が使う空ディレクトリ。中身は要らない
+.poison-dist/

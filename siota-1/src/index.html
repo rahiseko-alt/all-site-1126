@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SALTY DOG | ドッグトリマー・エディトリアルカルテシステム</title>
+<!-- **ホーム画面に追加できるようにする**（`docs/deferred.md` #4）。
+     飼い主画面（`my.html`）と管理者画面（`admin.html`）は結線済みで、
+     **トリマー画面だけが外れていた**——追加しても名前もアイコンも出ない。
+     毎日いちばん使うのがこの画面なので、外れている理由が無い。 -->
+<link rel="icon" href="/assets/app-icon.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<style>
+/* ==========================================================================
+   1. DESIGN TOKENS & SYSTEM VARIABLES (ReBITA Architectural & Editorial System)
+   ========================================================================== */
+:root {
+  --bg-page: #f8f8f7;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f2f2ef;
+  --bg-muted: #e9e9e5;
+  --bg-dark: #0f0f0f;
+  --bg-paper: #faf9f6;
+
+  --ink-primary: #121212;
+  --ink-body: #2c2c2c;
+  --ink-secondary: #585858;
+  --ink-muted: #8c8c88;
+  --ink-inverse: #ffffff;
+
+  --border-subtle: #e6e6e2;
+  --border-divider: #deded9;
+  --border-strong: #121212;
+
+  --accent-gold: #c59b27;
+  --accent-terracotta: #c85a32;
+  --accent-sage: #4a7c59;
+  --accent-alert: #d32f2f;
+  --accent-alert-bg: #fde8e8;
+
+  /* フォント統一（マスター指示・C-8）。`my.html`/`admin.html`/`backend/js/magazine-view.js`
+     の3箇所は元々このシステムフォント指定で揃っていた。ここ（`index.html`）だけ
+     "Noto Sans JP"/"Noto Serif JP" を指定していたが、フォントファイルを同梱していない
+     ため実機ではどのみちシステムフォントに落ちていた（見た目は変わらない・実測して
+     `npm run walk` の絵で確認済み）。指定を実態に合わせ、4箇所を揃える。 */
+  /* 全文明朝体（マスター指示・C-8再指示）。`--font-sans`/`--font-en` も
+     `--font-serif` と同じ明朝体の並びにし、個別の `font-family: var(--font-xxx)` 呼び出し
+     箇所（数十か所）を1つずつ書き換えずに、この3行だけで全文を明朝体に揃える。
+     日本語フォントはファイルサイズの都合で同梱していない（`docs/ASSET-PROVENANCE.md`）
+     ため、実際に描画されるのは端末のシステム明朝体——Mac/iOS は Hiragino Mincho ProN、
+     Windows は Yu Mincho（無ければ MS Mincho 相当）。Android 等システムに明朝体が
+     無い端末では、ブラウザの既定 serif（欧文明朝の代替）に落ちる。 */
+  --font-sans: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Times New Roman", serif;
+  --font-en: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Times New Roman", serif;
+  --font-serif: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Times New Roman", serif;
+
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --header-height: 54px;
+}
+
+/* ==========================================================================
+   2. RESET & BASE TYPOGRAPHY
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 14.5px;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  color: var(--ink-body);
+  font-family: var(--font-sans);
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: none;
+  background: transparent;
+}
+
+/* ==========================================================================
+   3. TOP NAVIGATION (Flat Clean Specular Glass)
+   ========================================================================== */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  height: var(--header-height);
+  background: rgba(12, 12, 12, 0.76);
+  backdrop-filter: blur(28px) saturate(200%) brightness(105%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(105%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+  color: var(--ink-inverse);
+}
+
+.top-nav__container {
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.top-nav__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.btn-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  padding: 5px 12px;
+  font-family: var(--font-en);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-home:hover {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.top-nav__divider {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+}
+
+.top-nav__brand {
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.top-nav__steps {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.top-nav__steps::-webkit-scrollbar { display: none; }
+
+.btn-step {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.72);
+  padding: 5px 12px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-step:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.btn-step.is-active {
+  background: #ffffff;
+  color: #111111;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .top-nav__container {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .top-nav__brand, .top-nav__divider {
+    display: none;
+  }
+  .btn-home {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .btn-step {
+    padding: 4px 7px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+}
+
+/* ==========================================================================
+   4. ARCHITECTURAL BUTTONS (ReBITA Signature)
+   ========================================================================== */
+.boxbutton {
+  align-items: center;
+  background-color: #000000;
+  border: 1px solid #000000;
+  color: #ffffff;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  min-height: 50px;
+  padding: 12px 54px 12px 20px;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  user-select: none;
+}
+
+.boxbutton:before {
+  background-color: rgba(255, 255, 255, 0.28);
+  content: "";
+  display: block;
+  height: 100%;
+  position: absolute;
+  right: 44px;
+  top: 0;
+  width: 1px;
+}
+
+.boxbutton:after {
+  background-color: #ffffff;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  content: "";
+  display: block;
+  height: 9px;
+  position: absolute;
+  right: 18px;
+  top: calc(50% - 4.5px);
+  width: 8px;
+  transition: transform 0.2s ease;
+}
+
+.boxbutton:hover:after { transform: translateX(4px); }
+
+.boxbutton--hero {
+  min-height: 64px;
+  max-width: 440px;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 16px 64px 16px 28px;
+}
+.boxbutton--hero:before { right: 54px; }
+.boxbutton--hero:after { right: 22px; width: 10px; height: 11px; top: calc(50% - 5.5px); }
+
+.boxbutton--white {
+  background-color: #ffffff;
+  border: 1px solid #111111;
+  color: #111111;
+}
+.boxbutton--white:before { background-color: #deded9; }
+.boxbutton--white:after { background-color: #111111; }
+.boxbutton--white:hover {
+  background-color: #111111;
+  color: #ffffff;
+}
+.boxbutton--white:hover:before { background-color: rgba(255, 255, 255, 0.3); }
+.boxbutton--white:hover:after { background-color: #ffffff; }
+
+.boxbutton--full { width: 100%; }
+
+.boxbutton--sm {
+  min-height: 38px;
+  font-size: 12px;
+  padding: 8px 40px 8px 14px;
+}
+.boxbutton--sm:before { right: 32px; }
+.boxbutton--sm:after { right: 12px; height: 7px; width: 6px; top: calc(50% - 3.5px); }
+
+/* ==========================================================================
+   5. SCREEN PANELS & SHELL
+   ========================================================================== */
+.main-wrapper {
+  width: 100%;
+  min-height: calc(100vh - var(--header-height));
+  margin: 0 auto;
+}
+
+.screen-panel {
+  display: none;
+  animation: panelFadeIn 0.35s var(--ease-editorial);
+}
+
+.screen-panel.is-active {
+  display: block;
+}
+
+/* 店側の画面は、通信が返って画面が1枚出るまで中身が空白になる（N-44）。
+   表示中の画面が1枚も無い間だけ、読み込み中だと分かる一文を出す。 */
+.boot-loading {
+  display: none;
+  padding: 120px 20px;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+}
+
+.main-wrapper:not(:has(.screen-panel.is-active)) .boot-loading {
+  display: block;
+}
+
+@keyframes panelFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   6. SCREEN 1: EDITORIAL ENTRANCE & AUTH (純粋なクライアント仕様)
+   ========================================================================== */
+.auth-hero-wrapper {
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f4f4f0 100%);
+}
+
+.auth-hero-card {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-brand-badge {
+  display: inline-block;
+  font-family: var(--font-en);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.auth-brand-title {
+  font-family: var(--font-serif);
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  color: var(--ink-primary);
+  margin-bottom: 20px;
+}
+
+.auth-hero-copy {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 2.1;
+  letter-spacing: 0.08em;
+  color: var(--ink-primary);
+  margin-bottom: 32px;
+}
+
+.auth-hero-image-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  margin: 0 auto 36px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.auth-hero-image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.auth-hero-image-tag {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  font-family: var(--font-en);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+}
+
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+}
+
+/* ==========================================================================
+   7. SCREEN 2: KARTE DIRECTORY & SEARCH (純粋なクライアント仕様)
+   ========================================================================== */
+.directory-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+.search-sticky-box {
+  position: sticky;
+  top: calc(var(--header-height) + 12px);
+  z-index: 800;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 20px;
+}
+
+.search-input-row {
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-wrap {
+  padding: 0 16px;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  min-height: 52px;
+  padding: 0 8px;
+  font-size: 15px;
+  color: var(--ink-primary);
+  outline: none;
+}
+
+.btn-search-mic {
+  min-height: 52px;
+  padding: 0 18px;
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-search-mic:hover { background: var(--bg-muted); }
+.btn-search-mic.is-recording {
+  background: var(--accent-alert);
+  color: #ffffff;
+  animation: pulseRecording 1.2s infinite;
+}
+
+@keyframes pulseRecording {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.directory-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 4px 12px;
+  border-bottom: 2px solid var(--ink-primary);
+  margin-bottom: 12px;
+}
+
+.directory-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.karte-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.karte-card {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 犬が1頭も居ないときの案内（`renderDogs`）。**行き止まりにしないための場所。**
+   ここが無いと、0件の店は「0件」とだけ出て、次に何をすればいいか分からない
+   （2026-09-02 に人と同じ操作で歩いて発見・`F-20260902-66`）。 */
+.karte-empty-note {
+  background: #ffffff;
+  border: 1px dashed var(--border-subtle);
+  padding: 22px 20px;
+  text-align: center;
+  line-height: 1.9;
+  font-size: 14px;
+}
+
+.karte-empty-note__title {
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.karte-empty-note p {
+  margin: 0 0 6px;
+}
+
+.karte-empty-note .boxbutton {
+  display: inline-block;
+  margin-top: 10px;
+  text-decoration: none;
+}
+
+.karte-card:hover {
+  border-color: var(--ink-primary);
+  transform: translateY(-2px);
+}
+
+.karte-card__body { flex: 1; padding: 0 16px; }
+
+.karte-card__name-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.karte-card__dog-name { font-size: 17px; font-weight: 700; color: var(--ink-primary); }
+.karte-card__owner-name { font-size: 13.5px; font-weight: 600; color: var(--ink-secondary); }
+.karte-card__breed { font-size: 12px; color: var(--ink-muted); }
+
+.karte-card__meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+
+.karte-card__badge-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--accent-alert-bg);
+  color: var(--accent-alert);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border: 1px solid rgba(211, 47, 47, 0.2);
+}
+
+.karte-card__badge-complete {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eaf5ea;
+  color: var(--accent-sage);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+}
+
+.karte-card__actions { display: flex; align-items: center; gap: 8px; }
+
+.btn-clone-karte {
+  padding: 6px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-body);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-clone-karte:hover { background: var(--ink-primary); color: #ffffff; }
+
+/* ==========================================================================
+   8. SCREEN 3: KARTE CREATION & CLINICAL EDITOR (純粋な手書き仕様)
+   ========================================================================== */
+.editor-wrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-bottom: 120px;
+}
+
+.editor-columns {
+  display: grid;
+  /* `1fr` は `minmax(auto, 1fr)`＝下限が min-content なので、中の1要素が縮まないと
+     枠ごと広がる。iPhone 13（390px）で 465px まで広がり、確定ボタンのタップを
+     別要素が奪って⑤へ進めなかった。下限を 0 にして、中身を幅に合わせて折り返す。
+     **文字サイズも余白も変えない**（マスター決定・`docs/decisions.md` D-20260825-39）。 */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px 16px;
+}
+
+@media (min-width: 900px) {
+  .editor-columns {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 32px 32px;
+  }
+}
+
+.editor-col-card {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  padding: 24px;
+}
+
+.editor-col-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px solid var(--ink-primary);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.editor-col-card__title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.editor-col-card__badge { font-size: 11.5px; color: var(--ink-muted); }
+
+.clinical-group {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-divider);
+}
+.clinical-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.clinical-group__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--ink-primary);
+}
+
+.clinical-group__hint { font-size: 11px; font-weight: 400; color: var(--ink-muted); }
+
+/* 写真入力（`F-20260827-44`）。**裏側は元から在ったのに、入口だけが無かった。**
+   ⑥（`backend/js/magazine-view.js`）が読むのは `trimming.photos` / `ear.photo` /
+   `teeth.photo` の3か所なので、入口もその3か所に置く。 */
+.photo-pick { margin-top: 10px; border: 1px dashed var(--border-subtle); padding: 8px; background: var(--bg-paper); }
+.photo-pick__label { font-size: 11px; font-weight: 700; margin-bottom: 6px; display: block; }
+.photo-pick__input { width: 100%; font-size: 12px; }
+.photo-pick__thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.photo-pick__thumb { position: relative; width: 64px; height: 64px; border: 1px solid var(--border-subtle); background: #ffffff; }
+.photo-pick__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-pick__kept { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 10px; font-weight: 700; color: var(--ink-muted); text-align: center; }
+.photo-pick__drop { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border: 1px solid var(--border-subtle); background: #ffffff; font-size: 12px; line-height: 1; font-weight: 700; cursor: pointer; }
+.photo-pick__note { font-size: 10px; color: var(--ink-muted); margin-top: 6px; }
+/* 写真に書き込む入口。**押せると目で分かる形で置く**（`title` の吹き出しはスマホに出ない）。
+   写真の下の帯にすると枠からはみ出して説明文に重なるので、**写真の上に重ねる**
+   ——64px の枠の中で完結させ、周りの並びを動かさない。 */
+.photo-pick__annotate {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 3px 0; border: 0; border-top: 1px solid var(--border-subtle);
+  background: rgba(255,255,255,0.92); color: var(--ink-primary);
+  font-size: 9px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+/* 来店日が空のときだけ「日付を選ぶ」を薄く出す（マスター指示 2026-09-09）。
+   `:not(:focus)` が要る——打っている途中の日付は未完成で `:invalid` のままなので、
+   除外しないと入力中の文字まで透明になって見えなくなる。
+   `box-shadow: none` は Firefox が `:invalid` に既定で付ける赤い光を消すため。 */
+/* 入口の一言（ふだんの案内と、戻されたときの理由）。 */
+.auth-note { margin: 10px 0 0; font-size: 12px; line-height: 1.7; color: var(--ink-muted); text-align: center; }
+
+.date-field { position: relative; display: block; }
+#input-visit-date:invalid:not(:focus) { color: transparent; box-shadow: none; }
+.date-field__placeholder {
+  position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-muted); font-weight: 700; pointer-events: none; opacity: 0;
+}
+#input-visit-date:invalid:not(:focus) + .date-field__placeholder { opacity: 1; }
+
+/* 口の写真への書き込み（マスター指示 2026-08-29・C-10）。
+   `#marking-canvas`（犬体4面図・全画面で1個だけの決め打ち）とは別に、
+   写真1枚ごとの使い捨てオーバーレイをその場で作る。 */
+.annotate-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.annotate-box { background: #ffffff; padding: 16px; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; gap: 10px; }
+/* 書き込み面は**アプリが指を全部受け取る**（`touch-action: none`）。ブラウザの
+   拡大に任せると1本指の書き込みが途中で持っていかれるため、拡大・移動は
+   `openAnnotate()` が2本指から自分で作る。枠は動かさず、中の canvas だけを
+   `transform` で動かすので、`overflow` は `hidden`。 */
+/* **枠は写真の大きさに吸い付かせる**（マスター指示 2026-09-09「画像が左半分に寄って
+   右が空白。中央に寄せて四方を均等に余白を持たせろ」）。以前は `width` の固定幅で、
+   縦長写真だと canvas が高さ側で縮んで枠より小さくなり、ブロック要素として左詰めになって
+   **余った幅が全部右の白帯**になっていた。枠が中身に吸い付けば、canvas と枠の左上が
+   一致したままなので、書き込みの座標もピンチ拡大の原点（`wrap` 基準）も動かさずに済む。 */
+.annotate-canvas-wrap { max-width: min(86vw, 560px); align-self: center; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; border: 1px solid var(--border-subtle); }
+.annotate-canvas { display: block; touch-action: none; transform-origin: 0 0; }
+.annotate-hint { font-size: 11px; color: var(--ink-muted); margin: 0; }
+.annotate-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.btn-inline { border: 1px solid var(--border-subtle); background: #ffffff; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.annotate-save { background: var(--ink-body); color: #ffffff; }
+
+.segmented-stepper { display: flex; gap: 6px; width: 100%; }
+
+.stepper-btn {
+  flex: 1;
+  min-height: 52px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-paper);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.stepper-btn .val { font-size: 14px; font-weight: 700; color: var(--ink-primary); line-height: 1.2; }
+.stepper-btn .desc { font-size: 10.5px; color: var(--ink-muted); line-height: 1.2; margin-top: 2px; }
+.stepper-btn.is-active {
+  background: var(--ink-primary);
+  border-color: var(--ink-primary);
+  color: #ffffff;
+}
+.stepper-btn.is-active .val, .stepper-btn.is-active .desc { color: #ffffff; }
+.stepper-btn.is-alert.is-active { background: var(--accent-alert); border-color: var(--accent-alert); }
+
+.weight-input-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.weight-stat-box {
+  border: 1px solid var(--border-subtle);
+  padding: 12px 14px;
+  background: var(--bg-paper);
+}
+.weight-stat-box__title { font-size: 11px; font-weight: 600; color: var(--ink-muted); margin-bottom: 4px; }
+.weight-stat-box__val-wrap { display: flex; align-items: baseline; gap: 6px; }
+
+.weight-input {
+  font-family: var(--font-en);
+  font-size: 24px;
+  font-weight: 700;
+  width: 90px;
+  color: var(--ink-primary);
+  border-bottom: 1.5px solid var(--ink-primary);
+  outline: none;
+}
+
+.weight-diff-badge {
+  font-family: var(--font-en);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.weight-diff-badge.is-up { background: #fde8e8; color: var(--accent-alert); }
+.weight-diff-badge.is-down { background: #eaf5ea; color: var(--accent-sage); }
+
+.weight-chart-box {
+  width: 100%;
+  height: 68px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  margin-top: 8px;
+}
+
+.guide-diagram-box {
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  margin-bottom: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.guide-diagram-box img { width: 100%; height: auto; display: block; }
+.guide-diagram-box__caption {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 10px;
+  padding: 2px 8px;
+}
+
+/* ペンの道具（色・太さ）。4面図の下と、写真の書き込み画面の両方で使う。 */
+.pen-tools {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  margin-top: 8px; padding: 8px 10px;
+  background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 10px;
+  font-size: 12px; color: var(--ink-muted);
+}
+.pen-tools__item { display: flex; align-items: center; gap: 6px; }
+.pen-tools__color {
+  width: 40px; height: 28px; padding: 0;
+  border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-surface);
+}
+.pen-tools__width { width: 120px; }
+.pen-tools__value { min-width: 18px; text-align: right; font-weight: 700; color: var(--ink-primary); }
+
+.teeth-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+@media (min-width: 600px) {
+  .teeth-selector-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.teeth-pill-btn {
+  min-height: 48px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-paper);
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.teeth-pill-btn .name { font-size: 12px; font-weight: 700; color: var(--ink-primary); line-height: 1.3; }
+.teeth-pill-btn .sub { font-size: 10px; color: var(--ink-muted); line-height: 1.2; }
+.teeth-pill-btn.is-active { background: var(--ink-primary); border-color: var(--ink-primary); }
+.teeth-pill-btn.is-active .name, .teeth-pill-btn.is-active .sub { color: #ffffff; }
+
+.body-marking-tool {
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+/* 閉じているあいだ（既定）: **絵は見えるが描けない**。道具の段は隠し、
+   絵の上に入口だけを重ねる（マスター指示 2026-09-09）。 */
+.body-marking-tool:not(.is-open) .body-marking-only { display: none; }
+.body-marking-tool:not(.is-open) #marking-canvas,
+.body-marking-tool:not(.is-open) #marking-canvas-2 { pointer-events: none; }
+.body-marking-open {
+  position: absolute; inset: 0;
+  border: 0; background: transparent; cursor: pointer;
+  display: flex; align-items: flex-end; justify-content: center; padding: 0 0 8px;
+}
+.body-marking-open span {
+  padding: 5px 12px; border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.92); color: var(--ink-primary);
+  font-size: 12px; font-weight: 700; line-height: 1.2;
+}
+/* 開いたとき: 歯の `.annotate-overlay` と同じ覆いにする。 */
+.body-marking-tool.is-open {
+  position: fixed; inset: 0; z-index: 999;
+  margin: 0; padding: 16px; border: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex; align-items: center; justify-content: center;
+}
+.body-marking-tool.is-open .body-marking-box {
+  background: #ffffff; padding: 16px;
+  width: min(92vw, 560px); max-height: 100%; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.body-marking-tool.is-open .body-marking-open { display: none; }
+
+/* ボタンの帯は**折り返して画面に収める**（マスター指示 2026-09-02。
+   `D-20260827-50`「保留・このまま」を差し替える）。
+   以前は横スクロールで、右端のボタン（「フケ」「全部消す」）が画面の外に隠れ、
+   **そこに何かが在ることが見えなかった**。 */
+.body-marking-stamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.stamp-btn {
+  padding: 6px 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-paper);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stamp-btn.is-active { background: var(--ink-primary); color: #ffffff; border-color: var(--ink-primary); }
+
+/* 置き方の切り替えと、取り消し。見た目は種類ボタンに揃えるが、**クラスは分ける**
+   ——`setStamp()` が `.stamp-btn` の選択を外して回るので、同じクラスにすると
+   種類を選び直すたびに「ペン／スタンプ」の選択まで消える。 */
+.mark-mode-btn,
+.mark-undo-btn {
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mark-mode-btn.is-active { background: var(--ink-primary); color: #ffffff; border-color: var(--ink-primary); }
+.mark-undo-btn { color: var(--ink-muted); }
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  touch-action: none;
+}
+.canvas-container canvas { width: 100%; height: 100%; display: block; }
+
+.trimmer-textarea-wrap { position: relative; margin-top: 8px; }
+.trimmer-textarea {
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  padding: 14px 14px 44px 14px;
+  font-size: 14px;
+  line-height: 1.8;
+  background: var(--bg-paper);
+  outline: none;
+  resize: vertical;
+  min-height: 110px;
+}
+.trimmer-textarea:focus { border-color: var(--ink-primary); background: #ffffff; }
+
+.btn-inline-mic {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: var(--ink-primary);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-inline-mic.is-recording { background: var(--accent-alert); animation: pulseRecording 1.2s infinite; }
+
+/* ==========================================================================
+   Editor Bottom Dock (単一層・未記入赤 / 完了黒)
+   ========================================================================== */
+.editor-bottom-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 950;
+  height: 58px;
+  background: rgba(12, 12, 12, 0.94);
+  backdrop-filter: blur(28px) saturate(200%) brightness(105%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(105%);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* 未記入あり時：フッター全体が赤 */
+.editor-bottom-dock.has-incomplete {
+  background: #d32f2f;
+  border-top: 1px solid #b71c1c;
+}
+
+.editor-bottom-dock__container {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dock-status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* 未記入の文と「該当項目へ ➜」を1行に並べる。**縮むのは文のほうだけ**——
+     ボタンが縮むと「該当項」のように文字が切れて押せるものに見えなくなる（実測・390px）。 */
+  min-width: 0;
+}
+
+.btn-dock-goto {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  transition: background 0.15s ease;
+}
+.btn-dock-goto:hover {
+  background: #ffffff;
+  color: #d32f2f;
+}
+
+.dock-action-wrap {
+  flex: 0 0 auto;
+}
+
+/* ==========================================================================
+   9. SCREEN 4: CUSTOMER MAGAZINE KARTE (純粋な手書き指示)
+   ========================================================================== */
+.magazine-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 16px 100px;
+  background: #ffffff;
+}
+
+.timeline-accordion-box {
+  background: var(--bg-paper);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 28px;
+  transition: all 0.2s ease;
+}
+
+.timeline-accordion-head {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* 見出しと「表示する ▼」がぶつかるのを防ぐ（マスター指示 2026-09-13・放置リスト #63）。
+     **効いているのは `magazine-view.js` 側の写し**（描画時に head へ後から足されるので
+     後勝ち）。ここを直しても画面は変わらないが、揃えておかないと次に読む人が
+     「index.html を直したのに変わらない」で詰まる。 */
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink-primary);
+  user-select: none;
+}
+.timeline-accordion-head:hover { background: var(--bg-subtle); }
+
+.timeline-chips-tray {
+  padding: 12px 16px 16px;
+  border-top: 1px dashed var(--border-subtle);
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.timeline-chips-tray::-webkit-scrollbar { display: none; }
+
+/* 前回からの引き継ぎの告知（マスター指示 2026-09-03）。 */
+.carry-over {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-paper);
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+/* **`hidden` を CSS で潰さない。** `display: flex` を素で書くと
+   ブラウザ既定の `[hidden] { display: none }` を上書きしてしまい、
+   引き継ぎが起きていない犬（初回の子）にも空の帯が出る。 */
+.carry-over[hidden] { display: none; }
+
+/* `data-entry-only` の印が付いたものは、**Worker が `/edit` に配る時点で
+   丸ごと落とす**（`worker/src/index.js` の `stripEntryMarkup`）。
+   はじめ `hidden` で実行時に隠していたが、`.btn-home` は `display: inline-flex` を
+   持つのでブラウザ既定の `[hidden]` を上書きして消えなかった。
+   それ以前に、**起動が途中で失敗すると隠す処理まで進まない**——
+   だから隠すのをやめ、配る前に消すことにした。ここに CSS は要らない。 */
+.carry-over__text { font-size: 11px; line-height: 1.5; color: var(--ink-body); }
+.past-reports { margin: 0 0 18px; }
+.past-reports__label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  color: var(--ink-muted); margin-bottom: 8px;
+}
+/* 横に流さない（`D-20260825-39`・マスター指定「横スクロール禁止」）。折り返す。 */
+.past-reports__list { display: flex; flex-wrap: wrap; gap: 6px; }
+.past-reports__item {
+  padding: 6px 12px; background: #fff; border: 1px solid var(--border-subtle);
+  font-family: var(--font-en); font-size: 12px; font-weight: 600;
+  color: var(--ink-body); cursor: pointer; text-decoration: none;
+}
+.past-reports__item:hover { background: var(--ink-primary); color: #fff; border-color: var(--ink-primary); }
+.timeline-date-chip {
+  padding: 6px 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-en);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.timeline-date-chip .sub { font-size: 10px; color: var(--ink-muted); font-family: var(--font-sans); }
+.timeline-date-chip.is-active, .timeline-date-chip:hover {
+  background: var(--ink-primary);
+  color: #ffffff;
+  border-color: var(--ink-primary);
+}
+.timeline-date-chip.is-active .sub { color: rgba(255,255,255,0.7); }
+
+.quick-jump-nav-sticky {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 860;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: -24px -16px 28px -16px;
+}
+
+.quick-jump-buttons {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.quick-jump-buttons::-webkit-scrollbar { display: none; }
+
+.btn-jump-number {
+  min-width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-paper);
+  color: var(--ink-primary);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.btn-jump-number:hover {
+  background: var(--ink-primary);
+  color: #ffffff;
+  border-color: var(--ink-primary);
+}
+
+.btn-toggle-all {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  padding: 6px 12px;
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.magazine-hero {
+  border-bottom: 1px solid var(--border-divider);
+  padding-bottom: 36px;
+  margin-bottom: 36px;
+}
+
+.magazine-hero__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--ink-primary);
+  padding-bottom: 10px;
+}
+
+.magazine-hero__brand {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  letter-spacing: 0.14em;
+  color: var(--ink-primary);
+}
+
+.magazine-hero__date {
+  font-family: var(--font-en);
+  font-size: 13px;
+  color: var(--ink-secondary);
+  font-weight: 600;
+}
+
+.magazine-hero__media-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+@media (min-width: 768px) {
+  .magazine-hero__media-grid {
+    grid-template-columns: 3fr 2fr;
+    gap: 28px;
+  }
+}
+
+.magazine-hero-photo-main {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--bg-muted);
+}
+.magazine-hero-photo-main img { width: 100%; height: 100%; object-fit: cover; }
+
+.magazine-hero-side-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  background: var(--bg-paper);
+  border: 1px solid var(--border-subtle);
+}
+
+.magazine-dog-title {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink-primary);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.magazine-dog-sub { font-size: 13px; color: var(--ink-secondary); margin-bottom: 16px; }
+
+.magazine-trimmer-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+.magazine-trimmer-badge__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--ink-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.magazine-letter-section {
+  padding: 28px 24px;
+  background: var(--bg-paper);
+  border-left: 3px solid var(--ink-primary);
+  margin-bottom: 40px;
+}
+.magazine-letter-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink-primary);
+  margin-bottom: 12px;
+}
+.magazine-letter-body {
+  font-size: 14.5px;
+  line-height: 2.1;
+  color: var(--ink-body);
+  letter-spacing: 0.03em;
+}
+
+.wave-accordion-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.wave-card {
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  transition: all 0.3s var(--ease-editorial);
+  overflow: hidden;
+}
+.wave-card.is-open {
+  border-color: var(--ink-primary);
+}
+
+.wave-card-head {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-paper);
+  position: relative;
+  transition: background 0.2s ease;
+}
+.wave-card-head:hover { background: var(--bg-subtle); }
+.wave-card.is-open .wave-card-head {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.wave-card-head__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wave-card-number-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink-primary);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-en);
+}
+
+.wave-card-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.wave-card-status-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  background: #eaf5ea;
+  color: var(--accent-sage);
+}
+
+.wave-card-toggle-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  color: var(--ink-secondary);
+}
+.wave-card.is-open .wave-card-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.wave-separator-svg {
+  width: 100%;
+  height: 12px;
+  display: block;
+  fill: none;
+  stroke: var(--border-subtle);
+  stroke-width: 1.5;
+}
+
+.wave-card-body {
+  display: none;
+  padding: 24px 20px;
+  animation: waveBodySlide 0.3s var(--ease-editorial);
+}
+.wave-card.is-open .wave-card-body {
+  display: block;
+}
+
+@keyframes waveBodySlide {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wave-body-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .wave-body-grid-2col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.wave-body-img-frame {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-paper);
+  overflow: hidden;
+}
+.wave-body-img-frame img { width: 100%; height: auto; object-fit: cover; }
+
+.gallery-mosaic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .gallery-mosaic-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+
+.gallery-mosaic-item {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--bg-muted);
+  cursor: pointer;
+}
+.gallery-mosaic-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--ease-editorial);
+}
+.gallery-mosaic-item:hover img { transform: scale(1.05); }
+.gallery-mosaic-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 10px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.magazine-revisit-box {
+  background: var(--ink-primary);
+  color: #ffffff;
+  padding: 36px 28px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+.magazine-revisit-tag {
+  font-family: var(--font-en);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.magazine-revisit-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+.magazine-revisit-desc {
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 600px;
+  margin: 0 auto 24px;
+}
+
+.lightbox-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+}
+.lightbox-modal.is-open { display: flex; }
+.lightbox-modal img {
+  max-width: 90vw;
+  max-height: 85vh;
+}
+
+/* ==========================================================================
+   10. MOBILE COMPREHENSIVE RESPONSIVE DESIGN (375px+ スマートフォン完全最適化)
+   ==========================================================================
+   **この `}` が抜けていた**（2026-09-10 に発見）。閉じていないと、すぐ下の
+   `@media (max-width: 600px)` が「宣言の途中に現れた at-rule」として捨てられ、
+   **スマホ用の指定 約310行が丸ごと効かなくなる**。
+   実測: 390px 幅で `html` の文字の大きさが 14.5px のまま（この節の指定は 13.5px）。
+   マスターの「スマホだと文字が切れている」（2026-09-09）の出どころがこれ。 */
+@media (max-width: 600px) {
+  html {
+    font-size: 13.5px;
+  }
+
+  /* 1. トップナビゲーション */
+  .top-nav__container {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .top-nav__brand, .top-nav__divider {
+    display: none;
+  }
+  .btn-home {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .btn-step {
+    padding: 4px 6px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  /* 2. ReBITA ボックスボタン */
+  .boxbutton {
+    min-height: 44px;
+    font-size: 12.5px;
+    padding: 10px 42px 10px 14px;
+  }
+  .boxbutton:before { right: 36px; }
+  .boxbutton:after { right: 14px; width: 7px; height: 8px; top: calc(50% - 4px); }
+
+  .boxbutton--hero {
+    min-height: 52px;
+    font-size: 14.5px;
+    padding: 12px 48px 12px 16px;
+    max-width: 100%;
+  }
+  .boxbutton--hero:before { right: 42px; }
+  .boxbutton--hero:after { right: 16px; }
+
+  /* 3. Screen 1: ログイン */
+  .auth-hero-wrapper {
+    padding: 32px 16px;
+    min-height: calc(100vh - var(--header-height));
+  }
+  .auth-brand-title {
+    font-size: 26px;
+    letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+  .auth-hero-copy {
+    font-size: 14.5px;
+    line-height: 1.9;
+    margin-bottom: 24px;
+  }
+  .auth-hero-image-frame {
+    margin-bottom: 24px;
+  }
+
+  /* 4. Screen 2: カルテ検索・カード一覧 */
+  .directory-container {
+    padding: 16px 12px 80px;
+  }
+  .search-sticky-box {
+    top: calc(var(--header-height) + 6px);
+    margin-bottom: 14px;
+  }
+  .search-input {
+    font-size: 13.5px;
+    min-height: 44px;
+    padding: 0 4px;
+  }
+  .search-icon-wrap {
+    padding: 0 10px;
+  }
+  .btn-search-mic {
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .karte-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 12px;
+  }
+  .karte-card-top-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  .karte-card__body {
+    padding: 0;
+    flex: 1;
+    min-width: 0;
+  }
+  .karte-card__dog-name {
+    font-size: 15.5px;
+  }
+  .karte-card__owner-name {
+    font-size: 12.5px;
+  }
+  .karte-card__meta-line {
+    gap: 8px;
+    font-size: 11px;
+  }
+  .karte-card__actions {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-subtle);
+  }
+  .karte-card__actions .btn-clone-karte {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  .karte-card__actions .boxbutton--sm {
+    flex: 1;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 32px 8px 10px;
+    font-size: 11.5px;
+  }
+
+  /* 5. Screen 3: カルテ作成・エディター */
+  .editor-columns {
+    padding: 12px 8px;
+    gap: 16px;
+  }
+  .editor-col-card {
+    padding: 16px 12px;
+  }
+  .editor-col-card__title {
+    font-size: 16px;
+  }
+  .clinical-group {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+  .clinical-group__label {
+    font-size: 12.5px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .weight-input {
+    font-size: 20px;
+    width: 75px;
+  }
+  .stepper-btn {
+    min-height: 44px;
+    padding: 4px 2px;
+  }
+  .stepper-btn .val {
+    font-size: 12px;
+  }
+  .stepper-btn .desc {
+    font-size: 9.5px;
+  }
+  .teeth-selector-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  .teeth-pill-btn {
+    min-height: 42px;
+    padding: 4px 6px;
+  }
+  .teeth-pill-btn .name {
+    font-size: 11px;
+  }
+  .teeth-pill-btn .sub {
+    font-size: 9px;
+  }
+  .stamp-btn,
+  .mark-mode-btn,
+  .mark-undo-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .trimmer-textarea {
+    font-size: 13px;
+    min-height: 90px;
+    padding: 10px 10px 40px 10px;
+  }
+
+  /* 単一層フッター（スマホ完全1行収容） */
+  .editor-bottom-dock {
+    height: 52px;
+    padding: 0 10px;
+  }
+  .editor-bottom-dock__container {
+    gap: 6px;
+  }
+  /* ボタンが「確定」だけになって細くなった分、未記入の表示に幅を回す
+     （マスター指示 2026-09-09「その分スペースができるので、未記入内容は全文見える様にしろ」）。
+     幅の上限は置かない——`min-width: 0` と `flex` で、余った分だけ自動で伸びる。 */
+  .dock-status-wrap {
+    gap: 4px;
+    font-size: 11px;
+  }
+  /* 矢印だけにする（上の注記のとおり、未記入の文と並べると切れるため）。
+     押せる大きさは保つので、左右の余白は逆に広げる。 */
+  .btn-dock-goto {
+    padding: 3px 9px;
+    font-size: 11px;
+  }
+  .btn-dock-goto__label { display: none; }
+  .dock-action-wrap .boxbutton {
+    min-height: 36px !important;
+    font-size: 11px !important;
+    padding: 8px 30px 8px 10px !important;
+    white-space: nowrap;
+  }
+  .dock-action-wrap .boxbutton:before { right: 26px !important; }
+  .dock-action-wrap .boxbutton:after { right: 9px !important; width: 6px !important; height: 7px !important; top: calc(50% - 3.5px) !important; }
+
+  /* 6. Screen 4: 顧客マガジン */
+  .magazine-container {
+    padding: 14px 10px 80px;
+  }
+  .quick-jump-nav-sticky {
+    margin: -14px -10px 18px -10px;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  .btn-jump-number {
+    min-width: 26px;
+    height: 26px;
+    font-size: 10px;
+    padding: 0 5px;
+  }
+  .btn-toggle-all {
+    padding: 4px 6px;
+    font-size: 9.5px;
+  }
+  .magazine-hero {
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+  .magazine-hero__brand {
+    font-size: 20px;
+  }
+  .magazine-hero__date {
+    font-size: 11px;
+  }
+  .magazine-hero-side-card {
+    padding: 16px 12px;
+  }
+  .magazine-dog-title {
+    font-size: 22px;
+  }
+  .magazine-dog-sub {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  .magazine-letter-section {
+    padding: 18px 14px;
+    margin-bottom: 28px;
+  }
+  .magazine-letter-title {
+    font-size: 16px;
+  }
+  .magazine-letter-body {
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  .wave-card-head {
+    padding: 12px 14px;
+  }
+  .wave-card-title {
+    font-size: 13.5px;
+  }
+  .wave-card-number-badge {
+    width: 22px;
+    height: 22px;
+    font-size: 10.5px;
+  }
+  .wave-card-status-pill {
+    font-size: 9.5px;
+    padding: 2px 6px;
+  }
+  .wave-card-body {
+    padding: 16px 12px;
+  }
+  .gallery-mosaic-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .magazine-revisit-box {
+    padding: 24px 16px;
+    margin-bottom: 28px;
+  }
+  .magazine-revisit-title {
+    font-size: 17px;
+  }
+  .magazine-revisit-desc {
+    font-size: 12.5px;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="top-nav__container">
+    <div class="top-nav__left">
+      <!-- **HOME も入口専用。** これを押すと `goToStep(1)` で screen-1 へ行くが、
+           スタッフの画面では screen-1 を外してあるので、**画面が真っ白になる**
+           （2026-09-04・サブ検証の実機で再現。`04` などのタブは残るが、
+           白紙を見た人がそこから戻れると気づける根拠は画面に無い）。
+           直す前は「押しても何も起きない死んだログイン画面」が出ていた場所で、
+           **同じボタンの同じ穴**——`01 ログイン` タブだけ塞いで、こちらを見落としていた。
+           スタッフにとっての「家」は ②カルテ検索 なので、そちらのタブが担う。 -->
+      <button class="btn-home" data-entry-only onclick="App.goToStep(1)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        HOME
+      </button>
+      <!--
+        **管理画面への入口。お店の人には全員出す。**
+        これまで `/admin` へのリンクは画面のどこにも無く（`grep` で0件）、
+        `/my` に着いたときに自動で飛ばす1箇所しか道が無かった。
+        そのためトリマー画面に居る人は、URL を手打ちしない限り
+        管理画面へ行けなかった。`my.html` にも逆向きの同じ穴が在り、同じ直し方を
+        したが、そちらは `D-20260904-66`（1アカウント＝1役割）で仕組みごと不要に
+        なったので削除済み。
+        権限は「お店の人 / 飼い主」の2つだけなので、**ここに来られる人には
+        全員出す**（マスター判断 2026-09-06・`D-20260906-68`
+        「管理者とスタッフは同一で良い」）。
+
+        **置き場所は右の段のタブではなく、左の常に見える側。**
+        右の帯は `overflow-x: auto` で、スマホ幅では 04 の途中で切れる。
+        最初そちらに置いたところ、機械の `isVisible()` は true なのに
+        **指が届かない**状態になった（2026-09-02 のスクショで発覚。
+        今回ずっと問題になっている「機械は緑、人は届かない」と同じ形）。
+      -->
+      <a href="/admin" class="btn-step" data-admin-link hidden>管理</a>
+      <!-- **ログアウトを、スタッフの画面にも置く。**
+           これが無かったので、`/edit` に着いた人は**別のアカウントに切り替える手段が
+           1つも無かった**——`/` に戻っても `supabase-auth.js` が即 `/edit` へ送り返す。
+           マスターの「スタッフ用→ログインできない」「Home に戻るとその後ログインできない」の
+           両方がこれ（2026-09-04・実機で再現）。`my.html:278` と同じ印を使う。 -->
+      <button type="button" class="btn-step" data-sign-out hidden>ログアウト</button>
+      <span class="top-nav__divider">/</span>
+      <span class="top-nav__brand" id="nav-brand-label">SALTY DOG カルテ</span>
+    </div>
+    
+    <div class="top-nav__steps">
+      <!-- **本番のスタッフ画面では出さない。**
+           `index.html` は `/`（入口）と `/edit`（スタッフ画面）で使い回している。
+           `/edit` でこれを押すと screen-1 が出て「Google でログイン」ボタンまで見えるが、
+           `bootLoginPage()` は `__ENTRY__` が無いと起動しないので**配線されておらず、
+           押しても何も起きない**（2026-09-04・実機で再現。押す前後で URL が変わらない）。
+           押せるのに仕事をしない入口は置かない（`D-12`）。
+           隠すのは `supabase-staff.js` の起動時＝スタッフの画面と分かったとき。 -->
+      <button class="btn-step is-active" data-step="1" data-entry-only onclick="App.goToStep(1)">01 ログイン</button>
+      <button class="btn-step" data-step="2" onclick="App.goToStep(2)">02 カルテ検索</button>
+      <button class="btn-step" data-step="3" onclick="App.goToStep(3)">03 カルテ作成</button>
+      <button class="btn-step" data-step="4" onclick="App.goToStep(4)">04 顧客カルテ</button>
+    </div>
+  </div>
+</nav>
+
+<main class="main-wrapper">
+
+  <p class="boot-loading" role="status">読み込み中…</p>
+
+  <!-- SCREEN 1: AUTH (独創切り替えボタン削除) -->
+  <section class="screen-panel is-active" id="screen-1">
+    <div class="auth-hero-wrapper">
+      <div class="auth-hero-card">
+        
+        <span class="auth-brand-badge">Trimmer & Owner Record</span>
+        <h1 class="auth-brand-title">SALTY DOG</h1>
+        
+        <p class="auth-hero-copy">
+          愛犬の暮らしと健康を美しく記録し、<br>
+          あなたと愛犬にとって豊かな未来をつくる
+        </p>
+
+        <div class="auth-hero-image-frame">
+          <img src="/assets/photo-trim-action.jpg" alt="トリミング風景">
+          <div class="auth-hero-image-tag">SALTY DOG ATELIER</div>
+        </div>
+
+        <div class="auth-actions">
+          <!--
+            **ここが唯一の入口のログインボタン**（マスター指示 2026-09-02）。
+            `data-entry-login` は `backend/js/supabase-auth.js` の
+            `bootLoginPage()` が探す目印。この目印が付いていなかったため、
+            ボタンは**ログインに一度も繋がっていなかった**（`grep` で0件）。
+            以前の `onclick="App.goToStep(2)"` は、押すと練習用の一覧へ
+            進むだけの仮の配線だったので外した。
+          -->
+          <button class="boxbutton boxbutton--hero boxbutton--full" data-entry-login>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <svg width="22" height="22" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.616z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
+                <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/>
+              </svg>
+              <span>Google でログイン</span>
+            </div>
+          </button>
+          <!-- **入口へ戻された理由を出す場所**（マスター報告 2026-09-10「Google認証が2回必要」）。
+               `bootLoginPage()` は前からここへ文言を入れようとしていたが、**受け皿の
+               `data-demo-note` がどこにも無く、その処理は何もしていなかった**（本番でも0件）。
+               ログインが弾かれても画面には何も出ず、人には「またログイン画面だ」としか
+               見えなかった——`F-20260907-75`（理由が1文字も残らない）と同じ形。 -->
+          <p class="auth-note" data-demo-note></p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- SCREEN 2: DIRECTORY & SEARCH (独創フィルターチップ削除) -->
+  <section class="screen-panel" id="screen-2">
+    <div class="directory-container">
+      
+      <div class="search-sticky-box">
+        <div class="search-input-row">
+          <div class="search-icon-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+          <input type="text" id="dir-search-input" class="search-input" placeholder="飼い主名・犬名・犬種・担当者で検索..." oninput="App.filterKarte(this.value)">
+          <button class="btn-search-mic" id="dir-mic-btn" onclick="App.toggleDirVoiceSearch()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            <span id="dir-mic-label">音声検索</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="directory-header-row">
+        <h2 class="directory-title">登録カルテ一覧</h2>
+        <div class="directory-actions">
+          <span style="font-size: 12.5px; color: var(--ink-muted);" id="karte-total-count">3件</span>
+        </div>
+      </div>
+
+      <div class="karte-cards-grid" id="karte-cards-container"><!-- /js/ui.js が仮データから描く --></div>
+
+      <!-- **`＋ 新規カルテを作成する` は外した**（マスター指示 2026-09-04:
+           「新規登録ボタンは存在意味が分からない。管理者ページにあれば済むなら
+             あそこにボタンを置く意味が無い」）。
+
+           このボタンは押しても**何もしない**——`createNewKarte()` は
+           「管理画面の『② 新規』から登録してください」と案内を出すだけだった。
+           犬を登録できるのは管理画面だけで、お店の人にはヘッダーの「管理」から
+           入る道が既に在る。飼い主にはそもそも登録の権限が無い。
+           **押せるのに仕事をしない入口は置かない**（`D-12`）。 -->
+
+    </div>
+  </section>
+
+
+  <!-- SCREEN 3: CLINICAL KARTE EDITOR -->
+  <section class="screen-panel" id="screen-3">
+    
+    <div class="editor-wrapper">
+
+      <div class="editor-columns">
+        
+        <!-- LEFT COLUMN -->
+        <div class="editor-col-card">
+          
+          <div class="editor-col-card__header">
+            <h2 class="editor-col-card__title" id="editor-dog-header"></h2>
+            <span class="editor-col-card__badge">1タップ判定</span>
+          </div>
+
+          <!-- 過去カルテ（`docs/deferred.md` #23・マスター指定 2026-08-26「③で犬を選んだら過去一覧を出す」）
+               その犬の**確定済み**カルテだけを、新しい順に並べる。
+               **1件も無ければ帯ごと出さない**——空の一覧を出すと「まだ無い」が
+               「読み込めていない」に見える（`D-10`）。中身は `ui.js` が入れる。 -->
+          <div class="past-reports" id="past-reports" hidden>
+            <div class="past-reports__label">この子の過去カルテ</div>
+            <div class="past-reports__list" id="past-reports-list"></div>
+          </div>
+
+          <!-- 「まだ前回のままです」の警告（`docs/decisions.md` A-3）
+               **「引き継ぎました」の告知はここから消した**（マスター指示 2026-09-10
+               「引き継ぎ自体はデフォルトだから記載不要」）。前回の値が入ることは
+               既定の動きなので、毎回は言わない。
+               残しているのは**前回の所見のまま確定しそうなとき**だけで、
+               これが無いと前回の所見が今回の所見として飼い主に届く（`D-12`）。
+               中身は `ui.js`（`showStillSameBand`）が入れる。 -->
+          <div class="carry-over" id="carry-over-undo" hidden>
+            <span class="carry-over__text" id="carry-over-text"></span>
+          </div>
+
+          <!-- 0. 来店日・コース（マスター指示 2026-08-29）
+               C-3: 体重の時系列は来店日を基準にする（`report_date` は触らず、
+               この入力欄を別に持って `weights[].date` へ使う）。
+               C-9: コースは来店ごとに変わるので毎回選択必須。 -->
+          <div class="clinical-group" id="sec-course">
+            <div class="clinical-group__label">
+              <span>◎ 来店日・コース</span>
+              <span class="clinical-group__hint">必須・カルテごとに選ぶ</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px;">
+              <!-- 空のとき「日付を選ぶ」を薄く出す（マスター指示 2026-09-09
+                   「初期状態が空白なので、日付を選ぶ欄がどうかが分からない」）。
+                   `required` を付けると空欄が `:invalid` になるので、**JS を足さずに**
+                   出し分けられる——下書きを復元して値が入った瞬間に自動で消える。 -->
+              <span class="date-field">
+                <input type="date" data-field="visit-date" id="input-visit-date" required
+                       style="width: 100%; border: 1px solid var(--border-subtle); padding: 8px; background: #ffffff; font-weight: 700;">
+                <span class="date-field__placeholder">日付を選ぶ</span>
+              </span>
+              <select data-field="course" required onchange="App.updateCompletionStatus()"
+                      style="width: 100%; border: 1px solid var(--border-subtle); padding: 8px; background: #ffffff; font-weight: 700;">
+                <option value="" disabled selected>コースを選択してください</option>
+                <option value="トリミングコース">トリミングコース</option>
+                <option value="グルーミングコース">グルーミングコース</option>
+                <option value="部分ケアコース">部分ケアコース</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 1. Weight & BCS -->
+          <div class="clinical-group" id="sec-weight">
+            <div class="clinical-group__label">
+              <span>① 体重・コンディション</span>
+            </div>
+            <div class="weight-input-container">
+              <div class="weight-stat-box">
+                <div class="weight-stat-box__title">本日の体重</div>
+                <div class="weight-stat-box__val-wrap">
+                  <!-- **既定値を入れない。** 以前は 2.79 が入っていて、量らずに確定すると
+                       どの犬にもその数字が届いた。空＝未記録。 -->
+                  <input type="number" min="0.1" max="100" step="0.01" class="weight-input" id="input-weight" placeholder="—" oninput="App.onWeightChange(this.value)">
+                  <span style="font-size: 13px; font-weight: 700;">kg</span>
+                </div>
+              </div>
+              <div class="weight-stat-box">
+                <div class="weight-stat-box__title">前回比</div>
+                <div class="weight-stat-box__val-wrap" style="margin-top: 4px;">
+                  <span class="weight-diff-badge" id="weight-diff-badge">前回の記録なし</span>
+                </div>
+              </div>
+              <div class="weight-stat-box">
+                <div class="weight-stat-box__title">ベスト体重</div>
+                <div class="weight-stat-box__val-wrap">
+                  <input type="number" min="0.1" max="100" step="0.01" class="weight-input" id="input-best-weight" placeholder="—" oninput="App.onBestWeightChange(this.value)">
+                  <span style="font-size: 13px; font-weight: 700;">kg</span>
+                </div>
+              </div>
+            </div>
+            <div class="clinical-group__hint" style="margin-top: 6px; display: block;">筋肉量を知りたい方はお問い合わせください</div>
+
+            <!-- BCS 5段階（マスター指示 2026-08-29・C-1）。体重の数値とは別に、見た目・触診での
+                 コンディション評価を残す。5段階の標準的な区分（削痩〜肥満）。 -->
+            <div class="clinical-group__label" style="margin-top: 14px;">
+              <span>BCS（ボディコンディションスコア・5段階）</span>
+            </div>
+            <div class="segmented-stepper" id="bcs-stepper-wrap">
+              <button class="stepper-btn is-alert" onclick="App.selectStepper(this, 'bcs', 1)">
+                <span class="val">1</span><span class="desc">削痩</span>
+              </button>
+              <button class="stepper-btn" onclick="App.selectStepper(this, 'bcs', 2)">
+                <span class="val">2</span><span class="desc">やや細い</span>
+              </button>
+              <!-- **既定で点けない。** 点けても `App.form.bcs` は 0 のままで、確定しても
+                   `data.bcs` は書かれない（`extractReport()` は真の値だけ書く）。つまり
+                   「3 適正」が選ばれて見えるのに、飼い主へは何も届かない——トリマーが
+                   画面を信じて触らないほど記録が消える。ドックの「未記入: BCS」とも
+                   食い違っていた。選ばれるまで、どれも点けない（`D-12`）。 -->
+              <button class="stepper-btn" onclick="App.selectStepper(this, 'bcs', 3)">
+                <span class="val">3</span><span class="desc">適正</span>
+              </button>
+              <button class="stepper-btn" onclick="App.selectStepper(this, 'bcs', 4)">
+                <span class="val">4</span><span class="desc">やや肥満</span>
+              </button>
+              <button class="stepper-btn is-alert" onclick="App.selectStepper(this, 'bcs', 5)">
+                <span class="val">5</span><span class="desc">肥満</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Nail Examination（前足・後ろ足を分けて記録・マスター指示 2026-08-29・C-5） -->
+          <div class="clinical-group" id="sec-nail">
+            <div class="clinical-group__label">
+              <span>② 爪のチェック (3段階判定・前足/後ろ足)</span>
+              <span class="clinical-group__hint">※血管位置と接地状態</span>
+            </div>
+
+            <!-- **繋いだ**（放置リスト #1・マスター判断 `D-20260827-47` の 1
+                 「そのまま繋ぐ」）。血管の位置を見て3段階を判定する図なので、
+                 **画質を落とさない**——縮めて血管が見えなくなれば、図が在る意味が無い。
+                 `nail-diagram.png` は **6.2MB** ある。`loading="lazy"` を付けるのは、
+                 **配るものを変えずに、要るときまで落とさない**ため（画質は同じ）。
+                 ②爪のチェックまで画面を送ってから読み込まれる。
+
+                 **この絵は後日マスターが差し替える**（同日・マスター発言）。
+                 差し替えるのは**ファイルだけ**で、この行は触らない——
+                 `src/assets/nail-diagram.jpg` を置き換えれば済む形にしてある。
+                 差し替えたら `docs/ASSET-PROVENANCE.md` の出どころも書き換えること
+                 （いまの1枚は AI 生成・`UNVERIFIED`・`A-3`）。 -->
+            <div class="guide-diagram-box">
+              <img src="/assets/nail-diagram.jpg" alt="爪の解剖図" loading="lazy">
+              <span class="guide-diagram-box__caption">爪の基準図</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <div style="font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px; background: var(--bg-paper); padding: 3px;">前足</div>
+                <div class="segmented-stepper" data-group="nail" data-side="front">
+                  <button class="stepper-btn" onclick="App.selectSubStepper(this)"><span class="val">1</span><span class="desc">適切</span></button>
+                  <button class="stepper-btn" onclick="App.selectSubStepper(this)"><span class="val">2</span><span class="desc">やや長め</span></button>
+                  <button class="stepper-btn is-alert" onclick="App.selectSubStepper(this)"><span class="val">3</span><span class="desc">要注意</span></button>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px; background: var(--bg-paper); padding: 3px;">後ろ足</div>
+                <div class="segmented-stepper" data-group="nail" data-side="rear">
+                  <button class="stepper-btn" onclick="App.selectSubStepper(this)"><span class="val">1</span><span class="desc">適切</span></button>
+                  <button class="stepper-btn" onclick="App.selectSubStepper(this)"><span class="val">2</span><span class="desc">やや長め</span></button>
+                  <button class="stepper-btn is-alert" onclick="App.selectSubStepper(this)"><span class="val">3</span><span class="desc">要注意</span></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ②爪のコメント欄（棚卸しで追加）。⑥は前から `nail.comment` を
+                 読んでいた（`magazine-view.js`）が、④に入力欄が無く書けなかった。 -->
+            <div class="trimmer-textarea-wrap">
+              <textarea id="editor-nail-comment" data-field="nail-comment" class="trimmer-textarea" rows="3" placeholder="爪について、気づいたことを一言。" oninput="App.updateCompletionStatus()"></textarea>
+              <button class="btn-inline-mic" id="nail-comment-voice-btn" onclick="App.toggleEditorVoice('editor-nail-comment', 'nail-comment-voice-btn')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Ear Examination（6段階判定・マスター指示 2026-08-29・C-6） -->
+          <div class="clinical-group" id="sec-ear">
+            <div class="clinical-group__label">
+              <span>③ 耳のチェック (左右判定・6段階)</span>
+              <span class="clinical-group__hint">1〜6レベル</span>
+            </div>
+            <div>
+              <div style="font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px; background: var(--bg-paper); padding: 3px;">右耳 (R)</div>
+              <div class="teeth-selector-grid" data-ear="right">
+                <!-- 既定で点けない（BCS と同じ理由・`D-12`）。点いていても `App.form.ear` は 0 で、
+                     確定しても `data.ear` は書かれない。「Lv.1 良好」に見えるのに何も届かない。 -->
+                <button class="teeth-pill-btn" data-level="1" onclick="App.selectEarLevel(this)"><span class="name">Lv.1 良好</span><span class="sub">問題なし</span></button>
+                <button class="teeth-pill-btn" data-level="2" onclick="App.selectEarLevel(this)"><span class="name">Lv.2 やや汚れ</span><span class="sub">軽い汚れ</span></button>
+                <button class="teeth-pill-btn" data-level="3" onclick="App.selectEarLevel(this)"><span class="name">Lv.3 汚れあり</span><span class="sub">要清掃</span></button>
+                <button class="teeth-pill-btn" data-level="4" onclick="App.selectEarLevel(this)"><span class="name">Lv.4 赤み</span><span class="sub">軽い炎症</span></button>
+                <button class="teeth-pill-btn" data-level="5" onclick="App.selectEarLevel(this)"><span class="name">Lv.5 悪臭</span><span class="sub">要注意</span></button>
+                <button class="teeth-pill-btn" data-level="6" onclick="App.selectEarLevel(this)"><span class="name">Lv.6 要処置</span><span class="sub">通院推奨</span></button>
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <div style="font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 4px; background: var(--bg-paper); padding: 3px;">左耳 (L)</div>
+              <div class="teeth-selector-grid" data-ear="left">
+                <!-- 既定で点けない（BCS と同じ理由・`D-12`）。点いていても `App.form.ear` は 0 で、
+                     確定しても `data.ear` は書かれない。「Lv.1 良好」に見えるのに何も届かない。 -->
+                <button class="teeth-pill-btn" data-level="1" onclick="App.selectEarLevel(this)"><span class="name">Lv.1 良好</span><span class="sub">問題なし</span></button>
+                <button class="teeth-pill-btn" data-level="2" onclick="App.selectEarLevel(this)"><span class="name">Lv.2 やや汚れ</span><span class="sub">軽い汚れ</span></button>
+                <button class="teeth-pill-btn" data-level="3" onclick="App.selectEarLevel(this)"><span class="name">Lv.3 汚れあり</span><span class="sub">要清掃</span></button>
+                <button class="teeth-pill-btn" data-level="4" onclick="App.selectEarLevel(this)"><span class="name">Lv.4 赤み</span><span class="sub">軽い炎症</span></button>
+                <button class="teeth-pill-btn" data-level="5" onclick="App.selectEarLevel(this)"><span class="name">Lv.5 悪臭</span><span class="sub">要注意</span></button>
+                <button class="teeth-pill-btn" data-level="6" onclick="App.selectEarLevel(this)"><span class="name">Lv.6 要処置</span><span class="sub">通院推奨</span></button>
+              </div>
+            </div>
+
+            <div class="photo-pick">
+              <span class="photo-pick__label">耳の写真（1枚）</span>
+              <input type="file" class="photo-pick__input" accept="image/*"
+                     data-field="photo-ear" onchange="App.onPhotoPick('ear', this)">
+              <div class="photo-pick__thumbs" data-photo-thumbs="ear"></div>
+              <div class="photo-pick__note">飼い主のカルテの「耳」の欄に出ます。</div>
+            </div>
+
+            <!-- ③耳のコメント欄（棚卸しで追加）。⑥は前から `ear.comment` を
+                 読んでいた（`magazine-view.js`）が、④に入力欄が無く書けなかった。 -->
+            <div class="trimmer-textarea-wrap">
+              <textarea id="editor-ear-comment" data-field="ear-comment" class="trimmer-textarea" rows="3" placeholder="耳について、気づいたことを一言。" oninput="App.updateCompletionStatus()"></textarea>
+              <button class="btn-inline-mic" id="ear-comment-voice-btn" onclick="App.toggleEditorVoice('editor-ear-comment', 'ear-comment-voice-btn')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Teeth & Oral Examination（口の写真2枚・書き込み可能・マスター指示 2026-08-29・C-10/C-11） -->
+          <div class="clinical-group" id="sec-teeth">
+            <div class="clinical-group__label">
+              <span>④ 口・歯のチェック (6段階判定)</span>
+              <span class="clinical-group__hint">頭骨歯列基準</span>
+            </div>
+
+            <!-- **実物を繋いだ**（放置リスト #1/#14）。`src` が無い `<img>` は
+                 絵ではなく `alt` の文字が並ぶだけで、基準図として役に立たない。
+                 `teeth-diagram.jpg` は 92KB・台帳が「使用中（トリマー側の画面）」と
+                 書いている当のもの（`docs/ASSET-PROVENANCE.md:115`）。 -->
+            <div class="guide-diagram-box">
+              <img src="/assets/teeth-diagram.jpg" alt="歯の頭骨解剖図">
+              <span class="guide-diagram-box__caption">頭骨解剖図</span>
+            </div>
+
+            <div class="teeth-selector-grid" id="teeth-selector-grid">
+              <!-- 既定で点けない（BCS・耳と同じ理由・`D-12`）。 -->
+              <button class="teeth-pill-btn" onclick="App.selectTeeth(this)">
+                <span class="name">ピカピカ✨</span>
+                <span class="sub">歯石なし良好</span>
+              </button>
+              <button class="teeth-pill-btn" onclick="App.selectTeeth(this)">
+                <span class="name">ちょっと付着💦</span>
+                <span class="sub">初期付着あり</span>
+              </button>
+              <button class="teeth-pill-btn" onclick="App.selectTeeth(this)">
+                <span class="name">歯石が厚い😥</span>
+                <span class="sub">要ケア状態</span>
+              </button>
+              <button class="teeth-pill-btn" onclick="App.selectTeeth(this)">
+                <span class="name">グラつき😟</span>
+                <span class="sub">要観察・注意</span>
+              </button>
+              <button class="teeth-pill-btn" onclick="App.selectTeeth(this)">
+                <span class="name">除去準備✋</span>
+                <span class="sub">次回処置提案</span>
+              </button>
+              <button class="teeth-pill-btn" onclick="App.selectTeeth(this)">
+                <span class="name">歯石取り推奨😷</span>
+                <span class="sub">除去が必要</span>
+              </button>
+            </div>
+
+            <div class="photo-pick">
+              <span class="photo-pick__label">口の写真（2枚まで・タップして書き込み可能）</span>
+              <input type="file" class="photo-pick__input" accept="image/*" multiple
+                     data-field="photo-teeth" onchange="App.onPhotoPick('teeth', this)">
+              <div class="photo-pick__thumbs" data-photo-thumbs="teeth"></div>
+              <div class="photo-pick__note">飼い主のカルテの「歯」の欄に出ます。写真の「✏️ 書き込む」から、ペンで書き込めます（色と太さを変えられます）。</div>
+            </div>
+
+            <!-- ④口・歯のコメント欄（棚卸しで追加）。⑥は前から `teeth.comment` を
+                 読んでいた（`magazine-view.js`）が、④に入力欄が無く書けなかった。 -->
+            <div class="trimmer-textarea-wrap">
+              <textarea id="editor-teeth-comment" data-field="teeth-comment" class="trimmer-textarea" rows="3" placeholder="口・歯について、気づいたことを一言。" oninput="App.updateCompletionStatus()"></textarea>
+              <button class="btn-inline-mic" id="teeth-comment-voice-btn" onclick="App.toggleEditorVoice('editor-teeth-comment', 'teeth-comment-voice-btn')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- RIGHT COLUMN -->
+        <div class="editor-col-card">
+
+          <div class="editor-col-card__header">
+            <h2 class="editor-col-card__title">皮膚スパ &amp; 仕上がり写真</h2>
+            <span class="editor-col-card__badge">4面図マーキング</span>
+          </div>
+
+          <!-- 5. 4-Plane Body Interactive Marking (手書き原本指示) -->
+          <div class="clinical-group" id="sec-skin">
+            <div class="clinical-group__label">
+              <span>⑤ 皮膚・スパ・犬体4面図</span>
+              <span class="clinical-group__hint">ペンで描く（スタンプも置ける）</span>
+            </div>
+
+            <!-- **歯の写真と同じ「タップして開く」形式**（マスター指示 2026-09-09
+                 「今はデフォルトで描画できる状態だが、歯と同じ形式にしろ。タップすると
+                 描画画面になる。描画画面のボタン配置なども歯と同じ。スタンプ機能などは
+                 同様に配置しろ」）。
+                 **描画面は動かさない**——`#marking-canvas` は読み込み時からここに在り、
+                 閉じているあいだは絵を見せるだけ（描けない）。開くと `is-open` が付いて
+                 覆いになり、並びは歯（`openAnnotate()`）と同じ
+                 「絵 → 道具の段 → 説明 → やり直す・キャンセル・保存する」になる。 -->
+            <div class="body-marking-tool" id="body-marking-tool">
+              <div class="body-marking-box">
+
+                <div class="canvas-container" id="canvas-wrapper">
+                  <img src="/assets/body-marking.png" id="canvas-bg-img" style="display:none;">
+                  <canvas id="marking-canvas"></canvas>
+                  <!-- 入口。歯の写真と同じ「✏️ 書き込む」。**絵のどこを触っても開く**ように
+                       全面を受け口にし、文字は下に小さく置く——帯で覆うと犬の足元が隠れる。 -->
+                  <button type="button" class="body-marking-open" data-annotate="skin"
+                          onclick="App.openBodyMarking()"><span>✏️ 書き込む</span></button>
+                </div>
+
+                <div class="body-marking-panel body-marking-only">
+                  <!-- どう置くか（マスター指示 2026-09-02）。**本体はペン**（フリーハンド）で、
+                       スタンプはその一部。以前はスタンプしか無く、範囲が書けなかった。
+                       表記は「なぞる」→「ペン」に変えた（マスター指示 2026-09-07）。
+                       消しゴムは**下絵を削らず、置いた印だけ**を取り除く。
+                       「✕ 全部消す」は下の「やり直す」と同じ働きなので置かない（`A-5`）。 -->
+                  <div class="body-marking-stamps">
+                    <button class="mark-mode-btn is-active" onclick="App.setMarkMode('ペン', this)">✏️ ペン</button>
+                    <button class="mark-mode-btn" onclick="App.setMarkMode('スタンプ', this)">📍 スタンプ</button>
+                    <button class="mark-mode-btn" onclick="App.setMarkMode('消しゴム', this)">🧽 消しゴム</button>
+                    <button class="mark-mode-btn" onclick="App.setMarkMode('文字', this)">🅰 文字</button>
+                    <button class="mark-undo-btn" onclick="App.undoMark()">↩ 1つ戻す</button>
+                  </div>
+
+                  <!-- 何の所見か（色を決める）。 -->
+                  <div class="body-marking-stamps">
+                    <button class="stamp-btn is-active" onclick="App.setStamp('赤み', this)">🔴 赤み</button>
+                    <button class="stamp-btn" onclick="App.setStamp('しこり/イボ', this)">🟡 しこり/イボ</button>
+                    <button class="stamp-btn" onclick="App.setStamp('毛玉', this)">🔵 毛玉</button>
+                    <button class="stamp-btn" onclick="App.setStamp('フケ', this)">⚪ フケ</button>
+                  </div>
+
+                  <!-- ペンの色と太さ（マスター指示 2026-09-07「ペンは全て、色と太さを
+                       調整できるようにしろ」）。写真への書き込みと同じ1組を触る。
+                       色は所見（赤み・しこり…）を選び直すとその色に戻り、そのあと
+                       ここで選び直せば、選んだ色で描ける。 -->
+                  <div class="pen-tools">
+                    <label class="pen-tools__item">色
+                      <input type="color" id="pen-color" class="pen-tools__color" value="#d32f2f"
+                             oninput="App.setPenColor(this.value)">
+                    </label>
+                    <label class="pen-tools__item">太さ
+                      <input type="range" id="pen-width" class="pen-tools__width" min="1" max="20" step="1"
+                             value="4" oninput="App.setPenWidth(this.value)">
+                      <span class="pen-tools__value" id="pen-width-value">4</span>
+                    </label>
+                    <!-- 透過度（マスター指示 2026-09-07）。薄くすると下の絵が透ける。 -->
+                    <label class="pen-tools__item">透明
+                      <input type="range" id="pen-alpha" class="pen-tools__width" min="0.1" max="1" step="0.1"
+                             value="1" oninput="App.setPenAlpha(this.value)">
+                      <span class="pen-tools__value" id="pen-alpha-value">100%</span>
+                    </label>
+                  </div>
+                </div>
+
+                <p class="annotate-hint body-marking-only">1本指で書き込みます。「キャンセル」を押すと、開く前の状態に戻ります。</p>
+
+                <div class="annotate-actions body-marking-only">
+                  <button type="button" class="btn-inline" onclick="App.clearCanvas()">やり直す</button>
+                  <button type="button" class="btn-inline" onclick="App.closeBodyMarking(false)">キャンセル</button>
+                  <button type="button" class="btn-inline annotate-save" onclick="App.closeBodyMarking(true)">保存する</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 犬体図②（マスター指示 2026-09-11「⑤の皮膚スパ項目に画像を追加。
+                 現状のしたにこの添付画像を追加して、現状と同じ機能も付けろ」）。
+                 **①と同じ形・同じ道具**。違うのは下絵と、印を入れる先だけ
+                 （`App.marks2` → 保存は `__marks2` / `bodyMarkingImage2`）。
+                 ①の id と位置は動かしていない——検査が掴んでいるため。 -->
+            <div class="body-marking-tool" id="body-marking-tool-2">
+              <div class="body-marking-box">
+
+                <div class="canvas-container" id="canvas-wrapper-2">
+                  <img src="/assets/body-marking-2.jpg" id="canvas-bg-img-2" style="display:none;">
+                  <canvas id="marking-canvas-2"></canvas>
+                  <!-- 入口。歯の写真と同じ「✏️ 書き込む」。**絵のどこを触っても開く**ように
+                       全面を受け口にし、文字は下に小さく置く——帯で覆うと犬の足元が隠れる。 -->
+                  <button type="button" class="body-marking-open" data-annotate="skin2"
+                          onclick="App.openBodyMarking(2)"><span>✏️ 書き込む</span></button>
+                </div>
+
+                <div class="body-marking-panel body-marking-only">
+                  <!-- どう置くか（マスター指示 2026-09-02）。**本体はペン**（フリーハンド）で、
+                       スタンプはその一部。以前はスタンプしか無く、範囲が書けなかった。
+                       表記は「なぞる」→「ペン」に変えた（マスター指示 2026-09-07）。
+                       消しゴムは**下絵を削らず、置いた印だけ**を取り除く。
+                       「✕ 全部消す」は下の「やり直す」と同じ働きなので置かない（`A-5`）。 -->
+                  <div class="body-marking-stamps">
+                    <button class="mark-mode-btn is-active" onclick="App.setMarkMode('ペン', this)">✏️ ペン</button>
+                    <button class="mark-mode-btn" onclick="App.setMarkMode('スタンプ', this)">📍 スタンプ</button>
+                    <button class="mark-mode-btn" onclick="App.setMarkMode('消しゴム', this)">🧽 消しゴム</button>
+                    <button class="mark-mode-btn" onclick="App.setMarkMode('文字', this)">🅰 文字</button>
+                    <button class="mark-undo-btn" onclick="App.undoMark(2)">↩ 1つ戻す</button>
+                  </div>
+
+                  <!-- 何の所見か（色を決める）。 -->
+                  <div class="body-marking-stamps">
+                    <button class="stamp-btn is-active" onclick="App.setStamp('赤み', this)">🔴 赤み</button>
+                    <button class="stamp-btn" onclick="App.setStamp('しこり/イボ', this)">🟡 しこり/イボ</button>
+                    <button class="stamp-btn" onclick="App.setStamp('毛玉', this)">🔵 毛玉</button>
+                    <button class="stamp-btn" onclick="App.setStamp('フケ', this)">⚪ フケ</button>
+                  </div>
+
+                  <!-- ペンの色と太さ（マスター指示 2026-09-07「ペンは全て、色と太さを
+                       調整できるようにしろ」）。写真への書き込みと同じ1組を触る。
+                       色は所見（赤み・しこり…）を選び直すとその色に戻り、そのあと
+                       ここで選び直せば、選んだ色で描ける。 -->
+                  <div class="pen-tools">
+                    <label class="pen-tools__item">色
+                      <input type="color" id="pen-color-2" class="pen-tools__color" value="#d32f2f"
+                             oninput="App.setPenColor(this.value)">
+                    </label>
+                    <label class="pen-tools__item">太さ
+                      <input type="range" id="pen-width-2" class="pen-tools__width" min="1" max="20" step="1"
+                             value="4" oninput="App.setPenWidth(this.value)">
+                      <span class="pen-tools__value" id="pen-width-value-2">4</span>
+                    </label>
+                    <!-- 透過度（マスター指示 2026-09-07）。薄くすると下の絵が透ける。 -->
+                    <label class="pen-tools__item">透明
+                      <input type="range" id="pen-alpha-2" class="pen-tools__width" min="0.1" max="1" step="0.1"
+                             value="1" oninput="App.setPenAlpha(this.value)">
+                      <span class="pen-tools__value" id="pen-alpha-value-2">100%</span>
+                    </label>
+                  </div>
+                </div>
+
+                <p class="annotate-hint body-marking-only">1本指で書き込みます。「キャンセル」を押すと、開く前の状態に戻ります。</p>
+
+                <div class="annotate-actions body-marking-only">
+                  <button type="button" class="btn-inline" onclick="App.clearCanvas(2)">やり直す</button>
+                  <button type="button" class="btn-inline" onclick="App.closeBodyMarking(false, 2)">キャンセル</button>
+                  <button type="button" class="btn-inline annotate-save" onclick="App.closeBodyMarking(true, 2)">保存する</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ①皮膚のコメント欄（棚卸しで追加・⑧と同じ道具の使い回し）。
+                 ⑥は前から `skin-comment` の段を持たず、犬体図の所見一覧
+                 （`skin-rows`）とは別に文章でも書けるようにする。 -->
+            <div class="trimmer-textarea-wrap">
+              <textarea id="editor-skin-comment" data-field="skin-comment" class="trimmer-textarea" rows="3" placeholder="皮膚について、気づいたことを一言。" oninput="App.updateCompletionStatus()"></textarea>
+              <button class="btn-inline-mic" id="skin-comment-voice-btn" onclick="App.toggleEditorVoice('editor-skin-comment', 'skin-comment-voice-btn')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- 6. 仕上がり写真（カットスタイルの選択欄は削除・マスター指示 2026-08-29・C-12） -->
+          <div class="clinical-group" id="sec-photo">
+            <div class="clinical-group__label">
+              <span>⑥ 仕上がり写真</span>
+            </div>
+
+            <div class="photo-pick">
+              <span class="photo-pick__label">仕上がりの写真（何枚でも）</span>
+              <input type="file" class="photo-pick__input" accept="image/*" multiple
+                     data-field="photo-trimming" onchange="App.onPhotoPick('trimming', this)">
+              <div class="photo-pick__thumbs" data-photo-thumbs="trimming"></div>
+              <div class="photo-pick__note">1枚目がカルテの表紙になります。残りはギャラリーに並びます。</div>
+            </div>
+          </div>
+
+          <!-- 6b. 使用オプション（旧デザイン試作にあった「今月の使用オプション」の
+               復活。マスター指示 2026-08-31）。選べる名前は店舗ごとに管理者が
+               ④店舗設定で追加・編集する。1件も無ければ帯ごと出さない（`D-10`）。 -->
+          <div class="clinical-group" id="sec-options" hidden>
+            <div class="clinical-group__label">
+              <span>⑦ 使用オプション</span>
+              <span class="clinical-group__hint">今回使ったものを選択</span>
+            </div>
+            <div class="teeth-selector-grid" id="options-grid"></div>
+          </div>
+
+          <!-- 7. Trimmer Personal Letter Message -->
+          <div class="clinical-group" id="sec-note">
+            <div class="clinical-group__label">
+              <span>⑧ 担当トリマーからのメッセージ</span>
+              <span class="clinical-group__hint">音声入力対応</span>
+            </div>
+
+            <div class="trimmer-textarea-wrap">
+              <textarea id="editor-trimmer-letter" data-field="staff-note" class="trimmer-textarea" rows="4" placeholder="今日の様子を、飼い主さんへ一言。" oninput="App.updateCompletionStatus()"></textarea>
+              <button class="btn-inline-mic" id="editor-voice-btn" onclick="App.toggleEditorVoice()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom Fixed Dock (単一層・未記入時は赤 / 完了時は黒) -->
+    <div class="editor-bottom-dock has-incomplete" id="editor-bottom-dock">
+      <div class="editor-bottom-dock__container">
+        <div class="dock-status-wrap" id="dock-status-wrap">
+          <span id="dock-status-icon">⚠️</span>
+          <span id="dock-status-text">未記入 ②爪のチェック</span>
+          <!-- スマホでは矢印だけにする。**名前つきの未記入と並べると幅が足りず、
+               このボタンが右で切れて矢印ごと消える**（実測 390px・未記入「④歯 ⑧メッセージ」で
+               中身269px・枠250px）。未記入の文を削るわけにはいかない（マスター指示
+               「全文見える様にしろ」）ので、こちらを縮める。 -->
+          <button class="btn-dock-goto" id="btn-dock-goto" aria-label="該当項目へ移動"
+                  onclick="App.focusMissingSection()"><span class="btn-dock-goto__label">該当項目へ </span>➜</button>
+        </div>
+        <div class="dock-action-wrap">
+          <!-- **文言は「確定」だけ**（マスター指示 2026-09-09）。空いた幅は
+               左の未記入表示に回す——スマホで未記入が切れていたのを直すため。 -->
+          <button class="boxbutton boxbutton--white" style="min-height: 44px; padding: 10px 48px 10px 18px;" onclick="App.commitReport()">
+            <span>確定</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- SCREEN 4: CUSTOMER MAGAZINE KARTE -->
+  <section class="screen-panel" id="screen-4">
+    <div class="magazine-container">
+      
+      <!-- 1. Past Reports Timeline Bar (手書き原本指示) -->
+      <div class="timeline-accordion-box">
+        <div class="timeline-accordion-head" onclick="App.toggleTimeline()">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>過去のカルテを見返す（来店履歴タイムライン）</span>
+          </div>
+          <span style="font-size: 11px; color: var(--ink-muted);" id="timeline-toggle-text">表示する ▼</span>
+        </div>
+        
+        <div class="timeline-chips-tray" id="timeline-tray" style="display:none;">
+          <div class="timeline-date-chip is-active" onclick="App.switchReportDate('2026.08.15', this)">
+            <span>2026.08.15</span>
+            <span class="sub">本日・フルコース</span>
+          </div>
+          <div class="timeline-date-chip" onclick="App.switchReportDate('2026.08.01', this)">
+            <span>2026.08.01</span>
+            <span class="sub">スパ＆部分ケア</span>
+          </div>
+          <div class="timeline-date-chip" onclick="App.switchReportDate('2026.07.18', this)">
+            <span>2026.07.18</span>
+            <span class="sub">フルコース</span>
+          </div>
+          <div class="timeline-date-chip" onclick="App.switchReportDate('2026.06.25', this)">
+            <span>2026.06.25</span>
+            <span class="sub">フルコース</span>
+          </div>
+          <div class="timeline-date-chip" onclick="App.switchReportDate('2026.06.05', this)">
+            <span>2026.06.05</span>
+            <span class="sub">爪・耳ケア</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Sticky Quick Jump Bar (手書き原本指示: リスト ① ② ③ ④ ⑤) -->
+      <div class="quick-jump-nav-sticky">
+        <div class="quick-jump-buttons">
+          <button class="btn-jump-number" onclick="App.jumpToWave('wave-skin')">① 皮膚</button>
+          <button class="btn-jump-number" onclick="App.jumpToWave('wave-nail')">② 爪</button>
+          <button class="btn-jump-number" onclick="App.jumpToWave('wave-ear')">③ 耳</button>
+          <button class="btn-jump-number" onclick="App.jumpToWave('wave-teeth')">④ 歯</button>
+          <button class="btn-jump-number" onclick="App.jumpToWave('wave-weight')">⑤ 体重</button>
+          <button class="btn-jump-number" onclick="App.jumpToWave('wave-cut')">⑥ カット</button>
+        </div>
+        <button class="btn-toggle-all" id="btn-toggle-all-waves" onclick="App.toggleAllWaves()">全開/全閉</button>
+      </div>
+
+      <!-- 3. Magazine Hero Section -->
+      <header class="magazine-hero">
+        <div class="magazine-hero__header">
+          <div class="magazine-hero__brand">SALTY DOG</div>
+          <div class="magazine-hero__date" id="mag-report-date-label">2026.08.15 vol.24</div>
+        </div>
+
+        <div class="magazine-hero__media-grid">
+          <div class="magazine-hero-photo-main">
+            <img alt="ポンチ 仕上がり写真" onclick="App.openLightbox(this.src)">
+          </div>
+          <div class="magazine-hero-side-card">
+            <div>
+              <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.16em; color: var(--ink-muted); text-transform: uppercase; margin-bottom: 6px;">Trimming & Spa Report</div>
+              <h2 class="magazine-dog-title" id="mag-dog-name">ポンチ くん</h2>
+              <!-- **見本の数字を置かない**（`docs/deferred.md` #35）。中身は
+                   `ui.js` が犬種だけ入れる。ここに数字を残すと、段のタブ「04」で
+                   直接来たとき**どの犬にも同じ体重が出る**。 -->
+              <div class="magazine-dog-sub" id="mag-dog-sub"></div>
+            </div>
+
+            <div>
+              <div style="font-size: 13.5px; line-height: 1.8; color: var(--ink-body); margin-bottom: 16px;">
+                ふわふわのテディベアカットと、<br>
+                皮膚を優しくうるおす保湿スパで、<br>
+                艶やかな美しい仕上がりになりました。
+              </div>
+              <div class="magazine-trimmer-badge">
+                <div class="magazine-trimmer-badge__avatar">塩</div>
+                <div>
+                  <div style="font-size: 12px; font-weight: 700;">担当トリマー: 塩田</div>
+                  <div style="font-size: 10.5px; color: var(--ink-muted);">SALTY DOG メディカルトリマー</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- 4. Editorial Personal Letter -->
+      <section class="magazine-letter-section">
+        <h3 class="magazine-letter-title">担当トリマーからのメッセージ</h3>
+        <p class="magazine-letter-body" id="mag-letter-content"></p>
+      </section>
+
+      <!-- 5. Hand-Drawn Style Wave Accordion Stack (手書き原本指示: 動きとして) -->
+      <section class="wave-accordion-stack">
+        
+        <div style="text-align: center; margin-bottom: 16px;">
+          <div style="font-family: var(--font-en); font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: var(--ink-muted); text-transform: uppercase;">Health & Grooming Details</div>
+          <h3 style="font-family: var(--font-serif); font-size: 22px; font-weight: 700;">各項目の健康診断・カルテ詳細</h3>
+          <p style="font-size: 12px; color: var(--ink-secondary); margin-top: 4px;">タップすると各項目の詳細・解剖図・写真が展開します</p>
+        </div>
+
+        <!-- Wave Card 1: 皮膚 -->
+        <div class="wave-card is-open" id="wave-skin">
+          <div class="wave-card-head" onclick="App.toggleWaveCard('wave-skin')">
+            <div class="wave-card-head__title-wrap">
+              <span class="wave-card-number-badge">1</span>
+              <span class="wave-card-title">皮膚・被毛・スパ状態（4面図）</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="wave-card-status-pill">保湿スパ済・良好</span>
+              <div class="wave-card-toggle-icon">▼</div>
+            </div>
+          </div>
+          
+          <svg class="wave-separator-svg" viewBox="0 0 1000 12" preserveAspectRatio="none"><path d="M0,6 Q250,0 500,6 T1000,6"/></svg>
+
+          <div class="wave-card-body">
+            <div class="wave-body-grid-2col">
+              <div class="wave-body-img-frame">
+                <img alt="皮膚被毛" onclick="App.openLightbox(this.src)">
+              </div>
+              <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">皮膚・被毛のコンディション</h4>
+                <p style="font-size: 13.5px; line-height: 1.8; color: var(--ink-body); margin-bottom: 12px;">
+                  背中・お腹ともに赤みや乾燥はなく、非常に良好な状態です。セラミド保湿スパをたっぷり浸透させたため、毛艶と手触りが格段に柔らかくなっています。
+                </p>
+                <div style="font-size: 12px; background: var(--bg-paper); padding: 10px; border: 1px solid var(--border-subtle);">
+                  <strong>トリマーチェック:</strong> フケ・ニキビなし / スパ保湿完了
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wave Card 2: 爪 -->
+        <div class="wave-card is-open" id="wave-nail">
+          <div class="wave-card-head" onclick="App.toggleWaveCard('wave-nail')">
+            <div class="wave-card-head__title-wrap">
+              <span class="wave-card-number-badge">2</span>
+              <span class="wave-card-title">爪のチェック（3段階判定・解剖図）</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="wave-card-status-pill">1. 適切カット済</span>
+              <div class="wave-card-toggle-icon">▼</div>
+            </div>
+          </div>
+
+          <svg class="wave-separator-svg" viewBox="0 0 1000 12" preserveAspectRatio="none"><path d="M0,6 Q250,12 500,6 T1000,6"/></svg>
+
+          <div class="wave-card-body">
+            <div class="wave-body-grid-2col">
+              <div class="wave-body-img-frame">
+                <img alt="爪解剖図" onclick="App.openLightbox(this.src)">
+              </div>
+              <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">爪の長さと接地状態の解説</h4>
+                <p style="font-size: 13.5px; line-height: 1.8; color: var(--ink-body); margin-bottom: 12px;">
+                  血管の直前で安全に丸く整えています。地面への接地がなく、歩行時に指の骨格へ負担がかからない理想的な長さを維持しています。
+                </p>
+                <div style="font-size: 12px; background: #fde8e8; color: var(--accent-alert); padding: 10px; border: 1px solid rgba(211,47,47,0.2);">
+                  ⚠️ <strong>注意点:</strong> 爪が長い状態で生活していると、歩行バランスが崩れ指が変形する恐れがあります。定期的なケアが重要です。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wave Card 3: 耳 -->
+        <div class="wave-card" id="wave-ear">
+          <div class="wave-card-head" onclick="App.toggleWaveCard('wave-ear')">
+            <div class="wave-card-head__title-wrap">
+              <span class="wave-card-number-badge">3</span>
+              <span class="wave-card-title">耳のチェック（左右個別スコアリング）</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="wave-card-status-pill">左右 Lv.1 良好</span>
+              <div class="wave-card-toggle-icon">▼</div>
+            </div>
+          </div>
+
+          <svg class="wave-separator-svg" viewBox="0 0 1000 12" preserveAspectRatio="none"><path d="M0,6 Q250,0 500,6 T1000,6"/></svg>
+
+          <div class="wave-card-body">
+            <div class="wave-body-grid-2col">
+              <div class="wave-body-img-frame">
+                <img alt="耳の様子" onclick="App.openLightbox(this.src)">
+              </div>
+              <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">左右耳道の清潔度</h4>
+                <p style="font-size: 13.5px; line-height: 1.8; color: var(--ink-body); margin-bottom: 12px;">
+                  右耳(R)・左耳(L)ともに内部の赤みや汚れはなく、通気性も良好です。耳毛の処理と優しいローション洗浄を行いました。
+                </p>
+                <div style="font-size: 12px; background: var(--bg-paper); padding: 10px; border: 1px solid var(--border-subtle);">
+                  <strong>判定結果:</strong> 右耳: Lv.1 (良好) / 左耳: Lv.1 (良好)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wave Card 4: 歯 -->
+        <div class="wave-card is-open" id="wave-teeth">
+          <div class="wave-card-head" onclick="App.toggleWaveCard('wave-teeth')">
+            <div class="wave-card-head__title-wrap">
+              <span class="wave-card-number-badge">4</span>
+              <span class="wave-card-title">口・歯のチェック（頭骨解剖図・6段階）</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="wave-card-status-pill">ピカピカ良好</span>
+              <div class="wave-card-toggle-icon">▼</div>
+            </div>
+          </div>
+
+          <svg class="wave-separator-svg" viewBox="0 0 1000 12" preserveAspectRatio="none"><path d="M0,6 Q250,12 500,6 T1000,6"/></svg>
+
+          <div class="wave-card-body">
+            <div class="wave-body-grid-2col">
+              <div class="wave-body-img-frame">
+                <img alt="頭骨歯列図" onclick="App.openLightbox(this.src)">
+              </div>
+              <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">口腔内・歯石の判定結果</h4>
+                <p style="font-size: 13.5px; line-height: 1.8; color: var(--ink-body); margin-bottom: 12px;">
+                  上顎・下顎ともに歯石の蓄積はなく、歯茎の引き締まりも健康です。グラつきのある歯も見られません。
+                </p>
+                <div style="font-size: 12px; background: var(--bg-paper); padding: 10px; border-left: 3px solid var(--ink-primary); line-height: 1.7;">
+                  <strong>トリマーアドバイス:</strong><br>
+                  食事内容よりも口腔環境の問題の方が寿命に大きく関わります。このピカピカな状態を保つため、毎日のガーゼ磨きを継続してください。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wave Card 5: 体重 -->
+        <div class="wave-card" id="wave-weight">
+          <div class="wave-card-head" onclick="App.toggleWaveCard('wave-weight')">
+            <div class="wave-card-head__title-wrap">
+              <span class="wave-card-number-badge">5</span>
+              <span class="wave-card-title">体重・体型スコア（BCS / MCS）</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="wave-card-status-pill">—</span>
+              <div class="wave-card-toggle-icon">▼</div>
+            </div>
+          </div>
+
+          <svg class="wave-separator-svg" viewBox="0 0 1000 12" preserveAspectRatio="none"><path d="M0,6 Q250,0 500,6 T1000,6"/></svg>
+
+          <div class="wave-card-body">
+            <div class="wave-body-grid-2col">
+              <div style="background: var(--bg-paper); padding: 16px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--ink-muted); margin-bottom: 8px;">過去の体重推移グラフ (kg)</div>
+                <svg viewBox="0 0 300 120" width="100%" height="90">
+                  <polyline fill="none" stroke="#deded9" stroke-width="1.5" stroke-dasharray="3,3" points="0,80 300,80" />
+                  <polyline fill="none" stroke="#121212" stroke-width="2.5" points="20,70 80,65 150,75 220,55 280,40" />
+                  <circle cx="280" cy="40" r="5" fill="#c85a32" />
+                  <text x="225" y="30" font-size="12" font-family="Inter" font-weight="700" fill="#c85a32"></text>
+                </svg>
+              </div>
+              <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">BCS（ボディコンディション）評価</h4>
+                <p style="font-size: 13.5px; line-height: 1.8; color: var(--ink-body); margin-bottom: 12px;">
+                  体重は単なる数値だけでなく、BCS（体型）とMCS（筋肉量）で総合評価します。肋骨に適度な脂肪の被覆があり、上から見て綺麗なウエストのくびれが確認できます（BCS 3: 理想体型）。
+                </p>
+                <div style="font-size: 12px; background: var(--bg-paper); padding: 10px; border: 1px solid var(--border-subtle);">
+                  前回の記録なし
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wave Card 6: カット -->
+        <div class="wave-card is-open" id="wave-cut">
+          <div class="wave-card-head" onclick="App.toggleWaveCard('wave-cut')">
+            <div class="wave-card-head__title-wrap">
+              <span class="wave-card-number-badge">6</span>
+              <span class="wave-card-title">カットスタイル & 本日のフォトギャラリー</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="wave-card-status-pill">4枚撮影</span>
+              <div class="wave-card-toggle-icon">▼</div>
+            </div>
+          </div>
+
+          <svg class="wave-separator-svg" viewBox="0 0 1000 12" preserveAspectRatio="none"><path d="M0,6 Q250,12 500,6 T1000,6"/></svg>
+
+          <div class="wave-card-body">
+            <div style="margin-bottom: 16px; font-size: 13.5px; line-height: 1.8;">
+              <strong>カット設定:</strong> ボディ6mmバリカン / お顔ふんわりテディベア / 足先すっきりブーツカット
+            </div>
+            <div class="gallery-mosaic-grid">
+              <div class="gallery-mosaic-item" onclick="App.openLightbox('/assets/photo-trim-action.jpg')">
+                <img src="/assets/photo-trim-action.jpg" alt="トリミング中">
+                <div class="gallery-mosaic-caption">カット中の真剣な表情</div>
+              </div>
+              <div class="gallery-mosaic-item" onclick="App.openLightbox('')">
+                <img alt="お手ポーズ">
+                <div class="gallery-mosaic-caption">上手にお手</div>
+              </div>
+              <div class="gallery-mosaic-item" onclick="App.openLightbox('')">
+                <img alt="肉球ケア">
+                <div class="gallery-mosaic-caption">肉球ぷるぷる保湿</div>
+              </div>
+              <div class="gallery-mosaic-item" onclick="App.openLightbox('')">
+                <img alt="仕上がり">
+                <div class="gallery-mosaic-caption">ご機嫌な仕上がり</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 6. Next Visit (手書き原本指示: 理想の周期) -->
+      <section class="magazine-revisit-box">
+        <div class="magazine-revisit-tag">Next Schedule</div>
+        <h4 class="magazine-revisit-title">次回のおすすめご来店時期</h4>
+        <!-- **犬の名前と具体的な日付は書かない**（`docs/deferred.md` #3）。
+             ここは意匠モックの文で、`ポンチくん` と `2026年9月10日前後` がベタ書き
+             だった。誰のカルテを開いても同じ名前と同じ日付が出るうえ、**その日付は
+             誰も計算していない**。節そのものはマスター指定で残す（`D-20260825-38`）
+             が、**持っていない値は出さない**（`D-10`）。 -->
+        <p class="magazine-revisit-desc">
+          被毛の毛玉防止と皮膚の健康維持のため、定期的なケアをおすすめいたします。
+        </p>
+        <button class="boxbutton boxbutton--white" style="min-height: 52px;" onclick="alert('LINE公式アカウントまたは予約システムと連携します')">
+          <span>次回のご予約・ご相談はこちら</span>
+        </button>
+      </section>
+
+      <div style="text-align: center; margin-top: 40px;">
+        <button class="boxbutton boxbutton--white" onclick="App.goToStep(2)">
+          <span>わんちゃんカルテ一覧へ戻る</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- Lightbox Modal -->
+<div class="lightbox-modal" id="lightbox-modal" onclick="App.closeLightbox()">
+  <div class="lightbox-close-btn">&times;</div>
+  <img id="lightbox-img" alt="拡大画像">
+</div>
+
+<!-- JS Logic (独創メソッド削除) -->
+<!-- 動きは /js/ui.js -->
+
+<script src="/js/dummy.js"></script>
+<script src="/js/ui.js"></script>
+</body>
+</html>

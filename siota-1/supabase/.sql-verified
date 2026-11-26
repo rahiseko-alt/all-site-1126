@@ -1,0 +1,4 @@
+# supabase/migrations の中身を、実際の PostgreSQL に流して通した記録。
+# 手で書かない。`npm run verify:migrations` が通ったときだけ更新される。
+# 24/24 PASS
+b7d8c04d71d1f1d97e5eed155d5e25929fde097d47fae37acc37e07193395283

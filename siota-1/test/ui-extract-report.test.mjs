@@ -1,0 +1,180 @@
+/**
+ * ui-extract-report.test.mjs — ④が出すものが、⑥が読む形になっていること
+ *
+ * `docs/ops/key-parity-F3.md` の突き合わせを、値の側から押さえる。
+ * `scripts/guard/key-parity.mjs` は**キーの名前**を見るが、ここは
+ * **触っていない項目がキーごと出ないこと**を見る——空の器を出すと、
+ * ⑥側で「記録なし」と「入力欄が無い」を区別できなくなる（`D-10`）。
+ *
+ * `src/js/ui.js` は古典スクリプトなので import できない。`vm` に最小限の
+ * `document` を置いて読み込む（`ui-body-marking.test.mjs` と同じ形）。
+ */
+
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SOURCE = fs.readFileSync(path.join(ROOT, 'src/js/ui.js'), 'utf8');
+
+/** `vm` の中で作られた object は、こちらの realm とは `Object.prototype` が違う。
+    `deepStrictEqual` は prototype も見るので、中身が同じでも落ちる
+    （`Values have same structure but are not reference-equal`）。
+    形だけを比べたいので、素の値に均してから比べる。 */
+const plain = (value) => JSON.parse(JSON.stringify(value));
+
+/** `[data-field="…"]` と `#marking-canvas` だけが在る、最小限の画面。 */
+function loadApp({ fields = {}, petName = null } = {}) {
+  const document = {
+    getElementById: () => null,
+    querySelectorAll: () => [],
+    querySelector: (selector) => {
+      const m = selector.match(/^\[data-field="([a-z-]+)"\]$/);
+      if (m && Object.prototype.hasOwnProperty.call(fields, m[1])) return { value: fields[m[1]] };
+      return null;
+    },
+    addEventListener: () => {},
+    createElement: () => ({ style: {}, classList: { add() {}, remove() {} }, append() {} }),
+  };
+  const sandbox = {
+    document,
+    window: { addEventListener: () => {}, DUMMY: { dogs: [] } },
+    setTimeout: () => {},
+    console,
+  };
+  sandbox.globalThis = sandbox;
+  if (petName) sandbox.__REPORT_CONTEXT__ = { petName };
+  vm.createContext(sandbox);
+  vm.runInContext(`${SOURCE}\n;globalThis.__App = App;`, sandbox);
+  return sandbox.__App;
+}
+
+test('何も触っていないカルテは、キーを1つも出さない', () => {
+  const App = loadApp();
+  App.marks = [];
+  assert.deepEqual(plain(App.extractReport()), {});
+});
+
+test('触った項目だけがキーになる（触っていない項目は器ごと出さない）', () => {
+  const App = loadApp({ fields: { 'staff-note': '耳の裏を丁寧に洗いました。' } });
+  App.marks = [];
+  App.form.nail.front = 2;
+  const out = App.extractReport();
+  assert.deepEqual(plain(out), { staffNote: '耳の裏を丁寧に洗いました。', nail: { front: 2, rear: 0 } });
+  assert.ok(!('ear' in out), '触っていない耳が出ている');
+  assert.ok(!('teeth' in out), '触っていない歯が出ている');
+  assert.ok(!('weights' in out), '触っていない体重が出ている');
+});
+
+test('犬の名前は backend が置いた文脈から取る（画面の見出しから読まない）', () => {
+  const App = loadApp({ petName: 'X' });
+  App.marks = [];
+  assert.equal(App.extractReport().pet, 'X');
+});
+
+test('耳は左右そろって1つのキーになる（片方だけ触っても両方出る）', () => {
+  const App = loadApp();
+  App.marks = [];
+  App.form.ear.right = 3;
+  assert.deepEqual(plain(App.extractReport().ear), { right: 3, left: 0 });
+});
+
+test('①②③④のコメントは、それぞれ触った項目のキーに載る', () => {
+  const App = loadApp({
+    fields: {
+      'skin-comment': '背中に軽い赤みあり。',
+      'nail-comment': '前足の血管が近め。',
+      'ear-comment': '右耳がやや汚れ気味。',
+      'teeth-comment': '奥歯に軽い歯石。',
+    },
+  });
+  App.marks = [];
+  const out = App.extractReport();
+  assert.equal(out.skinComment, '背中に軽い赤みあり。');
+  assert.equal(out.nail.comment, '前足の血管が近め。');
+  assert.equal(out.ear.comment, '右耳がやや汚れ気味。');
+  assert.equal(out.teeth.comment, '奥歯に軽い歯石。');
+});
+
+test('レベルを選んでいなくても、コメントだけでキーが出る（爪・耳・歯）', () => {
+  const App = loadApp({
+    fields: {
+      'nail-comment': 'コメントのみ。',
+      'ear-comment': 'コメントのみ。',
+      'teeth-comment': 'コメントのみ。',
+    },
+  });
+  App.marks = [];
+  const out = App.extractReport();
+  assert.deepEqual(plain(out.nail), { front: 0, rear: 0, comment: 'コメントのみ。' });
+  assert.deepEqual(plain(out.ear), { right: 0, left: 0, comment: 'コメントのみ。' });
+  assert.deepEqual(plain(out.teeth), { comment: 'コメントのみ。' });
+});
+
+test('①②③④のコメントが空白だけなら、書かれていないものとして扱う', () => {
+  const App = loadApp({
+    fields: { 'skin-comment': '  ', 'nail-comment': '\n', 'ear-comment': '', 'teeth-comment': '  ' },
+  });
+  App.marks = [];
+  const out = App.extractReport();
+  assert.ok(!('skinComment' in out));
+  assert.ok(!('nail' in out));
+  assert.ok(!('ear' in out));
+  assert.ok(!('teeth' in out));
+});
+
+test('空白だけの一言は、書かれていないものとして扱う', () => {
+  const App = loadApp({ fields: { 'staff-note': '   \n  ' } });
+  App.marks = [];
+  assert.ok(!('staffNote' in App.extractReport()));
+});
+
+test('直しで犬体図に触っていなければ、読み込んだ参照をそのまま出す（焼き直さない）', () => {
+  const App = loadApp();
+  App.marks = [{ type: 'stamp', x: 0.2, y: 0.3 }];
+  App.marksOriginalJson = JSON.stringify(App.marks);
+  App.marksOriginalImage = 'asset://11111111-1111-1111-1111-111111111111';
+  const out = App.extractReport();
+  assert.equal(out.bodyMarkingImage, 'asset://11111111-1111-1111-1111-111111111111');
+});
+
+test('直しで犬体図に触っていれば、控えと違うので焼き直しに回す（新規アップロードの対象になる）', () => {
+  const App = loadApp();
+  /* キャンバスの実体は無いので、焼き直しに回った証拠は「投げること」で見る
+     （`exportBodyMarking()` は描き先が無いと必ず投げる）。控えを再利用していれば
+     ここには来ない。 */
+  App.marks = [{ type: 'stamp', x: 0.2, y: 0.3 }];
+  App.marksOriginalJson = JSON.stringify([{ type: 'stamp', x: 0.9, y: 0.9 }]);
+  App.marksOriginalImage = 'asset://11111111-1111-1111-1111-111111111111';
+  assert.throws(() => App.extractReport(), /犬体図が見つからない/);
+});
+
+test('新規作成（控えが無い）では、いつもどおり焼き直しに回す', () => {
+  const App = loadApp();
+  App.marks = [{ type: 'stamp', x: 0.2, y: 0.3 }];
+  assert.equal(App.marksOriginalJson, null);
+  assert.throws(() => App.extractReport(), /犬体図が見つからない/);
+});
+
+test('⑥が読むキーの外は出さない（届かないキーを作らない）', () => {
+  const READ_BY_MAGAZINE = new Set(
+    [...fs.readFileSync(path.join(ROOT, 'backend/js/magazine-view.js'), 'utf8')
+      .matchAll(/\bdata\.([A-Za-z][A-Za-z0-9_]*)/g)].map((m) => m[1]),
+  );
+  const App = loadApp({
+    petName: 'X',
+    fields: { 'staff-note': 'a', course: 'トリミングコース' },
+  });
+  App.marks = [];
+  App.form = {
+    nail: { front: 1, rear: 1 }, ear: { right: 1, left: 2 }, teeth: 'ピカピカ✨', weight: 2.8,
+    bcs: 3, bestWeight: 3.5, options: ['アメージング'],
+  };
+  App.photos = { trimming: [], ear: '', teeth: [] };
+  for (const key of Object.keys(App.extractReport())) {
+    assert.ok(READ_BY_MAGAZINE.has(key), `⑥が読まないキーを出している: ${key}`);
+  }
+});

@@ -1,0 +1,371 @@
+# runbook — ポチ版B（ponchi-v2）本番デプロイ手順
+
+対象: `trimmer-system` ポチ版B（ponchi-v2.html + ponchi-app.js + publish-client-ponchi.js）
+
+---
+
+## 0. 前提・構成
+
+| 要素 | 実体 |
+|------|------|
+| ポチ HTML（編集/閲覧 兼用正本） | `src/design-samples/ponchi-v2.html`（**ローカルデモ用・相対パスのまま維持**） |
+| ポチ JS | `src/js/ponchi-app.js` / `src/js/publish-client-ponchi.js` |
+| アイコン群 | `src/assets/icon-{spa,weight,skin,ear,nail}.png` |
+| dist 配信物（絶対パス版） | `dist/ponchi-v2.html`（相対パス→絶対パスに変換済）/ `dist/js/ponchi-app.js` 等 |
+| Worker（/p/* /o/* /edit/* /api/*） | `worker/src/index.js`（KV binding `REPORTS`） |
+| データストア | Cloudflare Workers KV（id `50241192b25149eb8f846653ecae8f64`） |
+| 本番ドメイン | `trimmer-system.kouheikosehira.com`（Cloudflare 管理） |
+| Cloudflare 認証 | 運用担当者のアカウントで OAuth 済（`npx wrangler whoami` で確認） |
+| A版後方互換 | **このリポジトリには無い**。`beauty-report-mobile.html` は移設対象外（本番 KV に残る A版 slug は本リポジトリからは配信できない） |
+
+**パス方針（重要）**:
+`src/design-samples/ponchi-v2.html` は `../assets/` `../js/` の相対パスのまま維持し `file://` で開ける状態を保つ。
+dist にコピーする時だけ絶対パス（`/assets/` `/js/`）に書き換える。
+理由: 本番 `/p/{slug}/{reportId}` 閲覧時、相対パスだとブラウザが `/p/{slug}/js/...` と誤解決し
+Worker の `/p/*` route に吸われて 404 になる。
+
+route 優先順位: **Worker route（/p/* /o/* /edit/* /api/*）> Pages フォールスルー（他パス）**。
+
+---
+
+## 1. dist 構成手順（デプロイ前に必ず実行）
+
+> dist/ は gitignore 済。生成は `npm run build` 1 本に統一（手動コピー禁止）。
+
+### 1-A. ビルド実行
+
+```powershell
+cd <リポジトリのルート>
+npm run build
+```
+
+`scripts/build-dist.mjs` が src → dist を生成する:
+- `src/design-samples/ponchi-v2.html` → `dist/ponchi-v2.html`（相対パス `../assets/`・`../js/` を絶対パス `/assets/`・`/js/` へ自動置換）
+- `src/js/*.js`（ponchi-app.js / publish-client-ponchi.js）→ `dist/js/`（無変換）
+- `src/assets/` の使用 10 ファイル → `dist/assets/`（選別コピー）
+- `src/manifest.json` → `dist/manifest.json`
+
+スクリプト末尾の self-check が「相対パス残存ゼロ・絶対パス存在」を自動検証する。残存があれば EXIT 1 で停止するため、置換漏れによる本番 404 が構造的に起きない。
+
+### 1-B. 手動コピーは禁止
+
+旧来の手動 `Copy-Item` ＋ `-replace` 手順は廃止した。dist は必ず `npm run build` で生成すること。破損・差分時の復旧は `docs/build-recovery.md` を参照。
+
+---
+
+## 2. ローカル通電確認（wrangler dev）
+
+デプロイ前に必ずローカルで動作を確認する。
+
+```powershell
+cd worker
+npx wrangler dev --local
+```
+
+ブラウザで以下を確認（KV local のため既存データがない場合は 404 が正常）:
+
+| URL | 期待結果 |
+|-----|---------|
+| `http://localhost:8787/api/ping` | `{"ok":true}` |
+| `http://localhost:8787/edit` | ponchi-v2.html（__OWNER_LIST__ 注入・__VIEW__ なし） |
+| `http://localhost:8787/p/{slug}` | ponchi-v2.html（__VIEW__=true・__SCREEN__='paw'） |
+
+---
+
+## 2-B. 中身を CSV で取り出す（**製品の機能ではない**）
+
+> **画面にボタンは無い。** 書き出し／バックアップは見積もりに入っていないので機能にしていない
+> （`D-20260827-46`・マスター指示）。**あとで必要になったときに、ゼロから作らずに済むよう
+> 用意だけしてある。** クライアントの意向は「納品後、使いながら考える」。
+
+```powershell
+# 実行する人が鍵を渡す。AI は鍵を受け取らない（A-1）
+$env:SUPABASE_URL="https://xxxx.supabase.co"
+$env:SUPABASE_SECRET_KEY="sb_secret_xxx"     # Settings → API Keys で作る
+node scripts/export-csv.mjs owners  > owners.csv
+node scripts/export-csv.mjs pets    > pets.csv
+node scripts/export-csv.mjs reports > reports.csv
+```
+
+- **標準出力に出す。** ファイルを勝手に作らない——実顧客の情報をリポジトリの中に落とさない（`A-2`）。置き場所は実行する人が決める
+- **Excel で開ける**（先頭に BOM を付けている。無いと日本語が化ける）
+- **写真は出ない。** カルテの中身は `asset://{id}` の参照で、実体は Storage に在る。写真ごと持ち出すのは別の手順（`deferred` #35）
+- 機械: `test/export-csv.test.mjs`（引用符・カンマ・改行・BOM・列の順）。DB には触れない
+
+---
+
+## 2-C. 画像を差し替える
+
+**写真や図を自分のものに入れ替えるとき。** 拡張子が違っていても構わない。
+
+まず、差し替えられる画像の一覧を見る:
+
+```
+node scripts/swap-image.mjs
+```
+
+役割の名前・いまのファイル・**どの画面のどこに出るか**・**誰が見るか**が並ぶ。
+「誰が見るか」は大事で、`login-photo` だけは**ログインしていない誰にでも見える**。
+
+差し替える:
+
+```
+node scripts/swap-image.mjs login-photo /path/to/新しい写真.png
+```
+
+これで実体を置き換え、**その画像を参照している画面を全部書き換える**
+（1枚が3か所から参照されていることがある。手でやると片方だけ変わる）。
+
+そのあと必ず2つ:
+
+1. `npm run build && npm run check` —— 参照の食い違いはここで止まる
+2. `docs/ASSET-PROVENANCE.md` の**出どころを直す**。差し替えれば出どころも変わるが、
+   **機械には分からない**ので人が書く（`A-3`）
+
+**画質は勝手に変えない。** 縮めるかどうかは用途によって答えが違う——
+爪の基準図は血管の位置を見る図なので、縮めてはいけない（`D-20260827-47`）。
+
+## 2-D. 実顧客のカルテを本番へ入れる前に見ること
+
+**ここは1回しか通らない分かれ目。** ダミーで試している間は取り返しがつくが、
+実顧客のカルテが1枚でも入った瞬間から、失うと**作り直せない**（`D-20260827-46`）。
+
+この節は `docs/ops/bad-scenarios-F4.md` #9 が見つけた穴で作った——
+発火条件は記録にあったが、**手順書のどこにも書いていなかった**。
+
+| # | 見ること | いまの状態 | 根拠 |
+|---|---|---|---|
+| 1 | **バックアップ** | **決着済み**。クライアントの意向で「納品後、使いながら考える」 | `D-20260827-46` / `D-20260827-52`。**これは決定であって宿題ではない。再提起しない。** 取り出す準備は置いてある → 2-B |
+| 2 | **同姓同名で取り違えない** | **済**（2026-08-27） | 削除の一覧・新規ペットの飼い主選びに「飼っている子の名前 ＋ 登録日」を出す。それでも同じなら ID の先頭6文字。機械: `test/admin-same-name.test.mjs` |
+| 3 | **本番にダミーが残っていない** | **済**（2026-08-27） | マスターが管理者画面から犬3頭→飼い主3件を削除。3つの一覧が「登録されていません」を返した＝**サーバの答え**。`docs/deferred.md` #30 |
+| 4 | **鍵3種がローテーション済み** | **済**（2026-08-27） | `D-20260827-45`。3本とも旧い値は死んだ |
+| 5 | **本番が最新版を配っている** | 確認は `npm run verify:prod`（4/4） | 日次でも走る（`.github/workflows/watch-prod.yml`） |
+
+**1 は決着済み。** 残りの2〜5は済で、この表は**状態の記録**であって承認待ちの一覧ではない。
+
+## 2-E. 犬種と「管理者／スタッフ」を本番に出す前に（`N-48`・`N-49`・2026-11-19）
+
+**順番を逆にすると本番が止まる**（`F-20260829-61`）。新しい Worker は犬の一覧で `breed` 列を、
+ログインの確認で `role` 列を読むので、**列が無い本番に Worker だけ出すと、犬の一覧とログインが壊れる**。
+
+1. **先に、誰が管理者・スタッフになるかを見る**（読むだけ・何も変えない）。本番の Supabase → SQL Editor に貼る:
+
+   ```sql
+   select u.email,
+          m.active,
+          case when exists (
+            select 1 from public.invitations i
+            where i.invitation_type = 'staff' and i.shop_id = m.shop_id and i.claimed_by = m.user_id
+          ) then 'スタッフ' else '管理者' end as これからの役割
+   from public.shop_memberships m
+   join auth.users u on u.id = m.user_id
+   order by これからの役割, u.email;
+   ```
+
+   **クライアントのオーナーが「スタッフ」に出たら、ここで止めてマスターに言う**（そのまま当てると削除・店舗設定・スタッフ招待ができなくなる）。
+2. マスターが一覧を見て「この振り分けでよい」と言ったら、migration を2本、この順で当てる:
+   `supabase/migrations/202611190016_pet_breed.sql` → `supabase/migrations/202611190017_admin_staff_roles.sql`
+   **当てた直後に、マスターが「管理者」と決めた人を管理者に戻す**（スタッフ招待で入っていても管理者にする人）。
+   本番の SQL Editor で、1人ずつ:
+
+   ```sql
+   update public.shop_memberships m set role = 'admin'
+   from auth.users u
+   where u.id = m.user_id and u.email = '<マスターが決めたメールアドレス>';
+   ```
+
+   **メールアドレスはこの手順書にもコードにも書かない**（実在の人の情報・`AGENTS.md` A-2）。誰を管理者にするかは
+   `docs/ops/plan.md` の `N-47` に「誰の」とだけ書く。流したあと、上の 1. の一覧をもう一度出して確かめる。
+3. そのあとで Worker を出す（下の 3. A-1）。`npm run verify:prod` が緑になること。
+
+## 2-F. 確定済みカルテを前の版に戻す（N-77 / #77）
+
+**何ができるようになったか**: 確定したカルテを「カルテ修正」で直すと、**直す前の中身が1版ずつ自動で残る**
+（`supabase/migrations/202611200021_report_revisions.sql`）。間違えて上書きした・空にしてしまった、でも戻せる。
+**見られるのは管理者だけ**。スタッフには見えない。履歴は画面からも API からも書き換え・削除できない。
+
+> **本番に当てた（2026-11-20）**。これより前に直したカルテの履歴は無い。別の環境へ移すときも順番は 2-E と同じで、
+> **migration が先・Worker が後**（`F-20260829-61`）。
+
+1. **戻したいカルテの id を探す**（読むだけ）。犬の名前と日付で引ける:
+
+   ```sql
+   select r.id, r.report_date, p.name
+   from public.reports r join public.pets p on p.id = r.pet_id
+   where p.name = '<犬の名前>' and r.status = 'final'
+   order by r.report_date desc;
+   ```
+
+2. **そのカルテの履歴を見る**（読むだけ・何も変えない）。本番の Supabase → SQL Editor に貼る:
+
+   ```sql
+   select id, revised_at, revised_by, previous_data
+   from public.report_revisions
+   where report_id = '<カルテのid>'
+   order by revised_at desc;
+   ```
+
+   上ほど新しい。`revised_at` が「直した日時」、`previous_data` が「**その直しの直前の中身**」。
+   戻したい時点の行を選び、その `previous_data` をまるごとコピーする。
+3. **戻す**——管理者がログインした状態で「カルテ修正」から、選んだ版の内容で直して確定する。
+   戻す操作も「直し」の1回なので、**戻す直前の中身がまた1版残る**。戻しても何も失われない。
+   - SQL Editor から直接 `update public.reports ...` で書き戻さない。それだと履歴にも記録（`audit_logs`）にも残らない。
+   - 写真は `asset://…` という参照だけが残っている。直しで外した写真の実体は消えていないので、参照を戻せば写真も戻る。
+4. 戻したあと、飼い主の画面（そのカルテの共有 URL）を開いて、戻した内容で出ていることを目で確かめる。
+
+## 2-G. ログアウト後の通行証を通さない（`N-51`・2026-11-21）
+
+**何が変わるか**: ログアウトしたあと、その端末に残った通行証では何も読めなくなる（それまでは最大1時間読めた）。
+`supabase/migrations/202611210022_session_liveness.sql`。Worker は変えていないので、**順番の縛りは無い**が、
+いつもどおり migration を先に当てる。
+
+1. 本番の Supabase → SQL Editor に、GitHub の master にある上のファイルをそのまま貼って流す（文字数が手元と同じことを確かめる）。
+2. **流した直後に、入口から実際にログインして、登録カルテ一覧が出ることを確かめる。** 出なければ全員が締め出されている
+   （通行証に `session_id` が入っていない構成だった場合）。そのときは**すぐに**
+   `supabase/rollback/202611210022_rollback.sql` を同じように流す。元の動きに戻る（穴も元どおり開く）。
+3. ログアウトを押し、もう一度入口から入り直せることを確かめる。
+
+## 3. デプロイ手順（順序固定）
+
+> ⛔ **移設・統合フェーズのあいだ、本節の手順を実行するな。**
+> 移設元にあったデプロイ凍結（`predeploy-guard.mjs` / `deploy-freeze.md`）は、
+> 「`src/` が静的モックで本番と別世代」という前提が siota-1 では成立しないため
+> 移設していない。`npm run predeploy-check` は**存在しない**。
+> つまり機械的に止めるものが何も無いので、実行前に必ずマスターの承認を取ること。
+> 経緯 → （旧計画・削除済み）
+
+### A. Worker をデプロイ
+
+> **⚠️ 2026-09-02。** 設定ファイルを指定しない `npx wrangler deploy` は使えない。
+> **`worker/wrangler.toml`（KV 版・`saltydog-report-worker`）は削除した**
+> （`D-20260902-62`）。配り先は **Supabase 版（`shiota0823`）** 1本だけなので、
+> 手元から出すときは `--config wrangler.supabase.toml` を必ず付けること。
+
+**出し方は2つある。** 手元にリポジトリが無いなら **A-1（GitHub の画面）**を使う。
+
+### A-1. GitHub の画面から出す（推奨・PC に環境が要らない）
+
+`.github/workflows/deploy.yml`（**手で押したときだけ走る**）。
+
+1. GitHub → **Actions** → 左の **deploy** → **Run workflow**
+2. 走るのは `check` → `test` → `build` → `wrangler deploy`（Supabase 版）→ **`verify:prod`**
+3. **緑になったら成功。** 赤なら本番に届いていない（`verify:prod` が判定する）
+
+事前に一度だけ、**Settings → Secrets and variables → Actions** に2つ登録する:
+
+| 名前 | 中身 |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | 権限「Edit Cloudflare Workers」のトークン |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare のアカウント ID |
+
+**値はマスターが自分で貼る。** AI は受け取らない（`A-1`）。
+
+### A-2. 手元から出す（PC に環境があるとき）
+
+**いまの正しい順序**（リポジトリの一番上で）:
+
+```powershell
+git pull
+npm ci
+npm run build
+cd worker
+npx wrangler deploy --config wrangler.supabase.toml
+cd ..
+npm run verify:prod
+```
+
+- 認証は `npx wrangler login`（ブラウザが開く）。**API トークンを人に渡さない**（`A-1`）。
+- `npm run build` を先に流すこと。配られるのは `dist/` の中身で、**古いままだと古いものが出る**。
+- **合格の判定は `npm run verify:prod` が 4/4 PASS**。deploy が「成功」と出ても、
+  配信物が手元と違えばここで落ちる（`D-12`「押せた ではなく 届いた で見る」）。
+- 切り戻しは、Cloudflare の画面でその Worker の1つ前の版に戻す（Deployments → Rollback）。
+  **KV 版 Worker への切り戻しはもう無い**（2026-09-02 に削除・`D-20260902-62`）。
+  戻せるのは `shiota0823` の過去の版だけ。
+
+### B. Pages をデプロイ（dist の絶対パス指定）
+
+```powershell
+npx wrangler pages deploy dist `
+  --project-name=trimmer-system `
+  --branch=main `
+  --commit-dirty=true `
+  --commit-message="deploy ponchi-v2 dist"
+```
+
+注意: `--commit-message` は ASCII 文字のみ使用（日本語不可）。
+
+---
+
+## 4. デプロイ後 E2E チェックリスト
+
+### 閲覧 E2E（A版後方互換 — 回帰確認）
+
+- [ ] A版 slug の確認は本リポジトリでは行えない（`beauty-report-mobile.html` を移設していないため）
+- [ ] `https://trimmer-system.kouheikosehira.com/p/{A版slug}/{reportId}` → カルテ内容が正常表示
+- [ ] 上記で `window.__VIEW__=true` が注入されていること（DevTools > Console: `__VIEW__`）
+
+### 閲覧 E2E（ポチ版B）
+
+- [ ] `https://trimmer-system.kouheikosehira.com/o/{ownerSlug}` → `ponchi-v2.html` 飼い主画面（`__VIEW__=true`・`__SCREEN__='owner'`）
+- [ ] `https://trimmer-system.kouheikosehira.com/p/{ponchiSlug}` → 肉球画面（`__SCREEN__='paw'`）
+- [ ] `https://trimmer-system.kouheikosehira.com/p/{ponchiSlug}/all` → アーカイブ画面（`__SCREEN__='archive'`）
+- [ ] `https://trimmer-system.kouheikosehira.com/p/{ponchiSlug}/{reportId}` → カルテ画面（`__SCREEN__='report'`・`__VIEW__=true`）
+
+### 編集 E2E（ポチ版B）
+
+- [ ] `https://trimmer-system.kouheikosehira.com/edit` → 飼い主一覧画面（`__VIEW__` なし・`__OWNER_LIST__` 注入）
+- [ ] `https://trimmer-system.kouheikosehira.com/edit/o/{ownerSlug}` → 飼い主の犬一覧（`__VIEW__` なし・`__OWNER__` 注入）
+- [ ] `https://trimmer-system.kouheikosehira.com/edit/p/{slug}` → 月一覧/新規作成画面（`__VIEW__` なし・`__SCREEN__='archive'`）
+- [ ] `https://trimmer-system.kouheikosehira.com/edit/p/{slug}/{reportId}` → 既存レポート編集（`__VIEW__` なし・`__SCREEN__='report'`）
+- [ ] 上記編集 URL でフォームが入力可能（読取専用でない）ことを確認
+
+### スタティックアセット E2E
+
+- [ ] `https://trimmer-system.kouheikosehira.com/assets/icon-spa.png` → 200 OK（画像表示）
+- [ ] `https://trimmer-system.kouheikosehira.com/js/ponchi-app.js` → 200 OK
+- [ ] `https://trimmer-system.kouheikosehira.com/js/publish-client-ponchi.js` → 200 OK
+- [ ] ponchi-v2.html のアイコン・JS が 404 にならないこと（DevTools > Network で確認）
+
+---
+
+## 5. ロールバック手順
+
+### Worker のロールバック
+
+```powershell
+cd worker
+# Cloudflare ダッシュボードで前バージョンの deployment ID を確認してから:
+npx wrangler rollback <deployment-id>
+```
+
+または Cloudflare ダッシュボード（Workers & Pages > trimmer-system > Deployments）から前バージョンへ「Rollback」ボタンで戻す。
+
+### Pages のロールバック
+
+Cloudflare ダッシュボード（Workers & Pages > trimmer-system > Deployments）で前バージョンの「Rollback to this deployment」を使用。
+
+### git によるコードロールバック
+
+```powershell
+# worker/src/index.js を特定コミットに戻す場合:
+git checkout <commit-hash> -- worker/src/index.js
+# その後 wrangler deploy で再デプロイ
+```
+
+---
+
+## 6. 補足: 編集モード vs 閲覧モードの違い
+
+| 項目 | 閲覧（/p/* /o/*） | 編集（/edit/*） |
+|------|-----------------|---------------|
+| `window.__VIEW__` | `true` | 注入しない（undefined） |
+| `window.__SCREEN__` | 画面に応じて注入 | 画面に応じて注入 |
+| `window.__OWNER__` | 注入（/o/* のみ） | 注入（/edit/o/* のみ） |
+| `window.__OWNER_LIST__` | 注入しない | `/edit` のみ注入（飼い主一覧配列） |
+| `window.__PET__` | 注入（/p/* のみ） | 注入（/edit/p/* のみ） |
+| `window.__REPORT__` | 注入（/p/*/{reportId} のみ） | 注入（/edit/p/*/{reportId} のみ） |
+| ponchi-app.js の動作 | `__VIEW__=true` → 閲覧専用 | `__VIEW__` なし → 編集可能 |
+
+---
+
+v1.0 | 2026-06-03 | ポチ版B 本番デプロイ準備完了

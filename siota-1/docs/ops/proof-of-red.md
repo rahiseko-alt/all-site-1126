@@ -1,0 +1,3458 @@
+# 検査の「赤になったところを見た」台帳
+
+> **これは何か**（マスター指示・2026-08-28）
+>
+> > 「もはやルールじゃダメだろ。**16回中16回盛れない方法にしろ。**
+> >  壊してみて赤にならないなら**検査自体が壊れてるとする**か」
+>
+> `docs/watch.md` W-1 の型（検査が実際の仕組みと違う所を見る）は **16回**起きた。
+> `empty-pass.mjs` は**書き方**を見て止めるが、形で判るのは **5回分だけ**。
+> 残り11回は**形が正常なまま嘘をついていた**。形をいくら足しても、次の11回目の形は
+> 予測できない——**書き方の見張りでは 16/16 にならない。**
+>
+> そこで、見張るのをやめて**定義を置く**:
+>
+> **「壊して赤になったところを見ていない検査は、壊れているものとして数える」**
+>
+> 形に依存しないので**どんな嘘の付き方をしても逃げられない**。嘘をついている検査は、
+> 定義上「壊したら赤になった証拠」を出せないからである。
+>
+> 機械: `node scripts/guard/proof-of-red.mjs`（`npm run check` から呼ばれる）
+
+## いまの状態
+
+| | |
+|---|---|
+| 機械が数えた検査 | **204件**（`scripts/verify-*.mjs`） |
+| 壊して赤になったところを見た | **162件**（毒見 21 ＋ 1件ずつ壊す 141・2026-08-29） |
+| まだ見ていない | **42件** |
+
+> **この表は 112/71 のまま止まっていた**（`node scripts/guard/proof-of-red.mjs` は
+> その間ずっと 142/41 と出していた）。数を数えているのは機械なので、**この表が
+> 遅れても数が小さく見えるだけ**だが、遅れた表を根拠に判断されると困る。
+> 2026-08-29 に機械の出力へ合わせ直した。**迷ったら表ではなく機械を見ること。**
+
+**出発点は全件が未確認だった。** 毒見で埋め、天井に当たったあと（下の「⛔ 毒見の天井」）、
+**1件ずつ壊す**（マスター判断 A）で続けている。**数は上の表だけが正**——
+本文にも数を書いていたら今日5回ずれたので、**書く場所を1か所に減らした**。
+`verify:*` が全部緑であることは、いまのところ**それ自体が何も保証していない**——
+その緑が嘘でないことを、まだ一度も確かめていないため。
+
+**この数は少なく見せられない。** 検査を消せば「台帳に在るが実体に無い」で赤になり、
+台帳から行を消せば「台帳に無い検査」で赤になる。**逃げ道は塞いである。**
+
+## 盛らせない造り
+
+数ではなく、**検査を1件ずつ名前で**載せる（数だけの上限は、別の検査を消して枠を空ければ
+通ってしまう）。機械が数え上げた全件について:
+
+| | |
+|---|---|
+| 台帳のどちらの節にも無い | **赤**。新しい検査は、証拠と一緒でないと足せない |
+| 台帳に在るが実体に無い | **赤**。古い台帳を放置させない（`W-8` の型） |
+
+「未証明」に書けば通るが、**その1行が「まだ確かめていない」と名指しで残る**。
+
+## 証拠の書き方
+
+1件につき、**壊し方**と、**そのとき実際に出た赤の出力**を貼る。
+「落ちるはず」は証拠ではない（`D-18`）。書いたら「未証明」から「証明済み」へ1行移す。
+
+```
+### verify-admin.mjs :: 16. ペットが実際に消えた
+壊し方: 削除の RPC を呼ぶ行をコメントアウトする
+出力:
+    FAIL  16. ペットが実際に消えた  まだ居る（残り1頭）　画面の表示="削除しました"
+```
+
+## どう埋めるか（次の工程）
+
+手で182件を壊すのは現実的でないので、**まとめて壊す**を作る:
+
+**毒見（poison run）** — 接続先は `SUPABASE_LOCAL_URL` で差し替えられる
+（`scripts/lib/local-stack.mjs:37`）。土台とアプリの間に**中身を空にして返す層**を挟み、
+**その世界で `verify:*` を全部走らせる**。何も動いていない世界なのだから、
+**すべての検査が赤にならなければおかしい**。そこで**緑のまま残った検査**が、
+まさに「壊しても赤にならない検査」＝壊れている検査である。
+
+1回の実行で全件に判定が付く。Docker が要るので**この環境では走らず、CI に置く**。
+
+**毒見で判るのは「空の世界で緑になる」型まで。** 「正しく動いている世界で、
+別のものを見ている」型（`F-20260827-43`）は毒見では出ないので、
+そちらは1件ずつ壊すしかない。**この台帳は、その残りを名指しで残すためにも要る。**
+
+## 証明済み（`- <ファイル> :: <検査の名前>`）
+
+### 応答だけが切れたときの下書き・確定 3件（2026-11-25・実測・レビュー R2・R3・R5）
+
+本物のローカル Supabase で、画面は `/my` から押して進む。直しを外して走らせ、赤を見た。戻すと `verify-draft.mjs` 10/10。
+
+壊し方A: `saveDraft` の「作る前に既存の下書きを探す」1行を消し、確定の 409 の分岐を `if (false)` にする。
+出力:
+    FAIL  7. 下書きを作った返事が切れても、次の保存で2枚目の下書きを作らない  切った=true 下書き2件
+    FAIL  8. 写真の登録待ちで断られたら、「3分ほど待ってから」と言う  ["カルテを保存できませんでした。\n\nnot available / report assets are incomplete / (409)\n\nもう一度お試しください。"]
+
+壊し方B: `saveReport` の「404 なら読み直して確定済みなら成功」を `false &&` で切る。
+出力:
+    FAIL  9. 確定の返事が切れても、押し直すと「保存できませんでした」にならず確認へ進み、カルテは1枚  切った=true 着いた=false 知らせ=["カルテを保存できませんでした。\n\nnot available / not available / (404)\n\nもう一度お試しください。"] 確定1枚 下書き0件
+
+- verify-draft.mjs :: 7. 下書きを作った返事が切れても、次の保存で2枚目の下書きを作らない
+- verify-draft.mjs :: 8. 写真の登録待ちで断られたら、「3分ほど待ってから」と言う
+- verify-draft.mjs :: 9. 確定の返事が切れても、押し直すと「保存できませんでした」にならず確認へ進み、カルテは1枚
+
+### 管理者だけがスタッフを止める 6件（2026-11-20・実測・`N-50`・放置リスト `#76`）
+
+壊し方4つ（`member-active-anyone`・`member-self-stop-allowed`・`member-stop-ignored`・`staff-manage-visible-to-staff`）を1つずつ当て、
+各項が赤になるのを本物のローカル Supabase で見た。戻すと `verify-admin.mjs` 70/70。出力は `docs/ops/mutate-run-N50.md`。
+
+- verify-admin.mjs :: 23c. 「利用を止める」は確認の画面でもう1回押すと効き、一覧で「停止中」・「再開する」に変わる
+- verify-admin.mjs :: 23d. 止めた人の鍵では /api/pets が断られるか店の犬が1件も返らず、お店の人として扱われない
+- verify-admin.mjs :: 23e. 「再開する」を押すと「利用中」に戻り、その人の鍵で店の犬が再び取れる
+- verify-admin.mjs :: 23f. 管理者が API で自分を止めようとしても断られ、管理者のまま使える
+- verify-admin.mjs :: 23g. スタッフには ⑥ スタッフ管理 が出ず、/admin/staff を開くと「管理者だけ」の案内ともどるだけが出る
+- verify-admin.mjs :: 23h. スタッフの GET /api/staff と、管理者を止める POST は断られ、管理者は止まっていない
+
+### 犬種と管理者／スタッフ 21件（2026-11-19・実測・`N-48`・`N-49`）
+
+**10個の壊し方を1つずつ当て、各項が赤になるのを本物のローカル Supabase で見た。** 戻すと `verify-admin.mjs` 62/62。
+赤の出力（どの壊しで、どの項が赤になったか）は `docs/ops/mutate-run-N48-N49.md` に全件。代表:
+
+- `report-delete-admin-open`（カルテ削除の判定を `is_shop_staff` に戻す）→ `FAIL  22g. スタッフのカルテ削除は断られ、…`
+- `owner-pet-admin-delete-rls-open`（顧客・犬の削除をスタッフに開く）→ `FAIL  22i.` `FAIL  22j.`
+- `session-role-dropped`（`/api/session` から `role` を抜く）→ `FAIL  22b.` `FAIL  22f-1.`〜`22f-6.`
+- `pet-breed-not-sent`（登録で犬種を送らない）→ `FAIL  6b.` `FAIL  6c.` `FAIL  6e.` `FAIL  22d.`
+
+- verify-admin.mjs :: 22b. スタッフの管理画面には リピーター / 新規 の2つだけが出る（削除・店舗設定・スタッフ招待が無い）
+- verify-admin.mjs :: 22d. スタッフも新規で犬を作れて、打った犬種がそのまま保存される
+- verify-admin.mjs :: 22e. スタッフも「犬の情報を直す」で犬種を変えられる（サーバーの値が変わった）
+- verify-admin.mjs :: 22f-1. スタッフが /admin/delete を開くと「管理者だけ」の案内ともどるだけが出て、操作の部品が無い
+- verify-admin.mjs :: 22f-2. スタッフが /admin/delete/owner を開くと「管理者だけ」の案内ともどるだけが出て、操作の部品が無い
+- verify-admin.mjs :: 22f-3. スタッフが /admin/delete/pet を開くと「管理者だけ」の案内ともどるだけが出て、操作の部品が無い
+- verify-admin.mjs :: 22f-4. スタッフが /admin/delete/report を開くと「管理者だけ」の案内ともどるだけが出て、操作の部品が無い
+- verify-admin.mjs :: 22f-5. スタッフが /admin/settings を開くと「管理者だけ」の案内ともどるだけが出て、操作の部品が無い
+- verify-admin.mjs :: 22f-6. スタッフが /admin/invite-staff を開くと「管理者だけ」の案内ともどるだけが出て、操作の部品が無い
+- verify-admin.mjs :: 22g. スタッフのカルテ削除は断られ、カルテは消えず・削除中にもなっていない
+- verify-admin.mjs :: 22h. スタッフが犬を「使わない」にするのは断られ、犬は有効のまま（消す代わりの抜け道を塞ぐ）
+- verify-admin.mjs :: 22i. スタッフの DELETE /api/pets は断られ、犬は消えていない
+- verify-admin.mjs :: 22j. スタッフの DELETE /api/owners は断られ、顧客は消えていない
+- verify-admin.mjs :: 22k. スタッフの PATCH /api/shop は断られ、既定の来店間隔は変わっていない
+- verify-admin.mjs :: 22l. スタッフのスタッフ招待は断られ、招待は増えず・前の招待も取り消されていない
+- verify-admin.mjs :: 6a. 犬種の欄に、打つと出る候補が付いている
+- verify-admin.mjs :: 6b. 登録で手入力した犬種が、そのままの値で保存された
+- verify-admin.mjs :: 6c. 犬種で打つと、その犬種の子だけが出て、行に飼い主名・犬名・犬種が並ぶ
+- verify-admin.mjs :: 6e. 直す画面には、いまの犬種が入っている
+- verify-admin.mjs :: 6f. 直した犬種がサーバーに入った
+- verify-admin.mjs :: 6g. 空欄で保存すると犬種が消える（空文字ではなく「無し」）
+
+### 決着した判断を判断待ちへ戻させない 3件（2026-09-09・実測）
+
+**3通りの壊し方すべてで赤を実測した**（`N-3`）。
+
+壊し方①: `docs/ops/plan.md` 第6章の表に `#35`（バックアップ）を戻す。
+出力: `not ok 18 - 決着済みの \#35（バックアップ）が、棚卸しの判断待ち表に載っていない`
+
+壊し方②: `docs/runbook.md` 2-D のバックアップの行を「決着済み」から「未」に戻す。
+出力: `not ok 19 - 手順書（runbook 2-D）でも、バックアップが「決着済み」と書かれている`
+
+壊し方③: 「次の一手」に `- [ ] N-99 判断待ち #35（バックアップ）をマスターに確認する` を足す。
+出力: `not ok 20 - 「次の一手」に、バックアップをマスターへ確認する一手が未了で並んでいない`
+
+3件とも、戻したら `# pass 20 / # fail 0` に復した。
+
+- plan.test.mjs :: 決着済みの `#35`（バックアップ）が、棚卸しの判断待ち表に載っていない
+- plan.test.mjs :: 手順書（runbook 2-D）でも、バックアップが「決着済み」と書かれている
+- plan.test.mjs :: 「次の一手」に、バックアップをマスターへ確認する一手が未了で並んでいない
+
+### シナリオ台帳の記録欄 6件（2026-09-09・実測）
+
+壊し方①: 1行から「結果／実施日」の2列を消す。
+出力: `not ok 13 - お店の人 — ふつうの操作 の全行に「結果」と「実施日」が在る`
+
+壊し方②: 1行を `NG` にして理由を書かない。
+出力: `not ok 17 - NG を付けた行は、放置リストの番号か理由が書いてある`
+
+- scenarios.test.mjs :: お店の人 — ふつうの操作 の全行に「結果」と「実施日」が在る
+- scenarios.test.mjs :: お店の人 — 致命的な危険操作 の全行に「結果」と「実施日」が在る
+- scenarios.test.mjs :: 飼い主 — ふつうの操作 の全行に「結果」と「実施日」が在る
+- scenarios.test.mjs :: 飼い主 — 致命的な危険操作 の全行に「結果」と「実施日」が在る
+- scenarios.test.mjs :: NG を付けた行は、放置リストの番号か理由が書いてある
+- scenarios.test.mjs :: ❌（守りが無い）の行は、末尾の宿題の表から辿れる
+
+### 透過度・消しゴム・文字 13件（2026-09-07・実測）
+
+壊し方①: `drawCanvas()` / `redraw()` の `globalAlpha` の行を消す（＝いつも濃い）。
+出力: `not ok - 透過度を下げると、その薄さで描かれる`
+
+壊し方②: 消しゴムの当たり判定を「点だけ」に戻す（線分を見ない）。
+出力: `not ok - 消しゴムは、線の途中を触っても消せる（点と点の間も線）`
+——**これは実際に一度そうなっていた。** 点だけを見ていたので、なぞりが速くて点が
+飛んでいる線は真ん中を触っても消えなかった。検査が先に見つけた。
+
+- ui-body-marking-draw.test.mjs :: 透過度を下げると、その薄さで描かれる
+- ui-body-marking-draw.test.mjs :: 透過度は0.1〜1の外へ出さない
+- ui-body-marking-draw.test.mjs :: 消しゴムは、触れた線を1本だけ取り除く（下絵は消さない）
+- ui-body-marking-draw.test.mjs :: 消しゴムは、線の途中を触っても消せる（点と点の間も線）
+- ui-body-marking-draw.test.mjs :: 文字は、押した所に置かれる
+- ui-body-marking-draw.test.mjs :: 文字は、何も打たなければ何も置かない
+- ui-body-marking-draw.test.mjs :: 文字の大きさは太さに連れて変わる（道具を増やさない）
+- ui-body-marking-draw.test.mjs :: 置いた文字を掴んで動かすと、位置が変わる
+- ui-body-marking-draw.test.mjs :: 文字の無い所を押したら、動かさずに新しい文字を置く
+- ui-body-marking-draw.test.mjs :: 選んでいる文字の色を変えると、その文字の色が変わる
+- ui-body-marking-draw.test.mjs :: 選んでいない文字の色は、色を変えても変わらない
+- ui-body-marking-draw.test.mjs :: 入力を促すとき、説明の文は出さない
+- ui-body-marking-draw.test.mjs :: 選んでいる目印は、飼い主に届く画像には焼き込まない
+- verify-photo-roundtrip.mjs :: 12b. 直したあとの写真が、保存された実体を指している（一時的な住所になっていない）
+- verify-report-roundtrip.mjs :: 21b. 桁違いの体重（9999kg）では確定できない
+- verify-report-roundtrip.mjs :: 21d. 体重が空のまま確定を押すと、そのことを言って訊いてくる
+- verify-portal.mjs :: 13c. 犬のページから、愛犬の一覧へ戻る道が出ている
+- verify-admin.mjs :: 3h. 飼い主の名前で打つと、その飼い主の犬だけに絞られる（大文字小文字は問わない）
+- verify-admin.mjs :: 3i. 合う犬がいなければ、0行で「該当する子がいません」と出る
+- verify-admin.mjs :: 3j. 絞った行を押すと、その犬のカルテ作成（/edit/p/…）に直接着く
+  （2026-11-18・クライアント指示 C-14。手元の実 Supabase で取った赤:
+   壊し方: `backend/js/supabase-admin.js` の検索窓で `row.hidden = !hit;` を `row.hidden = false;` にする（絞り込みを効かなくする）
+   出力:
+       FAIL  3h. 飼い主の名前で打つと、その飼い主の犬だけに絞られる（大文字小文字は問わない）  全4行 → ["X飼い主: Owner A","Y飼い主: Owner A","Z飼い主: Owner A","Q飼い主: Owner B"]
+       FAIL  3i. 合う犬がいなければ、0行で「該当する子がいません」と出る  行=4 案内=true
+       FAIL  3j. 絞った行を押すと、その犬のカルテ作成（/edit/p/…）に直接着く  path=/edit/p/40000000-0000-0000-0000-0000000000a1
+       34/37 PASS
+   戻すと 37/37 PASS。）
+- verify-admin.mjs :: 3g. カルテ一覧から戻ると、ちょうど1つ手前（犬を選ぶ）に戻る
+  （2026-09-14・マスター指示「直せるものを先に治せ」。CI の `mutate`（run 406）で取った赤:
+
+       weight-limit-off         → 21b. 赤（体重の範囲の関所を外す）
+       blank-commit-not-asked   → 21d. 赤（空のまま確定できる状態に戻す）
+       pet-page-no-way-back     → 13c. 赤（犬のページの戻る道を外す）
+       admin-substep-no-history → 3g.  赤（1件選んだ後に履歴を積まない）
+
+   直しを入れた状態では4件とも緑。**赤 → 緑 → 戻して赤**がそろっている。）
+- verify-photo-roundtrip.mjs :: 12c. 直したあとも、飼い主に同じ写真が同じ色で届いている
+  （2026-09-13・マスター指示「直せるものを先に治せ」。**この作業コンテナに docker が
+   無いので、CI の `mutate` で赤を取った**（run 393・`docs/ops/mutate-run-partial.md`）。
+
+   壊し方 `revise-photos-from-hydrated` — `applyReport` が原本ではなく
+   `blob:` に置き換えたあとを使う＝直す前の状態に戻す:
+       12b. 直したあとの写真が、保存された実体を指している   ← 赤
+       12c. 直したあとも、飼い主に同じ写真が同じ色で届いている   ← 赤（run 396・書き直した後の形で取り直した）
+
+   直しを入れた状態の同じ実行では、12b が「5件すべて asset://」で緑。
+   **赤 → 緑 → 戻して赤**がそろっている。
+
+   **2026-09-23 追記**: この節にはもともと「壊し方 `revise-photo-add-not-locked`
+   → `12d. 直しの画面では、写真を足す入口が閉じている`」の赤も並んでいた。
+   マスター指示（2026-09-23）で確定済みカルテへの写真追加・貼り替えを許可した
+   （`202609230015_revise_report_photo_replace.sql`）ため、**この検査名・壊し方は
+   もう実体に無い**（`lockPhotoAddForRevise()` を削除・`revise-photo-add-not-locked`
+   を `scripts/mutate-run.mjs` から削除）。**見た事実は消さない**（`F-20260911-84`）
+   ので、この注記として残す。新しい `12d.`〜`12f.` の赤緑は下に別途記載。）
+- verify-photo-roundtrip.mjs :: 12d. 直しの画面で、写真を足す・貼り替える入口が開いている
+- verify-photo-roundtrip.mjs :: 12e. 貼り替えた耳の写真が保存できた（実体を指している）
+- verify-photo-roundtrip.mjs :: 12f. 貼り替えた耳の写真が、飼い主に新しい色で届いている
+  （2026-09-23・マスター指示「画像の追加が出来るようにしたい。貼る画像を間違えてその
+   修正をしたい時に困る」。確定済みカルテへの写真追加・貼り替えを許可した
+   （`202609230015_revise_report_photo_replace.sql`・`docs/decisions.md` D-20260923-81）。
+
+   壊し方 `revise-photo-upload-still-draft-only` — `register_report_asset`/
+   `storage_path_staff_upload` を元の `status = 'draft'` のみに戻す（DBの守りを
+   緩める前の状態に戻す）:
+       12e./12f. 相当（耳の写真の貼り替え保存）が `検査を最後まで実行できた` で赤
+       （`page.waitForURL: Timeout 60000ms exceeded` — 保存が
+       `画像を保存できませんでした` で失敗し、確定後の画面へ遷移しない）
+
+   直しを入れた状態（`status in ('draft', 'final')`）に戻した同じ実行では
+   18/18 PASS、12d./12e./12f. すべて緑（12e. は `asset://…` を指す・12f. は
+   貼り替えた新しい色 `[89,200,211]` で飼い主に届く）。もう一度壊すと同じ箇所で
+   再び赤（`docs/ops/mutate-run-partial.md`）。**赤 → 緑 → 戻して赤**がそろっている。
+   実行はこの作業コンテナの本物のローカル Supabase（Docker）で行った——
+   `db reset` 直後は Kong が古い upstream を掴んで `/auth/v1/health` が
+   502 を返すことがあるため（`scripts/lib/local-stack.mjs` の既知の注意）、
+   `docker restart supabase_kong_trimmer-system` で 200 を確認してから実行した。）
+- ui-annotate-pinch.test.mjs :: 透過度を下げると、その薄さで引かれる
+- ui-annotate-pinch.test.mjs :: 薄さは1件ごとに戻す（次の線まで薄くならない）
+- ui-annotate-pinch.test.mjs :: 消しゴムは、触れた線を取り除く（写真は削らない）
+- ui-annotate-pinch.test.mjs :: 消しゴムは、離れたところの線までは消さない
+- ui-annotate-pinch.test.mjs :: 文字は、打った文字がその場に置かれる
+- ui-annotate-pinch.test.mjs :: 文字は、何も打たなければ何も置かない
+
+<!-- 2026-09-07・ペンの色と太さ／歯の写真の入口（マスター指示） -->
+
+### ペンの色と太さ・歯の写真の入口 9件（2026-09-07・実測）
+
+壊し方①: `drawCanvas()` の `m.color || …` `m.width || 4` を、元の決め打ち
+（`this.markColor(m.type)` と `4`）に戻す。
+出力: `not ok 10 - 選んだ色と太さで描かれる（線ごとに覚える）`
+
+壊し方②: `renderPhotoThumbs()` から「✏️ 書き込む」ボタンを作る行をまるごと消す。
+出力: `not ok 1 - 歯の写真1枚につき、押せる「書き込む」入口が1つ出る` /
+`not ok 2 - その入口を押すと、書き込みが開く`
+
+- ui-body-marking-draw.test.mjs :: 選んだ色と太さで描かれる（線ごとに覚える）
+- ui-body-marking-draw.test.mjs :: 色や太さを変えても、先に引いた線は変わらない
+- ui-body-marking-draw.test.mjs :: 所見の種類を選び直すと、色はその所見の色に戻る
+- ui-body-marking-draw.test.mjs :: 太さは1〜20の外へ出さない（0や巨大な値で描かない）
+- ui-body-marking-draw.test.mjs :: 色と太さを持たない古い印も、これまでどおり描ける（下書きや確定済みが壊れない）
+- ui-annotate-pinch.test.mjs :: 写真の書き込みも、選んだ色で引かれる
+- ui-annotate-pinch.test.mjs :: 写真の書き込みも、太さを変えられる（画面ではなく写真の画素で数える）
+- ui-annotate-pinch.test.mjs :: 色を変えても、先に引いた線は変わらない
+- ui-annotate-pinch.test.mjs :: 4面図と写真で、ペンの道具は同じ1組（片方で変えたらもう片方にも効く）
+- ui-teeth-annotate-entry.test.mjs :: 歯の写真1枚につき、押せる「書き込む」入口が1つ出る
+- ui-teeth-annotate-entry.test.mjs :: その入口を押すと、書き込みが開く
+- ui-teeth-annotate-entry.test.mjs :: 保存済み（asset://）の写真には、書き込みの入口を出さない
+
+<!-- 証拠を書いたら、下の「未証明」から1行ここへ移す。 -->
+
+### 鍵が古いときも入口は1つ 1件（2026-09-05・37回目の実測）
+
+- verify-screens.mjs :: 4e. 鍵が古いときも入口は1つ（死んだログイン画面を復活させない）
+
+**⚠️ この回でもう1つやった失敗**: 「実行時に隠す」コードを削除したのに、
+**それを見ていた検査（`test/supabase-auth.test.mjs` の1本）を旧仕様のまま残した**。
+`npm test` の出力を先頭4行で切って読んでいたため**3本目の結果を見ておらず**、
+「全緑」と報告してしまった。CI が捕まえた（`# pass 31 / # fail 1`）。
+34回目・35回目とまったく同じ型——**直した直後に、同じものを見ている兄弟を数える**
+（`docs/watch.md` W-1）。**出力は端を切らずに読む。**
+
+
+### 入口には業務の器を配らない 3件（2026-09-05・38回目の実測）
+
+- verify-screens.mjs :: 2. 入口には、ログインの画面しか配られていない
+- verify-screens.mjs :: 3. 入口に、業務の画面へ連れて行く段のタブが無い
+- verify-screens.mjs :: 4. 入口で段を押しても、業務の画面に入れない
+
+
+### 入口を1つにする 3件（2026-09-05・36回目の実測）
+
+- verify-screens.mjs :: 4c. 未ログインでどの画面を開いても、入口（`/`）に集まる
+- verify-screens.mjs :: 4d. 配られた HTML でログインを始められるのは入口だけ
+- verify-invitation.mjs :: 4b. 未ログインで招待リンクを開くと、入口へ送られても招待と戻り先を落とさない
+
+
+### 逆向きの関所になっていた1本を直す 2件（2026-09-05・35回目の実測）
+
+**入れ替え漏れの3本目。いちばん質が悪い形だった。**
+
+未ログインで `/edit` を開いたときの転送先を `/my` から `/`（入口）に変えたが、
+**その1行を見ている検査は `verify:m6 ②a.` のリポジトリ全体で1本だけ**で、
+それを旧仕様のまま置き去りにした。結果:
+
+- **正しい実装（`/`）だと赤になる**
+- **元に戻す（`/my`）と緑に戻る**
+
+——**逆向きの関所**。検査が無いより悪い。CI の赤を見た人が「実装のほうを戻す」
+判断に誘導されるため。CI で実際にこう出た:
+
+```
+FAIL  ②a. 未ログインならログインの画面に導かれる  path=/
+##[error]The operation was canceled.
+```
+
+`docs/watch.md` W-1 の注記「**直した直後に同じファイルの兄弟を数えたか**も併せて見る
+（`F-20260828-48`）」がそのまま当てはまる。入れ替えたのは `verify-screens.mjs` と
+`test/supabase-auth.test.mjs` だけで、**同じものを見ている `verify-edit` /
+`verify-first-run` / `verify-m6` の3本を数えていなかった**（3本とも赤・34〜35回目で全部直した）。
+
+### ⚠️ もっと悪かったこと: **検査がハングして、CI ジョブごと殺された**
+
+上の `FAIL` のあと、`verify:m6` は**15分固まって**ジョブがキャンセルされた。
+原因は `scripts/lib/local-stack.mjs` の `injectSession()` に**時間切れが無かった**こと。
+セッションを入れる口（`TrimmerAuth`）を公開するのは `/my` と `/edit` の起動処理だけで、
+入口（`/`）は公開しない。転送先を `/` に変えたので、そこで**永久に待った**。
+
+**ハングは、赤より悪い。** 何が失敗したか誰にも分からず、CI の時間だけ溶ける。
+2つ直した:
+1. `injectSession()` に20秒の時間切れ。**何が足りなかったかを言って落ちる**
+2. `verify-m6` は注入の前に `/my` を開く（`openStaffPage()` と同じ順序）
+
+**2通りの壊し方で赤を実測した。**
+
+**N: 未ログインの `/edit` を `/my` に戻す**
+
+```
+FAIL  ②a. 未ログインなら入口のログイン画面に導かれる  {"path":"/my","login":false,"ret":"/edit"}
+```
+
+**O: 戻り先を積まない**
+
+```
+FAIL  ②b. 開こうとした URL を覚えている（ログイン後に戻れる）  覚えた先=null
+```
+
+**直した状態**: `verify:m6 16/16 PASS`
+
+**`②a.` は「着いた」だけを見ない形にした**——入口に着いても押せるログインが無ければ
+行き止まりなので、`[data-entry-login]` の可視と `post_auth_return` の中身まで見る。
+
+### ログアウトの行き先を揃えた 1件（2026-09-04・34回目の実測）
+
+`verify:portal 14.` は「サインアウトで `/my` に留まってログイン画面が出る」を
+要求していた。それだと**飼い主の画面がもう1つの入口**になり、マスター指示
+「入口を分けるな」と食い違う。3画面（`/edit` `/my` `/admin`）とも入口（`/`）へ
+返すように揃え、検査も**着いた先で実際にログインし直せるところまで**見る形にした
+（鍵が残っていないことも併せて見るので、守備範囲は広がっている）。
+
+```
+--- 壊し方M: /my のログアウトを /my に戻す
+FAIL  14. サインアウトすると入口に戻り、そこでログインし直せる  {"path":"/my","loginVisible":false,"tokenLeft":false}
+--- 直した状態 ---  15/15 PASS
+```
+
+### 消したボタンを押していた検査の入れ替え 4件（2026-09-04・34回目の実測）
+
+**サブ検証がいちばん大きな抜けを見つけた。** `＋新規カルテを作成する` を消したとき、
+`verify:screens 13.` は入れ替えたのに、**同じボタンを押していた
+`scripts/verify-first-run.mjs:74` を入れ替え忘れた**。結果:
+
+```
+FAIL  最後まで歩けた  locator.click: Timeout 30000ms exceeded.
+4/5 PASS
+```
+
+`verify:first-run` は `check(` を **18件**持つのに、**実際に走るのは 0〜3 の4件だけ**に
+なっていた。`#63` の本体（管理画面から飼い主・犬を登録 → ④で使用オプションに指が届く →
+確定 → 招待URL → 飼い主に届く）**14件が黙って走らなくなっていた**。
+`scripts/guard/verify-inventory.mjs` は**ソースに `check(` が在るか**しか見ないので、
+`npm run check` は緑のまま通る。**消したつもりが無くても、これは `A-4`（検査を弱めて
+緑にしない）に実質的に触れている**——台帳は18件と数え、実際は4件しか走っていなかった。
+
+入れ替えたあと: **18/18 PASS**（14件が全部走って全部通った）。
+
+**`9.` の入れ替えも同じ型**: `verify-screens 9.` は `[data-staff-link]` の有無を見ていたが、
+その属性は出荷物のどこにも無くなった（`grep` で0件）。**再導入されたときしか捕まらない**
+検査になっていたので、**いま危ないこと**——振り分けが飼い主を `/edit` へ送ってしまうこと
+——を見る形に替え、`9b.`（作業画面への入口を1つも出していない）を足した。
+
+**4通りの壊し方で赤を実測した。**
+
+**I: 「新規カルテ」ボタンを戻す**
+
+```
+FAIL  4. 押しても登録できない「新規カルテ」ボタンが、0件の店に残っていない  残っている=1件
+```
+
+**L: 0件の店の案内から手順を消す**
+
+```
+FAIL  4b. 0件の店の案内が、押す場所を名指ししている（「管理」→「② 新規」）
+      案内="まだ1頭も登録されていません。 ／ お店の人に聞いてください。 ／ 管理画面で登録する"
+```
+
+⚠️ **`4b.` は最初、空パスだった。** 「案内に `管理` が含まれるか」で書いたが、
+案内の下に**「管理画面で登録する」というリンクが付く**ので、手順を丸ごと消しても
+`管理` は残り、**壊しても緑のまま通った**（実測）。`② 新規` まで名指しさせる形に
+直してから、上の赤を得た。**自分で書いた検査が恒真だった**——`empty-pass` は
+この形（本文の部分一致）を捕まえない。
+
+**J: 飼い主の画面に作業画面への入口を足す**
+
+```
+FAIL  9b. 飼い主だけの人に、作業画面への入口を1つも出していない  入口=1件
+```
+
+**K: 飼い主も作業画面へ送る**（`memberships` を見ずに全員 `/edit`）
+
+```
+FAIL  検査を最後まで実行できた  page.goto: Timeout 30000ms exceeded.
+```
+
+`9.` の赤はこの形になる。飼い主を `/edit` へ送ると、`bootStaffPortal` が
+`memberships === 0` で `/my` へ送り返すので**転送が往復し、頁が開かない**。
+「着く先が違う」ではなく「開かない」として出る——**どちらも赤だが、次に読む人が
+出力を見て戸惑わないよう、ここに書いておく**。
+
+**直した状態**: `verify:first-run 18/18` / `verify:screens 29/29`
+
+### `/edit` の画面の数え方を直した 2件（2026-09-04・33回目の実測）
+
+`verify:edit` の `2.` は「`screen-N` が4枚在ること」を見ていたが、`/edit` から
+入口のログイン画面（`screen-1`）を外したので 3 枚になり、**正UI が配られているのに
+「配られていない」と読み違えた**。要件は枚数ではなく「仕事に使う②③④が在ること」。
+名前で見る形に正し、**「入口の画面が紛れ込んでいないこと」を見る `2b.` を足した**
+——判定を緩めたのではなく、守備範囲は増えている。
+
+```
+--- 壊し方: 入口の画面を外さない（2b が見る形）
+FAIL  2b. スタッフの画面に、入口のログイン画面が紛れ込んでいない  screen-1=true
+--- 壊し方: 作業画面を1枚落とす（2 が見る形）
+FAIL  2. 正UI が配られている（仕事に使う②③④が在る）  作業画面=2 全体=3
+--- 直した状態 ---  20/20 PASS
+```
+
+### 入口の取りこぼし 5件（2026-09-04・33回目の実測・サブ検証が見つけた）
+
+- verify-screens.mjs :: 8c. 作業画面に、白紙へ連れて行く HOME を出していない
+- verify-screens.mjs :: 8d. `goToStep(1)` を呼んでも、いまの画面が消えない
+- verify-screens.mjs :: 8e. 未ログインでスタッフの深い URL を開くと、入口へ送られる
+- verify-screens.mjs :: 8f. そのとき、開こうとした URL を覚えている
+- verify-screens.mjs :: 8g. ログインを押しても、戻り先が入口の既定で上書きされない
+
+
+### 入口を1本にする 6件（2026-09-04・32回目の実測）
+
+- verify-screens.mjs :: 5. スタッフ権限を持つ人は `/` から作業画面に着く
+- verify-screens.mjs :: 6. 着いた作業画面に、犬の一覧が出ている（器だけ運ばない）
+- verify-screens.mjs :: 7. 作業画面にログアウトが出ている（別のアカウントに切り替えられる）
+- verify-screens.mjs :: 8. 作業画面に、押しても何も起きないログインの入口が残っていない
+- verify-screens.mjs :: 8b. ログアウトを押すと入口（`/`）に戻る
+- verify-screens.mjs :: 13. ②一覧に、押しても何もしない「新規カルテ」ボタンが残っていない
+
+
+### ⑥飼い主の体重グラフ 2件（2026-09-03・31回目の実測・放置リスト `#46`）
+
+- verify-report-roundtrip.mjs :: 14c. 飼い主: 体重推移に線が引かれている（点が2つ以上）
+- verify-report-roundtrip.mjs :: 14d. 飼い主: 推移の点が、確定カルテの枚数（2枚）と合っている
+
+
+### 徹底調査で見つけた穴 2件（2026-09-03・30回目の実測）
+
+- verify-m6.mjs :: ⑤c-2. 確定後に「03」を押すと、組み立てていない④を開かず②へ戻す
+- verify-m6.mjs :: ⑤c-3. 戻った②に、犬を選び直せる一覧が在る（押せただけで終わらせない）
+
+
+### 体重の記録 9件（2026-09-03・29回目の実測）
+
+- verify-carry-over.mjs :: 前回比が「前回の記録なし」ではない（5枚目の体重を引けている）
+- verify-carry-over.mjs :: まだ量っていないので、前回の体重を出している（痩せたように見せない）
+- verify-carry-over.mjs :: 体重を入れると前回比が出る（4.4 → 4.6 で +200g ▲）
+- verify-carry-over.mjs :: カルテ1枚の応答に、確定カルテを横断した体重の履歴が載っている
+- verify-carry-over.mjs :: 履歴の最後が、いま入れた体重（4.6kg）
+- verify-carry-over.mjs :: ⑤の体重グラフに線が引かれている（点が2つ以上）
+- verify-carry-over.mjs :: 7枚目の前回比は、6枚目で量った体重（4.6kg）を基準にする
+- verify-carry-over.mjs :: カルテが1枚も無い犬では「前回の記録なし」のまま
+- verify-carry-over.mjs :: カルテが1枚も無い犬では、引き継ぎの帯を出さない
+
+
+### 管理者の入口 3件（2026-09-03・28回目の実測）
+
+- verify-admin.mjs :: 1. お店の人は、みんなと同じカルテ画面に着く
+- verify-admin.mjs :: 1b. お店の人には「管理」の入口が見えていて、指が届く
+- verify-admin.mjs :: 1c. 「管理」を押すと管理画面に着く
+
+
+### 6枚目を前回の続きから始める 20件（2026-09-03・27回目の実測）
+
+- verify-carry-over.mjs :: 来店日が空
+- verify-carry-over.mjs :: トリマーからのメッセージが空
+- verify-carry-over.mjs :: 体重が空
+- verify-carry-over.mjs :: ⑦使用オプションが1つも選ばれていない
+- verify-carry-over.mjs :: 6枚目に __marks が載っている（次の回で印を引き継げる）
+- verify-carry-over.mjs :: 7枚目に、6枚目で足した印まで引き継がれている
+- verify-carry-over.mjs :: 7枚目のメッセージは空（6枚目の文が残っていない）
+- verify-carry-over.mjs :: 爪（前足）が5枚目と同じ
+- verify-carry-over.mjs :: 爪（後ろ足）が5枚目と同じ
+- verify-carry-over.mjs :: 耳（右）が5枚目と同じ
+- verify-carry-over.mjs :: 耳（左）が5枚目と同じ
+- verify-carry-over.mjs :: 歯の状態が5枚目と同じ
+- verify-carry-over.mjs :: ベスト体重が5枚目と同じ
+- verify-carry-over.mjs :: 犬体図に前回の印が描かれている
+- verify-carry-over.mjs :: 引き継いだ印に、今回の印を足せる
+- verify-carry-over.mjs :: 6枚目に爪が引き継がれている
+- verify-carry-over.mjs :: 7枚目も「前回の続き」から始まる
+
+
+### 「開店初日の店から、人と同じ操作で最後まで行けるか」17件（2026-09-02）
+
+**なぜ足したか**: `verify:*` 15本と CI が全部緑、本番の `verify:prod` も 5/5 PASS の状態で、
+マスターがログインしたら **犬が0件で、そこから先へ進めなかった**（`F-20260902-66`）。
+既存の検査は**全部「犬が既に居る」状態から始めていた**（fixture が必ず犬を持っている）ので、
+**店を開いた初日の状態を、どの検査も一度も通っていなかった**。
+`scripts/verify-first-run.mjs` は、**犬0件から人の指で** 飼い主登録 → 犬登録 → 一覧に出る →
+カルテを書く → ⑦使用オプションを選ぶ → 確定 → 客が招待から入る → その値が届く、まで歩く。
+
+**壊し方①**: `src/js/ui.js` の `renderDogs()` 末尾、0件のときの案内を
+`if (false && data.length === 0 && ...)` で出さなくする。
+
+```
+FAIL  2. 1頭も居ないとき、次にどうすればいいかが画面に出ている  案内=0件
+16/17 PASS
+```
+
+**壊し方②**: `createNewKarte()` の案内文を、直す前の
+「②一覧の『初回登録QR』から…」に戻す（**0件のとき画面に存在しない入口**を指す文）。
+
+```
+FAIL  4. 「新規カルテを作成する」の案内が、存在しない入口を指していない
+        案内="新しい犬を登録するには、②一覧の「初回登録QR」から飼い主さんに登録してもらうか、管理画面の「②新規」から登録してくださ"
+16/17 PASS
+```
+
+どちらも戻すと **17/17 PASS**。
+
+- verify-first-run.mjs :: 0. 犬が1頭も居ない店から始めている
+- verify-first-run.mjs :: 1. 入口から、自分の作業画面に着く
+- verify-first-run.mjs :: 2. 1頭も居ないとき、次にどうすればいいかが画面に出ている
+- verify-first-run.mjs :: 3. 案内が指す入口が、実際に画面に在る
+- verify-first-run.mjs :: 4. 押しても登録できない「新規カルテ」ボタンが、0件の店に残っていない
+- verify-first-run.mjs :: 4b. 0件の店の案内が、押す場所を名指ししている（「管理」→「② 新規」）
+- verify-first-run.mjs :: 5. 「管理」を押すと管理画面に着く
+- verify-first-run.mjs :: 6. 飼い主を登録できた
+- verify-first-run.mjs :: 7. その飼い主に犬を登録できた
+- verify-first-run.mjs :: 8. 登録した犬が、作業画面の一覧に出る
+- verify-first-run.mjs :: 9. 犬を押すとカルテ作成に着く
+- verify-first-run.mjs :: 10. ④に使用オプションが出ている
+- verify-first-run.mjs :: 11. その使用オプションに指が届く
+- verify-first-run.mjs :: 12. 確定できた（カルテが1枚できた）
+- verify-first-run.mjs :: 13. 客に渡す初回登録の URL が出る
+- verify-first-run.mjs :: 14. 客がログインすると、自分の犬が出る
+- verify-first-run.mjs :: 15. 客がカルテを開ける
+- verify-first-run.mjs :: 16. スタッフが選んだ使用オプションが、客の画面に届いている
+- verify-first-run.mjs :: 最後まで歩けた
+
+### 「`/` が本物の入口として配られている」2件（2026-09-02）
+
+**なぜ足したか**: 本番の `/`（お客さんが最初に開く場所・ホーム画面のアイコンの行き先）が
+素の HTML のまま配られ、載っている「Google でログイン」が**ログインしなかった**
+（`F-20260902-66`）。それまでの検査は `/` について「4画面ある」「段のタブが4つある」
+「最初がログイン画面」しか見ておらず、**この3つは壊れた `/` でも全部緑になる**。
+器ではなく中身（＝バックエンドが載っているか）を見る検査が1本も無かった。
+
+- verify-screens.mjs :: 4b. `/` が本物の入口として配られている（ログインが繋がっている）
+- verify-production.mjs :: `/ が本物の入口として配られている（注入 ${topWant.length} 本）`
+
+**壊し方①（設定側）**: `worker/wrangler.local.toml` の `run_worker_first = ["/"]` を
+コメントアウトする（`[assets]` が静的ファイルを先に返し、Worker が呼ばれなくなる）。
+
+```
+FAIL  4b. `/` が本物の入口として配られている（ログインが繋がっている）  __ENTRY__=false supabase-auth.js=false
+21/22 PASS
+```
+
+**壊し方②（コード側）**: `worker/src/index.js` の上位振り分けにある
+`&& env.DATA_BACKEND !== 'supabase'` を外す（`/` を素の HTML で横取りして返す）。
+
+```
+FAIL  4b. `/` が本物の入口として配られている（ログインが繋がっている）  __ENTRY__=false supabase-auth.js=false
+21/22 PASS
+```
+
+どちらか片方を戻すだけで赤になる（＝両方が要る）。両方が入っている状態で **22/22 PASS**、
+`__ENTRY__=true supabase-auth.js=true`。
+
+**`1.`〜`4.` は①②のどちらの赤でも PASS のまま**だった——これがこの2件を足した理由そのもの。
+
+**本番側（`verify-production.mjs`）の赤**: 直す前の本番（`f0b288e` デプロイ済み）に対して
+実行した実測。
+
+```
+FAIL  / が本物の入口として配られている（注入 2 本）  HTTP 200
+        注入されるはず（worker から）: /backend/js/supabase-vendor.js /backend/js/supabase-auth.js
+        本番: /js/dummy.js /js/ui.js
+        __ENTRY__ の印: **無い**
+```
+
+同じ実行で `/edit` 側（`4.`）は PASS——**`/edit` しか見ていなかった**ことがそのまま出ている。
+
+### 毒見で赤になった 17件（2026-08-28）
+
+壊し方: **土台ごと空にする** — `node scripts/poison-run.mjs`。
+`scripts/lib/poison-stack.mjs` が「形だけ合っていて中身が空」の Supabase を立て、
+`SUPABASE_LOCAL_URL` をそこへ向ける。犬も飼い主もカルテも写真も1件も無い世界。
+
+出力（全文は `docs/ops/poison-run-result.md`）:
+
+```
+  赤になった（＝壊すと落ちることを確かめた）: 25件
+  **緑のまま残った（＝何も無くても通る）: 18件**
+```
+
+**この25件のうち、台帳に移せたのは 17件。** 残り8件は下の「移せなかったもの」。
+
+- verify-admin.mjs :: 検査を最後まで実行できた
+- verify-delete.mjs :: 検査を最後まで実行できた
+- verify-draft.mjs :: 0. 検査用の犬を登録できた
+- verify-draft.mjs :: 検査を最後まで実行できた
+- verify-edit.mjs :: 検査を最後まで実行できた
+- verify-empty-pet.mjs :: 0. カルテ0件の犬を用意できた
+- verify-empty-pet.mjs :: 検査を最後まで実行できた
+- verify-invitation.mjs :: 0. 新しい飼い主を登録できた
+- verify-invitation.mjs :: 検査を最後まで実行できた
+- verify-m6.mjs :: 検査を最後まで実行できた
+- verify-photo-roundtrip.mjs :: 検査を最後まで実行できた
+- verify-portal.mjs :: 検査を最後まで実行できた
+- verify-report-roundtrip.mjs :: 0. 検査用の犬を登録できた
+- verify-report-roundtrip.mjs :: 検査を最後まで実行できた
+- verify-screens.mjs :: 検査を最後まで実行できた
+- verify-stack.mjs :: マイグレーションと seed が当たっている（seed の犬 X を id で引ける）
+- verify-stack.mjs :: 鍵なしでは読めない（RLS/ゲートウェイが効いている）
+
+### 移せなかった8件（`verify-xss.mjs`）
+
+**毒見では赤になったが、台帳の鍵と結び付けられない。**
+`verify-xss.mjs` は `check(label, false, …)` と**名前に変数**を使っており、
+台帳（ソースを静的に読む）には `label` という文字列で載る。実行時の名前は
+`犬の名前（見出しへ入る）` `staffNote（担当からの一言）` など8種で、**別物になる**。
+
+さらに悪いことに、`check(label, …)` は**3か所**あるのに、台帳では
+`verify-xss.mjs :: label` という**同じ鍵に潰れている**。
+つまりこの3件は、いま**証明の単位として区別できていない**。
+
+**鍵の潰れは直した**（2026-08-28）——同じ名前が複数あるときは出現順の番号を付ける
+（`label #2` `label #3`）。これで **182件のうち4件が、数えられてはいるのに区別できて
+いなかった**状態は解消した。
+
+**ただし、実行時の名前と台帳の鍵を結び付ける問題は残っている。** 台帳はソースを
+静的に読むので `label` としか書けず、毒見の出力は `犬の名前（見出しへ入る）` などになる。
+**どの call site がどの行を出したかは、出力の文字だけからは決められない。**
+→ この8件は**未証明のまま**置く。数を良く見せない。
+
+直すなら、`check()` が**行番号か固定の id を一緒に印字する**しかない。
+182か所を書き換えることになるので、マスター判断に回す。
+
+
+
+### verify-stack.mjs :: マイグレーションと seed が当たっている（seed の犬 X を id で引ける）
+
+壊し方: **土台ごと空にする**（`node scripts/poison-run.mjs verify-stack.mjs`）。
+`scripts/lib/poison-stack.mjs` が「形だけ合っていて中身が空」の Supabase を立てる。
+
+直す前は、その世界で**緑のまま**だった——これが `F-20260828-50`:
+
+```
+PASS  マイグレーションが当たっている（pets を実際に引ける）  HTTP 200 / 0件
+```
+
+`200 かつ配列` を合格条件にしていたが、**空の配列も配列**である。
+seed にしか無いもの（犬 X を id で名指し）を引く形に直したあと、同じ毒見で:
+
+```
+FAIL  マイグレーションと seed が当たっている（seed の犬 X を id で引ける）  HTTP 200 / 0件
+```
+
+### 毒「noauth」で赤になった 2件（2026-08-28）
+
+**毒は1種類では足りない。** `empty`（データが空）では
+`verify-stack.mjs :: seed のアカウントで実ログインできる` が**緑のまま残った**——
+何を送っても通すサーバ相手だったため。そこで**ログインを拒む毒**を足した。
+
+壊し方: `node scripts/poison-run.mjs --flavor=noauth`。
+`/auth/v1/*` が `400 invalid_grant` を返す世界（`/auth/v1/health` だけは生かす——
+そこを止めると `ensureLocalSupabaseRunning()` の throw で何も走らなくなる）。
+
+`verify-stack` の変化（毒を変えると判定できる範囲が変わる）:
+
+```
+empty  : 赤 2 / 緑のまま 2
+noauth : 赤 4 / 緑のまま 1
+```
+
+全体（`docs/ops/poison-run-result-noauth.md`）: 赤 16件 / 緑のまま 15件。
+うち**新しく証明できたのは 2件**（残り13件は `empty` で証明済み）。
+
+- verify-stack.mjs :: seed のアカウントで実ログインできる
+- verify-xss.mjs :: 検査を最後まで実行できた
+
+### 両方の毒でも判定できない 15件
+
+`verify-portal` 10件 ／ `verify-screens` 4件 ／ `verify-stack :: Supabase が起きている`。
+
+**これらは緑が正しい。** 前の14件は「`/my` が配信される」「未ログインでログイン導線が
+出る」など**静的配信と未ログイン画面**の検査で、土台が空でもログインできなくても
+中身は変わらない。最後の1件も、その世界で土台は実際に応答している。
+
+**毒見の判定力は「その検査の対象が、その毒に依存しているか」で決まる。**
+この15件を判定するには、毒ではなく**配信物そのものを壊す**必要がある
+（例: `dist/` を空にする）。まだ作っていない。
+
+### 毒「nodist」で赤になった 2件（2026-08-28）
+
+壊し方: `node scripts/poison-run.mjs --flavor=nodist`。
+`worker/wrangler.poison.toml` が `dist/` の代わりに**空のディレクトリ**を配る。
+
+**注意: この毒は「配信物が空」だけではない。** 土台側は `empty` の毒のままなので、
+実際には**データも配信物も両方空**の世界である。より壊れている世界なので
+「赤になった」の証拠としては足りるが、**配信物だけを壊した判定ではない**。
+
+全体（`docs/ops/poison-run-result-nodist.md`）: 赤 26件 / 緑のまま 2件。
+**うち新しく証明できたのは 2件だけ**（残りは `empty` / `noauth` で証明済み）。
+
+- verify-m6.mjs :: ①. URL を開ける
+- verify-m6.mjs :: ②a. 未ログインなら入口のログイン画面に導かれる
+- verify-m6.mjs :: ②b. 開こうとした URL を覚えている（ログイン後に戻れる）
+
+### 1件ずつ壊して赤になった 9件（2026-08-28・CI run #111）
+
+壊し方: `node scripts/mutate-run.mjs`（`.github/workflows/ci.yml` の `mutate` ジョブ）。
+**土台は本物のまま**、製品を1か所だけ壊す。検査は最後まで走り、気づいた項だけが赤になる。
+
+出力（`docs/ops/mutate-run-result.md` は成果物として CI に上がる）:
+
+```
+  ✅ delete-assets      verify-delete.mjs              赤   2件
+  ✅ delete-assets      verify-admin.mjs               赤   1件
+  ✅ hydrate-assets     verify-photo-roundtrip.mjs     赤   6件
+  ✅ upload-assets      verify-photo-roundtrip.mjs     赤   1件
+  ✅ upload-assets      verify-delete.mjs              赤   1件
+  赤になった（＝その壊しを検出できた）: **10件**
+  製品のファイルに差分なし。すべて戻せている
+```
+
+**どの壊しがどれを赤にしたか**: `delete-assets` → `verify-delete` 4/5 と `verify-admin` 15。
+`hydrate-assets` → `verify-photo-roundtrip` 6/7/8/9/11/12。`upload-assets` → 同「検査を最後まで実行できた」。
+
+**3つの壊し全部に、検査が気づいた。新しい欠陥は出なかった。**
+客に当たる経路（写真が届く・消したものが消える）について、
+**検査が仕事をしていることが実測で確かめられた**——これがこの工程の目的である。
+
+- verify-photo-roundtrip.mjs :: 11. 直しで開くと、付けた写真5枚が控えに残っている
+- verify-photo-roundtrip.mjs :: 12. 直したあとも写真5枚が残っている
+- verify-admin.mjs :: 15. カルテ1枚が実際に消えた
+- verify-delete.mjs :: 4. 写真の実体が Storage から消えた（service_role で数える）
+- verify-delete.mjs :: 5. 飼い主のページからカルテが消えている
+- verify-photo-roundtrip.mjs :: 6. 飼い主: 表紙が、1枚目に入れた写真
+- verify-photo-roundtrip.mjs :: 7. 飼い主: ギャラリーに2枚並ぶ
+- verify-photo-roundtrip.mjs :: 8. 飼い主: 耳の写真が、耳の欄に
+- verify-photo-roundtrip.mjs :: 9. 飼い主: 歯の写真が2枚、歯の欄に順番どおり
+
+### 1件ずつ壊して赤になった 11件（2026-08-28・CI run #113・2回目）
+
+壊し方を3つ足した回。`settext-off`（`setText` が何も書かない＝飼い主の画面に文字が1つも出ない）。
+
+```
+  ✅ text-as-html       verify-xss.mjs                 赤  18件
+  ✅ settext-off        verify-report-roundtrip.mjs    赤  11件
+  ⚠️  weight-graph-off   verify-report-roundtrip.mjs    赤   0件   ← 穴が出た
+  赤になった: **39件**
+```
+
+- verify-report-roundtrip.mjs :: 3. 確認: 担当からの一言
+- verify-report-roundtrip.mjs :: 4. 確認: 爪（前足/後ろ足）
+- verify-report-roundtrip.mjs :: 5. 確認: 耳
+- verify-report-roundtrip.mjs :: 7. 確認: 体重
+- verify-report-roundtrip.mjs :: 9. 飼い主: 犬の名前
+- verify-report-roundtrip.mjs :: 10. 飼い主: 担当からの一言（＋次回のおすすめご来店時期が末尾に付く）
+- verify-report-roundtrip.mjs :: 11. 飼い主: 爪（前足/後ろ足）
+- verify-report-roundtrip.mjs :: 12. 飼い主: 耳
+- verify-report-roundtrip.mjs :: 14. 飼い主: 体重
+
+**`verify-xss` の18件は移せない。** `text-as-html`（`setText` が `innerHTML` を使う＝
+`F-20260821-17` の stored XSS そのもの）で **8つの細工すべて・3つの観点すべてが赤**になり、
+**XSS の検査が本物であることは実測できた**。しかし出力の名前は
+`ear.comment（耳のコメント）: 実行されない` のような実行時の値で、台帳の鍵
+（ソース上の `` `${label}: 実行されない` ``）と文字が一致しないため紐付けられない。
+**確かめられたのに数に入れられない**——これは台帳の鍵の付け方の問題である（上記）。
+
+### 穴を塞いだ検査を、同じ壊し方で証明した 1件（2026-08-28・CI run #116）
+
+`F-20260828-51`。**証拠は2回の実測の差**である:
+
+```
+run #114（14b を足す前）  ⚠️  weight-graph-off  verify-report-roundtrip.mjs  赤 0件  → EXIT 1
+run #116（14b を足した後） ✅  weight-graph-off  verify-report-roundtrip.mjs  赤 ≥1件 → EXIT 0
+```
+
+`mutate-run.mjs` は「(壊し方 × 検査) の組で赤が0件」なら EXIT 1 で止まる造りなので、
+**#116 が EXIT 0 で終わったこと自体が「赤が出た」の実測**である。
+2回の間で `verify-report-roundtrip.mjs` に加えた変更は **`14b` の1件だけ**。
+
+これは `D-18` の「直す前（赤）→ 直した後（緑）」を、**検査の側に向けた形**である——
+壊しても赤にならなかった状態から、赤になる状態へ変わったことを2回の実行で示した。
+
+- verify-report-roundtrip.mjs :: 14b. 飼い主: 体重のグラフが描かれている（数字だけでなく）
+
+### 1件ずつ壊して赤になった 4件（2026-08-28・CI run #119・4回目）
+
+壊し方を2つ足した回。`resume-draft-off`（書きかけが戻ってこない）と
+`empty-back-off`（空の一覧に置き去り・`F-20260825-39` の再現）。**8個とも赤が出た。**
+
+- verify-m6.mjs :: ★b. 戻った先に犬が並んでいる（空の一覧に置き去りにしない）
+- verify-m6.mjs :: ★c. 戻ってから、もう一度同じ犬に入れる
+- verify-draft.mjs :: 1. 記入が下書きとしてサーバに残った
+- verify-draft.mjs :: 2. 離れて戻ると、続きから書ける
+
+**1つ意外だった**: `verify-draft :: 1. 記入が下書きとしてサーバに残った` が
+`resume-draft-off` で赤になった。再開を止めただけなのに「保存されたか」の項が落ちる——
+検査の流れが**再開に依存している**ということで、項の名前と実際に測っているものが
+少しずれている可能性がある。**証明としては有効**（製品の壊れに反応した）が、
+`docs/watch.md` W-1 の型の疑いとして残す。
+
+### アプリを壊しても届かない場所（2026-08-28 に判明）
+
+**下書きが飼い主に見えないことと RLS は、アプリではなく DB（RLS）が守っている**
+（`worker/src/data-stores/supabase-data-store.js:167` のコメント
+「飼い主側は別経路（RLS が `status='final'` を…）」）。
+
+つまり `verify-draft :: 3. 下書きは飼い主に見えない` や
+`verify-portal :: 13. 他人の犬（Q）は見えない（RLS）` は、
+**アプリのコードをいくら壊しても赤にならない**。守りが DB 側にあるからである。
+
+証明するには**マイグレーションの SQL を壊して `supabase db reset` を掛ける**必要があり、
+いまの `mutate-run.mjs` には無い仕組み。**残り141件のうち、RLS が守っている分は
+この方法を作らないかぎり永久に埋まらない**。
+
+→ **この仕組みを作った**（下の run #122）。上の「永久に埋まらない」は解消している。
+
+### DB（RLS）を壊して赤になった 4件（2026-08-28・CI run #122・5回目）
+
+`mutate-run.mjs` に `sql: true` の壊し方を足した。マイグレーションの SQL を書き換えたあと
+**`npx supabase db reset` を掛ける**——ファイルを書き換えただけでは動いている DB は
+古いポリシーのままで、**壊したつもりで何も壊れておらず「検査が気づかなかった」という
+逆の結論が出る**。
+
+```
+  ✅ rls-any-owner-sees-any-dog verify-portal.mjs              赤   2件
+  ⚠️  rls-any-owner-sees-any-dog verify-report-roundtrip.mjs    赤   0件   ← 穴が出た
+  ✅ rls-drafts-leak    verify-draft.mjs               赤   1件
+  ✅ rls-drafts-leak    verify-empty-pet.mjs           赤   1件
+  赤になった: **48件**
+```
+
+`rls-any-owner-sees-any-dog` は `pets_customer_select` を
+`using (active and private.is_owner_user(owner_id))` → `using (active)` に開く。
+**ログインさえすれば全店の全頭が一覧に出る**状態である。
+`rls-drafts-leak` は `reports_customer_select` から `status = 'final'` を落とす。
+**確定前の下書きが飼い主にそのまま届く**状態である。
+
+- verify-draft.mjs :: 3. 下書きは飼い主に見えない
+
+**出た穴**: `verify-report-roundtrip :: 17. 他人には見えない（RLS）` は、
+犬の RLS を全開にしても**緑のままだった**。
+→ 名前を `17. 他人にはこのカルテが見えない（RLS）` に直し、
+`rls-any-owner-sees-any-dog` の期待先から外した（`F-20260828-52`）。
+
+### 逆側も剥がしてみたら、守りが二重だと分かった（run #124）
+
+`rls-reports-open-to-strangers`（カルテ側の RLS だけを開ける）を掛けた。
+**それでも `17.` は緑だった。** 2回の実測を並べると理由が出る:
+
+```
+run 122  犬の RLS だけ開ける      → カルテは private.can_read_pet(pet_id) が止める
+run 124  カルテの RLS だけ開ける  → 画面が犬を引けず、そこで止まる
+```
+
+`17.` が測っているのは**結果（他人にカルテが届くか）**で、どちらか一方のポリシーではない。
+片方が残っているかぎり届かないので、**どちらの回も緑が正しい**。
+**この項は、単発の壊しでは原理的に判定できない。**
+
+→ `mutate-run.mjs` に `edits`（2か所を同時に壊す）を足し、
+`rls-both-layers-open`（犬とカルテを**両方**開ける）に置き換えた。
+**run #126 で赤になった**——読みが当たったので、証明済みへ移す。
+
+- verify-report-roundtrip.mjs :: 17. 他人にはこのカルテが見えない（RLS）
+
+**ここで分かったこと**: 二重の守りは製品としては正しいが、**それを1本の項でしか
+見ていないと、片方が壊れても誰も気づかない**。犬の RLS が全開になった状態を
+捕まえたのは `verify-portal` の `11./13.` だけだった。**層ごとに、その層を
+名指しで見る項が要る**——これは読んでも出ず、**2回壊して初めて出た**。
+
+### `verify-xss` の18件を、3件として台帳に移した（同・run #122）
+
+`text-as-html`（`setText` が `innerHTML` を使う＝`F-20260821-17` の stored XSS そのもの）で
+**実行時の名前18件がすべて赤**になった。この18件は
+`ear.comment` `nail.comment` `staffNote` `teeth.comment` `teeth.status` `犬の名前` の
+**6つの細工 × 3つの観点**であり、`<細工の名前>: …` という形の名前を出す
+`check()` は `verify-xss.mjs` に**この3か所しか無い**（`scripts/verify-xss.mjs:131,133,134`）。
+18件すべてが赤なら、**3か所とも赤になったことが確定する**。
+実行時の文字列と台帳の鍵が一致しないのは変わらないが、**証明としては成立している**ので移す。
+
+（`check(label, false, …)` の3か所＝`label` `label #2` `label #3` は、
+犬を作れない・カルテを作れない・確定できないときの早期脱出で、**この壊しでは通っていない**。
+未証明のまま残る。）
+
+- verify-xss.mjs :: `${label}: 細工が文字として飼い主の画面に出ている`
+- verify-xss.mjs :: `${label}: 実行されない`
+- verify-xss.mjs :: `${label}: 要素として注入されていない`
+
+### 1回目: verify-admin を狙って赤になった 11件（2026-08-28・CI run #133）
+
+壊し方を `ids` で10個に絞って走らせた（`admin-redirect-off` 〜 `pet-purge-broken`）。
+
+```
+  ✅ admin-redirect-off verify-admin.mjs               赤   2件
+  ✅ admin-menu-title-lost verify-admin.mjs               赤   2件
+  ✅ admin-owner-create-broken verify-admin.mjs               赤   2件
+  ✅ admin-pet-create-broken verify-admin.mjs               赤   2件
+  ✅ admin-revise-no-prefill verify-admin.mjs               赤   1件
+  ✅ admin-revise-becomes-new-report verify-admin.mjs               赤   3件
+  ✅ admin-revise-endpoint-broken verify-admin.mjs               赤   2件
+  ✅ admin-delete-confirm-unlocked verify-admin.mjs               赤   1件
+  ✅ admin-non-admin-gate-off verify-admin.mjs               赤   2件
+  ⚠️  pet-purge-broken   verify-admin.mjs               赤   0件
+  赤になった: **13件**（名前の重複2件を除くと11件が新規）
+```
+
+**`pet-purge-broken` は1件も赤にならなかった。** `#18`（写真がゼロのまま Storage を
+見ていた構造欠陥）を直したあとの、初めての実測。これで `purgePetAssets` を壊すと
+**本当に検出できることが確かめられた**ので、証明済みへ移す。
+
+- verify-admin.mjs :: 5. 顧客アカウントが実際に作られた
+- verify-admin.mjs :: 6. ペットアカウントが実際に作られた
+- verify-admin.mjs :: 8. 修正で開くと、前に書いた中身が入っている
+- verify-admin.mjs :: 9. 直す操作が最後まで進んだ（保存されて開き直した）
+- verify-admin.mjs :: 10. 直しても同じカルテのまま（2枚目を作らない）
+- verify-admin.mjs :: 11. 確定済みのカルテは1枚のまま
+- verify-admin.mjs :: 12. 中身が直っている（確定済みが上書きされた）
+- verify-admin.mjs :: 14. 名前を打つまで削除ボタンは押せない
+- verify-admin.mjs :: 19. 飼い主は管理画面を使えない（顧客データを消せない）
+- verify-admin.mjs :: 20. 飼い主を行き止まりにせず、愛犬のページへの入口を出している
+
+**`admin-menu-title-lost` は謎が残っている。** 狙いは `2./3./4./13.`（見出しが
+`strong` → `span` で読めなくなる）だったが、集計に載った2件の名前が特定できない
+——`1.` と catch のどちらとも重ならないはずなのに、最終的な「赤になった」一覧に
+`2./3./4./13.` のどれも現れない。**この4件は未証明のまま残す**（狙いどおりと
+決めつけない・`D-18`）。次の回で `admin-menu-title-lost` **単体**を走らせ、
+どの2件が赤になったかを切り分けて確かめる。
+
+**この回でもう1つ分かったこと**: CI の「結果を枝にコミットする」段が
+`git status --porcelain` で差分を見ていたが、**この呼び方は無視ファイル
+（`.gitignore` の `mutate-run-partial.md`）を黙って見せない**。run 133 は
+実際には10個すべて走って赤も出ていたのに、CI は「差分なし」と誤判定して
+**一度もコミットしなかった**——記録が成果物（90日で消える）にしか残らない
+ところだった。`git diff --cached`（無視設定と無関係に本当の差分を返す）へ
+直した。上の内容は成果物から復元して手で移した。
+
+### 2〜6回目分・`admin-menu-title-lost` の再実行 41件（2026-08-28・CI run #139）
+
+`ids` に20個（`admin-menu-title-lost` の単体再実行 + 2〜5回目ぶん全部）を渡して走らせた。
+
+**`admin-menu-title-lost` の謎が解けた。** run #133 で「狙いは4件なのに2件しか
+赤にならない」と見えていたのは、**謎ではなく取り違い**だった——単体で走らせたら
+`2./3./4./13.` の**4件とも**赤になった。run #133 の集計表示（`proven` を検査の
+**名前**で `Map` に入れて重複を弾く仕組み）を読み違えていただけで、機械側の欠陥では
+なかった。
+
+**この run もまた `git status --porcelain` の無視ファイル問題を踏んだ**——
+直前に別のコミット（`d9c93ce`）を push していたため、CI 側の push が
+`rejected (fetch first)` で落ちた。**中身は正しく `docs/ops/mutate-run-partial.md`
+に書けていた**ので、成果物 zip から復元して手で移した（`F-20260828-53` の続き）。
+
+新たに ⚠️ が2種、4件出た:
+
+```
+⚠️  rls-any-owner-sees-any-dog verify-portal.mjs              赤   0件
+⚠️  rls-any-owner-sees-any-dog verify-invitation.mjs          赤   0件
+⚠️  edit-empty-photo-src-regress verify-edit.mjs                赤   0件
+⚠️  edit-empty-photo-src-regress verify-report-roundtrip.mjs    赤   0件
+```
+
+`edit-empty-photo-src-regress` は原因が判明・修正済み（`F-20260828-54`。
+`img.src=''` は**プロパティ**の代入で、`getAttribute('src')` で読む2つの検査には
+そもそも見えない）。`scripts` から `verify-edit.mjs` と `verify-report-roundtrip.mjs`
+を外し、狙いどおり動く `verify-photo-roundtrip.mjs` だけに絞った。
+
+`rls-any-owner-sees-any-dog` は**未解決**。この壊し方は run #122・#126 で
+**同じコードのまま** `verify-portal.mjs` を2回赤にしている。今回だけ0件になった
+理由が、CI環境の一時的なもの（`db reset` 後 PostgREST がまだ古いポリシーの
+キャッシュを見ていた、等）か、それとも本当に何かが変わったのかを、**まだ判別
+できていない**。次の回で**この壊し方だけを単体で**再実行し、切り分ける。
+`verify-invitation.mjs`（今回追加した分）の期待もその結果を見てから判断する。
+
+#### 追記（CI run #144・単体再実行）: もう1回、赤0件を再現した
+
+`ids` を `rls-any-owner-sees-any-dog app-throws-runtime-error portal-throws-runtime-error`
+の3つだけに絞り、`rls-any-owner-sees-any-dog` を完全に単独で再実行した。
+結果は同じ——`verify-portal.mjs` が**また1件も赤にならなかった**（`verify-invitation.mjs`
+も0件）。これで **run #122・#126（赤になった・2回）と run #139・#144（赤にならない・2回）
+が2対2で割れている**。
+
+切り分けのため、次の仮説を調べたが**どれも決め手にならなかった**:
+
+- 壊し方のコード自体がずれた → `grep -n "id: 'rls-any-owner-sees-any-dog'" -A 15
+  scripts/mutate-run.mjs` で確認、run #122 時点と**バイト単位で同一**
+- 別の migration がポリシーを上書きしている → `grep -rn "pets_customer_select"
+  supabase/migrations/*.sql` は1か所のみ。定義は1つしかない
+- 対象ペット（Q）の `active` フラグが立っていない → seed の INSERT は `active` を
+  明示していない。列は `not null default true` なので既定で `true`。除外の説明にならない
+- 他の permissive ポリシーが割り込んでいる → `pets_staff_all` は
+  `is_shop_staff(shop_id)` が要るので customer ロールでは false のはず
+- `mutate-run.mjs` の SQL 壊し全般が壊れている → **同じ run #144 のバッチに含まれる
+  他の SQL 壊し方は正しく赤になっている**ので、一般的な「SQL 壊し・db reset が
+  効いていない」という説明は成り立たない
+
+残っている仮説は2つ、どちらも確かめていない:
+
+1. **`ids` で絞った実行に固有の何か**（フル実行では違う結果になる可能性）
+2. **CI 環境側の何かが本当に変わった**（PostgREST のスキーマキャッシュ、
+   コネクションプール、runner イメージの更新など）
+
+これは `pets_customer_select`（**他人の犬が見えないこと**）を守る RLS を検出する
+検査で、**製品のセキュリティに直結する**。判別がつかないまま「証明済み」と
+書くのは `D-18` に反する（同じ壊し方で2回連続赤にならなかったのに、過去の
+2回だけを見て緑と決めるのは「落ちるはず」の側に立つことになる）ので、
+`verify-portal.mjs :: 11.` と `13.` は**「証明済み」から一旦外し、下の「未証明」
+へ戻す**。上の仮説1を切り分けるため、`ids` を絞らない**フル実行**（CI run #149）を
+別途走らせている——結果はこのファイルへ追記する。
+
+#### 追記（CI run #149・`ids` を絞らないフル実行）: 赤になった。ただし別の4件が今度は0件になった
+
+`ids` を空にして（`MUTATIONS` 全44個・約30分）走らせた。結果:
+
+```
+- 11. ログイン後、自分の犬（X/Y/Z）が一覧に出て、他人の犬（Q）は出ない   ← rls-any-owner-sees-any-dog / verify-portal.mjs
+- 13. 他人の犬（Q）は見えない（RLS）   ← rls-any-owner-sees-any-dog / verify-portal.mjs
+- 7. 使い終わった招待は、別の人が使えない   ← rls-any-owner-sees-any-dog / verify-invitation.mjs
+```
+
+**`rls-any-owner-sees-any-dog` は3回赤になった**（run #122・#126・#149）。**2回赤にならなかった**
+（run #139・#144、どちらも `ids` で絞った実行）。フル実行はこれで3戦3勝、`ids` を絞った実行は
+2戦2敗——きれいに割れている。
+
+そこで**仮説1（`ids` を絞った実行に固有の何か）が濃厚と見て**、`verify-portal.mjs :: 11.` /
+`13.` を「証明済み」へ戻す。判断の根拠は「過去の成功を信じる」ではなく、**今日・この
+コードで、フル実行が確かに赤にした**という直近の実測（run #149）が主体。
+
+- verify-portal.mjs :: 11. ログイン後、自分の犬（X/Y/Z）が一覧に出て、他人の犬（Q）は出ない
+- verify-portal.mjs :: 13. 他人の犬（Q）は見えない（RLS）
+
+ただし**この run で新しい割れ方が出た**。今度は逆方向——**過去に `ids` を絞った実行
+（run #139）で赤になったはずの4件が、このフル実行では0件（⚠️）だった**:
+
+```
+⚠️  delete-throws                       verify-delete.mjs             赤   0件
+⚠️  draft-becomes-new-report             verify-draft.mjs               赤   0件
+⚠️  report-roundtrip-teeth-value-mismatch verify-report-roundtrip.mjs   赤   0件
+⚠️  report-roundtrip-finalize-broken     verify-report-roundtrip.mjs   赤   0件
+```
+
+これで見えてきたのは「`ids` を絞ると壊れる／絞らないと直る」という単純な話ではなく、
+**この壊し方の機械（`mutate-run.mjs` ＋ Playwright ＋ ローカル Supabase）が、run ごとに
+違う個別の壊し方をたまたま検出し損ねる、一般的な不安定さを持っている**可能性——
+`rls-any-owner-sees-any-dog` はフル実行側で安定、この4件は絞った実行側で安定、という
+非対称ではなく、**両方向で「特定の1回だけ検出漏れ」が起きている**。
+
+このほかに今回新しく ⚠️ になった9件（`app-throws-runtime-error` 4件・
+`portal-throws-runtime-error` 1件・`portal-flavor-broken`・
+`portal-signout-hidden-after-login`・`empty-pet-fake-history-entry`、
+`pet-purge-broken`）は**今回が初めての実行**なので、run #144（一部）で赤だった
+`app-throws-runtime-error` / `portal-throws-runtime-error` の分と合わせて、
+再現するかを次の実行で確かめる。
+
+**再現性を確かめるため、失敗した2ジョブ（`mutate` / `walk`。`walk` は別件、下記）を
+再実行した（CI run #149 の rerun_failed_jobs）。** 結果が出たらここに追記する。
+「1回だけ0件」を根拠に恒久的な欠陥と決めつけない——CI babysit のルールどおり、
+**flake の可能性は1回の再実行で確かめてから**判断する。
+
+#### 追記（CI run #149・rerun_failed_jobs）: `walk` は再現せず（flake確定）。`mutate` は別の割れ方をした
+
+`walk` ジョブは**再実行で通った**（「②一覧が出なかった」というログイン注入のタイムアウトは
+1回だけで、2回連続では起きなかった）。**flake と確定**——製品コードの直しは要らない。
+
+`mutate` ジョブ（フル実行・44個）はまた失敗したが、**⚠️ の中身が1回目と変わった**:
+
+```
+- [pet-purge-broken] verify-admin.mjs             赤   0件   ← 1回目・2回目とも0件（2/2）
+- [invite-reusable]  verify-invitation.mjs        赤   0件   ← 1回目は赤だった（1/2）
+```
+
+1回目に ⚠️ だった `delete-throws` / `draft-becomes-new-report` /
+`report-roundtrip-teeth-value-mismatch` / `report-roundtrip-finalize-broken` /
+`app-throws-runtime-error`（4件）/ `portal-throws-runtime-error` /
+`portal-flavor-broken` / `portal-signout-hidden-after-login` /
+`empty-pet-fake-history-entry` の**9件は、2回目はすべて赤になった**（新規4件を
+証明済みへ移した——下記）。**これで一般的な不安定さ説が濃厚**——同じ壊し方でも
+run ごとに違う個別の項目が検出漏れを起こす。1回の0件では判定しない、を徹底する。
+
+`pet-purge-broken` だけは**2回連続で0件**——これは flake ではなく実在の欠陥だった。
+読み直したら `verify-admin.mjs :: 18.`（写真の実体が消えたか）の Storage 一覧 API 呼び出しに
+`apikey` ヘッダが無く、Kong に弾かれて**常に失敗**していた。失敗を `listed.ok ? … : []` で
+黙って「空」に丸め、`objects.length === 0` を合格にしていたため、**Storage 一覧が引けようが
+引けまいが必ず PASS** する構造だった——16/17 で直したのと同じ「空で受けて合格にする」型
+（`docs/watch.md` W-1）が、18 にはまだ残っていた（`F-20260828-56`）。`apikey` を足し、
+失敗を握り潰さず投げるよう直した。**この直しの効果はまだ未証明**（次の `pet-purge-broken`
+単体実行で赤になることを確かめる）。
+
+もう1つ、CI 側の実インフラ不具合も見つかった。`結果を枝にコミットする` 段の
+fetch+rebase+retry は**単純な競合（先を越されただけ）しか想定しておらず**、
+`docs/ops/mutate-run-result.md`（フル実行のたびに丸ごと書き直すファイル）どうしの
+**内容衝突**では `git rebase` 自体が止まり、この回の実測データが1つも枝に
+残らないところだった（成果物 zip から手で復元した）。`git rebase … -X theirs`
+（今回生成した中身を無条件に勝たせる）に直した——このファイルはスナップショットで
+マージする意味が無いため。
+
+- verify-portal.mjs :: 2. 起動分岐が立っている
+- verify-portal.mjs :: 4. ポータルが起動している
+- verify-portal.mjs :: 12. ログイン後はログアウトボタンが出る
+- verify-empty-pet.mjs :: 4. 履歴の行が1つも出ていない
+
+#### 追記（CI run #154・`apikey` 直し後のフル実行）: `mutate` の commit は直った。`pet-purge-broken` は3戦3敗で実欠陥と確定
+
+`-X theirs` の直しを検証するため、`verify-admin.mjs` の `apikey` 直しと合わせて
+フル実行（ids 無し）を CI に出した。**`結果を枝にコミットする` 段は今回衝突せず、
+素直にコミット・push できた**（直し自体は次に衝突が起きたときに効くはずだが、
+今回は競合が起きなかったので `-X theirs` の分岐は未通過。書き方としては正しい
+はずだが、実際に衝突を通したところはまだ見ていない）。
+
+`pet-purge-broken` は**3回目もまた `verify-admin.mjs` が0件**だった（run #149・
+rerun・run #154 で3戦3敗）。`apikey` を足しても直らなかったため、手順全体を
+読み直したところ、**2つ目の欠陥**が見つかった——直前の「⑤ 削除: カルテ1枚」
+（`15.`）が、この犬の唯一の写真をすでに Storage から消していたため、
+`purgePetAssets` に届く時点で対象が0件だった（`F-20260828-56` に追記）。
+`15.` の直後にもう1枚カルテを確定させ、写真を残してから「⑤ 削除: ペット全データ」
+へ進むよう直した。**この直しの効果はまだ未証明**——次の実行で赤になることを確かめる。
+
+一方 `invite-reusable` は今回は赤に戻った（run #149-1回目: 赤／2回目: 0件／
+run #154: 赤 → 3回中2回赤）。`rls-drafts-leak` が今回**新たに** 0件
+（`verify-draft.mjs`・`verify-empty-pet.mjs` の両方）——ただし run #122 での証明
+以降ずっと赤だったものが初めて0件になったのはこの1回だけなので、いまの時点では
+一般的な不安定さ説の範囲として扱い、証明済みの `verify-draft.mjs :: 3.` /
+`verify-empty-pet.mjs :: 6.` は動かさない。もう一度0件が出たら
+`rls-any-owner-sees-any-dog` と同じ扱い（未証明へ戻して調べる）にする。
+
+- verify-admin.mjs :: 2. 管理画面に リピーター / 新規 / 削除 / 店舗設定 / スタッフ招待 / スタッフ管理 が在る
+  （2026-11-20・放置リスト `#76`・レビュー M1 で `⑥ スタッフ管理` が増え、検査名が6項目版に変わった。
+   壊し方 `admin-invite-staff-menu-missing` は⑤を消すので6項目版でも赤になる——**6項目版で赤を見たのではない**。）
+  （2026-09-24・マスター指示「招待ボタン復活させて」で `⑤ スタッフ招待` が増え、
+   検査名が5項目版に変わった。旧名「…店舗設定 が在る」は`admin-invite-staff-menu-missing`
+   の壊し方が指す実体では既に無いので、この行に統合する。）
+- verify-admin.mjs :: 3f. 無い住所を開いても白い画面にならず、管理のトップが出る
+- verify-admin.mjs :: 18b. スタッフ招待の画面で、招待される側の権限を発行前に伝えている
+- verify-admin.mjs :: 18c. 発行すると スタッフ招待URL が出る
+- verify-admin.mjs :: 18d. QR が画像として出ている
+- verify-admin.mjs :: 18e. 招待を消化すると、新しいアカウントがトリマーの作業画面に着く
+- verify-admin.mjs :: 18f. その場で shop_memberships に有効な行が実際に作られている
+  （2026-09-24・この作業コンテナの本物のローカル Supabase（Docker）で実測。
+   壊し方 `admin-invite-staff-menu-missing`（⑤の項目自体を消す）・
+   `admin-invite-staff-broken-endpoint`（発行APIの宛先を壊す）・
+   `admin-invite-staff-no-warning`（権限説明の文言を弱める）の3本で、
+   上記7件すべてが赤になることを確認し、戻すと18/18・34/34 で緑に戻ることも確認した。
+   `docs/ops/mutate-run-partial.md` に記録。）
+- verify-admin.mjs :: 4. 新規に 顧客アカウント作成 / ペットアカウント作成 が在る
+- verify-admin.mjs :: 13. 削除に 顧客 / ペット / カルテ の3つが在る
+- verify-edit.mjs :: 1. /edit が配信される
+- verify-edit.mjs :: 2. 正UI が配られている（仕事に使う②③④が在る）
+- verify-edit.mjs :: 2b. スタッフの画面に、入口のログイン画面が紛れ込んでいない
+- verify-edit.mjs :: 3. App が名前で届く（インライン onclick の解決先）
+- verify-edit.mjs :: 3b. App のメソッドが実際に呼べる
+- verify-edit.mjs :: 3c. onclick="App.…" が実在する
+- verify-edit.mjs :: 4. Supabase vendor が載っている
+- verify-edit.mjs :: 5. staff モジュールが載っている（boot を持つ）
+- verify-edit.mjs :: 6. 注入先が backend/js/ に直っている
+- verify-edit.mjs :: 8. ②一覧が実データの犬になっている
+- verify-edit.mjs :: 11. 件数が実データと合っている
+- verify-edit.mjs :: 14. ⑤確認の器から意匠モックの既定文が消えている
+- verify-edit.mjs :: 17. ④の入力欄が空で始まる（見本の文が入っていない）
+- verify-portal.mjs :: 5. 未ログインの `/my` は入口へ送られ、そこに押せるログインが在る
+- verify-portal.mjs :: 6. そのとき、開こうとした URL を覚えている（ログイン後に戻れる）
+- verify-portal.mjs :: 9. 犬を直接指す URL でも入口へ送られ、その URL を覚えている
+- verify-portal.mjs :: 14. サインアウトすると入口に戻り、そこでログインし直せる
+- verify-portal.mjs :: 15. 失効・リンク解除のあとでも、ログインボタンが出て押せる（詰まない）
+- verify-m6.mjs :: ④. カルテを書く画面に、書く場所と確定の入口が在る
+- verify-m6.mjs :: ⑤c. 確定後に④へ戻ると、その犬の名前が見出しに出ている
+- verify-m6.mjs :: ⑥a. 飼い主は一覧から自分の犬に入れる
+- verify-empty-pet.mjs :: 2. 正直な空の状態が出ている
+- verify-empty-pet.mjs :: 3. 写真が1枚も出ていない
+- verify-empty-pet.mjs :: 5. 見本の文章が出ていない
+- verify-empty-pet.mjs :: 6. 確定していないカルテは飼い主に見えない
+- verify-invitation.mjs :: 2. 一覧に初回登録（QR）の入口が出ている
+- verify-invitation.mjs :: 3. 押すと初回登録の URL が出る
+- verify-invitation.mjs :: 4. QR が画像として出ている
+- verify-invitation.mjs :: 6. 招待を消化すると、自分の犬が見える
+- verify-invitation.mjs :: 7. 使い終わった招待は、別の人が使えない
+- verify-delete.mjs :: 3. 製品の削除の道が最後まで通った
+- verify-draft.mjs :: 5. 確定すると下書きは残らない
+- verify-draft.mjs :: 6. 次に開くと、確定済みの記入は蘇らない
+- verify-report-roundtrip.mjs :: 1b. 押したボタンの表示が、そのまま保存される値になっている
+- verify-report-roundtrip.mjs :: 2. 確定してカルテが1件できた
+- verify-report-roundtrip.mjs :: 6. 確認: 歯
+- verify-report-roundtrip.mjs :: 13. 飼い主: 歯
+- verify-photo-roundtrip.mjs :: 10. 飼い主: 壊れた画像（ページURL を指す img）が無い
+
+### 6回目: 「アプリ由来のエラーが無い」系をまとめて狙った（CI run #144・部分実行）
+
+`app-throws-runtime-error`（`ui.js init()` に遅延 throw を注入）と
+`portal-throws-runtime-error`（`supabase-auth.js bootProtectedPortal()` に同型の注入）の
+2つで、4本の検査ファイルにまたがる5件が同時に赤になった。
+
+- verify-admin.mjs :: 21. アプリ由来のエラーが無い
+- verify-edit.mjs :: 7. アプリ由来のエラーが無い
+- verify-photo-roundtrip.mjs :: 13. アプリ由来のエラーが無い
+- verify-report-roundtrip.mjs :: 18. アプリ由来のエラーが無い
+- verify-portal.mjs :: 10. アプリ由来のコンソールエラーが無い（ログイン前）
+
+### 9回目: `pet-purge-broken` の2つ目の直しが効いた 1件（2026-08-28・**手元で実測**）
+
+`F-20260828-56` の2つ目の直し（`15.` の直後にもう1枚カルテを確定させ、
+`purgePetAssets` に実際に消す対象を渡す）の効果を、**CI ではなく手元で**確かめた。
+CI は run #156 以降ずっと即死しているが、**この作業場では Docker が動いた**ので
+`npx supabase start` から先が全部走る（経緯は `docs/handoff.md` `0-K`）。
+
+```
+node scripts/mutate-run.mjs pet-purge-broken
+
+  ✅ pet-purge-broken   verify-admin.mjs               赤   1件
+
+    18. 消した犬の写真が Storage に残っていない   ← pet-purge-broken / verify-admin.mjs
+```
+
+**3戦3敗（run #149・rerun・#154）だったものが、直して初めて赤になった。**
+`purgePetAssets` を壊すと `18.` が気づく——これで `F-20260828-56` は
+「直したが未検証」ではなくなった。
+
+- verify-admin.mjs :: 18. 消した犬の写真が Storage に残っていない
+
+### 10回目: verify-edit の残りを狙った 5件（2026-08-28・**手元で実測**）
+
+`## F4 を閉じる範囲` の残り42件のうち、`verify-edit` に固まっていた分を狙って
+壊し方を4個足した。**CI ではなく手元の worktree で実測**（`docs/handoff.md` `0-K`）。
+
+```
+node scripts/mutate-run.mjs edit-dummy-dogs-leak edit-breed-mock-refill \
+                            empty-photo-attr-page-url letter-section-always-shown
+
+  ✅ edit-dummy-dogs-leak        verify-edit.mjs               赤   4件
+  ✅ edit-breed-mock-refill      verify-edit.mjs               赤   3件
+  ✅ empty-photo-attr-page-url   verify-edit.mjs               赤   3件
+  ✅ empty-photo-attr-page-url   verify-report-roundtrip.mjs   赤   1件
+  ✅ empty-photo-attr-page-url   verify-photo-roundtrip.mjs    赤   1件
+  ✅ letter-section-always-shown verify-edit.mjs               赤   3件
+
+  赤になった: 8件（⚠️ 0件）
+```
+
+**`empty-photo-attr-page-url` は `F-20260828-54` が残した宿題そのもの。**
+あの回は「共通部品を直したから共通に効くはず」で `edit-empty-photo-src-regress` の
+`scripts` を広げ、`verify-edit :: 15.` と `verify-report-roundtrip :: 16.` が
+赤0件だった。原因は `img.src = ''`（**プロパティ**代入）と `getAttribute('src')`
+（**素の属性**）の観測点の違いで、失敗記録には
+「`getAttribute('src')` が実際に壊れた値を返す形の壊し方が要る」と書き残してあった。
+今回はそのとおり `img.setAttribute('src', location.href)` で**属性そのものに**
+書き込む形にしたので、**両方の観測点から見える**——狙った2件がどちらも赤になった。
+
+- verify-edit.mjs :: 9. 仮データ（window.DUMMY）の犬が出ていない
+- verify-edit.mjs :: 10. 持っていない項目（犬種・担当）が空で出ている
+- verify-edit.mjs :: 15. 空の写真スロットがページURLを指していない
+- verify-edit.mjs :: 16. 担当メッセージが無いカルテで、文例が出ていない
+- verify-report-roundtrip.mjs :: 16. 飼い主: 壊れた画像（ページURL）が出ていない
+
+### 11回目: 犬体図の印と、体重の見本値 3件（2026-08-28・**手元で実測**）
+
+```
+node scripts/mutate-run.mjs skin-image-blank weight-prefilled-sample
+
+  ✅ skin-image-blank         verify-report-roundtrip.mjs   赤   2件
+  ✅ weight-prefilled-sample  verify-report-roundtrip.mjs   赤   1件
+
+    8. 確認: 犬体図の印が画像として出ている    ← skin-image-blank
+    15. 飼い主: 犬体図の印が画像として届く      ← skin-image-blank
+    19. 体重の欄が空で始まる（見本値が入っていない） ← weight-prefilled-sample
+```
+
+**`20.`（飼い主の画面に、量っていない体重が出ない）は緑のまま残した。**
+既定値を入力欄に入れても、その値は飼い主まで届いていない——つまり
+**症状そのものが起きていない**ので、緑が正しい。検査の欠陥ではないので
+未証明のまま置く（`17.` と同じ扱い。`docs/failures.md` `F-20260828-52` 参照）。
+
+**この回で2つ、記録しておくべきことがあった。**
+
+1. **`weight-prefilled-sample` は、はじめ狙う場所を間違えていた。**
+   `src/js/ui.js` の `applyReport()` にある `data.weights` を壊したが、
+   あそこは**既存カルテを開いたときにしか走らない**。検査19 は「カルテの無い
+   新しい犬」を開くので、1件も赤にならなかった（⚠️）。**壊し方が悪かったので
+   あって、検査は正しかった**——`F-20260828-54` と同じ型。狙う場所を
+   入力欄そのもの（`src/index.html` の `#input-weight`）に付け替えたら赤になった。
+2. **`skin-image-blank` は、1回目の実行で `0. 検査用の犬を登録できた` と
+   `検査を最後まで実行できた` が赤になり、狙った `8./15.` には届かなかった。**
+   壊し方を手で当てて `npm run verify:roundtrip` を直接走らせたところ、
+   **`8.` と `15.` だけが FAIL で他は全部 PASS**——狙いどおりだった。
+   1回目はその回限りの不安定さ。**⚠️ を「検査が壊れている」と記録する前に、
+   壊し方が本当に症状を起こしているかを直接見ること。**
+
+- verify-report-roundtrip.mjs :: 8. 確認: 犬体図の印が画像として出ている
+- verify-report-roundtrip.mjs :: 15. 飼い主: 犬体図の印が画像として届く
+- verify-report-roundtrip.mjs :: 19. 体重の欄が空で始まる（見本値が入っていない）
+
+### 12回目: 未ログインの `/my` 2件（2026-08-28・**手元で実測**）
+
+```
+node scripts/mutate-run.mjs portal-content-shown-logged-out portal-sample-image
+
+  ✅ portal-content-shown-logged-out  verify-portal.mjs   赤   1件
+  ✅ portal-sample-image              verify-portal.mjs   赤   1件
+
+    7. 未ログインで中身とログアウトは隠れている  ← portal-content-shown-logged-out
+    8. 見本画像を出していない                    ← portal-sample-image
+```
+
+- verify-portal.mjs :: 8. 見本画像を出していない
+
+### 13回目: いま開いている画面 2件（2026-08-28・**手元で実測**）
+
+```
+node scripts/mutate-run.mjs screen-stale-panels-stay-active
+
+  ✅ screen-stale-panels-stay-active  verify-edit.mjs   赤   4件
+
+    8. ②一覧が実データの犬になっている
+    11. 件数が実データと合っている
+    12. 一覧の画面（screen-2）が開いている
+    13. ⑤確認の画面（screen-4）が開いている
+```
+
+**1回目の壊し方は失敗した。記録しておく。** はじめ `goToStep()` の
+`document.getElementById(\`screen-${stepNum}\`)` を `'screen-1'` に固定したが、
+狙った `12./13.` には**1件も届かず** `検査を最後まで実行できた` だけが赤になった。
+理由は「壊しすぎ」——**目的の画面が隠れたままなので `waitForSelector` が
+タイムアウトし、検査がそこで死ぬ**。`⛔ 毒見の天井` と同じ型が、1件ずつ壊す
+やり方でも起きる。
+
+**画面を隠さずに、前の画面を閉じないだけ**にしたら通った。`is-active` が複数の
+パネルに残るので `querySelector('.screen-panel.is-active')` は DOM 順で最初の
+ものを返す——**流れは最後まで動いたうえで、「いま居る画面」の判定だけが狂う**。
+
+> **狙う項の手前に `waitForSelector` があるなら、そこを通れる壊し方にする。**
+> 通れないと、赤になるのは `検査を最後まで実行できた` だけで、狙った項は
+> 何も証明できない。
+
+- verify-edit.mjs :: 12. 一覧の画面（screen-2）が開いている
+- verify-edit.mjs :: 13. ⑤確認の画面（screen-4）が開いている
+
+### 14回目: 管理者の削除が DB に届いていない 2件（2026-08-28・**手元で実測**）
+
+削除は「写真 → DB」の2段（`D-20260824-34`）。**DB を消す段だけ**を落とすと、
+画面は成功したように見えるのに実体が残る——`16./17.` はそこを見ている。
+写真の段は残すので、検査は最後まで動く。
+
+```
+node scripts/mutate-run.mjs admin-owner-delete-not-persisted
+  ✅ 赤 1件   17. 顧客が実際に消えた
+
+node scripts/mutate-run.mjs admin-pet-delete-not-persisted
+  ✅ 赤 1件   16. ペットが実際に消えた
+```
+
+**2つを同時に走らせた1回目は、`admin-pet-delete-not-persisted` が
+`1.` と `検査を最後まで実行できた` を赤にして `16.` に届かなかった。**
+単体で走らせ直したら `16.` だけが赤になった——**一過性の不安定さ**。
+このセッションで3回目（`skin-image-blank`・`screen-switch-stuck` の1回目・これ）。
+
+> **狙った項に届かず `検査を最後まで実行できた` が赤になったときは、
+> まず単体で走らせ直す。** 壊し方が悪いのか、その回限りの不安定さなのかは、
+> 2回目を見るまで区別がつかない。
+
+- verify-admin.mjs :: 16. ペットが実際に消えた
+- verify-admin.mjs :: 17. 顧客が実際に消えた
+
+### 15回目: カルテ0件の犬 3件（2026-08-28・**手元で実測**）
+
+```
+  ✅ screen-stale-panels-stay-active  verify-empty-pet.mjs  赤 1件
+       8. トリマーは1件目を作る画面に入れる
+  ✅ empty-pet-name-wrong             verify-empty-pet.mjs  赤 1件
+       1. 犬の名前は出ている（ページ自体は開けている）
+  ✅ commit-button-out-of-dock        verify-empty-pet.mjs  赤 1件
+       9. 確定のボタンが在る（行き止まりでない）
+```
+
+`8.` は**既存の壊し方の `scripts` を広げて当てた**（`screen-stale-panels-stay-active`
+に `verify-empty-pet.mjs` を追加）。`F-20260828-54` の教訓どおり、**広げてから
+実測して**当たることを確かめている——広げただけで証明済みにはしていない。
+
+**この回も2つ、壊し方のほうが間違っていた。**
+
+1. **`empty-pet-name-lost`（見出しを空にする）は狙いに届かなかった。**
+   見出しが不可視になり `waitForSelector('[data-testid="pet-name"]')` が
+   タイムアウトして、検査がそこで死んだ（13回目とまったく同じ型）。
+   **別の子の名前を出す**形（`empty-pet-name-wrong`）にしたら、見えたまま
+   中身だけが違う状態になり、狙いどおり `1.` が赤になった
+2. **`commit-button-out-of-dock` を `hidden` で作ったら ⚠️（赤0件）だった。**
+   検査は `querySelector` で**在るかどうか**を見ているので、隠しても DOM には
+   残る。**掴む名前のほう**（`class="boxbutton …"`）を変えたら赤になった。
+   **「見えない」と「無い」は別物**——どちらを見ている検査なのかを先に読むこと
+
+- verify-empty-pet.mjs :: 1. 犬の名前は出ている（ページ自体は開けている）
+- verify-empty-pet.mjs :: 8. トリマーは1件目を作る画面に入れる
+- verify-empty-pet.mjs :: 9. 確定のボタンが在る（行き止まりでない）
+
+### 16回目: 犬の登録が「できた」と返さない 2件（2026-08-28・**手元で実測**）
+
+**「土台の設営そのもの（`0.`/`1.` の用意できた系）は狙えない」は、思い込みだった。**
+`0-I` 以来ずっと「個別に狙うと壊れる範囲が広すぎる」として後回しにしてきたが、
+**状態コードだけを変えれば、実体は作られたまま「作れたと返さない」状態を作れる**。
+
+```
+node scripts/mutate-run.mjs pet-create-wrong-status
+
+  ✅ pet-create-wrong-status  verify-delete.mjs      赤 2件
+  ✅ pet-create-wrong-status  verify-invitation.mjs  赤 1件
+
+    0. 検査用の犬を登録できた      ← verify-delete.mjs
+    1. その飼い主の犬を登録できた  ← verify-invitation.mjs
+```
+
+壊し方は `worker/src/index.js` の `201` を `200` にするだけ。**犬そのものは
+作られる**ので土台は壊れず、「作れたかどうかを状態コードで見ている」検査だけが
+赤になる。実際の欠陥としても本物で、呼ぶ側は成功を判定できず、画面は
+「登録できませんでした」に落ちて**同じ子が二重に作られる**。
+
+> **「用意できた」系を狙うときは、実体ではなく“できたという知らせ”を壊す。**
+> 実体を壊すと検査が最初の一歩で死んで何も証明できない（`⛔ 毒見の天井`）。
+
+- verify-delete.mjs :: 0. 検査用の犬を登録できた
+- verify-invitation.mjs :: 1. その飼い主の犬を登録できた
+
+### 単発の壊しでは赤にできないと分かった 2件（2026-08-28・**手元で実測**）
+
+> **見出しの付け方に注意。** この節ははじめ「判定できないと分かった 2件」という
+> 見出しにしていた。`delivery-ready.mjs` は下の3つの節を**見出しの前方一致**で
+> 探すため、この節が本来の除外リストを**乗っ取って**しまい、`npm test` が
+> 「理由の無い未証明がある」で落ちた。**機械が捕まえてくれた。**
+> さらに、その経緯をここに書いたとき**見出しの文字列をそのまま本文に書いてしまい、
+> 今度はそちらが拾われて同じ罠を2度踏んだ**（`indexOf` は本文と見出しを区別しない）。
+> 下の3つの節の名前は、**新しい見出しにも本文にも書かないこと。**
+
+**`verify-delete :: 1. 写真つきのカルテを確定できた` と
+`verify-admin :: 7. 直す対象のカルテを1枚確定できた` は、単発の壊しでは
+原理的に赤にできない。** `F-20260828-52` の `17.` と同じ型なので、
+埋めようとせずここに理由を残す。
+
+どちらも「確定したあとの URL の最後が**36文字のカルテ番号**か」を見ている。
+直前に `waitForURL(/\/edit\/p\/[0-9a-f-]+\/[0-9a-f-]+/)` があり、これは
+**長さを見ない**ので、「短く切り詰められた番号なら待ちは通り、検査だけが赤になる」
+——そう読んで `commit-report-id-truncated`（`saved.id` を8文字に切る）を作った。
+
+**通らなかった。** 実測:
+
+```
+npm run verify:delete   （壊し方を手で当てた状態）
+  PASS  0. 検査用の犬を登録できた  status=201
+  FAIL  検査を最後まで実行できた  page.waitForURL: net::ERR_HTTP_RESPONSE_CODE_FAILURE
+```
+
+**サーバが、不正なカルテ番号のページをそもそも返さない。** 番号が壊れていれば
+ページ取得の時点で HTTP エラーになり、`waitForURL` がそこで投げる。つまり
+**この検査行に到達した時点で、番号が正しいことは既に保証されている**——
+待ちとサーバ側の検証の二重で。到達したなら必ず緑になる。
+
+守り自体は正しい（二重にあること自体は良い）。ただし**この2行は、その二重の
+守りを1行で言い直しているだけ**で、単独で壊して赤にする方法が無い。
+壊し方は取り除いた（残すと「効かない壊し方」が台帳に居座る）。
+
+### 17回目: 動線の3件（2026-08-28・**手元で実測**）
+
+**新しい壊し方は1つも書いていない。** 既にある本物の欠陥の形が、そのまま届いた。
+
+```
+  ✅ screen-stale-panels-stay-active  verify-m6.mjs  → ★. 間違えても1タッチで一覧へ戻れる
+  ✅ settext-off                      verify-m6.mjs  → ⑤b. 確定した中身に、書いた一言が入っている
+  ✅ settext-off                      verify-m6.mjs  → ⑥b. 飼い主はカルテを開ける
+```
+
+やったのは、既存2つの `scripts` に `verify-m6.mjs` を足して**実測しただけ**
+（`F-20260828-54` の教訓どおり、広げただけで証明済みにはしない）。
+
+**この回の入り方を残しておく。** 直前に「赤にすることが目的ではない」という
+指摘を受けて、残りを**数ではなく「この検査は実際に壊れたとき客を守るのか」**で
+仕分け直した。すると:
+
+- `★` は「戻れるか」を見ている → **画面の状態が狂う**壊し方が当たるはず
+- `⑤b`/`⑥b` は「書いた一言が届くか」を見ている → **文字が出ない**壊し方が当たるはず
+
+どちらも**すでに実在の欠陥として作ってある形**で、新しく発明する必要が無かった。
+**検査の側から「何から守っているか」を読むと、当てるべき壊し方は既に手元にある**
+ことが多い。逆に、行を赤にするために壊れ方を発明し始めたら（`commit-report-id-truncated`）、
+それは目的を見失った合図。
+
+- verify-m6.mjs :: ★. 間違えても1タッチで一覧へ戻れる
+- verify-m6.mjs :: ⑤b. 確定した中身に、書いた一言が入っている
+- verify-m6.mjs :: ⑥b. 飼い主はカルテを開ける
+
+### 18回目: 一覧に犬が並ばない 2件（2026-08-28・**手元で実測**）
+
+```
+node scripts/mutate-run.mjs edit-dog-list-empty
+
+  ✅ edit-dog-list-empty  verify-m6.mjs  赤 2件（＋「検査を最後まで実行できた」）
+
+    ②b. ログインすると作業画面に入れる
+    ③. 名前で犬を選べる
+```
+
+**`②b` は `F-20260828-55` で `true` の直書きから直した行。** あのとき
+「壊し方はまだ作っていない（未証明のまま）」と書き残してあったものを、ここで
+実証した。直したあと**本当に測れる行になっている**ことが、これで確かめられた
+——直しただけでは、また `true` に戻っていても誰も気づかない。
+
+壊し方は `renderDogs()` の `data.forEach` を `[].forEach` にするだけ。
+**画面には入れるがカードが0枚**という、この検査がまさに守っている状態を作る。
+
+- verify-m6.mjs :: ②b. ログインすると作業画面に入れる
+- verify-m6.mjs :: ③. 名前で犬を選べる
+
+### 19回目: `verify-xss :: label`（89行目の分岐）1件（2026-08-28・**手元で実測**）
+
+**まず前提の訂正。** このセッションの途中で「`verify-xss` の18件が実測で赤に
+なったのに1件も数に入っていない」とマスターに報告したが、**それは誤りだった**。
+台帳を読み直したところ、18件は既に**3件として証明済みに入っている**
+（`### verify-xss の18件を、3件として台帳に移した`・run #122）。
+残っていたのは `label` / `label #2` / `label #3` の3件だけで、これは
+**細工が届かなかったときに理由を出す分岐**——性質がまったく違う。
+**台帳を読まずに記憶で報告した。** `F-20260828-57` と同じ型を繰り返した。
+
+そのうえで `label`（89行目・犬を登録できなかったとき）を実証した。
+
+```
+node scripts/mutate-run.mjs pet-create-wrong-status
+  ✅ verify-xss.mjs  赤 8件（8つの細工それぞれで分岐が発火）
+```
+
+**名前だけでは、89 / 101 / 112 行のどれが発火したか区別できない**——3か所とも
+同じ `label` 変数を名前に使っているため。断定せず、壊し方を手で当てて
+`npm run verify:xss` を直接走らせ、**詳細メッセージ**で確かめた:
+
+```
+FAIL  犬の名前（見出しへ入る）  犬を登録できず、細工を届けられなかった (200)
+FAIL  staffNote（担当からの一言）  犬を登録できず、細工を届けられなかった (200)
+```
+
+「**犬を登録できず**」＝ 89行目。101（カルテを作れず）・112（確定に失敗）は、
+89 で `continue` するので到達しない。**残る2件は、それぞれ別の壊し方が要る。**
+
+> **名前が変数の検査は、名前だけで紐付けない。** 詳細メッセージまで見るか、
+> その壊し方で到達し得る分岐が1つだけであることを示すこと。
+
+- verify-xss.mjs :: label
+
+### 20回目: 記入欄がひとつ消える 1件（2026-08-28・**手元で実測**）
+
+```
+node scripts/mutate-run.mjs ear-right-input-missing
+
+  ✅ ear-right-input-missing  verify-report-roundtrip.mjs  赤 2件
+
+    1. 記入先の要素がすべて実在する
+    検査を最後まで実行できた   ← 1. が落ちたら throw する設計なので、これは正しい道連れ
+```
+
+**この行が守っているもの**: 記入に使う要素が1つでも画面から消えると、トリマーは
+その項目を記録できない。しかも**押せないだけで警告は出ない**ので、気づかずに
+確定まで進み、飼い主にはその項目が空のまま届く。壊し方は
+`<div class="segmented-stepper" data-ear="right">` から掴む名前を外すだけ。
+
+- verify-report-roundtrip.mjs :: 1. 記入先の要素がすべて実在する
+
+### 21回目: カルテ作成が「できた」と返さない 2件（2026-08-28・**手元で実測**）
+
+`pet-create-wrong-status` と同じ型を、カルテ作成の状態コードに当てた（`201`→`200`）。
+**実体は作られる**ので土台は壊れず、「作れたかどうかを状態コードで見ている」検査
+だけが赤になる。
+
+```
+node scripts/mutate-run.mjs report-create-wrong-status
+
+  ✅ verify-empty-pet.mjs  → 0b. 下書きのカルテを用意できた
+  ✅ verify-xss.mjs        → 赤 8件（8つの細工それぞれで分岐が発火）
+```
+
+xss 側は前回（19回目）と同じく**名前だけでは分岐を特定できない**ので、
+壊し方を手で当てて `npm run verify:xss` を直接走らせ、詳細で確かめた:
+
+```
+FAIL  犬の名前（見出しへ入る）  カルテを作れず、細工を届けられなかった (200)
+```
+
+「**カルテを作れず**」＝ 101行目 ＝ `label #2`。残るのは `label #3`（112行目・
+確定に失敗）だけで、これは**確定だけを失敗させる**壊し方が要る。
+
+- verify-empty-pet.mjs :: 0b. 下書きのカルテを用意できた
+- verify-xss.mjs :: label #2
+
+### 22回目: 確定の要求がエラーになる 1件（2026-08-28・**手元で実測**）
+
+`verify-xss` の3つ目の分岐（112行目）を実証し、**`label` 3件がすべて揃った**。
+
+```
+node scripts/mutate-run.mjs finalize-returns-error
+  ✅ verify-xss.mjs  赤 8件（8つの細工それぞれで分岐が発火）
+
+npm run verify:xss （壊し方を手で当てて詳細を確認）
+  FAIL  犬の名前（見出しへ入る）  確定に失敗 (500)。細工を飼い主の画面まで届けられなかった
+```
+
+「**確定に失敗**」＝ 112行目 ＝ `label #3`。
+
+**この行が守っているもの**は他の検査と性質が違う。**細工が飼い主の画面まで
+届かなかったことを報告する行**で、これが無いと「土台の都合で細工が届かなかった」
+のに `verify-xss` が緑になる——**検査が実際には走っていないのに『XSS は安全』
+という偽の安心を出す**。その意味で、これは客を守っている。
+
+3つの分岐は、それぞれ別の壊し方でしか到達できない（前の段で `continue` するため）:
+
+| 分岐 | 到達させる壊し方 |
+|---|---|
+| `label`（89行目・犬を登録できず） | `pet-create-wrong-status` |
+| `label #2`（101行目・カルテを作れず） | `report-create-wrong-status` |
+| `label #3`（112行目・確定に失敗） | `finalize-returns-error` |
+
+- verify-xss.mjs :: label #3
+
+### 写真の実体を見る2件も、単発の壊しでは赤にできない（2026-08-28・**手元で実測**）
+
+`verify-delete :: 2. 写真の実体が Storage に在る` と
+`verify-photo-roundtrip :: 5. 保存された写真4枚が実体になっている（asset://）`。
+どちらも**確定のあと**に置かれていて、**写真がストレージに届かない壊し方は、
+どれも確定そのものを止めてしまう**。実測:
+
+```
+buildAssetPath からカルテの階層を落とす（asset-path-loses-report）
+  PASS  0. 検査用の犬を登録できた  status=201
+  FAIL  検査を最後まで実行できた  page.waitForURL: Timeout 30000ms exceeded.
+```
+
+保存先のポリシーが階層を要求しているため、**上げること自体が失敗** →
+`saveReport` が投げる → 画面が移らない → `waitForURL` が落ちる。`upload-assets`
+（1枚も上げない）も同じで、記録に残っている赤は
+`検査を最後まで実行できた` だけ（`docs/ops/mutate-run-result.md`）。
+
+つまり**この2行に到達した時点で、写真が上がったことは既に保証されている**。
+`verify-delete 1.` / `verify-admin 7.` と同じ型なので、埋めずに理由を残す。
+効かない壊し方（`asset-path-loses-report`）は取り除いた。
+
+> **ここまでで分かった一般則。** 「〜できた」を確認する行が**その動作の成功に
+> 依存する待ちの後ろ**にあるとき、その行は単発の壊しでは赤にできない。
+> 待ちが先に落ちるから。**守り自体は正しいが、その行は待ちを言い直している。**
+
+### `verify-invitation :: 5.` も単発では赤にできない（2026-08-28・**手元で実測**）
+
+`5. 招待を消化する前は、その犬を見られない`。守っているのは
+`is_owner_user(owner_id)` のはず——と読んで `rls-any-owner-sees-any-dog`
+（犬の RLS を全開にする）を当てたが、**赤になったのは `7.` だけで `5.` は緑のまま**
+だった。
+
+```
+node scripts/mutate-run.mjs rls-any-owner-sees-any-dog
+  ✅ verify-portal.mjs      → 11. / 13.
+  ✅ verify-invitation.mjs  → 7. 使い終わった招待は、別の人が使えない
+                              （5. は赤にならない）
+```
+
+**犬の RLS を1枚剥がしただけでは、招待未消化の人にその犬は見えない。**
+アプリ側にも飼い主の紐付けを見る層があり、`5.` は**その二重の守りの結果**を
+見ている——`F-20260828-52` の `17.`（「他人にはこのカルテが見えない」）と
+まったく同じ形。2枚同時に剥がす壊し方（`edits`）を作らないかぎり赤にできない。
+
+**いま作らない理由**: `17.` のときは `rls-both-layers-open` を作って解決したが、
+あれは**どの層を剥がすかが自明**（犬とカルテ）だった。こちらは**2枚目の層が
+どこなのか、読んでも特定できなかった**。**特定せずに当てずっぽうで剥がすのは、
+行を赤にするための発明**になるので作らない。
+
+**読んで確かめた範囲（どこに無かったか）**——次の人が同じ所を二度読まないように:
+
+| 見た場所 | 結果 |
+|---|---|
+| `backend/js/supabase-auth.js` の `loadProtectedResource()` | 飼い主の紐付けで弾く分岐は**無い**。`/api/my/pets/{id}` を取りに行くだけ |
+| `worker/src/index.js` の `/api/my/pets/{id}` | `store.getPet(petId)` を呼ぶだけ。**owner での絞り込みは無い** |
+| `worker/src/data-stores/supabase-data-store.js` の `getPet()` | `pets` と `reports` を引くだけ。**owners との結合は無い** |
+| `worker/src/auth-context.js` | トークンの検証だけ。**飼い主の紐付けは見ていない** |
+
+つまり**アプリ側には見当たらない**。DB 側も見た:
+
+- `pets` の SELECT ポリシー（`pets_customer_select`）を定義しているのは
+  `202607160001_supabase_base.sql` **1か所だけ**（`grep` 済み）。後続の
+  マイグレーションで再定義されてはいない
+- `202607160007_owner_access_control.sql` は `private.is_owner_user` の**中身**を
+  差し替えているが、**ポリシーの `using` 句そのものは触っていない**。壊し方は
+  `using` 句を置き換えるので、この関数の差し替えとは干渉しない
+
+**したがって「後続のマイグレーションに上書きされていた」説は否定できる。**
+壊し方はちゃんと効いている（同じ回に `verify-portal` の `11./13.` が赤になっている）。
+
+残る違いは**利用者の側**にある。`verify-portal` で赤になるのは
+**飼い主として紐付いている人**が他人の犬を見る場合で、`verify-invitation :: 5.` が
+見ているのは**どの犬にも紐付いていないアカウント**（`FIXTURE.uninvitedEmail`）。
+犬の RLS を全開にしてもこの人には見えていない以上、**紐付いていない人を
+別扱いしている経路が、まだどこかに在る**。**そこは特定できていない。**
+
+**もう1つ潰した仮説**: 「そもそも guest がログインできていないから緑なのでは」
+——これも否定できる。`uninvited@local.test` は `supabase/seed.sql` に
+**auth ユーザーとして実在し**、他の fixture 利用者（`owner-a` など）と
+**同じ対応表に載っている**。アカウントが無いから見えない、ではない。
+
+> **ここで止める理由**: 当てずっぽうで2枚目を剥がせば赤にはできるが、それは
+> **この検査が実際に何を守っているかを分からないまま「証明済み」にする**こと。
+> 名前（「招待を消化する前は、その犬を見られない」）が守っていると言っている
+> ものと、実際に守っている仕組みが一致しているかを、まだ誰も確かめていない。
+>
+### 決定打を実行した。**2枚目の層を特定した**（2026-08-28・手元で実測）
+
+上の手順を実際にやった。`pets` の RLS を全開にして `db reset` し、
+`uninvited@local.test` のトークンで PostgREST に直接問い合わせた:
+
+```
+curl "$API/rest/v1/pets?select=id,name,active&limit=5" -H "Authorization: Bearer <uninvited>"
+
+[{"id":"…a1","name":"X","active":true},
+ {"id":"…a2","name":"Y","active":true},
+ {"id":"…a3","name":"Z","active":true},
+ {"id":"…b1","name":"Q","active":true}]
+```
+
+**招待未消化の人が、犬を全部引けている。** つまり**止めているのは DB ではない。**
+
+2枚目は `backend/js/supabase-auth.js` の `bootProtectedPortal()` にあった——
+犬を取りに行く**前**の関門:
+
+```js
+const session = await (await authorizedFetch(supabase, '/api/session')).json();
+if ((session.ownerLinks || []).length === 0 && (session.memberships || []).length === 0) {
+  setMessage(status, invitationMessage || '登録されたお客様情報が見つかりません');
+  show(loginPanel, false);
+  return;                    // ← loadProtectedResource を呼ばずに戻る
+}
+```
+
+紐付きも所属も無いアカウントは、**ここで止まって犬を取りに行かない**。
+だから RLS を全開にしても `5.` は緑のままだった。
+
+> **`verify-invitation :: 5.` の守りは2層**（DB の RLS ＋ この関門）。
+> `F-20260828-52` の `17.` と同じで、**2枚同時に剥がさないと判定できない。**
+
+**いま作れない理由（機械の制約）**: `applyMutation` は `m.file` **1つ**しか扱えず、
+`edits` も**その1ファイルの中**での複数編集にしか対応していない。今回の2層は
+`supabase/migrations/…sql` と `backend/js/supabase-auth.js` の**別ファイル**に
+またがるため、**いまの機械では表現できない**。
+
+**次にやること（小さい）**: `applyMutation` の `edits` に**編集ごとの `file`**を
+許す（既定は `m.file`）。`test/mutate-run.test.mjs` の構文検査もファイルごとに
+回すよう合わせる。そのうえで `invitation-both-layers-open` を作れば `5.` を判定できる。
+**層は両方とも名指しで特定済みなので、これは当てずっぽうではない。**
+
+**⚠️ 後片付けをした（この手順を踏むときの注意）**: この観測は
+`supabase db reset` を伴うので、**終わったあとローカル DB は壊れたスキーマのまま
+残る。** マイグレーションのファイルを戻しただけでは DB は戻らない——
+**もう一度 `db reset` するまで、以降の実測はすべて壊れた土台の上で走る。**
+戻したことは同じ観測で確かめた:
+
+```
+（戻したあと）uninvited  → []                    ← 引けない
+（比較）      owner-a    → X / Y / Z のみ         ← 自分の犬だけ。他人の Q は出ない
+```
+
+ついでに分かったこと: **RLS は正しく効いている**。`owner-a` は自分の3頭だけが
+見えて `Q` は見えない——`verify-portal :: 11./13.` が守っているものを、
+画面を通さず DB の側から直接確かめた形になる。
+
+**続きは下の「23回目」で実際に赤にした。** 上の「いま作れない理由（機械の制約）」は
+2026-08-29 に解消してある（`applyMutation` が**ファイルをまたぐ `edits`** を扱えるようにした）。
+
+### 23回目: 招待未消化の人に、他人の犬が見える 1件（2026-08-29・**手元で実測**）
+
+**上で名指しした2層を、同時に剥がした。** `invitation-both-layers-open`:
+
+| 剥がした層 | どこ |
+|---|---|
+| (1) DB | `pets` の SELECT ポリシーから `is_owner_user(owner_id)` を外す |
+| (2) アプリ | `bootProtectedPortal()` の「紐付きも所属も無ければ犬を取りに行かない」関門を外す |
+
+**当てずっぽうではない。** どちらの層も、上の2節で**実測して名指しした**もの
+（PostgREST への直接問い合わせで「DB は開いている／止めているのはアプリ側」まで
+確定させてある）。層を発明したのではなく、**特定済みの層をそのまま剥がした**。
+
+```
+node scripts/mutate-run.mjs invitation-both-layers-open
+  ✅ invitation-both-layers-open verify-invitation.mjs          赤   2件
+
+    5. 招待を消化する前は、その犬を見られない   ← invitation-both-layers-open / verify-invitation.mjs
+    7. 使い終わった招待は、別の人が使えない   ← invitation-both-layers-open / verify-invitation.mjs
+```
+
+**同じ壊し方をもう一度当てて、検査の生の出力も見た**（`偽-11`「一度の緑で終える」を
+踏まないため。2回とも同じ結果）:
+
+```
+（壊す前・素の状態）node scripts/verify-invitation.mjs
+  PASS  5. 招待を消化する前は、その犬を見られない
+  8/8 PASS
+
+（2層を剥がして）  node scripts/verify-invitation.mjs
+  FAIL  5. 招待を消化する前は、その犬を見られない  ★ 見えている
+  FAIL  7. 使い終わった招待は、別の人が使えない  ★ 別の人にも見えた
+  6/8 PASS
+```
+
+**人間に何が起きるか**: 招待の紙をまだ渡していない相手が、`/my/pets/<犬のid>` を
+開くだけで**他人の犬のページを読める**。`5.` はそこを見ていた——**名前のとおりの
+ことを、実際に守っていた**。
+
+**`7.` は既に `rls-any-owner-sees-any-dog` で証明済み。** ここで一緒に赤になったのは、
+(1) だけでも `7.` は落ちるため（`docs/ops/mutate-run-result.md`）。新しく埋まるのは
+`5.` の1件。
+
+- verify-invitation.mjs :: 5. 招待を消化する前は、その犬を見られない
+
+### 24回目: クライアント指示 C-1/C-4/C-9 の新項目4件（2026-08-29・**手元で実測**）
+
+`docs/ops/plan.md` 第10章のクライアント指示（C-1 BCS・C-4 ベスト体重・C-9 コース
+必須）で `verify-report-roundtrip.mjs` に足した新規 `check()` 7件のうち、
+⑤⑥表示3組（コース・ベスト体重・BCS）＋必須検証1件の壊し方。
+
+**壊し方**: `mutate-run.mjs` の壊しをそれぞれ手で当て、`node scripts/build-dist.mjs`
+で dist に反映してから `node scripts/verify-report-roundtrip.mjs` を直接走らせた
+（`mutate-run.mjs` 自体の実行でも同じ2件ずつが赤になることを確認済み）。
+
+```
+node scripts/mutate-run.mjs course-badge-blank
+  ✅ course-badge-blank  verify-report-roundtrip.mjs  赤 2件
+    3b. 確認: 来店コース
+    9b. 飼い主: 来店コース
+
+（壊し方を手で当てて詳細を確認）
+FAIL  3b. 確認: 来店コース
+        期待: "トリミングコース"
+        実際: ""
+FAIL  9b. 飼い主: 来店コース
+        期待: "トリミングコース"
+        実際: ""
+===== 往復: 28/30 =====
+```
+
+```
+node scripts/mutate-run.mjs best-weight-blank
+  ✅ best-weight-blank  verify-report-roundtrip.mjs  赤 2件
+    3c. 確認: ベスト体重
+    9c. 飼い主: ベスト体重
+
+（壊し方を手で当てて詳細を確認）
+FAIL  3c. 確認: ベスト体重
+        期待: "目標体重 3.2kg"
+        実際: ""
+FAIL  9c. 飼い主: ベスト体重
+        期待: "目標体重 3.2kg"
+        実際: ""
+===== 往復: 28/30 =====
+```
+
+```
+node scripts/mutate-run.mjs bcs-text-blank
+  ✅ bcs-text-blank  verify-report-roundtrip.mjs  赤 2件
+    3d. 確認: BCS
+    9d. 飼い主: BCS
+
+（壊し方を手で当てて詳細を確認）
+FAIL  3d. 確認: BCS
+        期待: "ok"
+        実際: ""
+FAIL  9d. 飼い主: BCS
+        期待: "ok"
+        実際: ""
+===== 往復: 28/30 =====
+```
+
+```
+node scripts/mutate-run.mjs course-required-off
+  ✅ course-required-off  verify-report-roundtrip.mjs  赤 1件
+    21. コースを選ばずに確定を押すと、案内が出て画面が進まない
+
+（壊し方を手で当てて詳細を確認）
+FAIL  21. コースを選ばずに確定を押すと、案内が出て画面が進まない
+        期待: "ok"
+        実際: "dialogs=0 url変化=true"
+===== 往復: 29/30 =====
+```
+
+**この4行が守っているもの**: コース・ベスト体重・BCS は⑤トリマー確認と⑥飼い主
+画面の**両方**に表示される約束（`D-12`）。表示側を空にする壊し方で、それぞれの
+組が両方とも同時に赤になることを確かめた。`course-required-off` はコース未選択
+のまま確定できてしまう壊し方で、案内（`alert`）が出ず画面が進んでしまうことを
+確かめた——どのコースの記録か分からないカルテが残る不具合を防ぐ検証。
+
+4つとも壊した後 `node scripts/build-dist.mjs` で元の製品コードに戻し、
+`git diff --stat` で差分ゼロを確認済み。
+
+- verify-report-roundtrip.mjs :: 3b. 確認: 来店コース
+- verify-report-roundtrip.mjs :: 9b. 飼い主: 来店コース
+- verify-report-roundtrip.mjs :: 3c. 確認: ベスト体重
+- verify-report-roundtrip.mjs :: 9c. 飼い主: ベスト体重
+- verify-report-roundtrip.mjs :: 3d. 確認: BCS
+- verify-report-roundtrip.mjs :: 9d. 飼い主: BCS
+- verify-report-roundtrip.mjs :: 21. コースを選ばずに確定を押すと、案内が出て画面が進まない
+
+### 25回目: 飼い主に届く日付が確定日に戻る 1件（2026-08-29・**手元で実測**）
+
+マスター指示のサブ3体による敵対検証（検証2）が発見した穴。C-3（体重の時系列を
+来店日基準にする）で来店日入力欄を新設したが、`backend/js/magazine-view.js` の
+表示側は元々「確定を押した日（`report.reportDate`）」を先に見る並びのままだった
+ため、⑥飼い主の画面（`backend/js/supabase-auth.js :: renderReport()` が
+`report.report_date` を渡す経路）では**来店日ではなく確定日が出続ける**穴が
+残っていた。⑤トリマー確認（確定直後の in-memory 描画）はこの列を経由しないため
+気づかれなかった。
+
+修正: `data.isoDate || data.date || report.reportDate` の順に直し（来店日を優先し、
+古い報告のための確定日フォールバックだけ残す）、`verify-report-roundtrip.mjs` に
+`3e.`/`9e.` を追加。
+
+```
+node scripts/mutate-run.mjs report-date-confirm-wins
+  ✅ report-date-confirm-wins  verify-report-roundtrip.mjs  赤 1件
+    検査を最後まで実行できた   ← この回はサブ3体の敵対検証が同じ Supabase を
+                              同時に叩いていたため確定クリックが timeout し、
+                              9e. に届く前に落ちた（環境の混雑・下記で再現確認）
+
+（壊し方を手で当てて詳細を確認。空いている状態で2回実行し、2回とも同じ赤）
+FAIL  9e. 飼い主: 来店日（確定日ではなく）
+        期待: "2026.07.20"
+        実際: "2026.08.29"
+===== 往復: 31/32 =====
+```
+
+**`3e.`（⑤トリマー確認）は壊しても赤にならない。** ⑤は確定直後、`src/js/ui.js` が
+`reportDate: report.isoDate || report.date || ''` という別の（すでに来店日優先の）
+オブジェクトを組み立てて `renderMagazine()` に渡す経路（`report.report_date` という
+DB列そのものを持たない）ため、`magazine-view.js` 側の並びを壊しても影響しない。
+**これは検査の欠陥ではなく、⑤と⑥が別経路であることの反映**——⑥だけが実際に
+DB の `report_date` 列と衝突する。
+
+- verify-report-roundtrip.mjs :: 9e. 飼い主: 来店日（確定日ではなく）
+
+### 26回目: 「次回のおすすめご来店時期」新設 11件（2026-08-29・**手元で実測**）
+
+マスター指示（`D-20260829-58`）: 「デフォルトは30日後、別途修正できるようにする。
+修正はデフォルト自体の修正も犬ごとの修正も可能とする。」で新設した
+`scripts/verify-revisit-interval.mjs`（12 `check()`）のうち、11件を1件ずつ壊して赤にした。
+残り1件（`9.`）は下の「未証明」へ。
+
+**壊し方**: `mutate-run.mjs` に8つの壊し方を足し、`node scripts/mutate-run.mjs <id>`
+（本物の Supabase を通す）で実測。RLS の壊し（`shops-admin-update-rls-open`）だけは
+migration ファイルの書き換えなので `npx supabase db reset` を挟んでから検査、
+確認後に元へ戻して再度 `db reset`（`git diff --stat` で差分ゼロを確認済み）。
+
+```
+node scripts/mutate-run.mjs shops-admin-update-rls-open
+  ✅ shops-admin-update-rls-open  verify-revisit-interval.mjs  赤 1件
+    0. 一般スタッフは店舗の既定日数を変えられない
+
+（壊し方を手で当てて詳細を確認。RLS の using/with check を true に緩めた）
+FAIL  0. 一般スタッフは店舗の既定日数を変えられない
+        期待: "404"
+        実際: "200"
+===== 次回のおすすめご来店時期: 10/11 =====
+```
+
+```
+node scripts/mutate-run.mjs shop-patch-route-off
+  ✅ shop-patch-route-off  verify-revisit-interval.mjs  赤 3件
+    1. 管理者は店舗の既定日数を変えられる
+    1b. 変えた値が読み返せる
+    3. 確認: 次回日（上書き無し・店舗の既定日数）
+
+（壊し方を手で当てて詳細を確認。PATCH /api/shop の分岐を丸ごと無効化）
+FAIL  1. 管理者は店舗の既定日数を変えられる
+        期待: "200"
+        実際: "404"
+FAIL  1b. 変えた値が読み返せる
+        期待: "45"
+        実際: "null"
+===== 次回のおすすめご来店時期: 9/11 =====
+```
+
+（`3.` は、店舗の既定日数がまだ30（migration の既定値）のままの、まっさらな
+`supabase db reset` 直後に走らせたときだけ赤になる——PATCH が死んで45に変わらない
+ため、来店日+30日で計算された値と期待値+45日がずれる。手で当て直した2回目は、
+直前の別の検査が既定日数を45に変えたあとの状態が残っていたため`3.`はPASSのまま
+だったが、これは検査対象の状態依存であって壊し方の効き目とは無関係——
+`mutate-run.mjs` 本体の実行が、まっさらな状態での赤を実測している。）
+
+```
+node scripts/mutate-run.mjs revisit-edit-stays-hidden
+  ✅ revisit-edit-stays-hidden  verify-revisit-interval.mjs  赤 2件
+    4. 確認: 編集欄がスタッフ側に出ている
+    検査を最後まで実行できた
+
+（壊し方を手で当てて詳細を確認。編集欄の unhide だけを外す）
+FAIL  4. 確認: 編集欄がスタッフ側に出ている
+        期待: "ok"
+        実際: "出ていない"
+FAIL  検査を最後まで実行できた
+        期待: "ok"
+        実際: "page.fill: Timeout 30000ms exceeded.
+        - element is not visible"
+===== 次回のおすすめご来店時期: 5/7 =====
+```
+
+```
+node scripts/mutate-run.mjs revisit-save-stale-display
+  ✅ revisit-save-stale-display  verify-revisit-interval.mjs  赤 1件
+    5. 確認: 保存直後にその場で日付が変わる
+
+（壊し方を手で当てて詳細を確認。保存直後の再描画を古い値に戻す）
+FAIL  5. 確認: 保存直後にその場で日付が変わる
+        期待: "2026.07.30"
+        実際: "2026.09.03"
+===== 次回のおすすめご来店時期: 10/11 =====
+```
+
+```
+node scripts/mutate-run.mjs revisit-override-not-persisted
+  ✅ revisit-override-not-persisted  verify-revisit-interval.mjs  赤 2件
+    6. 確認: 読み直しても上書きが残っている
+    7. 飼い主: 上書き後の次回日が同じ値で届く
+
+（壊し方を手で当てて詳細を確認。PATCH本文の値を常に null に固定＝保存は200で
+成功するがサーバには残らない）
+FAIL  6. 確認: 読み直しても上書きが残っている
+        期待: "2026.07.30"
+        実際: "2026.09.03"
+FAIL  7. 飼い主: 上書き後の次回日が同じ値で届く
+        期待: "2026.07.30"
+        実際: "2026.09.03"
+===== 次回のおすすめご来店時期: 9/11 =====
+```
+
+```
+node scripts/mutate-run.mjs revisit-owner-override-dropped
+  ✅ revisit-owner-override-dropped  verify-revisit-interval.mjs  赤 1件
+    7. 飼い主: 上書き後の次回日が同じ値で届く
+
+（壊し方を手で当てて詳細を確認。⑥飼い主向けの応答だけ revisitDaysOverride を
+常に null にする——⑤は別経路なので無事）
+FAIL  7. 飼い主: 上書き後の次回日が同じ値で届く
+        期待: "2026.07.30"
+        実際: "2026.09.03"
+===== 次回のおすすめご来店時期: 10/11 =====
+```
+
+```
+node scripts/mutate-run.mjs revisit-edit-leaks-to-owner
+  ✅ revisit-edit-leaks-to-owner  verify-revisit-interval.mjs  赤 1件
+    8. 飼い主画面に編集欄が出ない（編集はスタッフ限定）
+
+（壊し方を手で当てて詳細を確認。編集欄の表示条件から onRevisitDaysChange の
+有無チェックを外す）
+FAIL  8. 飼い主画面に編集欄が出ない（編集はスタッフ限定）
+        期待: "ok"
+        実際: "出た"
+===== 次回のおすすめご来店時期: 10/11 =====
+```
+
+```
+node scripts/mutate-run.mjs pet-create-wrong-status
+  ✅ pet-create-wrong-status  verify-revisit-interval.mjs  赤 1件
+    2. 検査用の犬を登録できた
+  （同時に verify-delete.mjs / verify-invitation.mjs / verify-xss.mjs も赤——既存の壊し方）
+
+（壊し方を手で当てて詳細を確認。POST /api/owners/{id}/pets の成功コードを201→200に）
+FAIL  2. 検査用の犬を登録できた
+        期待: "201"
+        実際: "200"
+===== 次回のおすすめご来店時期: 10/11 =====
+```
+
+8つとも壊した後 `node scripts/build-dist.mjs` で元の製品コードに戻し（SQLの壊しは
+`npx supabase db reset` も再実行）、`git diff --stat` で差分ゼロを確認済み。
+
+**この11行が守っているもの**: 店舗の既定来店間隔は管理者しか変えられない（RLS）・
+変えれば実際に反映される・上書きが無い犬には既定日数が使われる・この犬だけの
+上書き入力欄は⑤（スタッフ）にだけ出る・保存すればその場でもサーバでも新しい値が
+使われる・⑥（飼い主）にも同じ計算結果が届くが編集欄は出ない——という
+`D-20260829-58` の全条件。
+
+- verify-revisit-interval.mjs :: 0. 飼い主は店舗の既定日数を変えられない
+- verify-revisit-interval.mjs :: 1. お店の人は店舗の既定日数を変えられる
+- verify-revisit-interval.mjs :: 1b. 変えた値が読み返せる
+
+> **2026-09-11 追記（名前だけ変えた・件数は減らしていない）**: 上の2行は
+> 旧「0. **一般スタッフ**は店舗の既定日数を変えられない」「1. **管理者**は…」。
+> `admin` と `staff` の2権限は **2026-09-06 にマスターの判断で廃止**され
+> （`D-20260906-68`「管理者とスタッフは同一で良い」・
+> `supabase/migrations/202609060012_single_staff_role.sql`）、
+> `shops_admin_update` は `shops_staff_update`（その店のメンバーなら誰でも）に
+> 置き換わっている。**旧 `0.` は、もう存在しない境界を見ていた。**
+> 消さずに、いま在る境界（お店の人か、飼い主か）へ**付け替えた**。
+> 壊し方の台帳（`mutate-run.mjs`）の本数も減らしていない。
+> `verify-admin.mjs` の 2026-09-02 と同じ扱い。
+>
+> **5日間気づけなかった理由**: この検査は CI に入っていなかった（`F-20260910-82`）。
+> **走らない検査は、古くなっても分からない。**
+
+- verify-revisit-interval.mjs :: 2. 検査用の犬を登録できた
+- verify-revisit-interval.mjs :: 3. 確認: 次回日（上書き無し・店舗の既定日数）
+- verify-revisit-interval.mjs :: 4. 飼い主: 次回日が同じ値で届く
+- verify-revisit-interval.mjs :: 検査を最後まで実行できた
+
+### 使用オプションの復活（2026-08-31・マスター指示）で足した2件
+
+- verify-report-roundtrip.mjs :: 8b. 確認: 使用オプション
+- verify-report-roundtrip.mjs :: 16b. 飼い主: 使用オプション
+
+壊し方: `backend/js/magazine-view.js` の `renderOptionTags(container, data.options);`
+（`renderMagazine()` 内、⑤⑥共有の「カット」カードを描く箇所）を1行コメントアウトする
+——選んだオプションをタグとして描く呼び出しそのものを止める。
+
+出力（`npm run verify:roundtrip`。他34項目は無傷のまま、狙った2件だけが赤になった）:
+```
+FAIL  8b. 確認: 使用オプション
+        期待: "アメージング"
+        実際: ""
+...
+FAIL  16b. 飼い主: 使用オプション
+        期待: "アメージング"
+        実際: ""
+
+===== 往復: 32/34 =====
+```
+戻して緑（34/34）に戻ることも確認済み。
+
+## F4 を閉じる範囲（マスター判断・2026-08-28）
+
+台帳を129件すべて埋めるのではなく、**客に当たる経路まで**で F4 を閉じる。
+機械（`scripts/guard/delivery-ready.mjs`・`gate.mjs --end` から呼ぶ）が見るのは
+下の3節。**節を離れて「だいたい埋まった」で判断させない**ため、範囲はファイル名で固定する。
+
+### 客に当たる経路（ここが埋まったら F4 を閉じてよい）
+
+以下の11本の**全件**が「証明済み」であること。1本でも減らせば `delivery-ready` が
+「宣言した本数が減っている」で赤になる。
+
+```
+verify-admin.mjs / verify-edit.mjs / verify-portal.mjs / verify-m6.mjs /
+verify-empty-pet.mjs / verify-invitation.mjs / verify-report-roundtrip.mjs /
+verify-photo-roundtrip.mjs / verify-delete.mjs / verify-draft.mjs / verify-xss.mjs
+```
+
+### 判定できない（理由つきで除外・8件）
+
+- **`verify-production.mjs` 4件** … 本番サイトへ出ていく検査で、**壊す対象がこの
+  リポジトリに無い**。`mutate-run.mjs` の仕組みでは判定できない
+- **`verify-stack.mjs` の残り4件** … 土台を落とす毒が要るが、それだと
+  `ensureLocalSupabaseRunning()` の `throw` で止まり**判定行が出ない**
+  （「⛔ 毒見の天井」と同じ構造）
+
+### F4 の後に回す（21件）
+
+- **`verify-screens.mjs`** … 正当な理由は無い。**単に高い**（21件が個別の静的構造で、
+  1件あたりの壊しが重い）。「判定できない」ではなく「まだやっていない」として残す
+
+## ⛔ 毒見の天井（2026-08-28 に判明）
+
+**毒を3種類まで作って、埋まったのは 182件中 21件。ここで止まる。**
+
+| 毒 | 赤 | そのうち新規 |
+|---|---|---|
+| `empty`（データが空） | 25 | **17** |
+| `noauth`（ログイン不可） | 16 | **2** |
+| `nodist`（配信物も空） | 26 | **2** |
+
+理由は構造的なもので、毒の種類を増やしても解けない:
+
+> **検査 N を判定するには、検査 1〜N-1 が通っていなければならない。**
+
+`verify:*` は上から順に走る。毒で最初の1件が落ちると**そこで終わり**、
+2件目以降は**実行すらされない**。`empty` の1回目で139件が判定行すら出なかったのも、
+`nodist` が狙った15件のうち各1件しか判定できなかったのも、**同じ理由**である。
+
+つまり毒見で埋まるのは「**各ファイルの、最初に落ちる1件の周辺**」だけ。
+**「まとめて壊せば一気に埋まる」は成立しなかった。**
+
+### 毒見が価値を出した場所
+
+**証明の道具としてではなく、欠陥の発見器として。** 本物を2件掘り出した:
+
+- `F-20260828-50` … 「マイグレーションが当たっている」が `HTTP 200 / 0件` で緑
+- 同 … `check('Supabase が起きている', true)` の恒真の直書き
+
+**残り161件をどう埋めるかは、マスター判断に回す**（`docs/handoff.md`）。
+
+## 1項ごとに埋められない理由（機械が読む）
+
+> **マスター判断 A（2026-08-28）。** 除外はそれまで**ファイル単位**でしか書けず、
+> 「この項だけは埋められない」を機械に伝える場所が無かった。理由を台帳に書いても
+> `delivery-ready.mjs` は数え続け、**F4 が構造上閉じられなかった**。ここがその置き場所。
+>
+> **書き方**: `- <ファイル> :: <検査の名前>` の次の行に、字下げして `理由:`。
+> 名前は `node scripts/guard/proof-of-red.mjs` が出すものと**1字でも違ってはいけない**
+> （違えば「実体に無い検査を指している」で赤になる）。
+>
+> **黙らせる道具ではない。** 機械が3つ見ている——理由が20字未満なら認めない／
+> 実体に無い検査を指していれば赤／すでに証明済みの項に理由が付いていれば矛盾として赤。
+> そして**何件をどの理由で外したかは、通ったときの出力に必ず出る**。
+>
+> **ここに足すのは「埋めるべきでないもの」だけ。** 埋められるのに面倒だから、は該当しない。
+> 判断に迷ったら、まず壊し方を書いて実測すること。
+
+
+- verify-revisit-interval.mjs :: 4b. 飼い主: 次回日の下に「予約はこちら」が在り、行き先が入っている
+  理由: この容器には docker が無く、ローカル Supabase を起こせないので `npm run verify:revisit-interval` を1度も実行できない。同じ見方（`[data-view="revisit-book"]` を読む）では直す前 null・直したあと href 入りを実ブラウザで実測しているが、検査そのものの赤は見ていない。
+- verify-revisit-interval.mjs :: 4c. 確認: 店の画面にも同じ入口が在る（同一レンダラ）
+  理由: 同上。⑤と⑥が同じレンダラを使っていることの確認で、実データの往復が要る。docker のある回に赤を見て移すこと。
+
+- verify-carry-over.mjs :: 引き継ぎの告知を出していない（引き継ぎは既定の動き）
+  理由: この容器には docker が無く、ローカル Supabase を起こせないので `npm run verify:carry-over` を1度も実行できない。告知を出す行を戻して赤を見る、という壊し方はできるが、その赤を実際に見ていないので証明済みとは書けない。docker のある回に実測して移すこと。
+- verify-carry-over.mjs :: 引き継ぎが実際に走った（前回の値が画面に入った）
+  理由: 同上。実データの往復（5枚の確定カルテを積んで6枚目を開く）が要るため、この容器では赤も緑も見ていない。引き継ぎを止める壊し方で赤になるはずだが、はずは証拠ではない。
+- verify-carry-over.mjs :: 「引き継ぎをやめて白紙にする」の入口が無い
+  理由: 同じ数え方（配信物を開いて `.carry-over__clear` を数える）では、直す前1本・直したあと0本を実ブラウザで実測している。ただし検査そのものは docker が要るので、この項の赤は見ていない。
+- verify-carry-over.mjs :: 白紙に戻す処理も残っていない（押す場所が無いのに動く道を残さない）
+  理由: 同じ数え方（`typeof App.clearCarryOver`）で、直す前 function・直したあと undefined を実測。検査そのものの赤は docker が無くて見ていない。なお当初 `window.App` を見て書いており、常に緑になる中身の無い検査だった（`偽-5`）ことも実測で判った。
+- verify-carry-over.mjs :: 土台: 確定カルテが5枚ある犬を作った
+  理由: 5枚を積む土台そのもの。ここを壊すと以降の全項が巻き添えで落ちるので、この行だけを狙って赤にする壊し方が無い（`verify-portal :: 1.` と同じ型）。
+- verify-carry-over.mjs :: ② 一覧に犬が出ている
+  理由: 同上。一覧に出ないと④へ入れず、検査は最初の一歩で死ぬ。赤になるのは「到達できなかった」ことであって、この行が守っているものではない。
+- verify-carry-over.mjs :: ④ カルテ作成画面まで、押すだけで着いた
+  理由: 同上。ここへ着けない壊し方は、引き継ぎ以前に②→④の動線を壊すもので、`verify-m6` が既に別の角度で見ている。
+- verify-carry-over.mjs :: 確定できた（⑤へ進んだ）
+  理由: 確定の経路そのものは `verify-report-roundtrip` と `verify-admin` が受け持っている。この検査では「6枚目を書き終えられる」ことの土台として置いており、単独で赤にする壊し方はそれらの担当。
+- verify-carry-over.mjs :: 確定カルテが6枚になった
+  理由: 同上。確定が保存されない壊し方は `verify:roundtrip` が先に赤になる。
+- verify-carry-over.mjs :: ⑦使用オプションが選べる（帯が出ている）
+  理由: オプションの帯そのものは `verify-options-human.mjs` が担当。ここでは「引き継ぎのあとでもオプションが選べる」ことの前提として置いている。
+- verify-carry-over.mjs :: コースが空
+  理由: **壊し方A（前回を丸ごとコピー）を当てても緑のままだった**（実測）。コースは `<select>` で、`applyReport()` が入れようとした前回の値が選択肢に無ければ空のままになる。つまり症状そのものが起きない。値が選択肢に在る形の壊し方をまだ書いていない。
+- verify-carry-over.mjs :: 写真が1枚も入っていない
+  理由: 壊し方Aでも緑のままだった（実測）。この検査の5枚目には写真を積んでいないので、丸ごとコピーしても入るものが無い。**5枚目に写真を積む形に作り直すのが正しい**——`docs/ops/plan.md` 第12章へ。
+- verify-carry-over.mjs :: BCS が選ばれている
+  理由: 画面の既定でボタンが1つ `is-active` のため、引き継ぎを壊しても件数は1のまま緑になる（壊し方Cで実測）。**この行は現状ほとんど何も守っていない。** 値まで見る形に作り直す必要がある——`docs/ops/plan.md` 第12章へ。
+- verify-carry-over.mjs :: 触っていないので下書きは生えていない
+  理由: 「引き継いだだけでは保存しない」を見る行。保存してしまう壊し方（引き継ぎ直後に `saveDraft()` を呼ぶ）はまだ書いていない。壊し方A〜Cはどれも保存の有無を変えないので、この行は3回とも緑のままだった。
+- verify-carry-over.mjs :: 隠したら本当に消えている（hidden が CSS に負けていない）
+  理由: この行は**実際にこの不具合を捕まえた**あとに足したもので、捕まえた時点ではまだ存在しなかった（当時の赤は「白紙にすると、引き継ぎの帯が消える」に出ている・27回目に記録）。CSS を戻す壊し方を台帳に足していない。
+- verify-carry-over.mjs :: 6枚目のメッセージは今回書いたもの（前回の使い回しではない）
+  理由: 壊し方Aでは、④の画面で前回の文が入ったまま**今回の文を上書きして**確定するため、6枚目の中身は今回の文になり緑のままだった（実測）。対になる「7枚目のメッセージは空」は同じ壊し方で赤になっており、そちらで同じ穴を証明済み。
+- verify-carry-over.mjs :: 6枚目に前回の写真が混ざっていない
+  理由: 上と同じく、5枚目に写真を積んでいないため症状が起きない。写真を積む形に作り直したときに、まとめて証明する——`docs/ops/plan.md` 第12章へ。
+
+- verify-admin.mjs :: 7. 直す対象のカルテを1枚確定できた
+  理由: 直前の `waitForURL` と、不正なカルテ番号のページを返さないサーバ側の検証が、同じことを既に保証している。この行に到達した時点で番号は正しい——つまり単発の壊しでは赤にできない（実測: `commit-report-id-truncated` は `net::ERR_HTTP_RESPONSE_CODE_FAILURE` で待ちが先に落ちた）。守り自体は正しく、この行はそれを言い直している。
+- verify-delete.mjs :: 1. 写真つきのカルテを確定できた
+  理由: `verify-admin :: 7.` と同じ型。直前の `waitForURL` とサーバ側の検証が同じことを保証しており、到達した時点で番号は正しい。単発の壊しでは赤にできない。
+- verify-delete.mjs :: 2. 写真の実体が Storage に在る（service_role で数える）
+  理由: 写真がストレージに届かない壊し方は、どれも確定そのものを止めてしまう（実測: `asset-path-loses-report` は保存先のポリシーに弾かれて `waitForURL` が落ちた。`upload-assets` も同様）。この行に到達した時点で、写真が上がったことは既に保証されている。
+- verify-draft.mjs :: 4. 下書きの中身が漏れていない
+  理由: いまの飼い主ページは一覧しか描かず、カルテの本文を出さない。RLS を開けて下書きが漏れても（`rls-drafts-leak`）、本文の文字列は画面に現れないので、この行は赤にならない。将来ここに本文を出す造りにしたときのための見張りで、いまの画面では症状を起こせない。
+- verify-empty-pet.mjs :: 7. 下書きの中身が漏れていない
+  理由: `verify-draft :: 4.` と同じ。いまの飼い主ページはカルテの本文を描かないので、下書きが漏れても本文の文字列は画面に出ず、この行は赤にならない。
+- verify-m6.mjs :: ⑤. 確定すると確認の画面に着く
+  理由: `verify-admin :: 7.` と同じ型。確定後の URL の最後が36文字のカルテ番号かを見ているが、番号が壊れていればページ取得の時点で落ちるので、到達した時点で保証されている。
+- verify-photo-roundtrip.mjs :: `${kind === 'trimming' ? '1' : kind === 'ear' ? '2' : '3'}. ${kind} の写真を付けられた`
+  理由: 検査の名前が実行時に決まる（`${kind}` を含むテンプレート文字列）ため、実行時に出る赤の名前と台帳の鍵が文字として一致せず、紐付けられない。**検査そのものは正しい**——同型の `verify-xss` の18件は、名前を3件にまとめ直すことで証明済みに入っている（`### verify-xss の18件を、3件として台帳に移した`）。ここも同じ手当てが要る。
+- verify-photo-roundtrip.mjs :: 4. 写真つきで確定できた
+  理由: `verify-admin :: 7.` と同じ型。直前の待ちとサーバ側の検証が同じことを保証しており、到達した時点で確定は済んでいる。
+- verify-photo-roundtrip.mjs :: 5. 保存された写真5枚が実体になっている（asset://）
+  理由: `verify-delete :: 2.` と同じ。写真がストレージに届かない壊し方は確定そのものを止めるので、この行に到達した時点で写真が上がったことは保証されている。
+- verify-portal.mjs :: 1. /my が配信される
+  理由: `/my` の配信を壊すと、この検査は最初の一歩で死ぬ（`⛔ 毒見の天井` と同じ構造）。赤になるのは「検査を最後まで実行できた」だけで、狙ったこの行は何も証明できない。
+- verify-portal.mjs :: 3. Supabase vendor が読めている
+  理由: vendor の読み込みを壊すとポータルが起動せず、以降の項が全部巻き添えで落ちる。この行だけを狙って赤にする壊し方が無い。
+- verify-report-roundtrip.mjs :: 20. 飼い主の画面に、量っていない体重が出ない
+  理由: 入力欄に既定値を入れても（`weight-prefilled-sample`）、その値は飼い主まで届かない——つまり**症状そのものが起きない**ので、緑が正しい判定である。検査の欠陥ではない。
+- verify-report-roundtrip.mjs :: 3e. 確認: 来店日（確定日ではなく）
+  理由: ⑤トリマー確認は確定直後、`src/js/ui.js` が `reportDate: report.isoDate || report.date || ''`（`report.report_date` という DB 列を持たない、既に来店日優先の別オブジェクト）を組み立てて描く経路なので、`backend/js/magazine-view.js` の並びをどう壊しても影響しない。実測（`report-date-confirm-wins`）でも `3e.` は2回ともPASSのまま、`9e.` だけが赤になった（`### 25回目`）。単発の壊しでは赤にできないが、対の `9e.`（⑥飼い主・実際にDB列と衝突する経路）で同じ穴を証明済み。
+- verify-revisit-interval.mjs :: 6. アプリ由来の確認ダイアログが余計に出ていない
+  理由: 「想定外の alert/confirm/prompt が出ていないか」だけを見る安全網で、対応する「出すべき場面」が無い（`21.` のようなコース必須の alert とは違い、この項は「出ない」ことしか守っていない）。この検査の他の項目（0〜5）を壊す壊し方はどれも値のずれ・欄の表示で赤になり、余計なダイアログを1つだけ出すピンポイントな壊し方をまだ書いていない。
+- verify-revisit-interval.mjs :: 5. 犬ごとに日数を直す欄が、店の画面に無い
+  理由: **消したものが残っていないこと**だけを見る項なので、壊すには消した欄を書き戻すことになる——それは「壊し方」ではなく機能の復活で、マスター指示（2026-09-10「日後も保存も不要だから削除しろ」）に反する。
+
+### 27回目: 「6枚目を前回の続きから始める」新設 40件のうち 20件（2026-09-03・**手元で実測**）
+
+マスター指示（`D-20260903-64`）で新設した `scripts/verify-carry-over.mjs`（40 `check()`）を、
+**実 Supabase・実ブラウザ・人と同じクリック**で回しながら、3つの壊し方を当てた。
+`mutate-run.mjs` の台帳には載せていない——この検査だけを狙う壊し方なので、
+`src/js/ui.js` を直接書き換えて当て、確認後に `diff -q` で元に戻したことを確かめている。
+
+**壊し方A: 前回のカルテを丸ごとコピーする**（空にすべき項目を落とさない）
+
+```
+carryOverReport(): const carried = {} → const carried = { ...source }
+
+FAIL  来店日が空  value="2026-08-01"
+FAIL  トリマーからのメッセージが空  value="前回のメッセージ。これは6枚目に出てはい"
+FAIL  体重が空  value="4.4"
+FAIL  ⑦使用オプションが1つも選ばれていない  active=1
+FAIL  7枚目のメッセージは空（6枚目の文が残っていない）  value="6枚目のメッセージ。今回書いたもの。"
+35/40 PASS
+```
+
+**壊し方B: 確定に `__marks` を載せない**（次の回で犬体図の印を引き継げなくなる）
+
+```
+commitReport(): { ...extractReport(), __marks: this.marks } → { ...extractReport() }
+
+FAIL  6枚目に __marks が載っている（次の回で印を引き継げる）  marks=0
+FAIL  7枚目に、6枚目で足した印まで引き継がれている  marks=0
+38/40 PASS
+```
+
+**壊し方C: 前回のカルテを取りに行かない**（引き継ぎそのものが起きなくなる）
+
+```
+resumeDraft(): staff.findLastFinalReport(petId).then(…) → Promise.resolve(null).then(…)
+
+FAIL  引き継ぎが実際に走った（帯に字が入った）
+FAIL  引き継ぎの帯が出ている
+FAIL  帯が「爪」を名指ししている        （耳・歯・BCS・ベスト体重・犬体図の印 も同じく赤・計6件）
+FAIL  爪（前足）が5枚目と同じ  front=
+FAIL  爪（後ろ足）が5枚目と同じ  rear=
+FAIL  耳（右）が5枚目と同じ  right=1
+FAIL  耳（左）が5枚目と同じ  left=1
+FAIL  歯の状態が5枚目と同じ  teeth=ピカピカ✨
+FAIL  ベスト体重が5枚目と同じ  value=""
+FAIL  犬体図に前回の印が描かれている  {"ok":false,"colored":0}
+FAIL  白紙にすると、引き継いだ選択が全部外れる  nail=0 teeth=1
+FAIL  引き継いだ印に、今回の印を足せる  marks=1
+FAIL  6枚目に爪が引き継がれている  front=undefined
+FAIL  6枚目に __marks が載っている（次の回で印を引き継げる）  marks=1
+FAIL  7枚目も「前回の続き」から始まる
+FAIL  7枚目に、6枚目で足した印まで引き継がれている  marks=0
+19/40 PASS
+```
+
+**この壊し方を1回目に当てたときは 14件で止まっていた。** 帯が出ていないので
+「引き継ぎをやめて白紙にする」を押せず、そこで検査が例外で死に、**以降の項が
+赤とも緑とも言われないまま消えていた**。検査の側を直して（押せないときは飛ばす／
+確定に失敗しても続ける）、最後まで報告できるようにしてから測り直した数字が上の 19/40。
+**途中で死ぬ検査は、壊したときに何を守れていないのかを言えない。**
+
+**作っている途中で、実ブラウザだけが見つけた不具合が1件ある。**
+帯の CSS（`.carry-over { display: flex }`）がブラウザ既定の
+`[hidden] { display: none }` を上書きしており、引き継ぎが起きていない初回の犬にも
+空の帯が出ていた。`.carry-over[hidden] { display: none; }` を足して直した。
+単体テストでは出ない型（`D-14`「絵で判定する」の理由そのもの）。
+
+`歯の状態` が最初の実測で赤だったのは、検査側が実在しないラベル（`軽度の歯石`）を
+見本に使っていたためで、`applyReport()` が「名前が一致するボタンしか押さない」
+（`D-10`）とおりに振る舞った結果。見本を実在するラベル（`歯石が厚い😥`）に直した。
+
+**この赤が、実際に1件の不具合を捕まえた**——`[hidden]` を CSS で潰していた件は
+これで見つかり、`.carry-over[hidden] { display: none; }` を足して直した。
+`歯の状態` は、検査側が実在しないラベル（`軽度の歯石`）を見本に使っていたための赤で、
+`applyReport()` が「名前が一致するボタンしか押さない」（`D-10`）とおりに振る舞った結果。
+見本を実在するラベル（`歯石が厚い😥`）に直した。
+
+**マウスで印を足す**ところも、待ちと操作が足りずに赤を通っている:
+
+```
+FAIL  引き継いだ印に、今回の印を足せる  marks=1
+```
+
+犬体図の既定の置き方は「なぞる」で、**なぞらずに触れただけの点1つは捨てる**仕様
+（見えない印を残さない）。クリック1回では増えない。押して・動かして・離す形に直し、
+さらに `scrollIntoViewIfNeeded()` を入れて（表示域の外を押していた）緑になった。
+
+**まだ見ていない20件**は下の「未証明」に名前で残す。
+
+### 28回目: 管理者の入口3件（2026-09-03・**手元で実測**）
+
+`0-AK`（2026-09-02）で仕様を「入口は1つ、管理者にだけ『管理』が出る」に作り替えたとき、
+`verify-admin.mjs` の `1.` `1b.` `1c.` を新設したが、**赤になるところを見ないまま**
+未証明に置いていた。`delivery-ready.mjs` / `gate.mjs --end` が閉じられない唯一の原因が
+これだったので、3件とも壊して赤を見た。
+
+壊し方を2つ足した（`admin-lands-elsewhere` / `admin-link-wrong-destination`）。
+`admin-link-hidden` は既にあったもの。**1件ごとに、狙った行だけが赤になる**ように
+分けてある——入口を消すと押した先まで届かないので、`1c.` は「押せるが行き先が違う」
+別の壊し方でないと測れない。
+
+**`admin-lands-elsewhere`: 管理者だけ着く先が変わる**（2026-08-26 まで実際にそうだった形）
+
+> **2026-09-11 追記**: この壊し方は **`mutate-run.mjs` から削除した**。
+> 注入していた `m.role === 'admin'` の `role` 列は 2026-09-06 に削除済みで
+> （`D-20260906-68`）、いま注入しても行き先は変わらない＝**壊しても赤にならない**。
+> **上に書いた「28回目」の赤は当時実際に見たものなので、記録はそのまま残す。**
+> 壊す対象が無くなった壊し方だけを外した（マスター指示「機械も拾わないように削除しろ」）。
+
+```
+supabase-auth.js: location.replace('/edit')
+  → location.replace(admin ? '/admin' : '/edit')
+
+FAIL  1. 管理者も、みんなと同じカルテ画面に着く  path=/admin
+FAIL  1b. 管理者には「管理」の入口が見えていて、指が届く  出ていない
+0/3 PASS
+```
+
+**`admin-link-hidden`: 管理者にも「管理」が出ない**（今回マスターが実際に詰まった形）
+
+```
+supabase-staff.js: adminLink.hidden = false → true
+
+PASS  1. 管理者も、みんなと同じカルテ画面に着く  path=/edit
+FAIL  1b. 管理者には「管理」の入口が見えていて、指が届く  出ていない
+1/3 PASS
+```
+
+**`admin-link-wrong-destination`: 押せるが、行き先が違う**（`D-12`「押せた ではなく 着いた」）
+
+```
+index.html: <a href="/admin" … data-admin-link> → href="/edit"
+
+PASS  1. 管理者も、みんなと同じカルテ画面に着く  path=/edit
+PASS  1b. 管理者には「管理」の入口が見えていて、指が届く  left=90 right=126 幅=390
+FAIL  1c. 「管理」を押すと管理画面に着く  path=/edit
+2/4 PASS
+```
+
+**注意**: `node scripts/mutate-run.mjs admin-link-wrong-destination` の要約は
+この3件を「1. と 1b. が赤」と**取り違えて出す**（実際は `1c.` だけが赤）。
+上の出力は `npm run verify:admin` を直接回して読んだもの。要約の取り違えは
+`docs/ops/plan.md` 第12章 `#44` へ。
+
+### 29回目: 体重の記録9件（2026-09-03・**手元で実測**）
+
+マスター指示「納品して問題あるなら直せ」。体重まわりに2つの不具合があった。
+
+- **④の「前回比」が常に「前回の記録なし」**。`currentDog.prevWeight` に値が入る経路は
+  仮データ（`src/js/dummy.js`）だけで、実データでは常に `null`。確定カルテが5枚ある
+  犬でも前回の体重を引けていなかった
+- **⑥飼い主の「体重推移」が常に点1つ**。`renderWeightGraph()` はカルテ1枚の
+  `weights`（＝その回の1件）を描いていた。`polyline` は2点未満では線を引けないので、
+  **推移は一度も飼い主に届いていない**。既存の `verify:roundtrip` の
+  `14b. 飼い主: 体重のグラフが描かれている` は**箱の中に要素が在るか**しか見ておらず、
+  点1つでも緑になる——これが見逃されていた理由
+
+新しい9件を、5つの壊し方で1件ずつ赤にした。
+
+**A: 履歴を最後の1件だけにする**（`listWeightHistory` に `.slice(-1)`）
+
+```
+FAIL  カルテ1枚の応答に、確定カルテを横断した体重の履歴が載っている  点=1
+FAIL  ⑤の体重グラフに線が引かれている（点が2つ以上）  {"ok":false,"points":1}
+47/49 PASS
+```
+
+**B: 前回の体重を入れない**（`resumeDraft` の `prevWeight` 代入を落とす）
+
+```
+FAIL  前回比が「前回の記録なし」ではない（5枚目の体重を引けている）  badge="前回の記録なし"
+FAIL  まだ量っていないので、前回の体重を出している（痩せたように見せない）  badge="前回の記録なし"
+FAIL  体重を入れると前回比が出る（4.4 → 4.6 で +200g ▲）  badge="前回の記録なし"
+FAIL  7枚目の前回比は、6枚目で量った体重（4.6kg）を基準にする  badge="前回の記録なし"
+45/49 PASS
+```
+
+**C: 履歴を新しい順にする**（`order=report_date.asc` → `desc`）
+
+```
+FAIL  履歴の最後が、いま入れた体重（4.6kg）  最後=4.4kg
+48/49 PASS
+```
+
+**D: 前回が無いとき見本の体重で引き算する**（`prevWeight || 2.67`・2026-08 まで実際にこうだった形）
+
+```
+FAIL  カルテが1枚も無い犬では「前回の記録なし」のまま  badge="前回 2.67kg"
+48/49 PASS
+```
+
+> **この D は、1回目は赤にならなかった。** 検査が
+> 「**計算して記録が無かった**」と「**一度も計算していない**」を区別できておらず、
+> 画面に出ていた「前回の記録なし」は HTML の初期値のままだった（`docs/watch.md` W-1 の型）。
+> `resumeDraft()` が**前回が無かったときも必ず `renderWeightDiff()` を呼ぶ**ように
+> 実装を直してから、赤になった。**検査を弱めずに、製品側を直して見分けられるようにした。**
+
+**E: 引き継ぐものが無くても引き継ぎの帯を出す**（`previous` の有無を見ない＋`labels.length === 0` の門を外す・2か所）
+
+```
+FAIL  カルテが1枚も無い犬では、引き継ぎの帯を出さない
+48/49 PASS
+```
+
+### 30回目: 徹底調査で見つけた穴の8件（2026-09-03・**手元で実測**）
+
+マスター指示「配線は全てつながっているのか、コードや緑/赤しか見てない箇所は正しく動くのか、
+致命的な見落としはないか、人間として操作して目的の動作はすべて完了するか、イレギュラーな操作を
+して壊れる事は無いか、脆弱性はないか、を徹底リサーチして記録に残せ」。
+見つけたものと直したものは `docs/ops/audit-2026-09-03.md` に全部書いた。ここは**赤の実測**だけ。
+
+**A: ④の入力欄が「選ばれて見えるのに保存されない」形に戻す**
+
+BCS・右耳・歯を、それぞれ出荷時の状態（`is-active` 付き）に戻した。3通りとも赤。
+
+```
+--- 壊し方A: BCS を出荷時の状態（点いている）に戻す
+not ok 1 - ④の入力欄が、選ばれて見えるのに保存されない状態で出荷されていない
+not ok 2 - ④の入力欄の初期値は、ドックの「未記入」の見方と揃っている
+--- 壊し方B: 耳を出荷時の状態に戻す
+not ok 1 - ④の入力欄が、選ばれて見えるのに保存されない状態で出荷されていない
+--- 壊し方C: 歯を出荷時の状態に戻す
+not ok 1 - ④の入力欄が、選ばれて見えるのに保存されない状態で出荷されていない
+=== 直した状態 ===  # pass 2 / # fail 0
+```
+
+**B: `pickWeightSeries()` を、空の配列で短絡する形に戻す**
+
+```
+--- 壊し方: return (report || {}).weightHistory;
+not ok 8  - 確定カルテが1枚も無い犬では、今日量った体重が捨てられない
+not ok 9  - 履歴が取れなかった回（null）も、今日の体重に落ちる
+--- 壊し方: return (data || {}).weights;
+not ok 10 - 履歴があるときは履歴が勝つ（点1つに戻らない）
+=== 直した状態 ===  # pass 10 / # fail 0
+```
+
+**C: 体重履歴のクエリから門を外す**
+
+```
+--- 壊し方: status=eq.final& を外す（下書き・削除待ちの体重が混ざる）
+not ok 26 - 体重の履歴は、確定したカルテだけを、古い順に、体重の列だけ取る
+--- 壊し方: 新しい順にする（線が前後する）
+not ok 26 - 体重の履歴は、確定したカルテだけを、古い順に、体重の列だけ取る
+=== 直した状態 ===  # pass 26 / # fail 0
+```
+
+**D: ⑤が `selectKarte()` を呼ぶ形（＝穴を開け直す）**
+
+⑤確認から段のタブ「03」を押すと、組み立てていない④が開いていた穴。
+
+```
+--- 壊し方: showReport() の setDogIdentity を selectKarte に戻す
+FAIL  検査を最後まで実行できた  page.waitForSelector: Timeout 20000ms exceeded.
+=== 直した状態 ===  15/15 PASS
+```
+
+**⚠️ 関所の変数だけを戻しても赤にならない。** `goToStep(3)` の判定を
+`karteInputReady` → `karteReady` に戻すだけでは `⑤c-2` は緑のままだった（実測）
+——`showReport()` が `selectKarte()` を呼ばなくなったので `karteReady` 自体が立たないため。
+**直しは2箇所に効いていて、片方だけでも塞がる。** 検査が見ているのは「どこに着いたか」
+なので、これは検査の弱さではなく、直しの厚さ。
+
+**足した8件**
+
+- ui-default-state.test.mjs :: ④の入力欄が、選ばれて見えるのに保存されない状態で出荷されていない
+- ui-default-state.test.mjs :: ④の入力欄の初期値は、ドックの「未記入」の見方と揃っている
+- weight-history.test.mjs :: 確定カルテが1枚も無い犬では、今日量った体重が捨てられない
+- weight-history.test.mjs :: 履歴が取れなかった回（null）も、今日の体重に落ちる
+- weight-history.test.mjs :: 履歴があるときは履歴が勝つ（点1つに戻らない）
+- supabase-store.test.mjs :: 体重の履歴は、確定したカルテだけを、古い順に、体重の列だけ取る
+- verify-m6.mjs :: ⑤c-2. 確定後に「03」を押すと、組み立てていない④を開かず②へ戻す
+- verify-m6.mjs :: ⑤c-3. 戻った②に、犬を選び直せる一覧が在る（押せただけで終わらせない）
+
+### 31回目: ⑥飼い主の体重グラフ2件（2026-09-03・**手元で実測**・`#46`）
+
+30回目の徹底調査で名指しした穴を埋めた。それまで**⑥飼い主の画面で線が引かれることを
+見る検査は1本も無く**、「⑤と⑥は同一レンダラだから飼い主にも届く」という**推論**だけだった
+（`AGENTS.md` の証拠の強さ: AI Reasoning < Runtime Evidence）。
+既存の `14b.` は枠の中に要素が在るかしか見ないので**点1つでも緑**になる。
+
+**実測（直す前）**: `backend/js/supabase-auth.js` を `weightHistory: null` に壊しても
+`verify:roundtrip` は **34/34 PASS のまま**だった。
+
+`verify:roundtrip` に前回の来店（3.2kg・確定）を1回ぶん置き、飼い主の画面で
+`polyline` の点を数える形にした。**2通りの壊し方で、どちらも赤になった。**
+
+**A: ⑥のビューへ渡さない**（`supabase-auth.js` の `weightHistory: null`）
+
+```
+FAIL  14c. 飼い主: 体重推移に線が引かれている（点が2つ以上）
+FAIL  14d. 飼い主: 推移の点が、確定カルテの枚数（2枚）と合っている
+===== 往復: 36/38 =====
+```
+
+**B: worker の⑥応答から落とす**（`worker/src/index.js` の `listWeightHistory` を `null` に）
+
+```
+FAIL  14c. 飼い主: 体重推移に線が引かれている（点が2つ以上）
+FAIL  14d. 飼い主: 推移の点が、確定カルテの枚数（2枚）と合っている
+===== 往復: 36/38 =====
+```
+
+**直した状態**: `===== 往復: 38/38 =====`
+
+**`>= 2` で止めなかった理由**: 点の数を「2以上」で見るだけだと、`status=eq.final` の門を
+外して**下書きの体重が混ざった**ときに気づけない。この犬の確定カルテは前回と今回の
+2枚だけなので、**ちょうど2**で見る。
+
+**前回の来店を置いたのは、恒真を避けるため**。1枚しか無い状態では `polyline` は
+そもそも引けないので、「線が無い」と「線を引く材料が無い」が区別できず、
+検査として何も見ていないことになる（`empty-pass` の型）。
+
+### 32回目: 入口を1本にする6件（2026-09-04・**手元で実測**）
+
+マスター報告（実機・本番）:
+- スタッフ用→**ログインできない**
+- 飼い主用: ①すでにカルテ在り→ログインするとカルテ作成画面に行く
+  ②Home に戻るとそのあとログインできない ③新規登録を押すと説明が出るだけ
+- 「そもそも管理者と顧客の入り口を分けるな。認証で振り分ける経路にしろ。
+  新規登録ボタンは存在意味が分からない」
+
+**実機で再現した原因**（`/edit` に**死んだログイン画面**が乗っていた）:
+
+```
+スタッフで /edit に着いた: http://localhost:8827/edit
+「01 ログイン」タブは見えるか: true
+押したあと: {"path":"/edit","panel":"screen-1",
+             "ログインボタンが見える":true,"ボタンの文言":"Google でログイン",
+             "ENTRY印":false}
+ログインボタンを押した結果: /edit → /edit  （変化なし=true）
+```
+
+`bootLoginPage()` は `__ENTRY__` のときだけ起動するので、`/edit` の
+「Google でログイン」は**配線されていない**。さらに `/edit` には**ログアウトが無く**、
+`/` に戻っても `location.replace('/edit')` で送り返されるため、
+**別のアカウントに切り替える手段が1つも無かった**。
+
+**4通りの壊し方で、新しい6件すべてを赤にした。**
+
+**A: 振り分けを元に戻す**（`ownerLinks === 0` の条件を足し直す）
+
+```
+FAIL  5. スタッフ権限を持つ人は `/` から作業画面に着く  path=/my
+FAIL  6. 着いた作業画面に、犬の一覧が出ている（器だけ運ばない）  card=0
+FAIL  8b. ログアウトを押すと入口（`/`）に戻る  url=/my
+```
+
+**B: ログアウトを出さない**（`signOut.hidden = true`）
+
+```
+FAIL  7. 作業画面にログアウトが出ている（別のアカウントに切り替えられる）
+FAIL  検査を最後まで実行できた  page.click: Timeout 30000ms exceeded.
+```
+
+**C: 入口の道具を外さない**（`[data-entry-only]` を隠さず screen-1 も残す）
+
+```
+FAIL  8. 作業画面に、押しても何も起きないログインの入口が残っていない  タブ=true ボタン=false 画面=true
+```
+
+**D: 「新規カルテ」ボタンを戻す**
+
+```
+FAIL  13. ②一覧に、押しても何もしない「新規カルテ」ボタンが残っていない  残っている=true
+```
+
+**直した状態**: `23/23 PASS`
+
+**消した5件**（実体が無くなったので台帳からも消した。`verify-inventory` が本数を見る）:
+`5. スタッフ兼飼い主は /my に留まる` / `6. その人に作業画面への入口が出ている` /
+`7. サインアウトの入口も出ている` / `8. その入口を押すと、犬の一覧に着く` /
+`13. ②一覧から新規カルテを作れる入口が在る`。
+前4件は兼務アカウントの救済を見るもので、`D-20260904-66`（1アカウント＝1役割）で
+仕組みごと無くなった。**検査を弱めたのではなく、見る対象が変わったので入れ替えた**
+（新しい6件のほうが多い）。
+
+### 33回目: 入口の取りこぼし5件（2026-09-04・**手元で実測**）
+
+32回目で入口を1本にしたあと、**サブの敵対検証（実機）が私の作った退行を2件見つけた。**
+`verify:screens` は 23/23、`npm test` も全緑のまま**どちらも通っていた**
+——「機械は緑、人は届かない」の型がまた出た。
+
+**退行1: `/edit` で左上の HOME を押すと画面が真っ白になる。**
+`screen-1` を作業画面から外したのに、HOME は `goToStep(1)` を呼んだままだった。
+`goToStep()` は**全部の `is-active` を外してから行き先を探す**ので、
+行き先が無いとどの画面も出ない。直す前は「押しても何も起きない死んだログイン画面」が
+出ていた**同じボタン**で、`01 ログイン` タブだけ塞いで**こちらを見落としていた**。
+
+**退行2: 未ログインで `/edit/p/{petId}` を開くと、ログイン後にそこへ戻れない。**
+送る側（`supabase-staff.js`）は戻り先を積んでいたのに、入口の「Google でログイン」が
+`signInWithGoogle(supabase, '/my')` 経由で `post_auth_return` を**無条件に上書き**して
+潰していた。`supabase-staff.js` のコメントが約束していたことが成立していなかった。
+
+**ついでに見つけた罠**: `[data-entry-only]` に `hidden` を付けても、`.btn-home` は
+`display: inline-flex` を持つので**ブラウザ既定の `[hidden] { display: none }` を
+上書きして出たまま**になる。`.btn-step` は `display` を持たないので効いていた
+——**同じ印を付けたのに片方だけ消えない**という、いちばん気づきにくい形。
+`.carry-over[hidden]` で同じ罠を1度踏んでおり、`src/index.html` にその注記も
+残っていたのに繰り返した。`[data-entry-only][hidden] { display: none; }` を足した。
+
+**4通りの壊し方で、新しい5件すべてを赤にした。**
+
+**E: HOME から入口専用の印を外す**（サブが見つけた白紙そのもの）
+
+```
+FAIL  8c. 作業画面に、白紙へ連れて行く HOME を出していない
+FAIL  検査を最後まで実行できた  page.goto: Timeout 30000ms exceeded.
+```
+
+**F: `goToStep()` の歯止めを外す**（行き先が無くても全部消す形に戻す）
+
+```
+FAIL  8c. 作業画面に、白紙へ連れて行く HOME を出していない
+FAIL  検査を最後まで実行できた  page.evaluate: TypeError: Cannot read properties of null (reading 'classList')
+```
+
+この `TypeError` が、画面がどこも `is-active` でなくなった状態そのもの（`8d.` が見る形）。
+
+**G: 戻り先を無条件に上書きする**（`signInWithGoogle` を元の書き方に戻す）
+
+```
+FAIL  8g. ログインを押しても、戻り先が入口の既定で上書きされない  押した後=/my
+```
+
+**H: `[data-entry-only][hidden]` の CSS を外す**
+
+```
+FAIL  8. 作業画面に、押しても何も起きないログインの入口が残っていない  タブ=true ボタン=false 画面=false
+FAIL  8c. 作業画面に、白紙へ連れて行く HOME を出していない
+```
+
+**直した状態**: `28/28 PASS`
+
+**`8g.` を測るときの注意**（次に触る人へ）: 認可画面へ出て行かせると**別ドメイン扱いになり、
+`sessionStorage` を読むと `SecurityError` になる**（実測）。`/auth/v1/authorize` を
+`route.abort()` で止め、**同じ入口へ戻ってから読む**。中断した頁の上では読めない。
+
+### 36回目: 入口を1つにする（2026-09-05・**手元で実測**）
+
+マスター指示「そもそも管理者と顧客の入り口を分けるな。認証で振り分ける経路にしろ。
+**指示は１つ。入り口を1つにしろ**」。
+
+35回目までに直したのは `/edit` に乗っていた**押しても何も起きない死んだ入口**だけで、
+マスターが名指しした「管理者と顧客の入り口」——`/my` と `/admin` の、**押せば本当に
+ログインが始まる画面**——には1行も触れていなかった。**数の上では 3 → 3 のまま。**
+
+`/admin` の入口はそもそも押しても着かなかった: `signInWithGoogle(supabase, '/admin')`
+を呼ぶが `safeReturnPath()` は `/my` と `/edit` しか通さないので、戻り先は `/my` に潰れる。
+
+**7通りの壊し方で、新しい3件と入れ替えた4件すべてを赤にした。**
+
+**P: `/my` の未ログインを、入口へ送らず留める**
+
+```
+FAIL  4c. 未ログインでどの画面を開いても、入口（`/`）に集まる
+      [{"door":"/my","path":"/my"},{"door":"/my/pets/…","path":"/my/pets/…"}]
+FAIL  5. 未ログインの `/my` は入口へ送られ、そこに押せるログインが在る  path=/my ログイン=false
+FAIL  9. 犬を直接指す URL でも入口へ送られ、その URL を覚えている
+```
+
+**Q: `my.html` にログインパネルを戻す** / **Q': `index.html` から `data-entry-login` を消す**
+
+```
+Q   FAIL  4d. 配られた HTML でログインを始められるのは入口だけ  {"/":1,"/my":1,"/admin":0}
+Q'  FAIL  4d. 配られた HTML でログインを始められるのは入口だけ  {"/":0,"/my":0,"/admin":0}
+```
+
+**Q' は錨側を壊したもの。両方向で赤になることが、`4d.` が恒真でない証拠**
+——取得に失敗して全部 0 になっても緑、にならない。
+
+**R: `/admin` の未ログインを元に戻す**
+
+```
+FAIL  4c. 未ログインでどの画面を開いても、入口（`/`）に集まる  [{"door":"/admin","path":"/admin"}]
+```
+
+**S: 入口へ送るとき、戻り先を積まない**
+
+```
+FAIL  6. そのとき、開こうとした URL を覚えている（ログイン後に戻れる）  覚えた先=null
+FAIL  9. 犬を直接指す URL でも入口へ送られ、その URL を覚えている  path=/ 覚えた先=null
+FAIL  4b. 未ログインで招待リンクを開くと、入口へ送られても招待と戻り先を落とさない
+      {"path":"/","token":"d0b1eb…","back":null}
+```
+
+**T: 招待の取り込みを、転送より後ろへ動かす**（この変更で唯一「静かに壊れる」経路）
+
+```
+FAIL  4b. …  {"path":"/","token":null,"back":"/my?invite=965afe41…"}
+```
+
+`token=null` が要点。**画面には何も出ないので、これが壊れても誰も気づけない**
+——飼い主は招待リンクを踏んでも自分の犬に一生たどり着けない。
+`4b.` が**発行したトークンと突き合わせている**（`!= null` ではない）から捕まる。
+
+**U: `catch` から `signOut()` を外して入口へ返す**
+
+同じ土台（`db reset` 直後）で比べた:
+
+```
+U を当てた       FAIL  検査を最後まで実行できた  page.waitForSelector: Timeout 15000ms exceeded.  6/7 PASS
+直した状態       14/14 PASS
+```
+
+**赤にはなるが、`15.` の名前では出ない。** 鍵を捨てずに返すと、入口が「セッションが
+在る」と見て `/my` へ送り返し、`/my` が 401 でまた返す——**往復して画面が出ない**ので、
+先に `11.` の待ちが時間切れになる。往復そのものは止められている証拠だが、
+`15.` を名指しで赤にはしないので、次を足した:
+
+**U': 入口へ返さず、その場に留まる**（`signOut()` は残す）
+
+```
+FAIL  15. 失効・リンク解除のあとでも、ログインボタンが出て押せる（詰まない）
+      {"path":"/my","buttonVisible":false,"buttonEnabled":false,"tokenLeft":false}
+```
+
+**直した状態**: `verify:portal 14/14` / `verify:screens 31/31` / `verify:invitation 9/9`
+
+### ⚠️ この回で私がやった失敗（繰り返さないために書く）
+
+**赤を測っている最中にコミットして、変異を1行取り込んだ。**
+`goToEntry()` から `location.replace('/')` が欠けた状態がコミットされ、
+**未ログインの人が入口へ送られない**製品がリポジトリに入った。
+ジョブがファイルを書き換えながら走っている間、作業ツリーは製品の状態ではない。
+**壊して赤を測っている間はコミットしない。**
+
+### 消した検査 1件
+
+`verify-portal :: 7. 未ログインで中身とログアウトは隠れている`——
+未ログインの `/my` は入口へ出ていくので、**この画面に留まる前提そのものが無くなった**。
+残すと恒真になる（`/` に居るのだから中身もログアウトも無い）。
+見たい性質「未ログインの人をここに留めない」は `5.` が見る。
+
+### 37回目: 入口の器は、隠すのではなく配る前に消す（2026-09-05・**手元で実測**）
+
+36回目で入口を1つにしたあと、**サブの敵対検証が実機で穴を見つけた。**
+
+**セッションが失効した状態で `/edit` を開くと、押しても何も起きないログイン画面が
+復活する**——マスターが最初に報告した画面そのもの。
+
+```
+{"段":"端末Aでログアウト後の端末B(スタッフ /edit)","where":"/edit",
+ "押せるもの":[…,"BUTTON:01 ログイン","BUTTON:Google でログイン"],
+ "screen1あり":true,"token":true}
+押しても何も起きない: "押した: /edit -> /edit"
+```
+
+**普通の操作で到達する。** `supabase-js` の `signOut()` は既定が `scope: 'global'` で、
+**1台でログアウトすると他の全端末のセッションがサーバ側で失効する**。
+店で iPad とスマホを併用していれば日常的に起きる。
+`/admin` は同じ状態で、生の JSON（`401 {"error":"authentication required"}`）を
+見せる**行き止まり**だった（ログアウトも入口も無い）。
+
+**原因は私の直し方。** 入口の器（`01 ログイン` タブ・`HOME`・`screen-1`）を
+**画面側で実行時に隠して**いたので、起動が途中で 401 に当たると隠す処理まで進まない。
+既存の `8.`（作業画面に押しても何も起きない入口が残っていない）は
+**起動が成功したときしか見ていない**ので、この経路を素通りしていた。
+
+**マスター指示（2026-09-05）**:
+> ふさぐというか、削除しろよ。お前がつくらなければこの世に存在していないのだから、
+> 消せば済むだろ
+
+そのとおりだった。**隠すのをやめ、Worker が配る時点で落とす**
+（`worker/src/index.js` の `stripEntryMarkup()`）。文書に無ければ、
+**どの失敗経路でも復活しない**。実行時に隠していたコードと、参照が0になった CSS は削除。
+
+あわせて、失効時に人が取り残されないようにした（入口へ返す・返す前に鍵を捨てる）:
+`supabase-staff.js` の `boot` の `catch` と `supabase-admin.js` の `catch`。
+「役割の判定は3か所で揃える」というコメント自身の約束が、**失効の経路だけ
+守られていなかった**。
+
+**2通りの壊し方で赤を実測した。**
+
+**V: 配る前に消すのをやめる**（入口の器を `/edit` にも配る）
+
+```
+FAIL  8. 作業画面に、押しても何も起きないログインの入口が残っていない  タブ=true ボタン=false 画面=true
+FAIL  8c. 作業画面に、白紙へ連れて行く HOME を出していない
+```
+
+**W: 失効時に入口へ返さない（スタッフ）**
+
+```
+FAIL  4e. 鍵が古いときも入口は1つ（死んだログイン画面を復活させない）
+      [{"label":"スタッフ","path":"/edit","deadLogin":false},
+       {"label":"管理者","path":"/","deadLogin":false},{"label":"飼い主","path":"/","deadLogin":false}]
+```
+
+**直した状態**: `verify:screens 32/32` / `verify:edit 20/20` / `verify:portal 14/14` / `verify:m6 16/16`
+
+**`4e.` は3役ぶんをまとめて見る。** `stalePages.length === 3` を条件に入れてあるので、
+3件そろわなければ緑にならない（`empty-pass` の型）。
+
+### サブ検証が「通った」と確認したもの（記録）
+
+- 未ログインの **28 URL** すべてが `/` に着地し、見えているログイン口はちょうど1つ
+- **転送のループは0件**（失効・壊れ・期限切れ × 3画面。最長4ホップ）
+- 戻り先 **25通り**（4役 × 5 URL）。消化後は必ず消える
+- 招待リンク: 入口を経由しても落ちず、その犬に着ける
+- **オープンリダイレクト15種すべて `/my` に潰される**（`//evil.example/` `javascript:` `data:` ほか）
+
+### 38回目: 入口に業務の器そのものを配っていた（2026-09-05・**手元で実測**）
+
+37回目で `/edit` 側（`stripEntryMarkup`）を直したとき、**その鏡像を数えなかった。**
+`index.html` は `/` と `/edit` で使い回している。入口を削ったのだから、
+**入口に業務の器が乗っている**ことも同時に見るべきだった（`docs/watch.md` W-1
+「直した直後に同じファイルの兄弟を数えたか」）。
+
+**直す前の実測**——未ログインで `/` を開いただけの状態:
+
+```
+screen=4  （screen-1/2/3/4 が全部配られている）
+tab=4     （段のタブ 01〜04 が押せる）
+[{"active":"screen-2","cards":5,"inputs":7},
+ {"active":"screen-3","cards":5,"inputs":7},
+ {"active":"screen-4","cards":5,"inputs":7}]
+```
+
+**未ログインの誰でも、犬のカード5件（架空の顧客名）とカルテの入力欄が見えていた。**
+`goToStep()` の関所は `__REPORT__` が在るときだけ効き、入口には注入しないので
+**1つも効いていなかった**。
+
+そして**古い検査 3本は、この状態を要求していた**——「`/` に4画面が乗っている」
+「`/` に段のタブが4つ在る」「`/` はログイン画面から始まる」。
+判定を緩めたのではなく、**要求そのものが間違っていた**ので正した（`A-4` の逆）。
+直しは `worker/src/index.js` の `stripAppMarkup()`——`stripEntryMarkup()` の鏡像で、
+配る前に `screen-2/3/4` と段のタブを落とす（`screen-3` は入れ子の `</section>` を持つので
+対応を数えて閉じる）。印が見つからなければ**何も消さずに返す**（`D-10`）。
+
+**X: 入口から業務の器を落とすのをやめる**（`const entryOnly = templateHtml;`）
+
+```
+FAIL  2. 入口には、ログインの画面しか配られていない  screen=4
+FAIL  3. 入口に、業務の画面へ連れて行く段のタブが無い  tab=4
+FAIL  4. 入口で段を押しても、業務の画面に入れない
+      [{"active":"screen-2","cards":5,"inputs":7},
+       {"active":"screen-3","cards":5,"inputs":7},
+       {"active":"screen-4","cards":5,"inputs":7}]
+```
+
+**直した状態**: `portal 14/14 ・ edit 20/20 ・ xss 24/24 ・ roundtrip 38/38 ・ empty 11/11 ・
+screens 32/32 ・ delete 6/6 ・ draft 7/7 ・ invitation 9/9 ・ m6 16/16 ・ admin 23/23`
+
+**`4.` は押して確かめる。** 器が無ければ入れないはずだが、「無い」ことは押して見る
+（`D-12`「押せた ではなく 届いた」の裏返し）。`pressed.length === 3` を条件に入れてあるので、
+3回押せなければ緑にならない（`empty-pass` の型）。
+
+
+### 39回目: 権限を1つにする（2026-09-06・**手元で実測**）
+
+マスター判断:
+
+> 管理者とスタッフは同一で良い
+> 使わないものを先に削除しろ
+
+**11ページ / 6URL / 権限2種＋飼い主** で、名前も数も噛み合っていなかった。
+まず**使わないと決まったもの＝`admin` と `staff` の区別**を、DB ごと削除した。
+
+`private.is_shop_admin()` は `private.is_shop_staff()` と**1行しか違わなかった**
+（`role = 'admin'` を見るか見ないか）。この1行が 12ファイル44か所に波及していた。
+削除したもの: `is_shop_admin()`・`shop_memberships.role` 列・`invitations.staff_role` 列・
+「最後の管理者は消せない」ガード（`last_admin`）・スタッフ管理の役割選択欄・
+招待の「管理者を招待 / スタッフを招待」の2択。
+
+**残る権限の境目は「お店の人 / 飼い主」の1本だけ。**
+
+検査は主役を**ただのスタッフ口座**（`staff@local.test`）に差し替えた。
+これで `1.`〜`18.` が「お店の人なら誰でも飼い主登録・犬登録・カルテ修正・削除ができる」
+の証明になる。`19.` `20.` は**飼い主を入れない**ことだけを見る形に入れ替えた。
+
+**4通りの壊し方で赤を実測した。**
+
+**A: 飼い主も管理画面に入れてしまう（錨側）**
+
+```
+FAIL  19. 飼い主は管理画面を使えない（顧客データを消せない）  denied=false 削除メニュー=1
+FAIL  20. 飼い主を行き止まりにせず、愛犬のページへの入口を出している  status=""
+21/23 PASS
+```
+
+**B: 「管理」の入口をお店の人に出さない**
+
+```
+FAIL  1b. お店の人には「管理」の入口が見えていて、指が届く  出ていない
+FAIL  検査を最後まで実行できた  locator.click: Timeout 30000ms exceeded.
+```
+
+**C: お店の人をカルテ画面へ送らない**
+
+```
+FAIL  1. お店の人は、みんなと同じカルテ画面に着く  path=/my
+FAIL  1b. お店の人には「管理」の入口が見えていて、指が届く  出ていない
+```
+
+**D: 管理画面から「店舗設定」を落とす**
+
+```
+FAIL  2. 管理画面に リピーター / 新規 / 削除 / 店舗設定 が在る  出た項目=["① リピーター","② 新規","③ 削除","④"]
+22/23 PASS
+```
+
+**単体テストの入れ替えも、2通りで赤を実測した。**
+（`test/supabase-store.test.mjs` の「最後の管理者は停止不可（409）」を要求していた1本を、
+役割が**どこにも流れない**ことを見る2本に入れ替えた）
+
+**E: 役割をまた RPC に送る**
+
+```
+not ok 20 - staff changes carry only active — no role travels to the RPC
+```
+
+**F: 受け口を緩めて `role` を通す**
+
+```
+not ok 21 - a role in the request body is refused (the field does not exist any more)
+```
+
+**直した状態**: `admin 23/23`（**ただのスタッフ口座で**）・`portal 14/14 ・ edit 20/20 ・
+xss 24/24 ・ roundtrip 38/38 ・ empty 11/11 ・ screens 32/32 ・ delete 6/6 ・ draft 7/7 ・
+invitation 9/9 ・ m6 16/16 ・ migrations 13/13 ・ stack 4/4 ・ first-run 18/18`
+
+**`19.` は「入れない」だけでは足りない。** 削除メニューが0件であることを同じ条件に入れてある
+——`denied` だけ見ていると、門は出ているのに下に操作が並んでいる形を見逃す（`empty-pass` の型）。
+
+
+### 40回目: 押す場所が無い画面を削除する（2026-09-06・**手元で実測**）
+
+ページ / URL / 権限の一覧をサブに作らせたところ、**スタッフ管理の画面が
+どこからも開けない**ことが分かった（`grep` で呼び出し0件・実測）。
+
+`D-20260823-05`（2026-08-23・マスター判断）で「とりあえず残す」と決めたまま、
+**押す場所が1つも無い状態で2週間残っていた**——`D-12`「押せた ではなく 届いた」の
+裏返しで、そもそも押せない。マスター指示（2026-09-06）で削除。
+
+削除したもの: `showStaffManager()` / `GET /api/staff` / `PATCH /api/staff/{id}` /
+`updateMembershipSchema` / `listStaff()` / `updateStaff()` /
+`public.update_staff_membership()`（migration `202609060013`）。
+
+**画面を消すだけでは足りない。** 口（API と `security definer` の RPC）が残ると、
+**誰も呼ばないのに membership を書き換えられる入口**が残る。だから
+「口が本当に閉じたか」を見る検査に入れ替えた。
+
+**G: `/api/staff` の口を戻す**
+
+```
+not ok 20 - the staff-management endpoints are gone (no way in)
+    GET /api/staff がまだ在る
+```
+
+**直した状態**: `npm test` 149+56+32 fail 0 ・ `stack 4/4 ・ migrations 14/14 ・
+portal 14/14 ・ edit 20/20 ・ xss 24/24 ・ roundtrip 38/38 ・ empty 11/11 ・
+screens 32/32 ・ delete 6/6 ・ draft 7/7 ・ invitation 9/9 ・ m6 16/16 ・
+admin 23/23 ・ first-run 18/18`
+
+**404 を2本とも同じ条件に入れてある**（GET と PATCH）。片方だけ見ていると、
+もう片方が残ったまま緑になる（`empty-pass` の型）。RPC が呼ばれていないことも
+併せて見る——404 を返しつつ先に RPC を叩く形を作らせない。
+
+**残った穴（次の候補）**: スタッフの招待（`invitationType: 'staff'`）は API に
+残っているが、**発行するボタンがどこにも無い**。つまり**アプリ上でお店の人を
+増やす手段が1つも無い**。削除前からそうだったので今回の変更で失われたものは無いが、
+**必要になったら作る**という判断が要る。
+
+### 41回目: 大計画をセッション開始時に必ず見る（2026-09-06・**手元で実測**）
+
+マスターの問い「おまえ、このセッションで大計画見ているのか？」の答えは**「見ていない」**。
+仕組みは在ったのに、**素通りできた**。
+
+**穴は3つあった。**
+
+1. **チェックインのスキルに大計画が無い**。`.agents/skills/session-checkin/SKILL.md` が
+   読ませるのは `docs/handoff.md` だけで、`roadmap.md` も `phase` も1行も出てこない
+2. **機械のチェックインも大計画を出していない**。`grep -c roadmap scripts/guard/checkin.mjs`
+   → **0**。`npm run plan` が出すのは「詳しい地図: docs/ops/roadmap.md」という
+   **案内1行**だけで、**地図の中身は一度も画面に出ていなかった**
+3. **読んだ印がセッションを越えて生き残る**。`.plan-read` は時刻1行で、関所は
+   **ファイルの有無しか見ていなかった**。実際このセッションは
+
+   ```
+   [plan-read] ✅ 読んだ（2026-09-05T08:09:23.576Z）
+   ```
+
+   と**前日の印**を見せて通っていた。関所は在るのに効いていない（`docs/watch.md` W-1）。
+
+**マスター指示**: 「大計画をセッション開始時に絶対に見る様に、チェックインスキルに
+組み込め。claude.md にも念のため @参照とファイル名でもかけ。三重で見逃し防止体制にしろ」。
+
+**直した形（三重）**: ①スキルの手順1を大計画に ②`CLAUDE.md` に `@docs/ops/roadmap.md`
+（ルールの正は `AGENTS.md` に1条足した）③関所が「**このセッションが・大計画を**」
+読んだかを見る（印に `session` と `shown` を入れ、`plan-read-mark.mjs` に形を1本化）。
+`checkin.mjs` は**地図の現物**を画面に出す。
+
+**4通りの壊し方で赤を実測した。**
+
+```
+H: 層1（スキル）から大計画を外す
+not ok 8 - 層1: チェックインのスキルが、大計画を最初に読ませる
+
+I: 層2（CLAUDE.md）から @参照 を外す
+not ok 9 - 層2: CLAUDE.md に大計画への @参照 が在る
+
+J: 層3（関所）を「在ればいい」に戻す
+not ok 11 - 層3: 関所が「このセッションが大計画を読んだか」を見る
+
+K: 層3b（大計画を画面に出すのをやめる）
+not ok 12 - 層3b: チェックインが大計画そのものを画面に出す（案内1行で済ませない）
+```
+
+**関所そのものも実地で確かめた。**
+
+```
+.plan-read を消して npm run check
+  [plan-read] ❌ まだ大計画を読んでいない（印が無いか、古い形式）
+印の session を書き換えて npm run check
+  [plan-read] ❌ 別のセッションが残した印（このセッションはまだ読んでいない）
+node scripts/guard/checkin.mjs のあと
+  [plan-read] ✅ 読んだ（2026-09-06T08:48:02.444Z）
+  → 画面に「【大計画】docs/ops/roadmap.md」の全文が出た
+```
+
+**1層だけ壊しても赤になる。** それが「三重」の意味で、各層に検査を1本ずつ置いてある。
+
+**【限界・明記】** セッション鍵（`CLAUDE_CODE_SESSION_ID` 等）が取れない AI では、
+同じ場所で8時間以内に始まった2つ目のセッションを区別できない。鍵が無ければ原理的に
+見分けられないので、そこは時間で切る（前日の印では通らない）。
+
+### 42回目: 大計画に進捗を**書き戻す**（2026-09-06・**手元で実測**）
+
+41回目で「読む」は強制した。**書く側が緩いままだった**ので、地図が嘘をついていた。
+
+**実測した食い違い**（2026-09-06 時点）:
+
+| 地図の記述 | 実態 |
+|---|---|
+| 「いま居るのは**棚卸しの入口**です」 | `docs/ops/phase` は **F4** |
+| 表に **F4 の行が無い** | `scripts/plan.mjs` の `STAGES` には在る |
+| 「本番はまだ古い版のまま。**いま作ったものは一度も出していない**」 | **2回出している**（`verify:prod` 32/33・あと1本ぶんだけ古い） |
+
+**マスター指示**: 「大計画更新。方向性は変えるな。進捗のみ更新だ」
+「大計画の書き込みもチェックアウトスキルに組み込め」。
+
+**直した形**: ①地図の進捗だけを実態に合わせる（方向＝フロー図は触らない）
+②`.agents/skills/session-checkout/SKILL.md` の**手順2**を「大計画に書き戻す」に
+③`AGENTS.md` の終了規約に1条 ④`checkout.mjs` に**項目8**を足し、
+**地図の現在地が `docs/ops/phase` と食い違えば赤**にする。
+
+**6通りの壊し方で赤を実測した。**
+
+関所（`checkout.mjs` 項目8）:
+
+```
+L: 地図の現在地を古いままにする（▶ を外す）
+   ❌ 8. 大計画（docs/ops/roadmap.md）の現在地が実態と合っている
+        F4 がいまの現在地なのに ▶ が無い
+
+M: 地図から段を1つ落とす（F4 の行を消す）
+   ❌ 大計画の表に段が足りない: F4
+
+N: まだの段に ✅ を付ける
+   ❌ 納品準備 はまだなのに ✅／▶ が付いている
+```
+
+三重の各層:
+
+```
+O: スキルから大計画を外す        → not ok 16 - チェックアウトのスキルが、大計画に書き戻させる
+P: AGENTS.md の終了規約から外す  → not ok 17 - ルールの正（AGENTS.md）にも、…
+Q: チェックアウトの項目8を外す   → not ok 15 - チェックアウトが、大計画の現在地を機械で見る
+```
+
+**直した状態**: `npm test` 159+56+32 fail 0 ・ `npm run check` 全緑 ・
+`checkout.mjs` の項目8「現在地 F4 と一致」。
+
+**項目8が見るのは「嘘をついていないか」だけ。** 中身の正しさは人が書く。
+機械に書けるのは、**`phase` と地図の印が食い違っていないか**までで、そこを超えて
+「進捗の文章が正しいか」を判定するふりをしない（`D-10`）。
+
+### 43回目: 確定と下書きが噛み合わず、本番で保存できなかった（2026-09-10・**手元で実測**）
+
+マスターが本番で「全項目入力した後でも保存できない」。画面に出ていた文言は
+**`not available / report assets are incomplete / (409)`**。
+
+**原因**: 下書き（`saveDraft`）は写真を `data:image/…` のまま置く——実体化するのは
+確定の側（`replaceDataUrlAssets`）。ところがサーバの確定 `finalize_report` は
+**「下書きに `data:image/` が残っていたら1件も返さない」**と決めている
+（`supabase/migrations/202607160004_private_storage_lifecycle.sql`）。
+`commitReport()` は `clearTimeout(this.draftTimer)` で下書きを止めていたが、
+止まるのは**これから出る**ものだけで、**もう出てしまったもの**は止まらない。
+写真を選んだ直後（`onPhotoPick`）と犬体図を閉じた直後（`closeBodyMarking`）は
+下書きが**直に**出るので、確定が中身を差し替えた後にそれが着地し、
+生の `data:image/` が書き戻されて確定が落ちていた。
+
+**直した形**: ①`commitReport()` が**飛んでいる下書きの着地を待ってから**中身を差し替える
+②確定を始めたら `committing` を立てて**新しい下書きを書かせない**
+③失敗したら `committing` を戻す（戻さないと以後1件も下書きが残らない）。
+
+**2通りの壊し方で赤を実測した。**
+
+| 壊し方 | 赤になった項 |
+|---|---|
+| `await this.draftInFlight` を外す（待たない） | `飛んでいる下書きが着地してから確定する（確定の後に生の data:image を書き戻さない）` |
+| `if (this.committing) return;` を外す（確定中も書く） | `確定を始めたら、新しい下書きは書かない` |
+
+```
+$ node --test test/report-commit-guard.test.mjs      ← 直しを戻した状態
+not ok 8 - 飛んでいる下書きが着地してから確定する（確定の後に生の data:image を書き戻さない）
+not ok 9 - 確定を始めたら、新しい下書きは書かない
+# pass 8
+# fail 2
+
+$ node --test test/report-commit-guard.test.mjs      ← 直しを入れ直した状態
+# pass 10
+# fail 0
+```
+
+**見ていないもの**: 本番の実機での再現（ログインできないため）。ここで見たのは
+**下書きと確定の順番**だけで、サーバ側が 409 を返す条件そのものは SQL を読んで特定した。
+
+## 未証明（**壊して赤になるところを、まだ見ていない**）
+
+- verify-admin.mjs :: 23a. 管理者が ⑥ スタッフ管理 を押して開くと、limited-staff@local.test が「スタッフ・利用中」で出る
+- verify-admin.mjs :: 23b. 管理者自身の行は「あなた」と出て、止めるボタンが無い
+  （2026-11-20・`#76`。4つの壊し方のどれもこの2件には当たらなかった。赤を見るには、⑥ の項目を消す・自分の行にもボタンを出す、の壊し方が要る。）
+
+- verify-admin.mjs :: 3. リピーターに カルテ作成 / カルテ修正 / 犬の情報を直す が在る
+- verify-admin.mjs :: 6d. 犬の情報を直す画面にも住所がある
+- verify-admin.mjs :: 6h. 直す画面からブラウザの戻るで、犬を選ぶ画面にちょうど1つ戻る
+- verify-admin.mjs :: 22a. スタッフも入口から「管理」を押して管理画面に着く
+- verify-admin.mjs :: 22c. スタッフも新規で顧客アカウントを作れる（サーバーに在る）
+  （2026-11-19・`N-48`/`N-49`。10個の壊し方のどれもこの5件には当たらなかった。
+   `3.` は「③ 犬の情報を直す」を足して名前と条件が変わったので、旧名の証明（2026-09-24）を引き継がない。
+   赤を見るには、メニューの項目を消す・`/admin/repeat/pet` を住所表から外す・`pushStep` を
+   `navigate` にする・スタッフの「管理」の入口を隠す・顧客の登録 API を壊す、の壊し方が要る。）
+
+- verify-admin.mjs :: 3g. カルテ一覧から戻ると、ちょうど1つ手前（犬を選ぶ）に戻る
+  （2026-09-13 追加・マスター指示「直せるものを先に治せ」。放置リスト `#49`。
+   赤は CI の `mutate`（`admin-substep-no-history`）で取る。移すまで消さない。）
+
+- verify-invitation.mjs :: 4c. 2枚目のQRは、1枚目とは別のものが出る
+- verify-invitation.mjs :: 4d. 「新しく発行すると前のQRは使えない」と画面で言っている
+- verify-invitation.mjs :: 4e. 1枚目のQRは、2枚目を出した時点で使えなくなっている
+  （2026-09-14。放置リスト `#61`。上の `#48` と同じ理由で取り直す
+   ——`invitation-old-stays-valid` は赤になったが「検査を最後まで実行できた」で、
+   **`4e.` が壊しに気づいたことの証明になっていない**。単独で走らせる。
+   **2026-09-14 後回しにした**（放置リスト `#66`・マスター指摘「意味不明な改善ばかりしてるけど？」）
+   ——これは帳簿付けで見える改善がゼロ、かつ `npm run check` を止めてもいない。）
+
+- verify-edit.mjs :: 18. 壊れた住所でも、アプリの画面が配られる（ブラウザの404に落ちない）
+- verify-edit.mjs :: 18b. 壊れた住所を開くと、犬の一覧まで連れ戻される
+- verify-portal.mjs :: 13b. 壊れた住所では「見つかりません」と言い、愛犬の一覧へ戻る道を出す
+  （2026-09-14。放置リスト `#48`。`mutate`（run 406）で `edit-broken-url-falls-out` は
+   **赤になったが、名前のついたこの3件ではなく「検査を最後まで実行できた」で赤になった**
+   ——`verify-edit` が途中で落ちたということで、**この3件が壊しに気づいたことの証明にならない**。
+   `mutate-run.mjs` は同じ名前を最初に取った壊し方にしか結び付けないので、
+   別の壊し方と同じ回に走らせると見分けが付かない。**この壊し方だけを単独で走らせて取り直す。**
+
+   **2026-09-14 追記①・単独で走らせても同じだった**（run 411・`docs/ops/mutate-run-partial.md`）。
+   原因は**壊し方が大雑把すぎること**——`path.startsWith('/edit/')` を `path === '/edit/'` に
+   すると**正しい住所（`/edit/p/{UUID}`）まで落ちる**ので、`verify-edit` は `18.` に着く前に崩れる。
+   取り直すなら **#48 を直す前の実物**（`git show 95ab801^:worker/src/index.js` の
+   `SUPABASE_EDIT_PATH_PATTERN`）をそのまま埋め込むこと。`F-20260912-85`
+   （「壊したのに赤にならない」は、まず自分の壊し方を疑う）の2回目。
+
+   **2026-09-14 追記②・`13b.` の括りは誤り**。`13b.` は `/my` 側
+   （`backend/js/supabase-auth.js` の `if (!route) throw new Error('route not found');`）で、
+   worker を壊す `edit-broken-url-falls-out` では**そもそも届かない**。
+   `13b.` には壊し方が1つも無い。**訂正として残す**（行は消さない）。
+
+   **2026-09-14 追記③・後回しにした**（放置リスト `#66`）。）
+
+
+- verify-admin.mjs :: 3b. メニューを押すと住所が変わる
+- verify-admin.mjs :: 3c. サブ画面（犬を選ぶ）でも住所が変わる
+- verify-admin.mjs :: 3d. ブラウザの戻るで、ちょうど1つ手前（リピーター）に戻る
+- verify-admin.mjs :: 3e. サブ画面の住所を直接開くと、その画面が出る（貼れる URL）
+- verify-admin.mjs :: 3f. 無い住所を開いても白い画面にならず、管理のトップが出る
+  （2026-09-07 追加。**この作業コンテナに docker が無く、ローカル Supabase を
+   起動できないため `npm run verify:admin` を1度も実行できていない**
+   ——`docker info` が daemon 不通で失敗する。したがって「壊すと赤になる」も
+   「通る」も、この手元では見ていない。**CI の `verify` ジョブが実行する**が、
+   それは「通った」の証拠であって「壊れたら赤くなる」の証拠ではない（`D-18`）。
+   docker のある回に、`ADMIN_ROUTES` からサブ画面の1行を消す／`navigate()` の
+   `pushState` を止める、の2つで赤を見て証明済みへ移すこと。）
+
+- verify-report-roundtrip.mjs :: 14f. 飼い主: 観測点の数だけ日付が出ている
+  （2026-09-10 追加。マスター指示「日付は観測点には全てつけろ。2回測定実績あるなら、
+   点も日付も2つ。4回あるなら4つ。最大4」。`14e.` と同じ事情で、**この手元では
+   `npm run verify:roundtrip` を実行できない**（docker が無い）。
+   **同じ数え方で、赤と緑は実ブラウザで見ている**——5回ぶんの履歴を渡して
+   `svg circle` と、理想体重の札を除いた `svg text` を数えた:
+   直す前 **点5／札2**（両端だけ）、直したあと **点4／札4**（直近4回に絞り、全部に札）。
+   **これは検査そのものの赤ではない**ので、証明済みには移さない。
+   docker のある回に `mutate-run.mjs` の `weight-date-labels-ends-only` を走らせて
+   `14f.` が赤になるところを見てから移すこと。）
+
+- verify-report-roundtrip.mjs :: 14e. 飼い主: 体重グラフに理想体重の線が引かれている
+  （2026-09-10 追加。マスターが本番で「理想体重のラインが出ていない」と指摘した1件。
+   **この手元では `npm run verify:roundtrip` を実行できない**——docker が無く
+   ローカル Supabase を起こせないため（上の `verify-admin.mjs` 3b〜3f と同じ事情）。
+   ただし**同じ DOM の数え方で、赤と緑は実ブラウザで見ている**:
+   直す前の `renderWeightGraph` で
+   `host.querySelectorAll('[data-view="ideal-weight-line"]').length` → **0**、
+   直したあと → **1**（Chromium 390px で描画して実測）。
+   **これは検査そのものの赤ではない**ので、証明済みには移さない。
+   docker のある回に `mutate-run.mjs` の `ideal-weight-line-off` を走らせて
+   `14e.` が赤になるところを見てから移すこと。）
+
+- verify-report-roundtrip.mjs :: 0b. 前回の来店を1回ぶん置けた（推移の線を引く材料）
+- verify-report-roundtrip.mjs :: 0c. 前回のカルテを確定できた（確定分だけが推移に乗る）
+  （**土台を組めたことの確認**。壊すには API 側を壊すことになり、そのときは
+   `14c.` `14d.` が先に赤になる。単独では赤を見ていない）
+
+> **2026-09-10 追記（マスター指示）**: 「引き継ぎ自体はデフォルトだから記載不要」。
+> 「◯◯から 爪・耳・歯… を引き継ぎました」の**告知と「白紙にする」ボタンを消した**ので、
+> それを見ていた5件を証明済みから外した——**指す先がもう無い**。
+> 件数は減らしていない: 代わりに「告知を出していない」「入口が無い」「処理も残っていない」
+> 「前回の値が画面に入った」の4件を下の「未証明」に置き、**引き継いだ値そのものを見る**
+> 検査（爪・耳・歯・BCS・ベスト体重・犬体図の印）は今までどおり全部残してある。
+> 消した挙動そのものをやめたので `verify-revisit-interval` のときと同じ扱い。
+
+- verify-report-roundtrip.mjs :: 15b. 飼い主: 犬体図②の印も画像として届く
+- verify-report-roundtrip.mjs :: 15c. 飼い主: ①と②が別の絵として届いている
+  （2026-09-11 追加。マスター指示「⑤の皮膚スパ項目に画像を追加。現状のしたにこの
+   添付画像を追加して、現状と同じ機能も付けろ」。**この手元では `npm run verify:roundtrip`
+   を実行できない**——docker が無くローカル Supabase を起こせない。
+   ただし**同じ見方で、赤と緑は実ブラウザで見ている**:
+   `15c` … `exportBodyMarking(2)` が①の絵を返すように壊すと「別の絵」が **false**、
+   直した作りでは **true**。
+   `15b` … ⑥が `bodyMarkingImage2` を受け取らないように壊すと
+   `[data-view="skin-image-2"]` の `src` が **空**、直した作りでは `data:image/png;…`。
+   **検査そのものの赤ではない**ので証明済みには移さない。docker のある回に
+   `mutate-run.mjs` の `body-marking-2-same-as-1` / `body-marking-2-not-delivered` を
+   走らせて移すこと。）
+
+- verify-revisit-interval.mjs :: 4b. 飼い主: 次回日の下に「予約はこちら」が在り、行き先が入っている
+- verify-revisit-interval.mjs :: 4c. 確認: 店の画面にも同じ入口が在る（同一レンダラ）
+  （2026-09-10 追加。マスター指示「予約はこちらボタンをつけろ。押すと指定のURLに飛ぶ仕組みにしろ」。
+   **この手元では `npm run verify:revisit-interval` を実行できない**——docker が無く
+   ローカル Supabase を起こせない。ただし**同じ見方で、赤と緑は実ブラウザで見ている**:
+   `[data-view="revisit-book"]` を読んで、直す前 **無し（null）**、直したあと
+   **文字「予約はこちら」／`href` は Wikipedia の人工知能／`target=_blank`**。
+   さらに**実際に押して**、新しいタブがその URL を要求するところまで見た。
+   **検査そのものの赤ではない**ので証明済みには移さない。docker のある回に
+   `mutate-run.mjs` の `revisit-book-href-off` を走らせて移すこと。
+
+   **2026-09-10 追記**: この2件を足したあと、`verify:revisit` が **CI に1本も
+   入っていない**ことに気づいた（`.github/workflows/ci.yml` の `verify` job に
+   この1本だけ無く、PR #103 の verify ログに `verify-revisit-interval` の文字が0件）。
+   **足した検査が、どこでも走らない検査だった**——守っているつもりで何も守っていない
+   形（`偽-5`）。CI に足したので、いまは本物の Supabase で走る。
+   それでも「壊すと赤になる」は別の話なので、ここは未証明のまま置く。）
+
+- verify-carry-over.mjs :: 引き継ぎの告知を出していない（引き継ぎは既定の動き）
+- verify-carry-over.mjs :: 引き継ぎが実際に走った（前回の値が画面に入った）
+  （2026-09-10 追加。**この手元では `npm run verify:carry-over` を実行できない**
+   ——docker が無くローカル Supabase を起こせない。この2件は実データの往復が要るので、
+   手元では赤も緑も見ていない。docker のある回に、告知を出す行を戻す／引き継ぎを
+   止める、の2つで赤を見て証明済みへ移すこと。）
+
+- verify-carry-over.mjs :: 「引き継ぎをやめて白紙にする」の入口が無い
+- verify-carry-over.mjs :: 白紙に戻す処理も残っていない（押す場所が無いのに動く道を残さない）
+  （2026-09-10 追加。**同じ数え方で、赤と緑は実ブラウザで見ている**——配信物を開いて
+   `.carry-over__clear` の数と `typeof App.clearCarryOver` を読んだ:
+   直す前 **1本 / function**、直したあと **0本 / undefined**。
+   なお最初は `window.App` を見て書いており、`ui.js` は `const App = {…}` なので
+   **処理が残っていても常に緑になる中身の無い検査**だった（`偽-5`）。実測で気づいて
+   素の `App` に直してある。**検査そのものの赤ではない**ので証明済みには移さない。）
+
+- verify-carry-over.mjs :: 土台: 確定カルテが5枚ある犬を作った
+- verify-carry-over.mjs :: ② 一覧に犬が出ている
+- verify-carry-over.mjs :: ④ カルテ作成画面まで、押すだけで着いた
+- verify-carry-over.mjs :: 確定できた（⑤へ進んだ）
+- verify-carry-over.mjs :: 確定カルテが6枚になった
+- verify-carry-over.mjs :: ⑦使用オプションが選べる（帯が出ている）
+- verify-carry-over.mjs :: コースが空
+- verify-carry-over.mjs :: 写真が1枚も入っていない
+- verify-carry-over.mjs :: BCS が選ばれている
+- verify-carry-over.mjs :: 触っていないので下書きは生えていない
+- verify-carry-over.mjs :: 隠したら本当に消えている（hidden が CSS に負けていない）
+- verify-carry-over.mjs :: 6枚目のメッセージは今回書いたもの（前回の使い回しではない）
+- verify-carry-over.mjs :: 6枚目に前回の写真が混ざっていない
+
+
+> **2026-09-02 追記**: マスター指示で仕様が変わり（「入口は1つ、管理者ページが
+> 表示されるかされないかの差だけでいい」）、`verify-admin.mjs` の①を作り替えた。
+> 旧「1. 管理者が /my を開くと管理者画面へ送られる」は**証明済みから外した**
+> ——その挙動自体をやめたので、指す先がもう無い。代わりの3件を下に置く。
+> 壊し方の台帳（`mutate-run.mjs`）も `admin-redirect-off` → `admin-link-hidden` に
+> 差し替えてあり、**件数は減らしていない**。
+
+
+- verify-stack.mjs :: seed のアカウントで実ログインできる #2
+- verify-stack.mjs :: マイグレーションと seed が当たっている（seed の犬 X を id で引ける） #2
+- verify-admin.mjs :: 7. 直す対象のカルテを1枚確定できた
+- verify-delete.mjs :: 1. 写真つきのカルテを確定できた
+- verify-delete.mjs :: 2. 写真の実体が Storage に在る（service_role で数える）
+- verify-draft.mjs :: 4. 下書きの中身が漏れていない
+- verify-empty-pet.mjs :: 7. 下書きの中身が漏れていない
+- verify-m6.mjs :: ⑤. 確定すると確認の画面に着く
+- verify-photo-roundtrip.mjs :: `${kind === 'trimming' ? '1' : kind === 'ear' ? '2' : '3'}. ${kind} の写真を付けられた`
+- verify-photo-roundtrip.mjs :: 4. 写真つきで確定できた
+- verify-photo-roundtrip.mjs :: 5. 保存された写真5枚が実体になっている（asset://）
+- verify-portal.mjs :: 1. /my が配信される
+- verify-portal.mjs :: 3. Supabase vendor が読めている
+- verify-report-roundtrip.mjs :: 3e. 確認: 来店日（確定日ではなく）
+- report-commit-guard.test.mjs :: 確定に失敗したら、下書きをまた書ける状態に戻す（行き止まりにしない）
+- verify-production.mjs :: `配信物が手元の dist と同じ（${sameCount}/${staticFiles.length} 本）`
+- verify-production.mjs :: /my が dist/my.html と同じ
+- verify-production.mjs :: `削除済みの旧UI が本番に残っていない（${deletedUiPaths.length} 本を確認）`
+- verify-production.mjs :: `/edit が正UI を配っている（手元 ${want.length} 本 ＋ 注入 ${injected.length} 本）`
+- verify-report-roundtrip.mjs :: 20. 飼い主の画面に、量っていない体重が出ない
+- verify-revisit-interval.mjs :: 6. アプリ由来の確認ダイアログが余計に出ていない
+- verify-revisit-interval.mjs :: 5. 犬ごとに日数を直す欄が、店の画面に無い
+- verify-screens.mjs :: 1. `/` が配信される
+- verify-screens.mjs :: 9. 飼い主だけの人は、飼い主の画面に留まる
+- verify-screens.mjs :: 9b. 飼い主だけの人に、作業画面への入口を1つも出していない
+- verify-screens.mjs :: 10. 飼い主には自分の犬が並んでいる
+- verify-screens.mjs :: 11. ②一覧に犬のカードが並んでいる
+- verify-screens.mjs :: 12. ②一覧に探す手段が在る
+- verify-screens.mjs :: 13c. ②一覧に初回登録（QR）の入口が在る
+- verify-screens.mjs :: 13b. 犬の名前を押すと画面が移る
+- verify-screens.mjs :: 14. 犬を選ぶと③カルテ作成に着く
+- verify-screens.mjs :: 15. ③に確定の入口が在る（行き止まりでない）
+- verify-screens.mjs :: 16. ③に犬体図が在る
+- verify-screens.mjs :: 17. 招待の入口を押しても、犬の選択には移らない
+- verify-screens.mjs :: 18. 招待の入口を押すと、その場で出る
+- verify-screens.mjs :: 19. 飼い主の画面で拡大を禁止していない
+- verify-stack.mjs :: Supabase が起きている
+- verify-stack.mjs :: seed のアカウントで実ログインできる

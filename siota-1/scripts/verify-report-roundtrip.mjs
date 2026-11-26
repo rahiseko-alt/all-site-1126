@@ -1,0 +1,537 @@
+/**
+ * verify-report-roundtrip.mjs — トリマーが書いたものが、飼い主にそのまま届くか
+ *
+ * **このアプリが在る理由そのものを見る検査**（`AGENTS.md` D-12 の機械強制）。
+ * `bad-scenarios-F3.md` #13。画面が出る・ボタンが押せるではなく、
+ * **記入 → 確定 → 飼い主が `/my` で開く**の往復で、1項目でも値が変わったら失格とする。
+ *
+ * `6685df5^` の版から**書き直した**（復元ではない）。旧版が掴んでいた目印
+ * （`.owner-pet-item` `#ponchi-commit-ok` `[data-field="skin-loc-1"]` …）は
+ * 正UI に1つも無い（`docs/ops/verify-restore-F3.md`）。**見るもの**——入力した値が
+ * 受け手に同一で届いたか——だけを引き継ぎ、掴む場所を正UI に合わせた。
+ *
+ * 入力欄を足したら、必ずここにも足すこと（`AGENTS.md` STEP 5 の指示）。
+ * いま正UI に在る入力は `docs/ops/key-parity-F3.md` の突き合わせが正。
+ *
+ * **日本語をセレクタに連結しない**（`D-9`）。歯の状態のように値が日本語のものは、
+ * ボタンを全部見て**中身で選ぶ**（`pickByValue`）。
+ *
+ *   npm run verify:roundtrip
+ *   （CI では .github/workflows/ci.yml が自動で走らせる）
+ *
+ * EXIT 0 = 全項目が往復した / EXIT 1 = 1項目でも変わった・消えた
+ */
+
+import { startLocalWorker, injectSession, passwordLogin, FIXTURE, LOCAL_PASSWORD } from './lib/local-stack.mjs';
+import { launchChromium } from './lib/chromium.mjs';
+
+/** トリマーが1回の施術で入れる値。**正UI に実在する入力だけ**を使う。
+    2026-08-29・マスター指示 C-1〜C-12 で足した項目（course/visitDate/bcs/bestWeight/
+    nailFront/nailRear/耳6段階）も、ここに足す（`AGENTS.md` STEP 5 の指示）。 */
+const INPUT = {
+  staffNote: '耳の裏を丁寧に洗いました。来月もお待ちしています。',
+  course: 'トリミングコース',
+  visitDate: '2026-07-20',
+  bcs: 4,
+  bestWeight: 3.20,
+  nailFront: 2,      /* 爪レベル（1〜3・前足） */
+  nailRear: 3,       /* 爪レベル（1〜3・後ろ足） */
+  earRight: 5,       /* 耳レベル（1〜6） */
+  earLeft: 1,
+  teeth: 'ちょっと付着💦',   /* 値が日本語。セレクタに連結しない（D-9） */
+  weight: 3.42,
+  /* 使用オプション（マスター指示 2026-08-31で復活）。`shops.grooming_options` の
+     既定値（migration の初期9件）に含まれる名前を使う——店舗設定を変えていない
+     まっさらな環境でも通るように。 */
+  option: 'アメージング',
+};
+
+const results = [];
+function check(name, actual, expected) {
+  const pass = String(actual) === String(expected);
+  results.push({ name, pass });
+  process.stdout.write(
+    `${pass ? 'PASS' : 'FAIL'}  ${name}`
+    + (pass ? `  "${String(actual).slice(0, 30)}"` : `\n        期待: "${expected}"\n        実際: "${actual}"`)
+    + '\n',
+  );
+}
+
+const { base: BASE, stop } = await startLocalWorker({ port: Number(process.env.ROUNDTRIP_PORT || 8791) });
+let browser = null;
+try {
+  /* 既存の飼い主（owner-a）の下に犬を作る。新しい飼い主を作ると `owner_users` に
+     紐付かない孤児になり、**誰も飼い主として読めない**——RLS がそこしか通さない。 */
+  const staffSession = await passwordLogin(FIXTURE.staffEmail, LOCAL_PASSWORD);
+  const authHeaders = { Authorization: `Bearer ${staffSession.access_token}`, 'Content-Type': 'application/json' };
+  const PET_NAME = `RT${Math.random().toString(36).slice(2, 7)}`;
+  const petRes = await fetch(`${BASE}/api/owners/${FIXTURE.ownerAOwnerId}/pets`, {
+    method: 'POST', headers: authHeaders,
+    body: JSON.stringify({ ownerId: FIXTURE.ownerAOwnerId, name: PET_NAME, template: 'ponchi' }),
+  });
+  check('0. 検査用の犬を登録できた', petRes.status, 201);
+  const pet = (await petRes.json()).pet;
+
+  /* **前回の来店を1回ぶん置く。** 体重の推移は確定カルテを横断して組み立てるので、
+     いま書く1枚だけでは点が1つしか乗らず、`polyline` は線を引けない。
+     ここを置かないと `14c.` は「線が無い」と「線を引く材料が無い」を区別できない
+     （`empty-pass` の型）。前回 3.20kg → 今回 `INPUT.weight` で線になる。
+
+     **`#46` を埋めるために足した**（2026-09-03・徹底調査）。それまで⑥飼い主の画面で
+     線が引かれることを見る検査は1本も無く、「⑤と⑥は同一レンダラだから飼い主にも
+     届く」という**推論**だけだった。実測: `supabase-auth.js` を
+     `weightHistory: null` に壊しても、この検査は 34/34 PASS のままだった。 */
+  const PREV_KG = 3.2;
+  const prevRes = await fetch(`${BASE}/api/pets/${pet.id}/reports`, {
+    method: 'POST',
+    headers: authHeaders,
+    body: JSON.stringify({
+      petId: pet.id,
+      reportDate: '2026-07-01',
+      data: {
+        course: '前回のコース',
+        weights: [{ ym: '2026-07', date: '2026-07-01', kg: PREV_KG }],
+      },
+    }),
+  });
+  check('0b. 前回の来店を1回ぶん置けた（推移の線を引く材料）', prevRes.status, 201);
+  const prevReportId = (await prevRes.json()).report.id;
+  const prevFinal = await fetch(
+    `${BASE}/api/pets/${pet.id}/reports/${prevReportId}/finalize`,
+    { method: 'POST', headers: authHeaders },
+  );
+  check('0c. 前回のカルテを確定できた（確定分だけが推移に乗る）', prevFinal.status, 200);
+
+  browser = await launchChromium();
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const pageErrors = [];
+  page.on('pageerror', (e) => pageErrors.push(e.message));
+  /* コース未選択のまま確定を押すと `alert()` が出る（マスター指示 2026-08-29・C-9）。
+     この検査では必ずコースを選んでから押すので出ないはずだが、
+     出た場合に画面が固まって検査全体が timeout するのを防ぐ（`verify-admin.mjs` と同型）。 */
+  const dialogs = [];
+  /* 既定は**断る**（「訊かれた＝進まない」で関所を確かめるため）。
+     ただし `20.` は**わざと体重を空のまま確定する**検査なので、そこだけ
+     `acceptNextDialog` を立てて「はい」と答える（マスター指示 2026-09-13 で
+     空のまま確定するときに一度訊くようにした・放置リスト `#55`）。 */
+  let acceptNextDialog = false;
+  page.on('dialog', (d) => {
+    dialogs.push(d.message());
+    if (acceptNextDialog) { acceptNextDialog = false; d.accept().catch(() => {}); return; }
+    d.dismiss().catch(() => {});
+  });
+
+  /* ── トリマー側: ④カルテ作成に入って記入する ── */
+  await page.goto(`${BASE}/my`);
+  await injectSession(page, FIXTURE.staffEmail);
+  await page.goto(`${BASE}/edit/p/${pet.id}`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('#screen-3.is-active', { timeout: 15_000 });
+
+  const filled = await page.evaluate((input) => {
+    const missing = [];
+    let teethLabel = '';
+    let teethSaved = null;
+    const note = document.querySelector('[data-field="staff-note"]');
+    if (!note) missing.push('[data-field="staff-note"]');
+    else { note.value = input.staffNote; note.dispatchEvent(new Event('input', { bubbles: true })); }
+
+    /* コース（マスター指示 2026-08-29・C-9）。未選択だと確定できない（`commitReport`）。 */
+    const courseEl = document.querySelector('[data-field="course"]');
+    if (!courseEl) missing.push('[data-field="course"]');
+    else { courseEl.value = input.course; courseEl.dispatchEvent(new Event('change', { bubbles: true })); }
+
+    /* 来店日（C-3）。 */
+    const dateEl = document.getElementById('input-visit-date');
+    if (!dateEl) missing.push('#input-visit-date');
+    else { dateEl.value = input.visitDate; dateEl.dispatchEvent(new Event('input', { bubbles: true })); }
+
+    const weight = document.getElementById('input-weight');
+    if (!weight) missing.push('#input-weight');
+    else {
+      weight.value = String(input.weight);
+      weight.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    /* ベスト体重（C-4）。 */
+    const bestWeightEl = document.getElementById('input-best-weight');
+    if (!bestWeightEl) missing.push('#input-best-weight');
+    else {
+      bestWeightEl.value = String(input.bestWeight);
+      bestWeightEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    /* BCS（C-1）。`App.selectStepper(this,'bcs',N)` を持つボタン。N で選ぶ（ASCII）。 */
+    const bcsBtn = [...document.querySelectorAll('#bcs-stepper-wrap .stepper-btn')]
+      .find((el) => (el.getAttribute('onclick') || '').includes(`'bcs', ${input.bcs}`));
+    if (!bcsBtn) missing.push(`bcs=${input.bcs}`); else bcsBtn.click();
+
+    /* 爪は前足・後ろ足に分かれた（C-5）。`data-group="nail"` `data-side="front"/"rear"`。 */
+    for (const [side, value] of [['front', input.nailFront], ['rear', input.nailRear]]) {
+      const group = document.querySelector(`[data-group="nail"][data-side="${side}"]`);
+      if (!group) { missing.push(`[data-group="nail"][data-side="${side}"]`); continue; }
+      const btn = [...group.querySelectorAll('.stepper-btn')]
+        .find((el) => (el.querySelector('.val') || {}).textContent === String(value));
+      if (!btn) missing.push(`nail ${side}=${value}`); else btn.click();
+    }
+
+    /* 耳は6段階（C-6）。値は表示文字ではなく `data-level`（ASCII）から選ぶ（`D-9`）。 */
+    for (const [side, value] of [['right', input.earRight], ['left', input.earLeft]]) {
+      const btn = document.querySelector(`[data-ear="${side}"] .teeth-pill-btn[data-level="${value}"]`);
+      if (!btn) missing.push(`ear ${side}=${value}`); else btn.click();
+    }
+
+    /* 歯は**ボタンの表示**で選ぶ。表示と保存値は同じもの——もとは HTML 側で
+       保存値を第2引数に二重に書いており、6つのうち3つでずれていた（`#24`・直した）。
+       日本語は**セレクタに連結せず**、中身を読んで比べる（`D-9`）。
+       ⚠️ 耳のグリッドも同じ `.teeth-pill-btn` クラスを使うので、`data-level` を
+       **持たない**ボタン（＝歯のグリッド）だけに絞る。 */
+    const teethBtn = [...document.querySelectorAll('.teeth-pill-btn:not([data-level])')]
+      .find((el) => ((el.querySelector('.name') || {}).textContent || '').trim() === input.teeth);
+    if (!teethBtn) missing.push(`teeth=${input.teeth}`);
+    else {
+      teethLabel = ((teethBtn.querySelector('.name') || {}).textContent || '').trim();
+      teethBtn.click();
+      /* **押した直後に、保存されることになった値そのものを読む。** ここが
+         「表示と保存値が同じ」と言える唯一の地点で、実際に3つずれていたのも
+         ここだった（`#24`）。届いた先（6・13）だけを見ていると、たまたま
+         同じ文字を入れ直しても気づけない。 */
+      /* `ui.js` は `const App = {...}` の素のスクリプトなので、**`globalThis.App`
+         では取れない**（宣言的レキシカル環境にいる）。素の `App` なら解決する。 */
+      teethSaved = (typeof App !== 'undefined' && App.form || {}).teeth;
+    }
+
+    /* 使用オプション（マスター指示 2026-08-31で復活）。名前で探す
+       （`.name` の表示＝保存値。D-9・日本語をセレクタに連結しない）。
+       店舗にオプションが1件も無ければ帯ごと隠れる（`sec-options` の `hidden`）ので、
+       見つからなければ「店舗設定が空」として欠落扱いにする。 */
+    const optionBtn = [...document.querySelectorAll('#options-grid .teeth-pill-btn')]
+      .find((el) => ((el.querySelector('.name') || {}).textContent || '').trim() === input.option);
+    if (!optionBtn) missing.push(`option=${input.option}`); else optionBtn.click();
+
+    /* 犬体図に印を1つ付ける。押した所見が残る道はここしか無い（`#3`）。
+       **2枚目にも付ける**（マスター指示 2026-09-11 で犬体図が2枚になった）。
+       ①だけ見ていると、2枚目に描いた所見が飼い主に届かなくても緑のまま通る。 */
+    for (const id of ['marking-canvas', 'marking-canvas-2']) {
+      const canvas = document.getElementById(id);
+      if (!canvas) { missing.push(`#${id}`); continue; }
+      const rect = canvas.getBoundingClientRect();
+      canvas.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true,
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2,
+      }));
+    }
+    return { missing, teethLabel, teethSaved };
+  }, INPUT);
+  check('1. 記入先の要素がすべて実在する',
+    filled.missing.length === 0 ? 'ok' : `欠落 ${JSON.stringify(filled.missing)}`, 'ok');
+  if (filled.missing.length > 0) throw new Error('UI と保存契約が食い違っている');
+
+  /* **押した表示と、保存される値が同じであること。** かつては6つのうち3つでずれていた
+     （`docs/deferred.md` #24）。HTML 側の二重書きを廃して直したので、**合否で見る**。
+     ここを出力だけにしておくと、また静かにずれても誰も止められない。
+
+     比べるのは「ボタンの表示」と「`App.form` に入った値」である。はじめは
+     `filled.teethLabel` を `INPUT.teeth` と比べていたが、**その表示で探した
+     ボタンの表示を読み返していただけ**で、何をどう壊しても緑になる検査だった
+     （偽-2）。読む先を `App.form.teeth` に変えて、ずれが出る地点に当てた。 */
+  check('1b. 押したボタンの表示が、そのまま保存される値になっている',
+    filled.teethSaved, filled.teethLabel);
+
+  /* ── ④確定 → ⑤確認へ。**保存されたものを開き直す**ので、ここに出ている値は
+        既にサーバを往復している（`D-12`）。 ── */
+  await Promise.all([
+    page.waitForURL(/\/edit\/p\/[0-9a-f-]+\/[0-9a-f-]+/, { timeout: 30_000 }),
+    page.click('.dock-action-wrap .boxbutton'),
+  ]);
+  await page.waitForSelector('#screen-4 .magazine-container', { timeout: 20_000 });
+  const reportId = new URL(page.url()).pathname.split('/').pop();
+  check('2. 確定してカルテが1件できた', /^[0-9a-f-]{36}$/.test(reportId) ? 'ok' : page.url(), 'ok');
+
+  const view = async (target) => target.evaluate(() => {
+    const at = (name) => {
+      const el = document.querySelector(`[data-view="${name}"]`);
+      return el ? el.textContent.trim() : '(器が無い)';
+    };
+    return {
+      dogName: at('dog-name'),
+      dogSub: at('dog-sub'),
+      reportDate: at('report-date'),
+      courseBadge: at('course-badge'),
+      staffNote: at('staff-note'),
+      revisitDate: at('revisit-date'),
+      bcsText: at('bcs-text'),
+      nailPill: at('nail-pill'),
+      earPill: at('ear-pill'),
+      teethPill: at('teeth-pill'),
+      weightPill: at('weight-pill'),
+      /* **体重のグラフが実際に描かれたか。**
+         数字（`weight-pill`）が出ていてもグラフは別の関数が描く。
+         `mutate-run.mjs` の `weight-graph-off`（`renderWeightGraph` を空にする）で
+         **どの検査も赤にならなかった**——数字だけ見ていて、グラフを誰も見ていなかった
+         （`F-20260828-51`）。中の要素を数える（枠が在るだけでは通さない）。 */
+      weightGraphNodes: (document.querySelector('[data-view="weight-graph"]') || {})
+        .childElementCount ?? -1,
+      /* **枠の中に何か在るだけでは通さない。** `childElementCount > 0` は
+         **点1つでも緑**になるので、`weightHistory` が届かず今回の1件に落ちても
+         気づけなかった（`#46`・2026-09-03 の徹底調査）。
+         線そのもの（`polyline`）の点を数える。2点未満では線は引けない。 */
+      weightGraphPoints: (() => {
+        const host = document.querySelector('[data-view="weight-graph"]');
+        if (!host) return -1;
+        const line = host.querySelector('polyline');
+        if (!line) return 0;
+        return (line.getAttribute('points') || '').trim().split(/\s+/).filter(Boolean).length;
+      })(),
+      /* **理想体重の線が引かれているか**（マスター指示 2026-09-10）。
+         `bestWeight` は「（目標 3.2kg）」という**文字にしか使っていなかった**ので、
+         いまの体重が理想より上か下かがグラフから読めなかった。文字だけ見ていると
+         `14b.`/`14c.` は緑のまま通る（`F-20260828-51` と同じ型）ので、**線の要素を数える**。 */
+      idealWeightLine: (() => {
+        const host = document.querySelector('[data-view="weight-graph"]');
+        if (!host) return -1;
+        return host.querySelectorAll('[data-view="ideal-weight-line"]').length;
+      })(),
+      /* **観測点の数だけ日付が出ているか**（マスター指示 2026-09-10「日付は観測点には
+         全てつけろ。2回測定実績あるなら、点も日付も2つ」）。以前は両端の2つしか
+         出しておらず、3点以上でも札は2つのままだった。理想体重の札は数から外す
+         ——あれは点の札ではない。 */
+      weightDateLabels: (() => {
+        const host = document.querySelector('[data-view="weight-graph"]');
+        if (!host) return -1;
+        return [...host.querySelectorAll('svg text')]
+          .filter((el) => el.dataset.view !== 'ideal-weight-label').length;
+      })(),
+      /* 犬体図の印が**画像として**届いているか。`asset://` のままだと出ない。 */
+      skinImage: (document.querySelector('[data-view="skin-image"]') || {}).getAttribute
+        ? (document.querySelector('[data-view="skin-image"]').getAttribute('src') || '')
+        : '',
+      /* 犬体図②（マスター指示 2026-09-11）。**①とは別の入れ物**なので別に見る
+         ——①だけ見ていると、2枚目に描いた所見が消えても気づけない（`D-12`）。 */
+      skinImage2: (document.querySelector('[data-view="skin-image-2"]') || {}).getAttribute
+        ? (document.querySelector('[data-view="skin-image-2"]').getAttribute('src') || '')
+        : '',
+      pageUrlImgs: [...document.querySelectorAll('img')]
+        .map((el) => el.getAttribute('src') || '')
+        .filter((src) => /^https?:\/\/[^/]+\/(edit|my)\//.test(src)).length,
+      /* 使用オプション（マスター指示 2026-08-31で復活）。「カット」カードの
+         タグとして届く（`renderOptionTags()`）。 */
+      optionTags: [...document.querySelectorAll('[data-view="options-tags"] .option-tag')]
+        .map((el) => el.textContent.trim()).join(','),
+    };
+  });
+
+  process.stdout.write('\n── ⑤確認（トリマー）に出ている値 ──\n');
+  const staffView = await view(page);
+  check('3. 確認: 担当からの一言', staffView.staffNote, INPUT.staffNote);
+  check('3b. 確認: 来店コース', staffView.courseBadge, INPUT.course);
+  check('3c. 確認: ベスト体重', staffView.dogSub, `目標体重 ${INPUT.bestWeight}kg`);
+  check('3d. 確認: BCS', staffView.bcsText.includes(String(INPUT.bcs)) ? 'ok' : staffView.bcsText, 'ok');
+  /* 来店日（C-3）。**確定を押した日ではなく、来店日入力欄の値**が出ること。
+     `magazine-view.js` は元々「確定した日（`report.reportDate`）」を優先する
+     並びだったため、来店日欄を新設しても画面には確定日が出続ける穴があった
+     （敵対検証・検証2で指摘）。ここを直した証拠として、この行を追加する。 */
+  const expectedDate = INPUT.visitDate.replace(/-/g, '.');
+  check('3e. 確認: 来店日（確定日ではなく）', staffView.reportDate, expectedDate);
+  check('4. 確認: 爪（前足/後ろ足）', staffView.nailPill, `前 Lv.${INPUT.nailFront} / 後 Lv.${INPUT.nailRear}`);
+  check('5. 確認: 耳', staffView.earPill, `右 Lv.${INPUT.earRight} / 左 Lv.${INPUT.earLeft}`);
+  check('6. 確認: 歯', staffView.teethPill, INPUT.teeth);
+  check('7. 確認: 体重', staffView.weightPill, `${INPUT.weight}kg`);
+  check('8. 確認: 犬体図の印が画像として出ている',
+    /^(blob:|data:image)/.test(staffView.skinImage) ? 'ok' : `src=${staffView.skinImage.slice(0, 40)}`, 'ok');
+  check('8b. 確認: 使用オプション', staffView.optionTags, INPUT.option);
+
+  /* ── 飼い主側: 別のブラウザ文脈でログインし直し、`/my` で同じ値を見る ── */
+  const ownerContext = await browser.newContext();
+  const ownerPage = await ownerContext.newPage();
+  await ownerPage.goto(`${BASE}/my`);
+  await injectSession(ownerPage, FIXTURE.ownerAEmail);
+  await ownerPage.goto(`${BASE}/my/pets/${pet.id}/reports/${reportId}`, { waitUntil: 'networkidle' });
+  await ownerPage.waitForSelector('.magazine-container', { timeout: 20_000 });
+
+  process.stdout.write('\n── ⑥飼い主が /my で見るもの ──\n');
+  const ownerView = await view(ownerPage);
+  check('9. 飼い主: 犬の名前', ownerView.dogName, PET_NAME);
+  check('9b. 飼い主: 来店コース', ownerView.courseBadge, INPUT.course);
+  check('9c. 飼い主: ベスト体重', ownerView.dogSub, `目標体重 ${INPUT.bestWeight}kg`);
+  check('9d. 飼い主: BCS', ownerView.bcsText.includes(String(INPUT.bcs)) ? 'ok' : ownerView.bcsText, 'ok');
+  /* 飼い主側は `backend/js/supabase-auth.js :: renderReport()` が `report.report_date`
+     （確定日・DB列）を渡す別経路なので、⑤とは独立に確かめる必要がある。 */
+  check('9e. 飼い主: 来店日（確定日ではなく）', ownerView.reportDate, expectedDate);
+  /* 顧客ページの案内文には、次回のおすすめご来店時期の一文が織り込まれる
+     （マスター指示「次回のおすすめ時期は顧客ページの案内文に表示しろ」）。
+     `INPUT.staffNote` が変わらず届いていることは prefix 一致で確かめ、
+     末尾に足された一文は実際に画面へ出た `revisit-date`（器が別に持つ、
+     この検査自身の実測値）と突き合わせる——期待値の日付計算を実装から
+     コピーしない（`D-9` と同じ理由：コピーは壊れても赤にならない）。 */
+  const expectedOwnerNote = ownerView.revisitDate
+    ? `${INPUT.staffNote}\n\n次回のご来店は ${ownerView.revisitDate} 頃をおすすめします。`
+    : INPUT.staffNote;
+  check('10. 飼い主: 担当からの一言（＋次回のおすすめご来店時期が末尾に付く）', ownerView.staffNote, expectedOwnerNote);
+  check('11. 飼い主: 爪（前足/後ろ足）', ownerView.nailPill, `前 Lv.${INPUT.nailFront} / 後 Lv.${INPUT.nailRear}`);
+  check('12. 飼い主: 耳', ownerView.earPill, `右 Lv.${INPUT.earRight} / 左 Lv.${INPUT.earLeft}`);
+  check('13. 飼い主: 歯', ownerView.teethPill, INPUT.teeth);
+  check('14. 飼い主: 体重', ownerView.weightPill, `${INPUT.weight}kg`);
+  check('14b. 飼い主: 体重のグラフが描かれている（数字だけでなく）',
+    ownerView.weightGraphNodes > 0 ? 'ok' : `中の要素=${ownerView.weightGraphNodes}`, 'ok');
+  /* **飼い主の画面で、線が実際に引かれているか。**
+     ここが `#46`。`14b.` は枠の中に要素が在るかしか見ないので点1つでも緑になり、
+     ⑥へ `weightHistory` を渡す配線を切っても 34/34 PASS のままだった（実測）。
+     前回 3.2kg ＋ 今回で2点。**⑤で見て⑥を推論する**のをやめ、飼い主の画面で数える。 */
+  check('14c. 飼い主: 体重推移に線が引かれている（点が2つ以上）',
+    ownerView.weightGraphPoints >= 2 ? 'ok' : `点=${ownerView.weightGraphPoints}`, 'ok');
+  /* **点の数はちょうど2**。この犬の確定カルテは前回と今回の2枚だけなので、
+     3以上なら別の犬の体重を混ぜているか、下書きを数えている（`status=eq.final` の門）。
+     1以下なら履歴が届いていない。`>= 2` だけだと、混ざったときに気づけない。 */
+  check('14d. 飼い主: 推移の点が、確定カルテの枚数（2枚）と合っている',
+    ownerView.weightGraphPoints, 2);
+  /* **理想体重の線**（マスター指示 2026-09-10「理想体重のラインが出ていない」）。
+     ④で入れたベスト体重（3.2kg）が、文字だけでなく**グラフの線**として出ているか。 */
+  check('14e. 飼い主: 体重グラフに理想体重の線が引かれている',
+    ownerView.idealWeightLine, 1);
+  /* **点の数と日付の数が同じ**（マスター指示 2026-09-10）。この犬の確定カルテは
+     前回と今回の2枚なので、点2つ・日付2つ。`14d.` が点を数えているので、
+     ここは札だけを数えて突き合わせる。 */
+  check('14f. 飼い主: 観測点の数だけ日付が出ている',
+    ownerView.weightDateLabels, ownerView.weightGraphPoints);
+  check('15. 飼い主: 犬体図の印が画像として届く',
+    /^(blob:|data:image)/.test(ownerView.skinImage) ? 'ok' : `src=${ownerView.skinImage.slice(0, 40)}`, 'ok');
+  /* 犬体図②（マスター指示 2026-09-11「現状のしたにこの添付画像を追加して、
+     現状と同じ機能も付けろ」）。**①と同じ強さで見る。** */
+  check('15b. 飼い主: 犬体図②の印も画像として届く',
+    /^(blob:|data:image)/.test(ownerView.skinImage2) ? 'ok' : `src=${ownerView.skinImage2.slice(0, 40)}`, 'ok');
+  /* **①と②が同じ画像になっていないこと。** 同じなら、どちらかの面の印が
+     もう一方で上書きされている（配列を取り違えた形）。 */
+  check('15c. 飼い主: ①と②が別の絵として届いている',
+    ownerView.skinImage !== '' && ownerView.skinImage2 !== ''
+      && ownerView.skinImage !== ownerView.skinImage2 ? 'ok' : '同じか空', 'ok');
+  check('16. 飼い主: 壊れた画像（ページURL）が出ていない', ownerView.pageUrlImgs, 0);
+  check('16b. 飼い主: 使用オプション', ownerView.optionTags, INPUT.option);
+
+  /* 他人には見えないこと（RLS）。届くことだけを見て、届いてはいけない相手に
+     届いていないかを見ないのは、検査として半分しかやっていない。 */
+  const strangerContext = await browser.newContext();
+  const strangerPage = await strangerContext.newPage();
+  await strangerPage.goto(`${BASE}/my`);
+  await injectSession(strangerPage, FIXTURE.ownerBEmail);
+  await strangerPage.goto(`${BASE}/my/pets/${pet.id}/reports/${reportId}`, { waitUntil: 'networkidle' });
+  await strangerPage.waitForTimeout(2_000);
+  const strangerSees = await strangerPage.evaluate(
+    (note) => document.body.textContent.includes(note), INPUT.staffNote,
+  );
+  /* **名前を実態に合わせてある。** ここが見ているのは `reports_customer_select`
+     （このカルテが他人に読めるか）だけで、`pets_customer_select`（他人の犬が一覧に
+     出るか）は見ていない。実際、犬の方の RLS を `using (active)` まで開いても
+     この項は緑のままだった（run 122）。**「他人には見えない」という広い名前のまま
+     置くと、犬が丸見えでもここが緑なので「RLS は見ている」と読めてしまう。**
+     犬の方は `verify-portal.mjs` の 11/13 が見ている（同じ run で赤になった）。 */
+  check('17. 他人にはこのカルテが見えない（RLS）', strangerSees ? '見えた' : 'ok', 'ok');
+  await ownerContext.close();
+  await strangerContext.close();
+
+  /* ── 19: **量らなかった体重が、勝手に届かないこと。**
+     入力欄に `value="2.79"` が入っていたため、体重に触れずに確定しても
+     **どの犬にも 2.79kg が届いていた**（診断 #75/#76）。書いていないことが
+     書いてあるように見える形で、`D-10` の型。 */
+  const NO_WEIGHT_PET = `NW${Math.random().toString(36).slice(2, 7)}`;
+  const nwRes = await fetch(`${BASE}/api/owners/${FIXTURE.ownerAOwnerId}/pets`, {
+    method: 'POST', headers: authHeaders,
+    body: JSON.stringify({ ownerId: FIXTURE.ownerAOwnerId, name: NO_WEIGHT_PET, template: 'ponchi' }),
+  });
+  const nwPet = (await nwRes.json()).pet;
+  await page.goto(`${BASE}/edit/p/${nwPet.id}`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('#screen-3.is-active', { timeout: 20_000 });
+  await page.waitForTimeout(1_500);
+  /* **体重には触らない。** 一言だけ書いて確定する。 */
+  const startedEmpty = await page.inputValue('#input-weight');
+  check('19. 体重の欄が空で始まる（見本値が入っていない）', startedEmpty === '' ? 'ok' : startedEmpty, 'ok');
+  await page.fill('[data-field="staff-note"]', '体重は量っていない回。');
+  /* コースは必須（C-9）。選ばないと確定の `alert()` に止められる。 */
+  await page.selectOption('[data-field="course"]', INPUT.course);
+  /* **この1回だけ「はい」と答える。** 体重が空なので確定の手前で訊かれる
+     （`#55`）。ここで見たいのは「量っていない体重が飼い主に出ないこと」で、
+     訊かれること自体は `21d.` が別に見ている。 */
+  acceptNextDialog = true;
+  await Promise.all([
+    page.waitForURL(/\/edit\/p\/[0-9a-f-]{36}\/[0-9a-f-]{36}$/, { timeout: 30_000 }),
+    page.click('.dock-action-wrap .boxbutton'),
+  ]);
+  const nwReportId = new URL(page.url()).pathname.split('/').pop();
+  const nwOwnerContext = await browser.newContext();
+  const nwOwnerPage = await nwOwnerContext.newPage();
+  await nwOwnerPage.goto(`${BASE}/my`);
+  await injectSession(nwOwnerPage, FIXTURE.ownerAEmail);
+  await nwOwnerPage.goto(`${BASE}/my/pets/${nwPet.id}/reports/${nwReportId}`, { waitUntil: 'networkidle' });
+  await nwOwnerPage.waitForSelector('.magazine-container', { timeout: 20_000 });
+  const nwOwnerView = await view(nwOwnerPage);
+  await nwOwnerContext.close();
+  /* 器が無い／空／数字を含まない、のいずれでも合格。**落ちるのは数字が出たときだけ**。
+     「空文字と比べる」だけにすると、器ごと消えた日にも緑になる（`F-20260825-40` の型）。 */
+  const nwWeightText = nwOwnerView.weightPill;
+  check('20. 飼い主の画面に、量っていない体重が出ない',
+    /\d/.test(nwWeightText) ? `出た: "${nwWeightText}"` : 'ok', 'ok');
+
+  /* 21: **コース未選択では確定できない**（マスター指示 2026-08-29・C-9）。
+     `<select required>` は見た目だけの印なので、`commitReport()` 側の
+     機械強制を実際に押して確かめる——コードを読むだけでは「本当に止まるか」
+     は分からない（`D-12` と同じ発想を必須チェックに当てる）。 */
+  const NO_COURSE_PET = `NC${Math.random().toString(36).slice(2, 7)}`;
+  const ncRes = await fetch(`${BASE}/api/owners/${FIXTURE.ownerAOwnerId}/pets`, {
+    method: 'POST', headers: authHeaders,
+    body: JSON.stringify({ ownerId: FIXTURE.ownerAOwnerId, name: NO_COURSE_PET, template: 'ponchi' }),
+  });
+  const ncPet = (await ncRes.json()).pet;
+  await page.goto(`${BASE}/edit/p/${ncPet.id}`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('#screen-3.is-active', { timeout: 20_000 });
+  await page.waitForTimeout(1_000);
+  const dialogsBefore = dialogs.length;
+  const urlBefore = page.url();
+  await page.click('.dock-action-wrap .boxbutton');
+  await page.waitForTimeout(1_000);
+  check('21. コースを選ばずに確定を押すと、案内が出て画面が進まない',
+    dialogs.length > dialogsBefore && page.url() === urlBefore ? 'ok'
+      : `dialogs=${dialogs.length - dialogsBefore} url変化=${page.url() !== urlBefore}`, 'ok');
+
+  /* ── 21b〜21d 変なものを飼い主に届けない（マスター指示 2026-09-13「直せるものを先に治せ」）──
+     どれも同じ犬（コース未選択の子）で続けて確かめる。`dialog` は上で
+     dismiss しているので、**訊かれた＝進まない**が成立する。 */
+  await page.selectOption('[data-field="course"]', 'トリミングコース');
+  await page.fill('[data-field="staff-note"]', '今日の様子を一言。');
+
+  /* 21b. 体重の桁違い（`#56`）。`9999` は飼い主の画面にそのまま出て、
+     折れ線の目盛りを支配して実物の3〜5kg を1本の直線につぶす。 */
+  await page.fill('#input-weight', '9999');
+  const beforeBigWeight = dialogs.length;
+  const urlBigWeight = page.url();
+  await page.click('.dock-action-wrap .boxbutton');
+  await page.waitForTimeout(1_000);
+  check('21b. 桁違いの体重（9999kg）では確定できない',
+    dialogs.length > beforeBigWeight && page.url() === urlBigWeight ? 'ok'
+      : `dialogs=${dialogs.length - beforeBigWeight} url変化=${page.url() !== urlBigWeight}`, 'ok');
+
+  /* 21c. 空のまま（`#55`）。**止め切らずに一度訊く**——犬が怖がって量れない日も
+     あるので、訊いたうえで「はい」なら通す形。ここは dismiss するので進まない。 */
+  await page.fill('#input-weight', '');
+  const beforeBlank = dialogs.length;
+  const urlBlank = page.url();
+  await page.click('.dock-action-wrap .boxbutton');
+  await page.waitForTimeout(1_000);
+  const blankAsked = dialogs.slice(beforeBlank).join(' / ');
+  check('21d. 体重が空のまま確定を押すと、そのことを言って訊いてくる',
+    dialogs.length > beforeBlank && page.url() === urlBlank && blankAsked.includes('体重') ? 'ok'
+      : `dialogs=${dialogs.length - beforeBlank} url変化=${page.url() !== urlBlank} 文言=${JSON.stringify(blankAsked)}`, 'ok');
+
+  check('18. アプリ由来のエラーが無い', pageErrors.length === 0 ? 'ok' : pageErrors.join(' | '), 'ok');
+} catch (error) {
+  check('検査を最後まで実行できた', error.message, 'ok');
+} finally {
+  if (browser) await browser.close();
+  await stop();
+}
+
+const passed = results.filter((r) => r.pass).length;
+process.stdout.write(`\n===== 往復: ${passed}/${results.length} =====\n`);
+if (passed !== results.length) {
+  process.stdout.write('\nトリマーが書いたのに、飼い主に同じ値で届いていない項目がある。\n');
+}
+process.exit(passed === results.length ? 0 : 1);

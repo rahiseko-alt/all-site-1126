@@ -1,0 +1,2756 @@
+const App = {
+  currentStep: 1,
+  currentDog: {
+    name: 'ポンチ',
+    owner: '塩田 様',
+    breed: 'トイプードル',
+    /* **見本の数字を置かない。** ここに 2.79 / 2.67 が入っていたため、
+       どの犬を開いても同じ体重と「前回比」が出ていた（書いていないことが
+       書いてあるように見える・`D-10`）。前回の記録は、実データから
+       入るまで `null`＝「記録なし」。 */
+    weight: null,
+    prevWeight: null
+  },
+  currentStamp: '赤み',
+  /* 犬体4面図の描き方。**本体はペン（フリーハンド）で、スタンプはその一部**
+     （マスター指示 2026-09-02）。以前はスタンプを置くことしかできず、
+     「ここからここまで赤い」のような**範囲**が書けなかった。
+     `'ペン'` か `'スタンプ'` のどちらか（表記の変更はマスター指示 2026-09-07。
+     画面の言葉と中の値を割らないため、値もそろえた）。 */
+  markMode: 'ペン',
+
+  /* いま動いている音声認識。1本しか持たない（マイクが1本しか無いから）。 */
+  voiceRec: null,
+
+  /* フッターの「該当項目へ ➜」が飛ぶ先。`updateCompletionStatus()` が毎回置き直す。 */
+  missingSection: null,
+
+  /* 犬体図を開いた時点の印の控え（「キャンセル」で戻すため）。閉じたら捨てる。 */
+  marksBeforeEdit: null,
+  /* 犬体図②（マスター指示 2026-09-11「現状のしたにこの添付画像を追加して、
+     現状と同じ機能も付けろ」）。**①とは別の入れ物**にする——同じ配列に混ぜると、
+     過去に①へ付けた印の位置の意味が変わる。 */
+  marksBeforeEdit2: null,
+
+  /* 確定の最中か（`true` の間は下書きを書かない）と、飛んでいる下書きの約束。
+     どちらも `commitReport()` が `saveDraft()` と噛み合わないようにするためのもの。 */
+  committing: false,
+  draftInFlight: null,
+
+  /* ペンの色と太さ（マスター指示 2026-09-07「ペンは全て、色と太さを調整できるようにしろ」）。
+     **4面図の書き込みと、写真への書き込みで同じ1組を使う**——道具は1つ、という
+     人の感覚に合わせる。色は所見の種類を選ぶたびにその色へ戻り（`setStamp`）、
+     そのあと自分で選び直せば、選んだ色で描ける。 */
+  penColor: '#d32f2f',
+  penWidth: 4,
+
+  /* 透過度（マスター指示 2026-09-07）。0.1〜1.0。薄くすると下の写真や絵が透ける。 */
+  penAlpha: 1,
+
+  /* 文字の大きさは太さから作る（道具を1つ増やさない）。太さ4なら16px。 */
+  textSize() { return Math.max(10, this.penWidth * 4); },
+  /* 付けた印。1件は次のどちらか。
+       スタンプ … `{ x, y, type }`
+       なぞった線 … `{ type, points: [{ x, y }, …] }`
+     座標は 0〜1 の割合で持つ（画面の大きさが変わっても位置がずれない）。
+     **古い下書きにはスタンプしか入っていない**ので、`points` の有無で見分ける。 */
+  marks: [],
+  marks2: [],
+  /* 直しで開いたとき、犬体図が「読み込んだときのまま」かを見るための控え。
+     `applyReport()` が置く。新規作成では使わない（`null` のまま）。 */
+  marksOriginalJson: null,
+  marksOriginalJson2: null,
+  marksOriginalImage: null,
+  marksOriginalImage2: null,
+  /* いま選んでいる文字の印（マスター指示 2026-09-12「配置された文字をドラッグすると
+     位置が変えられる」「文字の色は変えられる様にしろ」）。`{ n, mark }` か `null`。
+     **添字ではなく印そのものを持つ**——1つ戻す・消しゴム・キャンセルの戻しで
+     配列の中身が入れ替わるので、番号で覚えると別の印を指してしまう。 */
+  selectedText: null,
+  allWavesOpen: true,
+
+  /* 実データで動いているときに backend から入る犬の一覧。
+     `null` のあいだは「まだ受け取っていない」。仮データ（`window.DUMMY`）を使うのは
+     backend が居ないとき——つまり静的配信の `/`（F2 の `npm run walk` の経路）だけ。 */
+  dogs: null,
+
+  /* ④カルテ作成で押された値の控え。**押された時点で入る**（DOM から読み直さない）。
+     初期値は「まだ触っていない」を表す。触っていないものを 0 や既定値で埋めない
+     ——書いていないことが書いてあるように見える（`D-10`）。
+     `nail` は前足・後ろ足を分けて記録する（マスター指示 2026-08-29・C-5）。 */
+  form: {
+    nail: { front: 0, rear: 0 }, ear: { right: 0, left: 0 }, teeth: '', weight: 0,
+    bcs: 0, bestWeight: 0, options: [],
+  },
+
+  /* 口の写真1枚あたりの上限枚数（マスター指示 2026-08-29・C-11）。 */
+  MAX_TEETH_PHOTOS: 2,
+  /* 体重の受け付ける範囲（マスター指示 2026-09-13・放置リスト `#56`）。
+     いちばん大きい犬種でも 90kg 台なので、100kg を上限にする。
+     下は 0.1kg——生まれたての子犬でもこれを下回らない。
+     **黙って丸めるのではなく、この外は受け付けずに理由を言う**（`D-12`）。 */
+  MIN_WEIGHT_KG: 0.1,
+  MAX_WEIGHT_KG: 100,
+  /* この犬の確定済みカルテ（`{ reportId, date, status }`）。同じ日の2枚目を
+     確かめるためだけに持つ（`#57`）。`renderPastReports()` が入れる。 */
+  pastReports: [],
+
+  /* 犬体図の「面」。2枚目を足したときに作った（マスター指示 2026-09-11）。
+
+     **①の id と、印を入れる `marks` という名前は変えない。** 検査（`verify:roundtrip`
+     `verify:delete` `verify:carry-over` `walk-human`）も引き継ぎも、この名前を見ている。
+     2枚目だけを別の入れ物（`marks2`）にして、描く・消す・保存するが**面ごと**に
+     効くようにする。番号を渡さなければ①（既定）。 */
+  SURFACES: {
+    1: {
+      canvas: 'marking-canvas', wrap: 'canvas-wrapper', bg: 'canvas-bg-img',
+      tool: 'body-marking-tool', marks: 'marks', before: 'marksBeforeEdit',
+      empty: '犬体4面図（前面・背面・左側面・右側面）',
+    },
+    2: {
+      canvas: 'marking-canvas-2', wrap: 'canvas-wrapper-2', bg: 'canvas-bg-img-2',
+      tool: 'body-marking-tool-2', marks: 'marks2', before: 'marksBeforeEdit2',
+      empty: '犬体4面図（顔・横・正面・後ろ）',
+    },
+  },
+
+  /** 面の台帳を引く。**知らない番号は①として扱う**——番号を取り違えたときに
+      2枚目の印を①へ書き込むより、①に落とすほうが被害が小さい。 */
+  surface(n) {
+    return this.SURFACES[n === 2 ? 2 : 1];
+  },
+
+  /* **直しで、この面の犬体図に一度も触っていないか。** `applyReport()` が置いた
+     控えと、いまの `marks` が文字として同じなら「触っていない」——ペン・スタンプ・
+     文字・消しゴムのどれも一度も使っていないということ。新規作成（控えが無い）
+     では常に `false`（いつもどおり焼く）。 */
+  bodyMarkingUnchanged(n) {
+    const key = n === 2 ? 'marksOriginalJson2' : 'marksOriginalJson';
+    if (this[key] == null) return false;
+    return JSON.stringify(this[this.surface(n).marks]) === this[key];
+  },
+
+  /* 選ばれた写真。**中身は `data:image/jpeg` か、既に上がっている `asset://{id}`。**
+     前者は `saveReport`/`reviseReport` が実体化し（`replaceDataUrlAssets`）、
+     後者は**そのまま出し直す**——直しのときに落とすと、飼い主に届いていた写真が消える。
+     `trimming` と `teeth` は配列（`teeth` は最大2枚・C-11）、耳は1枚のまま。 */
+  photos: { trimming: [], ear: '', teeth: [] },
+
+  /* 下書きの居場所。`null` は「まだ1度も保存していない」。 */
+  draftPetId: null,
+  draftReportId: null,
+  /* 確定済みカルテを直しているときだけ、その id が入る（管理者画面「カルテ修正」）。
+     `null` は「新しく書いている」。ここが混ざると、直したつもりが2枚目になる。 */
+  reviseReportId: null,
+  draftWatching: false,
+  draftTimer: null,
+  draftSaving: false,
+
+  init() {
+    Object.keys(this.SURFACES).forEach((n) => this.initCanvas(Number(n)));
+
+    /* backend が載っていれば、そちらに描画を任せる（`/edit`）。
+       載っていなければ仮データで描く（`/`）。**判定は「居るか」だけ**で、
+       URL を見ない——見ると経路が増えたときに黙って片方が壊れる。
+
+       `supabase-staff.js` は ES モジュールなので `defer` 相当で走り、
+       `DOMContentLoaded` の時点では `globalThis.TrimmerSupabaseStaff` が載っている
+       （`bad-scenarios-F3` #10 で固定した繋ぎ方: backend が自分で globalThis に登録し、
+       `ui.js` は古典スクリプトのままそれを使う）。 */
+    if (globalThis.TrimmerSupabaseStaff) {
+      globalThis.TrimmerSupabaseStaff.boot(this);
+      return;
+    }
+
+    /* **backend が載るはずの画面で載らなかったときは、黙って仮データに落ちない。**
+       `/edit` を配るとき Worker は `window.__REPORT__` を必ず注入する
+       （`worker/src/index.js` の `createAppStateScript`）。静的配信の `/` には無い。
+       だから**この印の有無**で「backend が載るはずだったか」が分かる
+       ——URL は見ない（上の判断と同じ理由）。
+       印が在るのに backend が居ないのは、通信が切れた・キャッシュが壊れた等で
+       モジュールが1本落ちた状態。ここで黙って仮データ（ポンチ・レオ・モカ・モモ）を
+       描くと、トリマーには「知らない犬が並び、⑦使用オプションが出ない」だけが見える。
+       `dummy.js` の注記にある「本番で実際に発生・マスター報告」がこれ。 */
+    if ('__REPORT__' in globalThis) {
+      globalThis.alert(
+        'お店のデータを読み込めませんでした。\n\n'
+        + '通信が届いていない可能性があります。\n'
+        + '電波を確かめて、画面を読み込み直してください。\n\n'
+        + '※ このまま操作しても、書いたものは保存されません。',
+      );
+      return;
+    }
+
+    this.renderDogs();
+  },
+
+  /* ── 描画係の口 ────────────────────────────────────────────────
+     `TrimmerSupabaseStaff.boot(App)` が、取ってきたものをここへ渡す。
+     backend は `App` を依存ではなく**差し替え可能な口**として扱うので、
+     こちら側が `show(screen, data)` を満たしていればよい（`plan.md` 4-1）。
+
+     受け取る画面は4つ。知らない画面が来たら**投げる**——黙って無視すると、
+     前の画面（意匠モックの既定文が入っている）が残り、
+     お客さんがそれを本当のことだと読む（`bad-scenarios-F3` #1・`D-10`）。 */
+  show(screen, data) {
+    if (screen === 'owner') return this.showDogList(data || {});
+    if (screen === 'archive') return this.showPetKarte(data || {});
+    if (screen === 'report') return this.showReport(data || {});
+    throw new Error(`描画できない画面が来ました: ${screen}`);
+  },
+
+  /* ②一覧 — 実データの犬をカードにする。
+     `mapPet()` の形（`petName` / `ownerName` / `months`）を、カードの形に写すだけ。
+     **持っていない項目は空で出す。** 犬種も担当も `pets` テーブルに無いので、
+     ここで見本を入れると「書いていないことが書いてあるように見える」（`D-10`）。 */
+  showDogList(data) {
+    const pets = data.petListFlat || (data.owner && data.owner.pets) || [];
+    this.dogs = pets.map((pet) => {
+      const dates = (pet.months || []).map((m) => m && m.date).filter(Boolean).sort();
+      return {
+        id: pet.id,
+        ownerId: pet.ownerId || '',
+        name: pet.petName || '',
+        owner: pet.ownerName || '',
+        /* 犬種（`N-48`）。入っていない子は空のまま（`D-10`）。 */
+        breed: pet.breed || '',
+        lastVisit: dates.length > 0 ? dates[dates.length - 1] : '',
+        staff: '',
+        incomplete: '',
+      };
+    });
+    this.renderDogs();
+    this.goToStep(2);
+  },
+
+  /* ③選択のあと — その犬のカルテ画面へ。
+     カルテ作成（screen-3）に入り、その犬の**過去カルテを同じ画面に並べる**
+     （`docs/deferred.md` #23・マスター指定 2026-08-26）。 */
+  showPetKarte(pet) {
+    /* **印は `selectKarte()` より先に立てる。** `selectKarte()` はその場で
+       `goToStep(3)` を呼ぶので、後から立てると自分の関所に弾かれて②へ戻る。 */
+    this.karteInputReady = true;
+    this.selectKarte(pet.petName || '', pet.ownerName || '', '');
+    this.renderPastReports(pet);
+    /* 使用オプションのボタンを、下書き読み込みより前に組み立てる。
+       `resumeDraft` が呼ぶ `applyReport` はボタンを探して押すので、
+       先に用意しておかないと選んでいたものが戻せない。 */
+    this.renderOptionChips(pet.shopGroomingOptions || [], pet.shopOptionsUnavailable);
+    this.resumeDraft(pet.id);
+  },
+
+  /* その犬の過去カルテを、新しい順に並べる。
+     **確定済み（`final`）だけを出す。** 下書きは飼い主に届いていないし、
+     archived は畳んだものなので、ここに混ぜると「在る」ことになってしまう。
+     **1件も無ければ帯ごと出さない**——空の一覧は「まだ無い」と
+     「読み込めていない」の区別を消す（`D-10`）。
+
+     文字は `textContent` で入れる。日付は DB の `date` 列から来るので
+     スクリプトにはならないが、**入力形を信用しない**（`D-11`）。 */
+  renderPastReports(pet) {
+    const wrap = document.getElementById('past-reports');
+    const list = document.getElementById('past-reports-list');
+    if (!wrap || !list) return;
+
+    const petId = pet && pet.id;
+    const months = ((pet && pet.months) || [])
+      .filter((m) => m && m.reportId && m.status === 'final')
+      .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+
+    /* **確定の手前で「同じ日の2枚目か」を見るために、ここでしまう**（`#57`）。
+       新しく問い合わせない——`months` は犬を選んだ時点で既に手元に在る。
+       0件のときも空で入れ直す（前の犬の分を持ち越さない）。 */
+    this.pastReports = months;
+
+    list.textContent = '';
+    if (!petId || months.length === 0) {
+      wrap.hidden = true;
+      return;
+    }
+
+    for (const month of months) {
+      const item = document.createElement('a');
+      item.className = 'past-reports__item';
+      item.href = `/edit/p/${encodeURIComponent(petId)}/${encodeURIComponent(month.reportId)}`;
+      item.textContent = String(month.date || '').replace(/-/g, '.');
+      list.append(item);
+    }
+    wrap.hidden = false;
+  },
+
+  /* ── ④の記入を、黙って失わないための下書き ──────────────────────
+     `bad-scenarios-F3` #15。記入は DOM とメモリにしか無く、サーバに残るのは
+     「確定」の後だけだった。カルテ画面の「戻る」は確認なしで遷移するので、
+     **誤タップ1回で数十分の記入が消える**。スリープ・着信・引っぱって更新でも同じで、
+     しかも消えたことに気づけない（`D-20260824-30` の 1 と 7）。 */
+
+  /** 前回の続きを読み込む。無ければ何もしない（新規のまま）。 */
+  /* 前回の確定カルテから、**次の回でも変わらない項目だけ**を取り出す
+     （マスター指示 2026-09-03）。入るのも出るのもただのオブジェクトで、
+     画面も通信も触らない——1項目ずつ検査できる形にしておく。
+
+     **空にするもの**（毎回変わる／確認せずに届くと事故になる）:
+       来店日・コース・トリマーからのメッセージ・体重・使用オプション・写真3種。
+       写真とメッセージは、撮り直さず書き直さずに確定すると
+       **前回のものが今回のカルテとして飼い主に届く**。
+
+     **引き継ぐもの**（急には変わらない所見）:
+       爪（前足・後ろ足）・耳（右・左）・歯の状態・BCS・ベスト体重・犬体図の印。
+
+     空になったキーは**キーごと出さない**（空の器を作らない＝`D-10`）。 */
+  carryOverReport(previous) {
+    const source = previous && typeof previous === 'object' ? previous : {};
+    const carried = {};
+
+    if (source.nail && (source.nail.front || source.nail.rear)) {
+      carried.nail = { front: source.nail.front, rear: source.nail.rear };
+    }
+    /* 耳は段だけ。`photo` は連れてこない。 */
+    if (source.ear && (source.ear.right || source.ear.left)) {
+      carried.ear = { right: source.ear.right, left: source.ear.left };
+    }
+    /* 歯も状態だけ。`photos` は連れてこない。 */
+    if (source.teeth && source.teeth.status) {
+      carried.teeth = { status: source.teeth.status };
+    }
+    if (source.bcs) carried.bcs = source.bcs;
+    if (source.bestWeight) carried.bestWeight = source.bestWeight;
+    /* 犬体図の印。**焼いた PNG（`bodyMarkingImage`）からは復元できない**ので、
+       確定カルテにも `__marks` を載せてある（`commitReport()`）。 */
+    if (Array.isArray(source.__marks2) && source.__marks2.length > 0) {
+      carried.__marks2 = source.__marks2;
+    }
+    if (Array.isArray(source.__marks) && source.__marks.length > 0) {
+      carried.__marks = source.__marks;
+    }
+    return carried;
+  },
+
+  /** 引き継いだものを、名前で言う。**引き継いでいないものを言わない。** */
+  carryOverLabels(carried) {
+    const labels = [];
+    if (carried.nail) labels.push('爪');
+    if (carried.ear) labels.push('耳');
+    if (carried.teeth) labels.push('歯');
+    if (carried.bcs) labels.push('BCS');
+    if (carried.bestWeight) labels.push('ベスト体重');
+    if (carried.__marks || carried.__marks2) labels.push('犬体図の印');
+    return labels;
+  },
+
+  /* 下書きを再開したとき、**まだ前回のままの項目**を名前で返す。
+     `carryOverLabels()` と組にして使う。
+
+     見つけた事故（2026-09-03・徹底調査）: 引き継いだ直後は帯で
+     「爪・耳・歯・BCS…を引き継ぎました」と出るが、**画面のどこかを1回触ると
+     下書きが1枚でき、次に開いたときは帯だけが消えて値だけが残る**。
+     下書き分岐は `applyCarryOver()` を通らないので、帯を出す場所に届かない。
+     実測では、そのまま残り2項目を埋めると完了バッジが「全項目入力完了 (8/8)」に
+     なり、**前回の所見が今回の所見として飼い主に届く**（`commitReport()` が
+     見るのはコースだけ）。`6fecedc` で消した「何もしていないのに読み込んだと言う」の
+     裏返しで、**何かしているのに何も言わない**（`D-12`）。
+
+     持ち回りの印は増やさない。**手元の前回のカルテと突き合わせて、いま同じものだけを
+     言う。** こうすると「引き継いだから同じ」でも「たまたま同じ値を入れた」でも
+     言っていることは正しい——どちらでも「前回と同じ」は事実。 */
+  carryOverStillSame(draftData, previous) {
+    const carried = this.carryOverReport((previous || {}).data);
+    const draft = draftData || {};
+    const still = {};
+    /* **キーの並び順で比べない。** `JSON.stringify` で突き合わせたら、
+       `{right, left}` と `{left, right}` が別物になり、耳と爪だけ名指しから
+       漏れた（実機で確認）。保存の形は `extractReport()` が決めるので、
+       並び順は約束のうちに入っていない。**値そのものを1つずつ見る。** */
+    const pair = (a, b, k1, k2) => !!a && !!b && a[k1] === b[k1] && a[k2] === b[k2];
+    if (pair(carried.nail, draft.nail, 'front', 'rear')) still.nail = carried.nail;
+    if (pair(carried.ear, draft.ear, 'right', 'left')) still.ear = carried.ear;
+    /* 歯は状態だけを引き継ぐので、**状態だけ**を突き合わせる（写真の有無で外さない）。 */
+    if (carried.teeth && carried.teeth.status
+      && carried.teeth.status === ((draft.teeth || {}).status)) still.teeth = carried.teeth;
+    if (carried.bcs !== undefined && carried.bcs === draft.bcs) still.bcs = carried.bcs;
+    if (carried.bestWeight !== undefined && carried.bestWeight === draft.bestWeight) {
+      still.bestWeight = carried.bestWeight;
+    }
+    const marks = carried.__marks;
+    const drawn = draft.__marks;
+    if (Array.isArray(marks) && Array.isArray(drawn) && marks.length === drawn.length
+      && marks.every((m, i) => m.x === drawn[i].x && m.y === drawn[i].y && m.type === drawn[i].type)) {
+      still.__marks = marks;
+    }
+    /* 犬体図②も同じ見方で（マスター指示 2026-09-11）。**別の配列**なので別に見る。 */
+    const marks2 = carried.__marks2;
+    const drawn2 = draft.__marks2;
+    if (Array.isArray(marks2) && Array.isArray(drawn2) && marks2.length === drawn2.length
+      && marks2.every((m, i) => m.x === drawn2[i].x && m.y === drawn2[i].y && m.type === drawn2[i].type)) {
+      still.__marks2 = marks2;
+    }
+    return this.carryOverLabels(still);
+  },
+
+  /* 下書きの続きを開いたときに、**前回のままの項目を名指しで出す。**
+
+     **これは「引き継ぎました」の告知ではない**（あれはマスター指示 2026-09-10 で
+     やめた——引き継ぎは既定の動きなので毎回言わない）。こちらは
+     **前回の所見のまま確定してしまう手前で止める警告**で、消すと
+     「前回の所見が今回の所見として飼い主に届く」が黙って起きる（`D-12`）。 */
+  showStillSameBand(labels, previous) {
+    if (!labels || labels.length === 0) return false;
+    const text = document.getElementById('carry-over-text');
+    if (text) {
+      const when = (previous && previous.date) ? `${previous.date} のカルテ` : '前回のカルテ';
+      text.textContent = `${labels.join('・')} は ${when}のままです。`
+        + '今回見た結果に直してから確定してください。';
+    }
+    const band = document.getElementById('carry-over-undo');
+    if (band) band.hidden = false;
+    return true;
+  },
+
+  /* 前回の確定カルテから引き継いで、④を「続きから」の状態にする。
+     **下書きが1件も無いときだけ**呼ばれる（`resumeDraft`）。
+
+     ここで嘘をつかないこと。以前の「前回を複製」（`cloneAndCreate`・`6fecedc` で削除）は
+     「過去カルテデータを読み込みました」と出しながら**何も複製していなかった**。
+     出す文言は、実際に引き継いだ項目だけを名指しする。 */
+  applyCarryOver(previous) {
+    const carried = this.carryOverReport(previous && previous.data);
+    const labels = this.carryOverLabels(carried);
+    if (labels.length === 0) return false;
+    this.applyReport(carried);
+    /* **引き継いだことは知らせない**（マスター指示 2026-09-10
+       「引き継ぎ自体はデフォルトだから記載不要」）。前まではここで
+       「◯◯から 爪・耳・歯… を引き継ぎました」の帯を出していた。
+       **値が入ることは既定の動きなので、毎回言う必要がない。**
+       ただし「**前回のまま確定しそうなとき**」は別で、そちらは
+       `showStillSameBand()` が引き続き名指しで言う——あれは
+       「引き継ぎました」の告知ではなく、**直してから確定しろ**の警告。 */
+    return true;
+  },
+
+  resumeDraft(petId) {
+    const staff = globalThis.TrimmerSupabaseStaff;
+    if (!staff || !staff.findDraft || !petId) return;
+    this.draftPetId = petId;
+
+    /* **読み込みを待つ間に人が打ったら、書き戻さない**（`docs/deferred.md` #27）。
+       `findDraft` はサーバとの往復で、その間 ④ の入力欄は打てる。戻ってきた
+       中身を無条件に `applyReport` すると、**打った文字が下書きの内容で上書きされる**
+       ——しかも消えたことに気づけない（`D-20260824-30` の 1 と同じ型）。
+       印を付けるのは**往復を始める前**でなければならない。後から付けると、
+       往復中に打たれた分を見落とす。 */
+    this.draftTouched = false;
+    const panel = document.getElementById('screen-3');
+    const mark = () => { this.draftTouched = true; };
+    if (panel) {
+      panel.addEventListener('input', mark, { once: true });
+      panel.addEventListener('change', mark, { once: true });
+    }
+
+    /* **前回の確定カルテは、下書きが在っても取る。**
+       引き継ぎ（`applyCarryOver`）は下書きが無いときだけだが、
+       **「前回比」は下書きの続きを書くときにも要る**（マスター指示 2026-09-03）。
+       ここを「下書きが無いときだけ」にしていたので、続きを書く回は前回比が
+       出なかった。取れなくても記入は続けられるので、**記入は止めない**。
+
+       ただし**黙って飲まない**（`D-12`・`docs/watch.md` W-1）。ここを
+       `.catch(() => null)` で握るだけにしていたので、「通信に失敗した」と
+       「前回の記録が本当に無い（初回の子）」が画面で**まったく同じ**に見えていた
+       ——トリマーは常連を初回と誤認し、前回比も引き継ぎも無いまま書き始める。
+       組み替える前（`origin/master`）は外側の `.catch` に落ちて一言出ていたので、
+       これは今回の組み替えで**失われた**もの。失敗した事実だけは持ち帰る。 */
+    let previousFailed = false;
+    const previousPromise = staff.findLastFinalReport
+      ? staff.findLastFinalReport(petId).catch(() => { previousFailed = true; return null; })
+      : Promise.resolve(null);
+
+    Promise.all([staff.findDraft(petId), previousPromise]).then(([draft, previous]) => {
+      /* 前回の体重を先に入れる。**引き継ぎより先**——`applyReport` が体重欄を
+         触ったときに、前回比が「記録なし」のまま描かれないように。 */
+      const previousKg = Number((((previous || {}).data || {}).weights || [])[0]?.kg);
+      if (Number.isFinite(previousKg) && previousKg > 0) this.currentDog.prevWeight = previousKg;
+      /* **前回が無かったときも必ず描き直す。** 描かないと、画面に出ている
+         「前回の記録なし」は HTML の初期値のままで、**一度も計算していない**のと
+         **計算して記録が無かった**のが区別できない。検査もそこを見分けられない
+         （`docs/watch.md` W-1 と同じ形）。 */
+      this.renderWeightDiff();
+      /* **前回が読めなかったことを、必ず言う。** 言わないと、常連なのに
+         「初回の子」とまったく同じ画面になる（引き継ぎ無し・前回比「記録なし」）。
+         下の分岐がもっと急ぎの用件を書くことがあるので、**先に**置く。 */
+      if (previousFailed) {
+        const status = document.getElementById('dock-status-text');
+        if (status) status.textContent = '前回のカルテを読み込めませんでした（引き継ぎと前回比は出ません）';
+      }
+
+      if (draft) {
+        /* **id は必ず引き継ぐ。** 引き継がないと、続きを書いたつもりが新しい
+           下書きになって、同じ犬の下書きが2枚残る。 */
+        this.draftReportId = draft.id;
+        if (this.draftTouched) {
+          /* **黙って捨てない。**「読み込まなかった」と言う（`D-12`）。 */
+          const status = document.getElementById('dock-status-text');
+          if (status) status.textContent = '入力中のため、前回の続きは読み込みませんでした';
+        } else {
+          this.applyReport(draft.data || {});
+          /* **前回のままの項目を、名指しで言う。** 引き継いだ直後は帯が出るが、
+             画面を1回触れば下書きができ、次に開いたときは**帯だけが消えて値が残る**。
+             そのまま確定すると、前回の所見が今回の所見として飼い主に届く。 */
+          this.showStillSameBand(this.carryOverStillSame(draft.data, previous), previous);
+        }
+        this.watchDraft();
+        return;
+      }
+      /* **下書きが1枚も無い＝この犬の新しい1枚を、いまから書く。**
+         前回の確定カルテから、変わらない項目だけを引き継いで始める
+         （マスター指示 2026-09-03）。下書きが在るときは下書きが勝つ——
+         書きかけを前回の内容で上書きしない。
+         往復のあいだに打たれていたら引き継がない（`D-20260824-30` の型）。 */
+      if (previous && !this.draftTouched) this.applyCarryOver(previous);
+      this.watchDraft();
+    }).catch(() => {
+      /* 読み込めなくても記入は続けられる。**続きから書けないことだけは伝える。** */
+      const status = document.getElementById('dock-status-text');
+      if (status) status.textContent = '前回の続きを読み込めませんでした';
+      this.watchDraft();
+    });
+  },
+
+  /** 触られたら下書きを保存する。1秒まとめてから1回だけ送る。 */
+  watchDraft() {
+    const panel = document.getElementById('screen-3');
+    if (!panel || this.draftWatching) return;
+    this.draftWatching = true;
+    const queue = () => {
+      /* **最初の1回はすぐ残す。** まとめて1秒待つだけだと、書いた直後に誤タップで
+         画面を移った人の記入が**そのまま消える**——それが `#15` の防ぎたいことそのもの
+         （`D-20260824-30` の 1）。`verify:m6` が実際にこれで落ちた: 一言を書いて
+         すぐ段のタブを押すと、下書きが出来る前にページが移っていた。
+         2回目以降は1秒まとめる（毎打鍵で送らない）。 */
+      if (this.draftReportId === null && !this.draftSaving) {
+        this.saveDraft();
+        return;
+      }
+      clearTimeout(this.draftTimer);
+      this.draftTimer = setTimeout(() => this.saveDraft(), 1000);
+    };
+    panel.addEventListener('input', queue);
+    panel.addEventListener('click', queue);
+    panel.addEventListener('pointerdown', queue);
+    /* 画面を離れるときに、まとめ待ちの分を出しておく。 */
+    globalThis.addEventListener('pagehide', () => {
+      clearTimeout(this.draftTimer);
+      this.saveDraft();
+    });
+  },
+
+  saveDraft() {
+    const staff = globalThis.TrimmerSupabaseStaff;
+    if (!staff || !staff.saveDraft || !this.draftPetId) return;
+    /* **確定を始めたら、下書きはもう書かない。**
+       下書きは写真を `data:image/…` のまま置く（実体化するのは確定の側）。
+       ところがサーバの確定は「下書きに `data:image/` が残っていたら失敗」と決めており
+       （`finalize_report`）、確定が中身を差し替えた**後**に下書きが着地すると、
+       生の `data:image/` が書き戻されて確定が 409 `report assets are incomplete`
+       で落ちる。マスターが本番で「全項目入力した後でも保存できない」と踏んだのがこれ
+       （2026-09-10・`F-20260910-79`）。 */
+    if (this.committing) return;
+    /* 1件目を作っている最中にもう1回入ると、下書きが2件出来る。 */
+    if (this.draftSaving) return;
+    this.draftSaving = true;
+    /* 印は PNG から戻せないので、**印そのもの**も一緒に置く（`__marks`）。
+       ⑥ は知らないキーを読まないので、飼い主に届くものは変わらない。
+       **確定でも落とさない**（`commitReport()` も同じ形で載せる・マスター指示
+       2026-09-03）——次の回に引き継ぐには印そのものが要るため。 */
+    const data = { ...this.extractReport(), __marks: this.marks, __marks2: this.marks2 };
+    /* **飛んでいる下書きを、確定が待てるようにしておく**（上の理由）。 */
+    this.draftInFlight = staff.saveDraft(this.draftPetId, this.draftReportId, data, this.today())
+      .then((id) => { this.draftReportId = id; this.draftSaving = false; })
+      .catch(() => {
+        this.draftSaving = false;
+        /* **黙って捨てない。** 保存できていないことを画面に出す（`D-2` の型）。 */
+        const status = document.getElementById('dock-status-text');
+        if (status) status.textContent = '⚠️ 下書きを保存できていません';
+      });
+  },
+
+  /** 下書きを画面に戻す。`extractReport()` の逆。 */
+  applyReport(data) {
+    const set = (selector, value) => {
+      const el = document.querySelector(selector);
+      if (el && value != null) el.value = value;
+    };
+    set('[data-field="staff-note"]', data.staffNote || '');
+    set('[data-field="course"]', data.course || '');
+    /* ①②③④のコメント欄（棚卸しで追加）。`extractReport()` の逆。 */
+    set('[data-field="skin-comment"]', data.skinComment || '');
+    set('[data-field="nail-comment"]', (data.nail || {}).comment || '');
+    set('[data-field="ear-comment"]', (data.ear || {}).comment || '');
+    set('[data-field="teeth-comment"]', (data.teeth || {}).comment || '');
+    /* **来店日を戻す**（マスター指示 2026-08-29・C-3）。`isoDate`/`date` のどちらかに
+       入っている（⑥の受け手は両方読む・`magazine-view.js`）。 */
+    set('#input-visit-date', data.isoDate || data.date || '');
+    const weight = (data.weights || [])[0];
+    if (weight && weight.kg) {
+      set('#input-weight', weight.kg);
+      this.onWeightChange(weight.kg);
+    }
+    if (data.bestWeight) {
+      set('#input-best-weight', data.bestWeight);
+      this.onBestWeightChange(data.bestWeight);
+    }
+    const bcs = data.bcs;
+    if (bcs) {
+      const btn = [...document.querySelectorAll('#bcs-stepper-wrap .stepper-btn')]
+        .find((el) => (el.getAttribute('onclick') || '').includes(`'bcs', ${bcs}`));
+      if (btn) btn.click();
+    }
+    /* 爪は前足・後ろ足に分けて記録する（マスター指示 2026-08-29・C-5）。
+       ⚠️ 移行前の記録は `nail.level`（単一値）で保存されている。新しい形
+       （`nail.front` / `nail.rear`）が無ければ、そちらへは戻さない
+       （無い値を推測で埋めない＝`D-10`）。 */
+    for (const side of ['front', 'rear']) {
+      const value = (data.nail || {})[side];
+      if (!value) continue;
+      const group = document.querySelector(`[data-group="nail"][data-side="${side}"]`);
+      if (!group) continue;
+      const btn = [...group.querySelectorAll('.stepper-btn')]
+        .find((el) => (el.querySelector('.val') || {}).textContent === String(value));
+      if (btn) btn.click();
+    }
+    /* 耳は6段階（マスター指示 2026-08-29・C-6）。段は `data-level` の数字で持つ
+       （日本語の表示文字列に依存しない＝`D-9`）。 */
+    for (const side of ['right', 'left']) {
+      const value = (data.ear || {})[side];
+      if (!value) continue;
+      const btn = document.querySelector(`[data-ear="${side}"] .teeth-pill-btn[data-level="${value}"]`);
+      if (btn) btn.click();
+    }
+    const teeth = (data.teeth || {}).status;
+    if (teeth) {
+      /* 日本語はセレクタに連結しない。中身を読んで比べる（`D-9`）。
+         表示＝保存値なので、表示で探せる。**歯のグリッドに絞る**——使用オプション
+         のボタンも同じ `.teeth-pill-btn` を流用しており `data-level` も持たないため、
+         絞らないと名前が偶然一致したオプションを歯の状態として押してしまう。 */
+      const btn = [...document.querySelectorAll('#teeth-selector-grid .teeth-pill-btn')]
+        .find((el) => ((el.querySelector('.name') || {}).textContent || '').trim() === teeth);
+      if (btn) btn.click();
+    }
+    /* 使用オプション（マスター指示 2026-08-31）。名前が一致するボタンだけ押す
+       ——店舗の一覧から消えた名前は、無い値を推測で埋めない（`D-10`）ので触らない。 */
+    const options = Array.isArray(data.options) ? data.options : [];
+    if (options.length > 0) {
+      document.querySelectorAll('#options-grid .teeth-pill-btn').forEach((btn) => {
+        const name = ((btn.querySelector('.name') || {}).textContent || '').trim();
+        if (options.includes(name) && !btn.classList.contains('is-active')) btn.click();
+      });
+    }
+    /* **写真を戻す。** 下書きの再開でも「カルテ修正」でも、ここで戻さなければ
+       次の確定で**落ちる**——飼い主に届いていた写真が消える。中身は
+       `asset://{id}`（保存済み）のことが多く、絵にはできないが**そのまま出し直せる**。
+       `teeth` は最大2枚の配列になった（マスター指示 2026-08-29・C-11）。 */
+    this.photos = { trimming: [], ear: '', teeth: [] };
+    const keep = (value) => (typeof value === 'string' && value.trim() !== '' ? value : '');
+    /* **写真だけは原本から取る**（マスター指示 2026-09-13）。
+       「② カルテ修正」で流れてくる `data` は、絵を出すために `asset://{id}` を
+       `blob:` の一時的な住所に置き換えたもの。**その住所はこのタブの中でしか通じない。**
+       そのまま確定すると住所が写真の値として保存され、閉じた瞬間に指し先を失う
+       ——**飼い主の画面で写真が出なくなる**（文字だけ直したときも起きる・`F-20260913-86`）。
+       `__stored` は置き換える前の原本（`backend/js/supabase-staff.js` が添える）。
+       この画面は保存済みの写真を「保存済み」の札で出すだけで絵を使わないので、
+       原本に替えても**見た目は1つも変わらない**。 */
+    const stored = (data && data.__stored) || data;
+    this.photos.trimming = ((stored.trimming || {}).photos || []).filter((v) => keep(v));
+    this.photos.ear = keep((stored.ear || {}).photo);
+    this.photos.teeth = ((stored.teeth || {}).photos || []).filter((v) => keep(v)).slice(0, this.MAX_TEETH_PHOTOS);
+    for (const kind of ['trimming', 'ear', 'teeth']) this.renderPhotoThumbs(kind);
+
+    if (Array.isArray(data.__marks) && data.__marks.length > 0) {
+      this.marks = data.__marks;
+      this.resizeCanvas(1);
+    }
+    if (Array.isArray(data.__marks2) && data.__marks2.length > 0) {
+      this.marks2 = data.__marks2;
+      this.resizeCanvas(2);
+    }
+    /* **直しで、触っていない犬体図まで焼き直さない**（マスター報告
+       「カルテの修正をしようと思ったら保存できないと言われた」の実体）。
+       `exportBodyMarking()` は毎回 canvas から新しい PNG を作るので、絵の中身が
+       同じでも「新しい画像」として `uploadReportAssets` に上げようとする。
+       ところが確定済みカルテへの新規アップロードは、保存の守り
+       （`storage_path_staff_upload`: `report.status = 'draft'` のときだけ許す）
+       がDB側で止めている——**触っていなければ、読み込んだときの参照
+       （`asset://…`）をそのまま出す**。⑥に届くものは何も変わらない。
+       写真と同じ理由で、焼き直す前の原本（`__stored`）から取る。 */
+    this.marksOriginalJson = JSON.stringify(this.marks);
+    this.marksOriginalJson2 = JSON.stringify(this.marks2);
+    this.marksOriginalImage = keep(stored.bodyMarkingImage);
+    this.marksOriginalImage2 = keep(stored.bodyMarkingImage2);
+    this.updateCompletionStatus();
+  },
+
+  /* ⑤確認 — 実データのカルテを screen-4 に描く。
+     **描くのは backend のレンダラ**（`renderMagazine`）で、⑥顧客ページと同一のもの
+     （マスター指定）。器の中身は丸ごと差し替わるので、意匠モックの既定文もここで消える。
+
+     カルテが取れていなければ `renderMagazine` は器を空にしてから投げる。
+     ここで握りつぶすと**誰も書いていない手紙が残る**ので、そのまま外へ出す。 */
+  showReport(pet) {
+    const render = globalThis.TrimmerSupabaseStaff && globalThis.TrimmerSupabaseStaff.renderMagazine;
+    if (!render) throw new Error('カルテの描画係が載っていません');
+    const panel = document.getElementById('screen-4');
+    if (!panel) throw new Error('screen-4 が見つかりません');
+    const report = globalThis.__REPORT__;
+
+    /* **「カルテ修正」で来たときは、⑤確認ではなく④カルテ作成に入る。**
+       管理者画面が `?revise=1` を付けて開く。付いていなければ従来どおり
+       ⑤確認（読むだけ）に着く——`verify:*` も飼い主の導線もそちらを通る。
+       確定済みを上書きする道はここだけで、`commitReport()` が `reviseReport` を呼ぶ。 */
+    const reviseId = new URLSearchParams(location.search).get('revise') === '1'
+      ? pet.reportId
+      : null;
+    if (reviseId && report) {
+      /* **④の中身を実際に組み立てる経路**なので、印を立ててよい。
+         `selectKarte()` が `goToStep(3)` を呼ぶので、**その前に**立てる。 */
+      this.karteInputReady = true;
+      this.selectKarte(pet.petName || '', pet.ownerName || '', '');
+      /* ここも `applyReport` の前に組み立てる（`showPetKarte` と同じ理由）。 */
+      this.renderOptionChips(pet.shopGroomingOptions || []);
+      this.reviseReportId = reviseId;
+      this.applyReport(report);
+      /* **「前回比」を、HTML の初期値のまま残さない。**
+         この経路は `resumeDraft()` を通らないので `currentDog.prevWeight` が入らず、
+         画面には `src/index.html` の初期値「前回の記録なし」がそのまま残っていた
+         ——確定カルテが8枚ある犬でもそう見える（2026-09-03・徹底調査で実機再現）。
+         「計算して記録が無かった」と「一度も計算していない」が区別できない形
+         （`docs/watch.md` W-1）。何を出すかは `renderWeightDiff()` が決める。 */
+      this.renderWeightDiff();
+      this.goToStep(3);
+      return;
+    }
+
+    /* **③の見出しも、この犬に合わせておく。** 確定すると保存したカルテの URL へ
+       開き直すので、この経路は `selectKarte()` を通らない。そのままだと③の見出しが
+       HTML の初期値のまま残り、確定後に「03 カルテ作成」へ戻った人に**別の犬の
+       名前**が見える。`D-14` の問2 が ✕ になった唯一の原因で、絵で見つけた
+       （`docs/ops/walk-D14-F3.md` / `docs/deferred.md` #28）。
+       保存先は URL の petId なので書けば正しい子に入るが、**人はそれを見出しで
+       確かめる**ので、見えているものが違えば手が止まる。
+       **移動はしない**（ここは⑤確認へ行く経路）。 */
+    this.setDogIdentity(pet.petName || '', pet.ownerName || '', '');
+    /* **描いてから移る。** 先に移ると、描画に失敗したときに空の器へ人を運ぶ。 */
+    render(panel, report && {
+      petName: pet.petName || '',
+      reportDate: report.isoDate || report.date || '',
+      data: report,
+      /* 「次回のおすすめご来店時期」（マスター指示 2026-08-29・D-20260829-58）。
+         **犬ごとに日数を直す欄は消した**（マスター指示 2026-09-10）。値は表示側で
+         既定日数の代わりに使うだけで、画面から直す道はもう無い。 */
+      revisitDaysOverride: pet.revisitDaysOverride ?? null,
+      shopDefaultRevisitDays: pet.shopDefaultRevisitDays,
+      /* 体重の推移（マスター指示 2026-09-03）。⑥飼い主と同じものを渡す。 */
+      weightHistory: pet.weightHistory || null,
+    });
+    /* **描けたことを覚えておく。** 段のタブ「04」は本番の動線として使う
+       （マスター回答 2026-08-27・`docs/deferred.md` #2）ので、まだ描いていない
+       ときに押されたら**空の器へ運ばない**ための印（`goToStep` が見る）。 */
+    this.magazineReady = true;
+    this.goToStep(4);
+  },
+
+  /* 実データのカードを押したとき。URL を変えて backend に読み直させる
+     （画面の中だけで完結させない——戻る・共有・再読み込みが効かなくなる）。 */
+  /* 初回登録の QR / URL を出す。中身は backend が持っている（`showOwnerInvitation`）。
+     押せる場所を1つ作っただけで、発行の仕組みは足していない。 */
+  showInvitation(ownerId, ownerName) {
+    const staff = globalThis.TrimmerSupabaseStaff;
+    if (!staff || !staff.showOwnerInvitation) return;
+    Promise.resolve(staff.showOwnerInvitation(ownerId, ownerName)).catch((error) => {
+      globalThis.alert(`初回登録用のQRを出せませんでした。\n\n${error.message}`);
+    });
+  },
+
+  openPet(petId) {
+    location.href = `/edit/p/${encodeURIComponent(petId)}`;
+  },
+
+  /* 犬の一覧を仮データ（window.DUMMY）から描く。
+     ベタ書きの3件を置き換えたもの。同名の犬（モモが2頭）を入れてあるのは、
+     飼い主名まで見ないと見分けられない場面を、絵で確かめるため。 */
+  renderDogs() {
+    const box = document.getElementById('karte-cards-container');
+    /* 実データを受け取っていればそれ。まだなら仮データ（`/` の経路だけ）。 */
+    const data = this.dogs || (window.DUMMY && window.DUMMY.dogs) || [];
+    if (!box) return;
+    box.innerHTML = '';
+    data.forEach((dog) => {
+      const card = document.createElement('div');
+      card.className = 'karte-card';
+      /* 実データの犬は `id` を持つ。持っていれば URL で開く、持っていなければ
+         画面の中だけで進む（仮データ）。**データの形で決める**——URL を見ない。 */
+      card.onclick = () => (dog.id
+        ? this.openPet(dog.id)
+        : this.selectKarte(dog.name, dog.owner, dog.breed));
+      card.innerHTML =
+        '<div class="karte-card-top-row">'
+        + '<div class="karte-card__body">'
+        +   '<div class="karte-card__name-line">'
+        +     '<span class="karte-card__dog-name"></span>'
+        +     '<span class="karte-card__owner-name"></span>'
+        +     '<span class="karte-card__breed"></span>'
+        +   '</div>'
+        +   '<div class="karte-card__meta-line">'
+        +     '<span>最終: <strong class="js-last"></strong></span>'
+        +     '<span>担当: <strong class="js-staff"></strong></span>'
+        +     '<span class="karte-card__badge-alert js-alert"></span>'
+        +   '</div>'
+        + '</div></div>'
+        /* 「選択」を先に置く（カードを開く操作は`btn-invite`と違って
+           `stopPropagation()`しないので、押しても押さなくても`card.onclick`まで
+           届く＝安全）。**サブエージェントによる敵対検証で発見**: 以前は
+           「初回登録QR」が先頭にあり、カードの幾何学的中心がちょうどこのボタンの
+           上に来ていた（実測: 390px幅で中心座標がBUTTON.btn-inviteに一致）。
+           `btn-invite`は自分の`onclick`で`stopPropagation()`するため、カードの
+           中央付近を押しただけのつもりが招待QRのモーダルへ吸い込まれ、
+           ④カルテ作成画面（使用オプションを含む）に一度も到達できていなかった。 */
+        + '<div class="karte-card__actions">'
+        +   '<button class="btn-clone-karte">前回を複製</button>'
+        +   '<button class="boxbutton boxbutton--sm">選択</button>'
+        +   '<button class="btn-invite" hidden>初回登録QR</button>'
+        + '</div>';
+      /* 値は textContent で入れる。仮データでも、名前を HTML として解釈させない。 */
+      card.querySelector('.karte-card__dog-name').textContent = dog.name;
+      card.querySelector('.karte-card__owner-name').textContent = dog.owner;
+      card.querySelector('.karte-card__breed').textContent = dog.breed;
+      card.querySelector('.js-last').textContent = dog.lastVisit;
+      card.querySelector('.js-staff').textContent = dog.staff;
+      const alert = card.querySelector('.js-alert');
+      if (dog.incomplete) alert.textContent = '⚠️ 未記入: ' + dog.incomplete;
+      else alert.remove();
+      /* 「前回を複製」は仮データ（F2）専用のボタンで、実データの犬には出さない。
+         `cloneAndCreate()` は `selectKarte()` を直接呼ぶだけで、実際には
+         何も複製していない（アラート文言だけが「読み込みました」と主張する・
+         `D-12`違反）。加えて、実データの初期化（下書きの再開・使用オプションの
+         一覧取得）を丸ごと飛ばしてしまう——`verify-screens.mjs` が「実際にそれで
+         一度落ちた」と書いて避けてきた場所そのもの。カードそのもの・犬の名前を
+         押せば、同じ画面に正しい初期化つきで入れる（`openPet()`）ので、
+         実データではボタンごと消す（`btn-invite` と同じ判定基準）。 */
+      const clone = card.querySelector('.btn-clone-karte');
+      if (dog.id) {
+        clone.remove();
+      } else {
+        clone.onclick = (e) => { e.stopPropagation(); this.cloneAndCreate(dog.name, dog); };
+      }
+      /* 初回登録（QR）の入口。**新規のお客様はこれを通らないと自分のカルテを
+         永久に見られない**——飼い主側の RLS は `owner_users` 経由でしか通らず、
+         そこへ行を入れられるのは `claim_invitation`（招待の消化）だけである。
+         F2 で飼い主を選ぶ画面ごと動線から外れ、**本番で招待を発行する手段が
+         消えていた**（`D-20260823-05` は残すと決めていたのに・`D-20260824-29`）。
+         仮データの犬は飼い主 id を持たないので出さない。 */
+      const invite = card.querySelector('.btn-invite');
+      if (dog.ownerId) {
+        invite.hidden = false;
+        invite.onclick = (e) => { e.stopPropagation(); this.showInvitation(dog.ownerId, dog.owner); };
+      } else {
+        invite.remove();
+      }
+      box.appendChild(card);
+    });
+    const total = document.getElementById('karte-total-count');
+    if (total) total.textContent = data.length + '件';
+
+    /* **1頭も居ないとき、行き止まりにしない。**
+       実測（2026-09-02・人と同じ操作で歩いた）: 犬が0件の店では、この画面は
+       「0件」とだけ出て、**次に何をすればいいかを一言も言わなかった**。
+       マスターは「＋新規カルテを作成する」を押し、そこから出る案内が
+       「②一覧の『初回登録QR』から」と言うのを読んだ——だが**初回登録QR は
+       犬のカードの中にしか無い**ので、0件のときは画面に存在しない。
+       **存在しない入口を案内していた**（`F-20260902-66`）。
+
+       ここに出すのは「いま押せる入口」だけ。管理者には「管理」がヘッダーに
+       出ているので、そこへ送る。出ていない人（一般スタッフ）は自分では
+       登録できないので、そう書く——できないことを「できる」と書かない。 */
+    if (data.length === 0 && globalThis.TrimmerSupabaseStaff) {
+      const note = document.createElement('div');
+      note.className = 'karte-empty-note';
+      note.dataset.view = 'karte-empty';
+      const adminLink = document.querySelector('[data-admin-link]');
+      const canAdmin = !!adminLink && !adminLink.hidden;
+      const title = document.createElement('p');
+      title.className = 'karte-empty-note__title';
+      title.textContent = 'まだ1頭も登録されていません。';
+      const body = document.createElement('p');
+      body.textContent = canAdmin
+        ? '上の「管理」→「② 新規」から、飼い主さんを登録し、そのあと犬を登録してください。'
+        : 'この画面からは登録できません。お店の管理者に、飼い主さんと犬の登録を頼んでください。';
+      note.append(title, body);
+      if (canAdmin) {
+        const go = document.createElement('a');
+        go.className = 'boxbutton';
+        go.href = '/admin';
+        go.textContent = '管理画面で登録する';
+        note.append(go);
+      }
+      box.appendChild(note);
+    }
+  },
+
+  goToStep(stepNum) {
+    /* **②へ戻るとき、一覧を持っていなければ URL で開き直す。**
+       `/edit/p/{petId}` で開いた画面は、その犬の分しか読んでいない（backend の
+       `bootStaffPortal` が route ごとに必要なものだけ取る）。この状態で段のタブ
+       「02」を押すと、screen-2 に移りはするが**中身が空**で、犬を選び直せない
+       ——「押せた」だけで「戻れて」いない（`D-14` の2問目）。
+       `verify:m6` がこれを見つけた。 */
+    if (stepNum === 2 && this.dogs === null && globalThis.TrimmerSupabaseStaff) {
+      location.href = '/edit';
+      return;
+    }
+
+    /* **「04 顧客カルテ」を、中身が無いまま開かない。**
+       段のタブは本番の動線として使う（マスター回答 2026-08-27・`#2`）。
+       `screen-4` の中身は `renderMagazine` が丸ごと差し替えるまで**意匠の器**なので、
+       確定前に押すと「その犬の顧客カルテ」の見出しのまま**空の雑誌**が出る
+       ——`D-12`「押せた ではなく 届いた」で見れば、これは届いていない。
+       ②の穴（`verify:m6` が見つけたもの）とまったく同じ形。
+       **黙って何もしないのは同じ罪**なので、何をすれば見られるかを器に出す。 */
+    /* **「03 カルテ作成」を、犬を選ばないまま開かない。**
+       段のタブは本番の動線として使う（マスター回答 2026-08-27・`#2`）。
+       ところが犬を選ばずにここを押すと、④の器は意匠のまま開くのに
+       `showPetKarte()` を通っていないので、**⑦使用オプションが一度も
+       組み立てられず帯ごと消える**（`sec-options` は HTML の既定が `hidden`）。
+       犬の名前も空のまま出る。「オプションが出ていない」というマスターの指摘を、
+       この経路で実際に再現した（2026-09-01・10パターン検証の②③⑥）。
+       `＋新規カルテを作成する`（`createNewKarte`）で塞いだのと同じ穴が、
+       段のタブにも空いていた——**入口が2つあり、1つしか塞いでいなかった**。
+       すぐ下の screen-4 の穴とまったく同じ形なので、同じ直し方をする。
+
+       **入口は3つあった。** 見るのを `karteReady` にしていたので、⑤確認から
+       段のタブ「03」を押すと関所が効かなかった——`showReport()` が③の見出しを
+       直すために `selectKarte()` を呼び、それが `karteReady` を立てるため
+       （2026-09-03・徹底調査で実機再現）。確定すると必ず⑤に着くので、
+       **本番の動線でそのまま踏める**。開くのは `showPetKarte()` を通っていない ④ で、
+       ⑦使用オプションの帯ごと消え、引き継ぎも前回比も出ない——マスターが
+       「オプションが出ていない」と指摘したのと同じ画面。
+       1つの印に2つの意味（「犬の名前が分かっている」と「④を組み立てた」）を
+       持たせていたのが原因なので、**印を分ける**。 */
+    /* 関所を掛けるのは**本番の画面のときだけ**。`/`（仮データ・`npm run walk` の
+       F2 経路）では従来どおり素通しする。見るのは `__REPORT__` の印であって
+       URL ではない（`init()` と同じ判定）。backend が落ちていて
+       `TrimmerSupabaseStaff` が居ないときも、印は在るので関所は効く。 */
+    if (stepNum === 3 && !this.karteInputReady && '__REPORT__' in globalThis) {
+      /* **どちらの人に言っているのかで、文言を変える。**
+         犬を一度も選んでいない人（`karteReady` も立っていない）と、
+         ⑤確認まで来た人（この子は分かっているが、④は次の1枚の分として
+         組み立て直しが要る）とでは、次にすることが違う。
+         「先に犬を選んでください」だけだと、いま名前が出ている画面に居る人には
+         意味が通らない。 */
+      globalThis.alert(this.karteReady
+        ? `${this.currentDog.name} の次のカルテを書くときは、\n`
+          + '「02 カルテ検索」でもう一度この子を選んでください。\n\n'
+          + '前回の内容を引き継いだ、新しい1枚から始まります。'
+        : '先に犬を選んでください。\n\n'
+          + '「02 カルテ検索」の一覧で犬のカードを押すと、その子のカルテ作成画面になります。');
+      this.goToStep(2);
+      return;
+    }
+
+    if (stepNum === 4 && !this.magazineReady && globalThis.TrimmerSupabaseStaff) {
+      const panel = document.getElementById('screen-4');
+      if (panel) {
+        panel.textContent = '';
+        const note = document.createElement('p');
+        note.className = 'magazine-empty-note';
+        note.dataset.view = 'not-ready';
+        note.textContent = 'このカルテはまだ確定していません。'
+          + '「03 カルテ作成」で書いて、確認へ進むとここに出ます。';
+        panel.append(note);
+      }
+    }
+
+    /* **行き先の画面が無いときは、いまの画面を残す。**
+       以前はここで全部の `is-active` を外してから行き先を探していたので、
+       行き先が無いと**どの画面も出ない＝真っ白**になった。実際に起きた:
+       スタッフの画面では `screen-1`（ログイン）を外してあるのに、左上の HOME が
+       `goToStep(1)` を呼んでいて、押すとナビ帯だけが残った白紙になった
+       （2026-09-04・サブ検証の実機で再現）。
+       入口を消すたびに同じ穴が開くので、**外す前に行き先を確かめる**。
+       黙って何もしないのではなく、**いま見えているものを壊さない**のがここの役目
+       （呼び出し側の入口を消すのが本筋の直し。これはその取りこぼしの受け皿）。 */
+    const targetPanel = document.getElementById(`screen-${stepNum}`);
+    /* **何も書き換えないうちに帰る。** 段の見出しや `currentStep` を先に
+       書き換えてから帰ると、**画面と印が食い違う**（`D-12`）。 */
+    if (!targetPanel) return;
+
+    this.currentStep = stepNum;
+
+    document.querySelectorAll('.btn-step').forEach(btn => {
+      btn.classList.toggle('is-active', parseInt(btn.dataset.step) === stepNum);
+    });
+
+    document.querySelectorAll('.screen-panel').forEach(panel => {
+      panel.classList.remove('is-active');
+    });
+    targetPanel.classList.add('is-active');
+
+    const brandLabel = document.getElementById('nav-brand-label');
+    if (brandLabel) {
+      if (stepNum === 1) brandLabel.textContent = 'SALTY DOG';
+      else if (stepNum === 2) brandLabel.textContent = 'カルテ検索・一覧';
+      else if (stepNum === 3) brandLabel.textContent = `${this.currentDog.name} カルテ作成`;
+      else if (stepNum === 4) brandLabel.textContent = `${this.currentDog.name} 顧客カルテ`;
+    }
+
+    if (stepNum === 3) {
+      /* **描く前に測り直す。** 隠れている間は器が 0 なので、ここで測らないと
+         描画面が 0×0 のままになる（上の `resizeCanvas` の注記）。 */
+      setTimeout(() => this.resizeCanvases(), 50);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  /* **犬の名前まわりを合わせるだけ。移動はしない。**
+     ⑤確認（`showReport`）は③の見出しを直すためだけにこれを呼ぶ。以前は
+     `selectKarte()` をそのまま呼んでいたので、**④へ移ろうとして**いた上に
+     「犬が選ばれている」の印まで立ち、⑤から段のタブ「03」を押すと関所が効かなかった
+     （2026-09-03・徹底調査で実機再現）。**移る所と、名前を書く所を分ける。** */
+  setDogIdentity(dogName, ownerName, breed) {
+    this.currentDog.name = dogName;
+    this.currentDog.owner = ownerName;
+    this.currentDog.breed = breed;
+
+    /* screen-4 は実データのときレンダラが器ごと差し替えるので、この3つは
+       在るとは限らない。無い前提で触る（`renderMagazine` が入ったあとに
+       ここへ来ると、素で書くと TypeError で導線が止まる）。 */
+    const header = document.getElementById('editor-dog-header');
+    if (header) header.textContent = `${dogName} カルテ入力`;
+    const magName = document.getElementById('mag-dog-name');
+    if (magName) magName.textContent = `${dogName} くん`;
+    const magSub = document.getElementById('mag-dog-sub');
+    /* **犬種だけ。** 以前は見本の年齢と体重を全頭に付けていた（`#35`）。 */
+    if (magSub) magSub.textContent = breed || '';
+
+    // 爪の未選択リセット
+    const nailWrap = document.getElementById('nail-stepper-wrap');
+    if (nailWrap) {
+      nailWrap.querySelectorAll('.stepper-btn').forEach(b => b.classList.remove('is-active'));
+    }
+    /* フッターの帯は、爪だけでなく8項目の総ざらいで判定する（`updateCompletionStatus`）。
+       ここで固定文言を書くと、また「実態と違う帯」に戻る（`D-12`）。 */
+    this.updateCompletionStatus();
+  },
+
+  /* ④カルテ作成へ入る。名前を合わせてから移る。 */
+  selectKarte(dogName, ownerName, breed) {
+    /* **ここを通ったことが「犬が選ばれている」の印。**
+       ただし `goToStep(3)` の関所が見るのは**こちらではない**——印が2つに
+       分かれている理由は `goToStep()` の関所の注記にある。 */
+    this.karteReady = true;
+    this.setDogIdentity(dogName, ownerName, breed);
+    this.goToStep(3);
+  },
+
+  cloneAndCreate(dogName, dog) {
+    alert(`【複製完了】${dogName}の過去カルテデータを読み込みました。変更箇所のみ上書きして保存できます。`);
+    this.selectKarte(dogName, (dog && dog.owner) || '', (dog && dog.breed) || '');
+  },
+
+  /* `createNewKarte()` は**関数ごと削除した**（マスター指示 2026-09-04:
+     「新規登録ボタンは存在意味が分からない。管理者ページにあれば済むなら
+       あそこにボタンを置く意味が無い」）。
+     押しても「管理画面の『② 新規』から登録してください」と案内を出すだけで、
+     **何もしない関数**だった。呼ぶ場所（②一覧のボタン）も `src/index.html` から
+     外したので、残すと死んだコードになる（`AGENTS.md` A-5）。
+     犬を登録する道は管理画面の「② 新規」の1本。管理者にはヘッダーの「管理」から
+     入れる（`data-admin-link`）。 */
+
+  filterKarte(query) {
+    const q = (query || '').trim().toLowerCase();
+    const cards = document.querySelectorAll('.karte-card');
+    let count = 0;
+
+    cards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      if (!q || text.includes(q)) {
+        card.style.display = 'flex';
+        count++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    const totalEl = document.getElementById('karte-total-count');
+    if (totalEl) totalEl.textContent = `${count}件`;
+  },
+
+  toggleDirVoiceSearch() {
+    const btn = document.getElementById('dir-mic-btn');
+    const label = document.getElementById('dir-mic-label');
+    const input = document.getElementById('dir-search-input');
+
+    if (btn) btn.classList.add('is-recording');
+    if (label) label.textContent = '録音中...';
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SpeechRec();
+      rec.lang = 'ja-JP';
+      rec.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        if (input) {
+          input.value = text;
+          this.filterKarte(text);
+        }
+        if (btn) btn.classList.remove('is-recording');
+        if (label) label.textContent = '音声検索';
+      };
+      rec.onerror = () => {
+        if (btn) btn.classList.remove('is-recording');
+        if (label) label.textContent = '音声検索';
+      };
+      rec.start();
+    } else {
+      setTimeout(() => {
+        if (input) {
+          input.value = 'ポンチ';
+          this.filterKarte('ポンチ');
+        }
+        if (btn) btn.classList.remove('is-recording');
+        if (label) label.textContent = '音声検索';
+      }, 1200);
+    }
+  },
+
+  toggleWaveCard(id) {
+    const card = document.getElementById(id);
+    if (card) {
+      card.classList.toggle('is-open');
+    }
+  },
+
+  toggleAllWaves() {
+    this.allWavesOpen = !this.allWavesOpen;
+    document.querySelectorAll('.wave-card').forEach(card => {
+      card.classList.toggle('is-open', this.allWavesOpen);
+    });
+    const btn = document.getElementById('btn-toggle-all-waves');
+    if (btn) btn.textContent = this.allWavesOpen ? 'すべて閉じる' : 'すべて開く';
+  },
+
+  jumpToWave(id) {
+    const card = document.getElementById(id);
+    if (card) {
+      card.classList.add('is-open');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  },
+
+  toggleTimeline() {
+    const tray = document.getElementById('timeline-tray');
+    const label = document.getElementById('timeline-toggle-text');
+    if (tray) {
+      const isOpen = tray.style.display !== 'none';
+      tray.style.display = isOpen ? 'none' : 'flex';
+      if (label) label.textContent = isOpen ? '表示する ▼' : '閉じる ▲';
+    }
+  },
+
+  switchReportDate(dateStr, chipEl) {
+    document.querySelectorAll('.timeline-date-chip').forEach(c => c.classList.remove('is-active'));
+    chipEl.classList.add('is-active');
+
+    const dateLabel = document.getElementById('mag-report-date-label');
+    if (dateLabel) dateLabel.textContent = `${dateStr} vol.24`;
+    alert(`【過去カルテ表示】${dateStr} の施術記録に切り替えました。`);
+  },
+
+  /* `nail`（前足/後ろ足）は分割済みで、いまここを通るのは `bcs` だけ。
+     `this.form[type]` に**そのまま代入する型**（数値1個）にのみ使うこと。 */
+  selectStepper(btn, type, val) {
+    const parent = btn.parentElement;
+    if (parent) {
+      parent.querySelectorAll('.stepper-btn').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+    }
+    this.form[type] = val;
+    this.updateCompletionStatus();
+  },
+
+  /* 前足/後ろ足の爪、左右の耳……**同じ形の段が2つ並ぶ項目**で使う。
+     押されたボタンだけでは**どの組か分からない**ので、囲みに付けた
+     `data-group`（例: `nail`）と `data-side`（例: `front`/`rear`・ASCII。`D-9`）で見分ける。
+     `this.form[group]` が `{ side: number, ... }` の形を持っていることが前提。 */
+  selectSubStepper(btn) {
+    const parent = btn.parentElement;
+    if (parent) {
+      parent.querySelectorAll('.stepper-btn').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const group = parent.dataset && parent.dataset.group;
+      const side = parent.dataset && parent.dataset.side;
+      if (group && side && this.form[group] && typeof this.form[group] === 'object') {
+        const val = btn.querySelector('.val');
+        this.form[group][side] = Number((val && val.textContent) || '') || 0;
+        this.updateCompletionStatus();
+      }
+    }
+  },
+
+  /* ④画面下部の帯（`editor-bottom-dock`）。**測定・評価項目**（コース・体重・
+     ベスト体重・BCS・爪・耳・歯・担当からのメッセージ）が全部埋まって初めて
+     「全項目入力完了」と名乗る（マスター指示 2026-09-01）。
+     写真・犬体図の印・使用オプションは、症状や追加サービスが無ければ元々ゼロが
+     正しいことがあるため、ここには含めない（同・マスター確認済み）。
+
+     ⚠️ 以前はここが爪のチェックだけを見て「全項目入力完了 (6/6)」と名乗っていた
+     ——C-1〜C-12や使用オプションで項目が増えるたびに数が古びていき、
+     ついに「全項目入力してないのに完了になる」とマスターから指摘された
+     （`D-12`違反）。この関数は、押されたボタンごとの個別更新ではなく、
+     **毎回すべての項目を読み直して**判定する——1箇所でも更新を足し忘れると
+     また同じ嘘に戻るため、足し算ではなく毎回の総ざらいにしてある。 */
+  updateCompletionStatus() {
+    const dock = document.getElementById('editor-bottom-dock');
+    const statusIcon = document.getElementById('dock-status-icon');
+    const statusText = document.getElementById('dock-status-text');
+    const gotoBtn = document.getElementById('btn-dock-goto');
+    if (!dock || !statusIcon || !statusText) return;
+
+    const courseEl = document.querySelector('[data-field="course"]');
+    const noteEl = document.querySelector('[data-field="staff-note"]');
+    /* `mark` と `sec` は**画面の見出しと同じ番号・同じ場所**（マスター指示 2026-09-09
+       「未記入①④など番号で表示しろ」）。①には3項目がぶら下がるので、番号だけを出すときは
+       重複を畳む。`sec` は「該当項目へ ➜」が飛ぶ先。
+       **名前は短くする**——番号が場所を指しているので見分けが付く長さで足り、長い名前
+       （「担当からのメッセージ」等）を並べるとスマホの1行に収まらず、隣の
+       「該当項目へ ➜」を押し出して切ってしまう（実測・390px）。 */
+    const items = [
+      { mark: '◎', sec: 'sec-course', label: 'コース', done: !!(courseEl && courseEl.value) },
+      { mark: '①', sec: 'sec-weight', label: '体重', done: !!this.form.weight },
+      { mark: '①', sec: 'sec-weight', label: 'ベスト体重', done: !!this.form.bestWeight },
+      { mark: '①', sec: 'sec-weight', label: 'BCS', done: !!this.form.bcs },
+      { mark: '②', sec: 'sec-nail', label: '爪', done: !!(this.form.nail.front && this.form.nail.rear) },
+      { mark: '③', sec: 'sec-ear', label: '耳', done: !!(this.form.ear.right && this.form.ear.left) },
+      { mark: '④', sec: 'sec-teeth', label: '歯', done: !!this.form.teeth },
+      /* **⑤⑥⑦を数に入れる**（マスター指示 2026-09-10「未入力項目、8で全部じゃないだろ、
+         ⑤⑥⑦が未入力でも残り8と出た」）。8項目しか見ていなかったので、犬体図も
+         仕上がり写真も使用オプションも空のまま「全項目入力完了」と言えてしまっていた
+         ——**画面が嘘をつく**（`D-12`）。 */
+      { mark: '⑤', sec: 'sec-skin', label: '犬体図', done: this.marks.length > 0 || this.marks2.length > 0 },
+      { mark: '⑥', sec: 'sec-photo', label: '仕上がり写真', done: this.photos.trimming.length > 0 },
+      { mark: '⑧', sec: 'sec-note', label: 'メッセージ', done: !!(noteEl && noteEl.value.trim()) },
+    ];
+    /* ⑦は**帯が出ているときだけ**数える。店がオプションを1つも登録していないと
+       `#sec-options` は `hidden` で、画面に無いものは埋めようがない（`D-10` の型）。 */
+    const optionsEl = document.getElementById('sec-options');
+    if (optionsEl && !optionsEl.hidden) {
+      items.splice(items.length - 1, 0,
+        { mark: '⑦', sec: 'sec-options', label: 'オプション', done: this.form.options.length > 0 });
+    }
+    const missing = items.filter((i) => !i.done);
+    const total = items.length;
+
+    if (missing.length === 0) {
+      dock.classList.remove('has-incomplete');
+      statusIcon.textContent = '✓';
+      statusText.textContent = `全項目入力完了 (${total}/${total})`;
+      if (gotoBtn) gotoBtn.style.display = 'none';
+    } else {
+      dock.classList.add('has-incomplete');
+      statusIcon.textContent = '⚠️';
+      statusText.textContent = this.missingText(missing);
+      if (gotoBtn) gotoBtn.style.display = 'inline-block';
+    }
+    this.missingSection = missing.length > 0 ? missing[0].sec : null;
+  },
+
+  /* **スマホの1行に必ず収める**（マスター指示 2026-09-09「未記入内容は全文見える様にしろ。
+     複数あることも想定されるので、未記入①④など番号で表示しろ」）。
+     以前は項目名を全部並べていたので、`text-overflow: ellipsis` に食われて
+     **何が足りないのか読めなかった**。少ないうちは名前まで出し、増えたら番号だけにする
+     （マスター選択）——どちらも切れずに全部見える。 */
+  missingText(missing) {
+    if (missing.length <= 2) return `未記入 ${missing.map((i) => `${i.mark}${i.label}`).join(' ')}`;
+    const marks = [];
+    for (const item of missing) if (!marks.includes(item.mark)) marks.push(item.mark);
+    return `未記入 ${marks.join('')}`;
+  },
+
+  /* 耳の6段階（マスター指示 2026-08-29・C-6）。歯と同じグリッド見た目を使うが、
+     押した先が**どちらの耳か**を `data-ear` から見分け、値は表示文字ではなく
+     `data-level`（ASCII の数字・`D-9`）から取る。 */
+  selectEarLevel(btn) {
+    const group = btn.closest('[data-ear]');
+    if (!group) return;
+    group.querySelectorAll('.teeth-pill-btn').forEach((b) => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const side = group.dataset.ear;
+    if (side === 'right' || side === 'left') {
+      this.form.ear[side] = Number(btn.dataset.level || '') || 0;
+    }
+    this.updateCompletionStatus();
+  },
+
+  /* 歯の状態。**押されたボタンの表示そのものを保存値にする。**
+
+     もとは HTML 側で `App.selectTeeth(this, 'ちょっと歯石💦')` のように保存値を
+     第2引数で二重に書いていた。そのため6つのうち3つで**表示と保存値がずれていた**
+     ——トリマーが「ちょっと付着💦」を押すと、飼い主には「ちょっと歯石💦」が届く
+     （意匠モックの時点でずれており、`src/` で混入したものではない）。
+     悪意も事故も無いが、**押した表示と届く値が違うこと**は `D-12` が守ろうとしている型。
+     引数を廃して重複そのものを無くしたので、構造的に二度とずれない。 */
+  selectTeeth(btn) {
+    const parent = btn.parentElement;
+    if (parent) {
+      parent.querySelectorAll('.teeth-pill-btn').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+    }
+    const name = btn.querySelector('.name');
+    this.form.teeth = ((name && name.textContent) || '').trim();
+    this.updateCompletionStatus();
+  },
+
+  /* 使用オプション（旧デザイン試作にあった「今月の使用オプション」の復活。
+     マスター指示 2026-08-31）。選べる名前は店舗ごとに管理者が④店舗設定で
+     追加・編集する（`shopGroomingOptions`）ので、ボタンはその場で組み立てる
+     ——歯の状態と同じ `.teeth-pill-btn` を流用するが、こちらは複数選択
+     （押すたびに on/off が切り替わるだけで、他のボタンを消さない）。
+     1件も無い店舗では帯ごと隠す（`D-10`・空の選択肢を出さない）。 */
+  renderOptionChips(names, unavailable) {
+    const section = document.getElementById('sec-options');
+    const grid = document.getElementById('options-grid');
+    if (!section || !grid) return;
+    this.form.options = [];
+    grid.textContent = '';
+    const list = (names || []).filter((v) => typeof v === 'string' && v.trim() !== '');
+
+    /* **読み込みに失敗したときは、帯を消さずに理由を出す。**
+       消してしまうと「この店はオプションを登録していない」と見分けが付かず、
+       トリマーもマスターも何が起きたか分からない（`D-10` は「書いていないことを
+       出すな」であって「失敗を隠せ」ではない）。 */
+    if (unavailable) {
+      section.hidden = false;
+      const note = document.createElement('p');
+      note.className = 'magazine-empty-note';
+      note.dataset.view = 'options-unavailable';
+      note.textContent = `${unavailable}この画面のオプションは選べません。`;
+      grid.append(note);
+      return;
+    }
+
+    section.hidden = list.length === 0;
+    for (const name of list) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'teeth-pill-btn';
+      btn.onclick = () => this.toggleOption(btn);
+      const label = document.createElement('span');
+      label.className = 'name';
+      /* `textContent` で入れる。店舗管理者が自由入力した文字列なので
+         `innerHTML` にすると細工が実行される（`D-11`）。 */
+      label.textContent = name;
+      btn.append(label);
+      grid.append(btn);
+    }
+  },
+
+  toggleOption(btn) {
+    btn.classList.toggle('is-active');
+    const name = ((btn.querySelector('.name') || {}).textContent || '').trim();
+    if (!name) return;
+    const set = new Set(this.form.options);
+    if (btn.classList.contains('is-active')) set.add(name);
+    else set.delete(name);
+    this.form.options = [...set];
+    this.updateCompletionStatus();
+  },
+
+  /* 前回比のバッジを描く。**前回の体重が入ったときにも描き直せるように**
+     `onWeightChange()` から切り出した（マスター指示 2026-09-03）。
+     前回の体重は `resumeDraft()` が前回の確定カルテから入れる——それまでは
+     `null`＝「記録なし」で、見本の数字とは引き算しない（`D-10`）。
+
+     **`onWeightChange()` を呼んで描き直させない。** あれは `form.weight` を
+     書き換えるので、空の入力欄で呼ぶと「0kg を量った」ことになってしまう。 */
+  renderWeightDiff() {
+    const badge = document.getElementById('weight-diff-badge');
+    if (!badge) return;
+    /* **過去のカルテを直しているときは、比べない。**
+       比べる相手は「いまの前回」ではなく「そのカルテの1つ前」なので、
+       手元にあるもので答えると嘘になる。取っていないものを推測で埋めない（`D-10`）。
+       ここに置くのは、体重を打ち直すたびに `onWeightChange()` から呼ばれるため
+       ——入口（`showReport()`）で1回書くだけでは、打ち直した瞬間に戻ってしまう。 */
+    if (this.reviseReportId) {
+      badge.className = 'weight-diff-badge';
+      badge.textContent = 'カルテ修正中（前回比は出しません）';
+      return;
+    }
+    const prev = Number(this.currentDog.prevWeight);
+    if (!Number.isFinite(prev) || prev <= 0) {
+      badge.className = 'weight-diff-badge';
+      badge.textContent = '前回の記録なし';
+      return;
+    }
+    const now = Number(this.form.weight);
+    /* **まだ量っていないときは、差ではなく前回の値を出す。** `0 - 4.4` を
+       「-4400g ▼」と出すと、痩せたように見える（書いていないことが見える）。 */
+    if (!Number.isFinite(now) || now <= 0) {
+      badge.className = 'weight-diff-badge';
+      badge.textContent = `前回 ${prev}kg`;
+      return;
+    }
+    const diff = Math.round((now - prev) * 1000);
+    if (diff >= 0) {
+      badge.className = 'weight-diff-badge is-up';
+      badge.textContent = `+${diff}g ▲`;
+    } else {
+      badge.className = 'weight-diff-badge is-down';
+      badge.textContent = `${diff}g ▼`;
+    }
+  },
+
+  onWeightChange(val) {
+    const w = parseFloat(val) || 0;
+    this.form.weight = w;
+    this.renderWeightDiff();
+    this.updateCompletionStatus();
+  },
+
+  /* ベスト体重（目標体重）。⑥側の受け手は既にあり、この値をそのまま渡すだけ
+     （マスター指示 2026-08-29・C-4）。 */
+  onBestWeightChange(val) {
+    this.form.bestWeight = parseFloat(val) || 0;
+    this.updateCompletionStatus();
+  },
+
+  /* ⑧担当メッセージの音声入力。**押すたびに、始める／止めるが交互に効く。**
+
+     直す前は2つ壊れていた（2026-09-07・マスター実機報告「コメント入力が2回目出来ない」）:
+
+       1. **止める道が無かった。** 名前は `toggle` なのに `rec.stop()` を1度も呼ばず、
+          押すたびに**新しい認識器**を作って `start()` していた。マイクは1本しか
+          無いので、1回目が終わっていない間の2回目は何も起きない（`onerror` で
+          赤い印が消えるだけ）。人からは「2回目が入らない」に見える。
+       2. **音声が使えない端末で、見本の文（ブラッシングの作り話）を書き込んでいた。**
+          トリマーが消し忘れれば、
+          **誰も言っていない文が担当者の名前で飼い主に届く**（`D-10`・`F-20260821-14`
+          と同じ型）。使えないなら、使えないと言う。作り話で埋めない。
+
+     ①②③④（皮膚・爪・耳・口）のコメント欄も、この同じ道具をそのまま使う
+     （マスター指示・放置リスト `#41` の隣で見つかった「⑧しか声で書けない」の解消）。
+     マイクは実機で1本しか無いので、`this.voiceRec` は元から共有のまま——
+     複数欄で同時に録音できる想定はしない（②を録音中に③を押すと②が止まる）。 */
+  toggleEditorVoice(targetId = 'editor-trimmer-letter', btnId = 'editor-voice-btn') {
+    const btn = document.getElementById(btnId);
+    const ta = document.getElementById(targetId);
+    const stopped = () => {
+      this.voiceRec = null;
+      if (btn) btn.classList.remove('is-recording');
+    };
+
+    /* 2回目は「止める」。 */
+    if (this.voiceRec) {
+      try { this.voiceRec.stop(); } catch (_) { /* 既に終わっていることがある */ }
+      stopped();
+      return;
+    }
+
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      globalThis.alert('この端末では音声入力が使えません。文字で入力してください。');
+      return;
+    }
+
+    const rec = new SpeechRec();
+    rec.lang = 'ja-JP';
+    rec.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      if (ta) {
+        ta.value += (ta.value ? ' ' : '') + text;
+        /* `mag-letter-content` は⑧の一言専用のプレビュー。②③④等の欄で
+           声を使っても、そこは書き換えない（別の欄の文言で上書きしない）。 */
+        if (targetId === 'editor-trimmer-letter') {
+          const preview = document.getElementById('mag-letter-content');
+          if (preview) preview.textContent = ta.value;
+        }
+        this.updateCompletionStatus();
+      }
+    };
+    rec.onerror = stopped;
+    /* **終わったら必ずここを通る**（結果が出ても、無音で切れても）。
+       ここで手放さないと、次の1回が始められない——それが「2回目が出来ない」。 */
+    rec.onend = stopped;
+    this.voiceRec = rec;
+    if (btn) btn.classList.add('is-recording');
+    try {
+      rec.start();
+    } catch (_) {
+      stopped();
+    }
+  },
+
+  /* **いちばん上の未記入の場所へ運ぶ**（マスター選択 2026-09-09）。
+     以前は名前のとおり必ず爪へ飛んでいたので、番号で「①が未記入」と出しているのに
+     押すと②爪へ行く、という食い違いになっていた。行き先は
+     `updateCompletionStatus()` が毎回置き直す（判定と行き先を1か所で決める）。 */
+  focusMissingSection() {
+    const sec = document.getElementById(this.missingSection || 'sec-nail');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  },
+
+  /* 犬体図の描画面を、いまの器の大きさに合わせる。
+
+     **画面が隠れているあいだは器の大きさが 0 になる。** `screen-3` は最初
+     `is-active` ではないので、読み込み直後に測ると `clientWidth === 0` になり、
+     描画面が 0×0 のまま固定される。そのまま印を付けると `toDataURL()` は
+     `data:,`（**中身の無い画像**）を返し、飼い主には空が届く。
+     実際 `verify:roundtrip` の 8 と 15 がこれで落ちた。
+     `#3`（トリマーが見つけた印がどこにも残らず消える）と同じ結末なので、
+     **画面に入るたびに測り直す**。 */
+  resizeCanvas(n) {
+    const surface = this.surface(n);
+    const canvas = document.getElementById(surface.canvas);
+    if (!canvas) return;
+    /* 器は測るためだけに要る。無くても**描くことはやめない**——
+       描画面の大きさが既に決まっていれば、印は描ける。 */
+    const wrapper = document.getElementById(surface.wrap);
+    if (wrapper) {
+      const width = wrapper.clientWidth;
+      const height = wrapper.clientHeight;
+      if (width > 0 && height > 0 && (canvas.width !== width || canvas.height !== height)) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+    }
+    this.drawCanvas(n);
+  },
+
+  /** 面を全部測り直す。画面に入った直後や窓の大きさが変わったときはこちら
+      ——**どちらか片方だけ測ると、測っていない面が 0×0 のまま**になり、
+      そこに付けた印は `data:,`（中身の無い画像）として飼い主に届く。 */
+  resizeCanvases() {
+    Object.keys(this.SURFACES).forEach((n) => this.resizeCanvas(Number(n)));
+  },
+
+  /* 犬体図は「タップして開く」形式（マスター指示 2026-09-09「歯と同じ形式にしろ」）。
+     **描画面は動かさない**——`#marking-canvas` は読み込み時から同じ場所に在り、
+     開閉は class の付け外しだけ。印は 0〜1 の割合で持っているので（`marks`）、
+     大きさが変わっても測り直して描き直せば同じ絵になる。 */
+  openBodyMarking(n) {
+    const surface = this.surface(n);
+    const tool = document.getElementById(surface.tool);
+    if (!tool) return;
+    /* 「キャンセル」で**開く前**に戻すための控え（マスター選択・歯と同じ3ボタン）。 */
+    this.clearTextSelection();
+    this[surface.before] = JSON.stringify(this[surface.marks]);
+    tool.classList.add('is-open');
+    /* 器の大きさが変わるので測り直す。間の取り方は `goToStep()` と同じ。 */
+    setTimeout(() => this.resizeCanvas(n), 50);
+  },
+
+  closeBodyMarking(save, n) {
+    const surface = this.surface(n);
+    const tool = document.getElementById(surface.tool);
+    if (!tool) return;
+    if (!save && typeof this[surface.before] === 'string') {
+      this[surface.marks] = JSON.parse(this[surface.before]);
+    }
+    /* 閉じるときに必ず外す。キャンセルは `marks` を JSON から作り直すので、
+       選んだままだと**もう配列に無い印**を指し続ける。 */
+    this.selectedText = null;
+    this[surface.before] = null;
+    tool.classList.remove('is-open');
+    setTimeout(() => this.resizeCanvas(n), 50);
+    this.updateCompletionStatus();
+    if (save) this.saveDraft();
+  },
+
+  initCanvas(n) {
+    const surface = this.surface(n);
+    const canvas = document.getElementById(surface.canvas);
+    if (!canvas) return;
+    /* この面の印を出し入れする窓口。**面ごとに別の配列**なので、
+       ここを間違えると2枚目の線が1枚目に描かれる。 */
+    const marks = () => this[surface.marks];
+
+    const resize = () => this.resizeCanvas(n);
+    window.addEventListener('resize', resize);
+    setTimeout(resize, 100);
+
+    /* 指1本で「ペンで描く」か「スタンプを置く」。**2本目の指は無視する**——
+       写真の書き込み（`openAnnotate()`）と同じで、2本の座標が同じ線に混ざると
+       線が暴れる。ここは拡大を持たないので、2本目はただ捨てる。 */
+    let drawingPointerId = null;
+    const pointAt = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) / rect.width,
+        y: (event.clientY - rect.top) / rect.height,
+      };
+    };
+
+    canvas.addEventListener('pointerdown', (event) => {
+      if (drawingPointerId !== null) return;
+      const point = pointAt(event);
+
+      /* 消しゴム（マスター指示 2026-09-07）。**写真や下絵は消さない**——
+         触れた印（線・スタンプ・文字）を1件ずつ取り除く。画素を削る方式にすると
+         下絵の犬まで白くなり、戻せない。 */
+      if (this.markMode === '消しゴム') {
+        drawingPointerId = event.pointerId;
+        this.eraseAt(point, undefined, n);
+        return;
+      }
+
+      /* 文字（マスター指示 2026-09-07）。押した所に置く。
+         **何も打たなければ何も置かない**（空の印を残さない・`D-10`）。
+
+         2026-09-12 のマスター指示で、**置いたあとも動かせる**ようにした。
+         すでに在る文字の上を押したら「新しく置く」ではなく「掴む」。
+         押した所に文字が無いときだけ、これまでどおり訊いて置く。
+         説明の文は出さない（「入れる文字という説明は消せ」）。 */
+      if (this.markMode === '文字') {
+        const held = this.findTextAt(point, n);
+        if (held) {
+          this.selectText(held, n);
+          drawingPointerId = event.pointerId;
+          return;
+        }
+        const text = (globalThis.prompt && globalThis.prompt('')) || '';
+        if (!text.trim()) return;
+        const placed = {
+          ...point,
+          text: text.trim(),
+          type: this.currentStamp,
+          color: this.penColor,
+          width: this.penWidth,
+          alpha: this.penAlpha,
+          size: this.textSize(),
+        };
+        marks().push(placed);
+        /* 置いた直後は選んでいる状態にする——**置いてすぐ色を変えられる**
+           （そうしないと、置く→もう一度押す、の2手が要る）。 */
+        this.selectText(placed, n);
+        return;
+      }
+
+      if (this.markMode === 'スタンプ') {
+        marks().push({
+          ...point,
+          type: this.currentStamp,
+          color: this.penColor,
+          width: this.penWidth,
+          alpha: this.penAlpha,
+        });
+        this.drawCanvas(n);
+        return;
+      }
+      drawingPointerId = event.pointerId;
+      marks().push({
+        type: this.currentStamp,
+        points: [point],
+        color: this.penColor,
+        width: this.penWidth,
+        alpha: this.penAlpha,
+      });
+      this.drawCanvas(n);
+    });
+    canvas.addEventListener('pointermove', (event) => {
+      if (event.pointerId !== drawingPointerId) return;
+      if (this.markMode === '消しゴム') {
+        /* なぞって消せる。指を動かした先も見る。 */
+        this.eraseAt(pointAt(event), undefined, n);
+        return;
+      }
+      /* 掴んだ文字を運ぶ（マスター指示 2026-09-12）。**線には足さない**——
+         下の「末尾の線に点を足す」へ落とすと、文字の隣に見えない線が生える。 */
+      if (this.markMode === '文字') {
+        this.moveSelectedText(pointAt(event), n);
+        return;
+      }
+      const last = marks()[marks().length - 1];
+      if (!last || !last.points) return;
+      last.points.push(pointAt(event));
+      this.drawCanvas(n);
+    });
+    /* 指を離す。**点1つだけの線は捨てる**——なぞらずに触れただけのとき、
+       画面には何も見えないのに「所見あり」の印が1件残ってしまう。
+       見えないものを飼い主に送らない（`#3` と同じ型）。 */
+    const stopStroke = (event) => {
+      if (event.pointerId !== drawingPointerId) return;
+      drawingPointerId = null;
+      if (this.markMode === '消しゴム') return;
+      /* 文字は運び終えただけ。**選んだままにする**——離した瞬間に外すと、
+         置いてから色を選ぶ間がない。線の後始末（下）にも掛けない。 */
+      if (this.markMode === '文字') return;
+      const last = marks()[marks().length - 1];
+      if (last && last.points && last.points.length < 2) {
+        marks().pop();
+        this.drawCanvas(n);
+      }
+    };
+    canvas.addEventListener('pointerup', stopStroke);
+    canvas.addEventListener('pointercancel', stopStroke);
+    canvas.addEventListener('pointerleave', stopStroke);
+  },
+
+  setStamp(type, btn) {
+    /* **先に選択を外す。** この下で `setPenColor` を呼ぶので、外さないと
+       「🔵 毛玉」を押しただけで、前に置いた文字の色が黙って変わる。 */
+    this.clearTextSelection();
+    this.currentStamp = type;
+    document.querySelectorAll('.stamp-btn').forEach(b => b.classList.remove('is-active'));
+    if (btn) btn.classList.add('is-active');
+    /* **色は所見の色に戻す。** 色が所見の種類を表しているので、種類を選び直したら
+       いったんその色に戻すのが素直（そのあと自分で選び直せば、その色で描ける）。 */
+    this.setPenColor(this.markColor(type));
+  },
+
+  /* ペンの色を決める（4面図でも写真の書き込みでも同じ1組を使う）。 */
+  setPenColor(color) {
+    if (!color) return;
+    this.penColor = color;
+    /* 犬体図が2枚になったので、**道具の欄も2組ある**（マスター指示 2026-09-11）。
+       色・太さ・透明はどちらの面でも同じ1組を使うので、**両方の欄をそろえる**
+       ——片方だけ直すと、開いた面によって表示が食い違う。 */
+    ['pen-color', 'pen-color-2'].forEach((id) => {
+      const picker = document.getElementById(id);
+      if (picker && picker.value !== color) picker.value = color;
+    });
+    /* 文字を選んでいれば、**その文字の色も変える**（マスター指示 2026-09-12
+       「文字の色は変えられる様にしろ」）。色の欄は既に画面に在るので増やさない。
+       選んでいないときは何もしない——置いてある文字まで塗り替えない。 */
+    const chosen = this.selectedText;
+    if (chosen && chosen.mark) {
+      chosen.mark.color = color;
+      this.drawCanvas(chosen.n);
+    }
+  },
+
+  /* ペンの透過度を決める（0.1〜1.0）。数字は画面にも出す。 */
+  setPenAlpha(alpha) {
+    const asNumber = Number(alpha);
+    const value = Number.isFinite(asNumber) ? Math.min(1, Math.max(0.1, asNumber)) : 1;
+    this.penAlpha = value;
+    ['pen-alpha', 'pen-alpha-2'].forEach((id) => {
+      const slider = document.getElementById(id);
+      if (slider && Number(slider.value) !== value) slider.value = String(value);
+    });
+    ['pen-alpha-value', 'pen-alpha-value-2'].forEach((id) => {
+      const label = document.getElementById(id);
+      if (label) label.textContent = `${Math.round(value * 100)}%`;
+    });
+  },
+
+  /* ペンの太さを決める。数字は画面にも出す（いくつなのか分からないと選べない）。 */
+  setPenWidth(width) {
+    /* 数として読めれば 1〜20 に収める（0 は「無し」ではなく**細い方の端**）。
+       読めないものが来たら既定の4に戻す——0 を falsy として弾くと、
+       いちばん細い指定が既定に化ける。 */
+    const asNumber = Number(width);
+    const value = Number.isFinite(asNumber) ? Math.min(20, Math.max(1, asNumber)) : 4;
+    this.penWidth = value;
+    ['pen-width', 'pen-width-2'].forEach((id) => {
+      const slider = document.getElementById(id);
+      if (slider && Number(slider.value) !== value) slider.value = String(value);
+    });
+    ['pen-width-value', 'pen-width-value-2'].forEach((id) => {
+      const label = document.getElementById(id);
+      if (label) label.textContent = `${value}`;
+    });
+  },
+
+  /* ペン／スタンプの切り替え。種類（赤み・しこり…）はそのままで、
+     置き方だけを変える。 */
+  setMarkMode(mode, btn) {
+    /* 文字の道具から離れたら、選んでいた文字は外す
+       （ペンの色を変えたつもりで、置いた文字まで変わらないように）。 */
+    if (mode !== '文字') this.clearTextSelection();
+    this.markMode = mode;
+    document.querySelectorAll('.mark-mode-btn').forEach(b => b.classList.remove('is-active'));
+    if (btn) btn.classList.add('is-active');
+  },
+
+  /* 点と線分の距離。**線は点の列ではなく、点と点の間もつながっている。**
+     点だけを見ると、なぞりが速くて点が飛んでいる線は、真ん中を触っても消せない
+     （実測でそうなった）。間も見る。 */
+  distanceToSegment(point, a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const lengthSquared = (dx * dx) + (dy * dy);
+    if (lengthSquared === 0) return Math.hypot(point.x - a.x, point.y - a.y);
+    let t = (((point.x - a.x) * dx) + ((point.y - a.y) * dy)) / lengthSquared;
+    t = Math.min(1, Math.max(0, t));
+    return Math.hypot(point.x - (a.x + (t * dx)), point.y - (a.y + (t * dy)));
+  },
+
+  /** 線（点の列）に、指がどれだけ近いか。1点だけの線もそのまま測れる。 */
+  distanceToStroke(point, points) {
+    if (points.length === 1) return Math.hypot(point.x - points[0].x, point.y - points[0].y);
+    let best = Infinity;
+    for (let i = 1; i < points.length; i += 1) {
+      best = Math.min(best, this.distanceToSegment(point, points[i - 1], points[i]));
+    }
+    return best;
+  },
+
+  /* ── 置いた文字を掴む・運ぶ・選び直す（マスター指示 2026-09-12）─────────────
+     > ⑤配置された文字をドラッグすると位置が変えられる
+     > 文字の色は変えられる様にしろ
+     置いてしまうと二度と動かせず、書き損じたら消してもう一度打つしかなかった。
+     ──────────────────────────────────────────────────────────────────── */
+
+  /** 押した所に在る文字の印を返す（無ければ `null`）。
+      **当たり判定は文字の実寸で見る。** スタンプと同じ「中心から◯%」にすると、
+      長い文字は端を押しても掴めず、短い文字は離れていても掴めてしまう。 */
+  findTextAt(point, n) {
+    const surface = this.surface(n);
+    const canvas = document.getElementById(surface.canvas);
+    if (!canvas || !canvas.width || !canvas.height) return null;
+    const ctx = canvas.getContext('2d');
+    const list = this[surface.marks];
+    /* **後ろから見る。** 後に置いたものが上に描かれるので、重なっていたら
+       上に見えているほうが掴めないと、人の目と食い違う。 */
+    for (let i = list.length - 1; i >= 0; i -= 1) {
+      const m = list[i];
+      if (!m || !m.text) continue;
+      const size = m.size || 16;
+      ctx.font = this.textFont(size);
+      /* `measureText` が使えない場（テストの替え玉）では字数から見積もる。
+         **黙って「当たらない」にしない**——そうすると掴めないのに検査は緑になる。 */
+      const measured = ctx.measureText ? ctx.measureText(m.text) : null;
+      const textWidth = measured && Number.isFinite(measured.width)
+        ? measured.width
+        : m.text.length * size * 0.6;
+      const halfX = ((textWidth / 2) + (size * 0.25)) / canvas.width;
+      const halfY = (size * 0.75) / canvas.height;
+      if (Math.abs(point.x - m.x) <= halfX && Math.abs(point.y - m.y) <= halfY) return m;
+    }
+    return null;
+  },
+
+  /** 文字を選ぶ（どれを選んでいるかは画面にも出す）。 */
+  selectText(mark, n) {
+    /* 面の番号は `surface()` と同じ決め方にそろえる（不明な番号は①）。 */
+    this.selectedText = { n: n === 2 ? 2 : 1, mark };
+    this.drawCanvas(n);
+  },
+
+  /** 選ぶのをやめる。**取り出す絵に目印を焼き込まないため**にも要る。 */
+  clearTextSelection() {
+    const chosen = this.selectedText;
+    if (!chosen) return;
+    this.selectedText = null;
+    this.drawCanvas(chosen.n);
+  },
+
+  /** 掴んでいる文字を指の位置へ運ぶ。枠の外へは出さない。 */
+  moveSelectedText(point, n) {
+    const chosen = this.selectedText;
+    if (!chosen || !chosen.mark) return;
+    const clamp = (v) => Math.min(1, Math.max(0, v));
+    chosen.mark.x = clamp(point.x);
+    chosen.mark.y = clamp(point.y);
+    this.drawCanvas(n);
+  },
+
+  /** 文字を描くときの書体。**掴む判定と描くのとで同じものを使う**
+      ——別々に書くと、測った幅と見えている幅がずれて掴めなくなる。 */
+  textFont(size) {
+    return `700 ${size}px "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Times New Roman", serif`;
+  },
+
+  /* 消しゴム（マスター指示 2026-09-07）。触れた印を取り除く。
+
+     **画素を削らない。** 下絵（犬体4面図）や写真まで白くしてしまうと戻せないので、
+     消すのは**こちらが置いた印**（線・スタンプ・文字）だけにする。
+     当たり判定は「指の位置から近いか」——線は点の1つでも近ければ、その線ごと消える。
+     指1本ぶんの太さ（画面の 4%）を目安にする。 */
+  eraseAt(point, reach = 0.04, n) {
+    const surface = this.surface(n);
+    const before = this[surface.marks].length;
+    this[surface.marks] = this[surface.marks].filter((m) => {
+      if (Array.isArray(m.points)) return this.distanceToStroke(point, m.points) > reach;
+      return Math.hypot(m.x - point.x, m.y - point.y) > reach;
+    });
+    /* 選んでいた文字ごと消えたかもしれない。**消えた印を選んだままにしない**
+       （残っていると、色を変えたときに画面に無い印へ書き込む）。 */
+    const chosen = this.selectedText;
+    if (chosen && chosen.mark && !this[surface.marks].includes(chosen.mark)) {
+      this.selectedText = null;
+    }
+    if (this[surface.marks].length !== before) this.drawCanvas(n);
+    return before - this[surface.marks].length;
+  },
+
+  /* 直前の1件だけ取り消す。**全部消すしか無いと、線を1本間違えただけで
+     最初からやり直しになる**（ペンの操作は1回が長い）。 */
+  undoMark(n) {
+    const surface = this.surface(n);
+    this.clearTextSelection();
+    this[surface.marks].pop();
+    this.drawCanvas(n);
+    this.updateCompletionStatus();
+  },
+
+  clearCanvas(n) {
+    const surface = this.surface(n);
+    this.clearTextSelection();
+    this[surface.marks] = [];
+    this.drawCanvas(n);
+    this.updateCompletionStatus();
+  },
+
+  /* 犬体図に付けた印を、カルテに残せる形（PNG）で取り出す。
+
+     印は `marks` に載っているだけで、**画面を移れば消える**。トリマーが体を触って
+     見つけた「しこり/イボ」も、ここを通らなければ飼い主にも記録にも残らない
+     （`docs/ops/bad-scenarios-F3.md` #3）。⑥の受け手は
+     `backend/js/magazine-view.js` の `data.bodyMarkingImage` で、**そこへ渡す唯一の道**。
+
+     印が1つも無いときは `null` を返す——白紙の絵を「所見あり」として残さない。
+     印が在るのに描き先が無いときは**投げる**。黙って `null` を返すと、
+     見つけた所見が消えたことに誰も気づけない（`#1` と同じ型）。 */
+  /* ④が出す側。⑥（`backend/js/magazine-view.js`）が読む形にそろえる。
+
+     **対応は `docs/ops/key-parity-F3.md` が正**で、`scripts/guard/key-parity.mjs` が
+     毎回突き合わせる。⑥に読む先を足したのにここが出していなければ**黙って消える**し、
+     ここが出していて⑥が読まなければ**届かない**——どちらも同じ事故なので両方向を見る
+     （`F-20260821-12`/`-13` の型）。
+
+     **入力欄が無いキーは、キーごと出さない。** 空の器を出すと⑥側で「記録なし」と
+     「入力欄が無い」を区別できなくなる。出どころが無い6キー（`date` `isoDate`
+     `bestWeight` `skin` `heroPhotos` `bodyLanguage`）は、いま正UI に入力が無い。 */
+  extractReport() {
+    const text = (selector) => {
+      const el = document.querySelector(selector);
+      return ((el && (el.value != null ? el.value : el.textContent)) || '').trim();
+    };
+    const report = {};
+    const context = globalThis.__REPORT_CONTEXT__;
+    if (context && context.petName) report.pet = context.petName;
+
+    const staffNote = text('[data-field="staff-note"]');
+    if (staffNote) report.staffNote = staffNote;
+
+    const course = text('[data-field="course"]');
+    if (course) report.course = course;
+
+    /* ①皮膚のコメント（マスター指示・棚卸しで追加）。`skin` キーは既に
+       犬体図の所見一覧（部位・大きさ・種類・変化の配列）で使っており、
+       その形を壊さないよう**別のキー**にする。⑥は `renderSkinRows()` とは
+       別に `skinComment` を段の下へ表示する。 */
+    const skinComment = text('[data-field="skin-comment"]');
+    if (skinComment) report.skinComment = skinComment;
+
+    /* 来店日（マスター指示 2026-08-29・C-3）。`report_date`（DB 列）は触らない
+       ——トリマーのトークンでは書き換えられない設計のまま（`#33`）。
+       体重の時系列は、この入力値を基準にする。未入力なら押した日のまま
+       （従来どおり・`today()`）。⑥は `isoDate` と `date` の両方を読む
+       （`magazine-view.js:550`）ので両方に入れる。 */
+    const visitDate = text('#input-visit-date');
+    if (visitDate) {
+      report.date = visitDate;
+      report.isoDate = visitDate;
+    }
+
+    if (this.form.bcs) report.bcs = this.form.bcs;
+    if (this.form.bestWeight) report.bestWeight = this.form.bestWeight;
+
+    /* 爪は前足・後ろ足を分けて記録する（マスター指示 2026-08-29・C-5）。
+       ②のコメントは⑥が前から読んでいた（`data.nail.comment`）が、④に入力欄が
+       無く**書きようが無かった**（放置リスト `#41` の隣で見つかった穴）。
+       コメントだけ書いてレベルを選んでいない場合もキーを出す。 */
+    const nailComment = text('[data-field="nail-comment"]');
+    if (this.form.nail.front || this.form.nail.rear || nailComment) {
+      report.nail = { front: this.form.nail.front, rear: this.form.nail.rear };
+      if (nailComment) report.nail.comment = nailComment;
+    }
+    /* **写真だけでもキーを出す。** レベルが未選択でも、撮った写真は届けたい。
+       逆に、どちらも無ければキーごと出さない（空の器を出さない）。 */
+    const earComment = text('[data-field="ear-comment"]');
+    if (this.form.ear.right || this.form.ear.left || this.photos.ear || earComment) {
+      report.ear = { right: this.form.ear.right, left: this.form.ear.left };
+      if (this.photos.ear) report.ear.photo = this.photos.ear;
+      if (earComment) report.ear.comment = earComment;
+    }
+    const teethComment = text('[data-field="teeth-comment"]');
+    if (this.form.teeth || this.photos.teeth.length > 0 || teethComment) {
+      report.teeth = {};
+      if (this.form.teeth) report.teeth.status = this.form.teeth;
+      /* 口の写真は最大2枚（マスター指示 2026-08-29・C-11）。 */
+      if (this.photos.teeth.length > 0) report.teeth.photos = [...this.photos.teeth];
+      if (teethComment) report.teeth.comment = teethComment;
+    }
+    /* **`ym` を必ず添える。** ⑥は `weights` を `w.ym` が在るものだけに絞ってから描く
+       （`magazine-view.js:575`）ので、`kg` だけ出すと**体重は「未記録」になる**——
+       書いたのに届かない（`F-20260821-12`/`-13` の型）。**月は来店日から作る**
+       （マスター指示 2026-08-29・C-3。未入力なら押した日のまま）。 */
+    if (this.form.weight) {
+      const baseDate = visitDate || this.today();
+      report.weights = [{ ym: baseDate.slice(0, 7), date: baseDate, kg: this.form.weight }];
+    }
+
+    /* ⑥が読むのは `trimming.comment` と `trimming.photos`（`magazine-view.js:582`）。
+       カットの長さ・スタイルの選択欄は削除した（マスター指示 2026-08-29・C-12）ので、
+       `comment` はもう作らない。写真の入口はそのまま残す。 */
+    if (this.photos.trimming.length > 0) {
+      report.trimming = { photos: [...this.photos.trimming] };
+    }
+
+    /* 使用オプション（マスター指示 2026-08-31で復活）。1件も選ばれていなければ
+       キーごと出さない（空の選択を「選んだ」ことにしない＝`D-10`）。 */
+    if (this.form.options.length > 0) report.options = [...this.form.options];
+
+    /* 犬体図の印。**印が無ければキーごと出さない**（白紙の絵を「所見あり」にしない）。
+       印が在るのに描き先が無ければ `exportBodyMarking()` が投げる——握らない。
+
+       **直しで、この面に一度も触っていなければ焼き直さない**——`bodyMarkingUnchanged()`。
+       毎回 canvas から作り直すと、絵の中身が同じでも「新しい画像」としてアップロード
+       しようとし、確定済みカルテへの新規アップロードを禁じるDBの守りに落ちて
+       保存そのものが失敗する（詳細は `applyReport()` のコメント）。 */
+    const marking = this.bodyMarkingUnchanged(1) ? this.marksOriginalImage : this.exportBodyMarking(1);
+    if (marking) report.bodyMarkingImage = marking;
+    /* 犬体図②（マスター指示 2026-09-11）。**①と同じ扱いで、別のキー**にする。
+       ⑥（`magazine-view.js`）に `bodyMarkingImage2` の枠を足してあり、
+       `key-parity` が「④が出す」と「⑥が読む」を毎回突き合わせる。 */
+    const marking2 = this.bodyMarkingUnchanged(2) ? this.marksOriginalImage2 : this.exportBodyMarking(2);
+    if (marking2) report.bodyMarkingImage2 = marking2;
+
+    return report;
+  },
+
+/* ④保存・確定 — ドックの「確定してお客様カルテを見る」から呼ばれる。
+
+     backend が居なければ、これまでどおり画面を移すだけ（仮データの `/`＝F2 の
+     `npm run walk` の経路。ここを壊すと合否の絵が撮れなくなる）。
+
+     居るときは**保存して、保存されたものを開き直す**。手元の値をそのまま
+     screen-4 に出すと、届いたかどうかを見ないまま「届いた」と言うことになる
+     （`D-12`「押せた ではなく 同じ値で届いた で見る」）。
+
+     失敗したら**画面を移さず、理由を出す。** 黙って進むと「保存しました」と
+     出たのに残っていない、が起きる（`D-2`・`bad-scenarios-F3` #1）。 */
+  async commitReport() {
+    /* コースは来店ごとに変わるので、カルテ作成のたびに選択必須にする
+       （マスター指示 2026-08-29・C-9）。`<select required>` は HTML の見た目だけの
+       印なので、確定の直前にもう一度ここで確かめる——ボタンを直接叩かれても抜けない。 */
+    const courseEl = document.querySelector('[data-field="course"]');
+    if (courseEl && !courseEl.value) {
+      globalThis.alert('来店コースを選択してください。');
+      courseEl.focus();
+      return;
+    }
+    /* **体重が桁違いのまま確定させない**（マスター指示 2026-09-13・放置リスト `#56`）。
+       `9999` と打てて、そのまま飼い主の画面に「9999kg」と出ていた。さらに体重の
+       折れ線は最小〜最大で目盛りを作るので、1点でも桁違いが混ざると
+       **実物の3〜5kg が全部つぶれて1本の直線**になり、理想体重の線とも重なって読めない。
+       **黙って丸めない**——打った値が勝手に変わるのは画面が嘘をつくのと同じ（`D-12`）。
+       受け付けずに理由を言う（歯の写真が3枚目を断るのと同じ形）。 */
+    const outOfRange = [
+      ['本日の体重', this.form.weight],
+      ['ベスト体重', this.form.bestWeight],
+    ].filter(([, kg]) => kg && (kg < this.MIN_WEIGHT_KG || kg > this.MAX_WEIGHT_KG));
+    if (outOfRange.length > 0) {
+      globalThis.alert(
+        `${outOfRange.map(([name, kg]) => `${name}に ${kg}kg`).join('、')} が入っています。\n\n`
+        + `${this.MIN_WEIGHT_KG}〜${this.MAX_WEIGHT_KG}kg の範囲で入れ直してください。`,
+      );
+      const el = document.getElementById(outOfRange[0][0] === 'ベスト体重' ? 'input-best-weight' : 'input-weight');
+      if (el) el.focus();
+      return;
+    }
+
+    /* **空のまま黙って確定させない**（マスター指示 2026-09-13・放置リスト `#55`）。
+       画面いちばん下の帯は前から「未記入 ①体重 ⑧メッセージ」と出していたが、
+       **ボタンは止まらなかった**ので、気づかずに確定できていた。
+       ただし**止め切らない**——犬が怖がって量れない日もあり、止めると先へ進めなくなる。
+       「このまま出しますか」と一度だけ訊いて、はいなら通す。 */
+    const blanks = [];
+    if (!this.form.weight) blanks.push('①体重');
+    const noteEl = document.querySelector('[data-field="staff-note"]');
+    if (noteEl && !String(noteEl.value || '').trim()) blanks.push('⑧メッセージ');
+    if (blanks.length > 0 && globalThis.confirm
+      && !globalThis.confirm(`${blanks.join(' と ')} が空のままです。\n\nこのまま確定しますか？`)) {
+      this.focusMissingSection();
+      return;
+    }
+
+    /* **同じ子の、同じ日の2枚目**（マスター指示 2026-09-13・放置リスト `#57`）。
+       確定すると「この子の過去カルテ」に同じ日付が2つ並び、飼い主にも2通届く。
+       ただし同じ日に2回来ることは在りうるので、止めずに一度だけ訊く。
+       **直しているときは訊かない**——`reviseReport` は2枚目を作らない
+       （「前回比を出さない」の見分けと同じ `reviseReportId` を使う）。 */
+    if (!this.reviseReportId) {
+      const today = this.today();
+      const sameDay = (this.pastReports || []).filter((m) => m && m.date === today);
+      if (sameDay.length > 0 && globalThis.confirm
+        && !globalThis.confirm(`${this.currentDog.name || 'この子'} の ${today} のカルテは、すでに ${sameDay.length}枚 あります。\n\nもう1枚つくりますか？`)) {
+        return;
+      }
+    }
+
+    const staff = globalThis.TrimmerSupabaseStaff;
+    const context = globalThis.__REPORT_CONTEXT__;
+    if (!staff || !staff.saveReport || !context || !context.petId) {
+      this.goToStep(4);
+      return;
+    }
+    const button = document.querySelector('.dock-action-wrap .boxbutton');
+    if (button) button.disabled = true;
+    try {
+      clearTimeout(this.draftTimer);
+      /* **飛んでいる下書きが着地してから中身を差し替える。**
+         `clearTimeout` が止められるのは「これから出る」下書きだけで、
+         **もう出てしまったもの**は止まらない。写真を選んだ直後や犬体図を閉じた
+         直後は下書きが直に出ているので、待たずに確定すると、確定が書いた
+         `asset://…` の上に下書きの `data:image/…` が後から乗り、サーバの確定が
+         409 `report assets are incomplete` で落ちる（`F-20260910-79`）。
+         下書きの失敗そのものは確定を止めない——止めるとむしろ保存できなくなる。 */
+      this.committing = true;
+      try { await this.draftInFlight; } catch { /* 下書きの成否は確定の可否ではない */ }
+      /* 直しているのか、新しく書いているのか。**ここを間違えると、直したつもりが
+         2枚目のカルテになって飼い主に2通届く。** */
+      /* **確定にも `__marks` を載せる**（マスター指示 2026-09-03）。
+         犬体図の印は `bodyMarkingImage`（焼いた PNG）としてしか残っておらず、
+         **PNG からは印を復元できない**。次の回で引き継ぐには、印そのものが要る。
+         `saveDraft()` が下書きに載せているのと同じ形。⑥は知らないキーを読まないので、
+         飼い主に届くものは変わらない（`extractReport()` は⑥向けのまま触らない）。 */
+      const payload = { ...this.extractReport(), __marks: this.marks, __marks2: this.marks2 };
+      const saved = this.reviseReportId
+        ? await staff.reviseReport(context.petId, this.reviseReportId, payload)
+        : await staff.saveReport(
+          context.petId, payload, this.today(), this.draftReportId,
+        );
+      /* **番号が入っているところまで確かめてから移る。** `encodeURIComponent` は
+         `null`／`undefined` を**文字列**に変えてしまうので、欠けていても URL は
+         組み上がり、例外が出ないまま `/edit/p/{petId}/null` へ進んでいた
+         （`F-20260828-59`）。ここで投げて、下の `catch` に理由を出させる。 */
+      if (!saved || !saved.id) throw new Error('確定の応答にカルテの番号がありませんでした');
+      location.href = `/edit/p/${encodeURIComponent(context.petId)}/${encodeURIComponent(saved.id)}`;
+    } catch (error) {
+      if (button) button.disabled = false;
+      /* **やり直せる状態に戻す。** ここを戻さないと、以後どれだけ直しても
+         下書きが1件も残らない（`saveDraft()` が入口で弾き続ける）。 */
+      this.committing = false;
+      /* 理由をそのまま出す。「失敗しました」だけだと、やり直せばよいのか
+         人を呼ぶのかが分からない。
+
+         **番号（status）と、サーバが言った理由（reason）も出す。**
+         2026-09-07 にマスターが本番で「カルテを確定できませんでした」だけを
+         受け取り、**そこから先を誰も辿れなかった**（`F-20260907-75`）。
+         `readJson()` は失敗時に `error.status` と `error.reason` を載せてくれる。
+         載っているのに捨てていたのはこちら側。 */
+      const detail = [error.message, error.reason, error.status && `(${error.status})`]
+        .filter(Boolean).join(' / ');
+      /* **待てば通るときは、待てと言う**（レビュー 2026-11-25 R5）。写真を上げた直後にタブを
+         閉じて開き直すと、上げたばかりの写真は3分間は片付けない（別の端末が登録中かもしれない）
+         ので、その間の確定は 409 で断られる。「もう一度」だけだと、すぐ押し直して同じ所で止まる。 */
+      if (error.status === 409 && error.reason === 'report assets are incomplete') {
+        globalThis.alert(`カルテを保存できませんでした。\n\n写真の登録が終わっていません。3分ほど待ってから、もう一度「確定」を押してください（書いた内容は消えていません）。\n\n${detail}`);
+        return;
+      }
+      globalThis.alert(`カルテを保存できませんでした。\n\n${detail}\n\nもう一度お試しください。`);
+    }
+  },
+
+  /* 施術日。正UI に日付の入力欄が無いので、**押した日**を使う
+     （`docs/ops/key-parity-F3.md`: `date` / `isoDate` は出どころが無い6キーのうちの2つ）。 */
+  today() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  },
+
+  /* 写真を1枚、送れる大きさの `data:image/jpeg` にする。
+
+     **そのまま送らない。** いまのスマホは1枚 4〜8MP で、上限（10MB）に当たるか、
+     当たらなくても飼い主の回線で開けない。長辺 1600px・q0.8 まで落とす。
+
+     **iPhone の HEIC もここで JPEG になる。** サーバが受け取るのは canvas が出した
+     JPEG なので、`mimeType` の enum（jpeg/png/webp）を広げる必要が無い。
+     ただし **HEIC を復号できるのは、その形式を読めるブラウザだけ**（iPhone/iPad は読める）。
+     読めない環境では下の `createImageBitmap` が投げるので、**黙って捨てずに理由を出す**。 */
+  async shrinkImage(file) {
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    } catch {
+      throw new Error(`「${file.name}」を読めませんでした。この端末が対応していない形式かもしれません。`);
+    }
+    const long = Math.max(bitmap.width, bitmap.height);
+    const scale = long > 1600 ? 1600 / long : 1;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    if (!canvas.width || !canvas.height) throw new Error(`「${file.name}」の大きさを取れませんでした。`);
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close?.();
+    return canvas.toDataURL('image/jpeg', 0.8);
+  },
+
+  /* `trimming` と `teeth` は配列（複数枚）、`ear` は文字列（1枚）。
+     配列かどうかで分岐すれば、新しく配列になったキーにも自動で対応する。 */
+  isMultiPhoto(kind) {
+    return Array.isArray(this.photos[kind]);
+  },
+
+  /* ファイルが選ばれたとき。**1枚でも失敗したら理由を出す**——黙って減ると、
+     トリマーは「入れたつもり」で確定してしまう（`D-2`）。
+     `teeth` は上限が2枚（マスター指示 2026-08-29・C-11）——**超えた分は理由を出して捨てる**。
+     黙って先頭2枚だけ使うと、選んだのに届かない写真が出る。 */
+  async onPhotoPick(kind, input) {
+    const files = [...(input.files || [])];
+    input.value = '';
+    if (files.length === 0) return;
+    const limit = kind === 'teeth' ? this.MAX_TEETH_PHOTOS : Infinity;
+    for (const file of files) {
+      if (this.isMultiPhoto(kind) && this.photos[kind].length >= limit) {
+        globalThis.alert(`「${file.name}」は追加できませんでした。この項目は最大${limit}枚までです。`);
+        continue;
+      }
+      try {
+        const dataUrl = await this.shrinkImage(file);
+        if (this.isMultiPhoto(kind)) this.photos[kind].push(dataUrl);
+        else this.photos[kind] = dataUrl;
+      } catch (error) {
+        globalThis.alert(error.message);
+      }
+    }
+    this.renderPhotoThumbs(kind);
+    this.updateCompletionStatus();
+    /* **その場で下書きに残す。** 画面の入力を見張っている `queue` は、
+       ファイルを選んだ瞬間に走る——縮小が終わる前なので、待たずに送ると
+       写真の無い下書きが残る。処理が終わったここで、明示的に残す。 */
+    this.saveDraft();
+  },
+
+  removePhoto(kind, index) {
+    if (this.isMultiPhoto(kind)) this.photos[kind].splice(index, 1);
+    else this.photos[kind] = '';
+    this.renderPhotoThumbs(kind);
+    this.updateCompletionStatus();
+    this.saveDraft();
+  },
+
+  /* 選んだものを見せる。**`asset://` は絵にできない**（実体は認証つきでしか取れない）ので、
+     「保存済み」と字で出す。消せることは同じ——押せば次の確定で落ちる。
+     `kind === 'teeth'` の `data:` 画像だけは、タップで書き込み（お絵描き）を開ける
+     （マスター指示 2026-08-29・C-10。`asset://` は復号していないので対象外）。 */
+  renderPhotoThumbs(kind) {
+    const box = document.querySelector(`[data-photo-thumbs="${kind}"]`);
+    if (!box) return;
+    const list = this.isMultiPhoto(kind) ? this.photos[kind] : [this.photos[kind]].filter(Boolean);
+    box.textContent = '';
+    list.forEach((src, index) => {
+      const cell = document.createElement('div');
+      cell.className = 'photo-pick__thumb';
+      if (src.startsWith('data:')) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        if (kind === 'teeth') {
+          img.style.cursor = 'pointer';
+          img.title = 'タップして書き込む';
+          img.onclick = () => this.openAnnotate(kind, index);
+        }
+        cell.appendChild(img);
+        /* **押せる場所を目に見える形で置く**（マスター指示 2026-09-07
+           「歯の添付写真にペンで書き込めるようにしろ」）。
+           書き込み自体は前から在った（`C-10`）が、入口は**画像を直接タップ**する
+           だけで、案内は `title`（マウスを乗せたときだけ出る吹き出し）しか無かった。
+           スマホには `title` が出ない——**押せると分からないものは、無いのと同じ**
+           （`D-12`）。 */
+        if (kind === 'teeth') {
+          const pen = document.createElement('button');
+          pen.type = 'button';
+          pen.className = 'photo-pick__annotate';
+          pen.dataset.annotate = 'teeth';
+          pen.textContent = '✏️ 書き込む';
+          pen.onclick = () => this.openAnnotate(kind, index);
+          cell.appendChild(pen);
+        }
+      } else {
+        const kept = document.createElement('span');
+        kept.className = 'photo-pick__kept';
+        kept.textContent = '保存済み';
+        cell.appendChild(kept);
+      }
+      const drop = document.createElement('button');
+      drop.className = 'photo-pick__drop';
+      drop.type = 'button';
+      drop.textContent = '×';
+      drop.onclick = () => this.removePhoto(kind, index);
+      cell.appendChild(drop);
+      box.appendChild(cell);
+    });
+  },
+
+  /* 口の写真への書き込み（マスター指示 2026-08-29・C-10）。
+     犬体4面図（`#marking-canvas`）とは別の、写真1枚専用の使い捨てキャンバスを
+     その場で作る——`#marking-canvas` は全画面で1個だけの決め打ちで、
+     複数の写真スロットには使えないため。フリーハンドで丸を描き、
+     「保存」で元の写真に焼き込む（差し替え）。 */
+  openAnnotate(kind, index) {
+    /* 寄れる上限。これ以上は写真の画素が伸びるだけで、見えるものが増えない。 */
+    const ANNOTATE_MAX_SCALE = 6;
+    const src = this.photos[kind][index];
+    if (!src || !src.startsWith('data:')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'annotate-overlay';
+    overlay.innerHTML = `
+      <div class="annotate-box">
+        <div class="annotate-canvas-wrap"><canvas class="annotate-canvas"></canvas></div>
+        <div class="pen-tools">
+          <button type="button" class="mark-mode-btn is-active annotate-mode" data-mode="ペン">✏️ ペン</button>
+          <button type="button" class="mark-mode-btn annotate-mode" data-mode="消しゴム">🧽 消しゴム</button>
+          <button type="button" class="mark-mode-btn annotate-mode" data-mode="文字">🅰 文字</button>
+        </div>
+        <div class="pen-tools">
+          <label class="pen-tools__item">色
+            <input type="color" class="pen-tools__color annotate-color">
+          </label>
+          <label class="pen-tools__item">太さ
+            <input type="range" class="pen-tools__width annotate-width" min="1" max="20" step="1">
+            <span class="pen-tools__value annotate-width-value"></span>
+          </label>
+          <label class="pen-tools__item">透明
+            <input type="range" class="pen-tools__width annotate-alpha" min="0.1" max="1" step="0.1">
+            <span class="pen-tools__value annotate-alpha-value"></span>
+          </label>
+        </div>
+        <p class="annotate-hint">1本指で書き込み、2本指で拡大・移動できます。</p>
+        <div class="annotate-actions">
+          <button type="button" class="btn-inline annotate-clear">やり直す</button>
+          <button type="button" class="btn-inline annotate-cancel">キャンセル</button>
+          <button type="button" class="btn-inline annotate-save">保存する</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const canvas = overlay.querySelector('.annotate-canvas');
+    const wrap = overlay.querySelector('.annotate-canvas-wrap');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    let strokes = [];
+    let drawing = false;
+    let erasing = false;
+    let activePointerId = null;
+    /* 書き込み画面の中だけの道具の選択（ペン／消しゴム／文字）。
+       4面図の `markMode` とは別に持つ——写真に「スタンプ」は無いので、
+       同じ入れ物にすると、片方で選んだ道具がもう片方で存在しないことになる。 */
+    let mode = 'ペン';
+    /* 拡大の状態。`scale` 倍して `(x, y)` だけずらしたものを画面に出す。
+       画像そのもの（canvas の中身）は触らない——書き込んだ線の座標が
+       拡大の履歴で狂わないように、拡大は**見た目だけ**にする。 */
+    const view = { scale: 1, x: 0, y: 0 };
+    const pointers = new Map();
+    let pinch = null;
+
+    /* **線1本ごとに色と太さを覚える**（マスター指示 2026-09-07）。
+       途中で色や太さを変えても、先に引いた線は引いたときの見た目のまま。
+       写真は原寸で描いているので、太さは画面の見かけではなく写真の画素で数える
+       ——寄って書いても引いて書いても、焼き上がりの太さが同じになる。 */
+    /* **枠ではなく「最初に測った使える幅」で数える**（2026-09-09）。枠は写真に吸い付いて
+       縮むようになったので、`wrap.clientWidth` を都度読むと分母が変わり、**頼まれていない
+       太さの変更**が起きる。`fitToWrap()` が最初の1回に覚えた幅を使い、今までと同じにする。 */
+    let availableWidth = 0;
+    const strokeWidth = () => Math.max(1, this.penWidth * (canvas.width / (availableWidth || canvas.width)));
+    const redraw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (const stroke of strokes) {
+        /* 透過度は**1件ごとに戻す**。戻し忘れると次の線まで薄くなる。 */
+        ctx.globalAlpha = typeof stroke.alpha === 'number' ? stroke.alpha : 1;
+        if (stroke.text) {
+          const size = stroke.size || 16;
+          ctx.fillStyle = stroke.color || '#e0392b';
+          ctx.font = `700 ${size}px "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Times New Roman", serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(stroke.text, stroke.x, stroke.y);
+          ctx.globalAlpha = 1;
+          continue;
+        }
+        const points = stroke.points || stroke;
+        if (points.length < 2) { ctx.globalAlpha = 1; continue; }
+        ctx.strokeStyle = stroke.color || '#e0392b';
+        ctx.lineWidth = stroke.width || 4;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (const pt of points.slice(1)) ctx.lineTo(pt.x, pt.y);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    };
+
+    /* 消しゴム（写真側）。**写真は削らない**——こちらが置いた線と文字だけを取り除く。
+       当たりの広さはペンの太さに連れて変わる（太いペンなら大きく消える）。 */
+    const eraseAt = (point) => {
+      const reach = Math.max(12, strokeWidth() * 1.5);
+      const before = strokes.length;
+      strokes = strokes.filter((stroke) => {
+        if (stroke.text) return Math.hypot(stroke.x - point.x, stroke.y - point.y) > reach;
+        return this.distanceToStroke(point, stroke.points || stroke) > reach;
+      });
+      if (strokes.length !== before) redraw();
+    };
+
+    const pointFromEvent = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) * (canvas.width / rect.width),
+        y: (event.clientY - rect.top) * (canvas.height / rect.height),
+      };
+    };
+
+    /* 拡大の下限は「1枚まるごと見えている状態」。ここより引けないようにし、
+       寄ったときは枠の外に白地が出ないところまでしか動かせないようにする。 */
+    const applyView = () => {
+      const width = canvas.offsetWidth || 0;
+      const height = canvas.offsetHeight || 0;
+      view.scale = Math.min(ANNOTATE_MAX_SCALE, Math.max(1, view.scale));
+      if (width && height) {
+        view.x = Math.min(0, Math.max(width - width * view.scale, view.x));
+        view.y = Math.min(0, Math.max(height - height * view.scale, view.y));
+      }
+      canvas.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+    };
+
+    /* 写真は枠に収まる大きさで出す。**canvas の画素数と表示の大きさを分ける**
+       ——書き込みの座標は `getBoundingClientRect()` から画素数へ換算するので、
+       表示だけ縮めても線はずれない。 */
+    const fitToWrap = () => {
+      /* 枠は写真に吸い付いて縮むので、**測り直すと縮み続ける**。最初の1回だけ覚える。 */
+      availableWidth = availableWidth || wrap.clientWidth || 0;
+      const boxWidth = availableWidth;
+      const boxHeight = Math.round((globalThis.innerHeight || 0) * 0.6);
+      if (!boxWidth || !canvas.width || !canvas.height) return;
+      const ratio = Math.min(boxWidth / canvas.width, (boxHeight || boxWidth) / canvas.height, 1);
+      canvas.style.width = `${Math.round(canvas.width * ratio)}px`;
+      canvas.style.height = `${Math.round(canvas.height * ratio)}px`;
+    };
+
+    img.onload = () => {
+      const long = Math.max(img.naturalWidth, img.naturalHeight) || 1;
+      const scale = long > 900 ? 900 / long : 1;
+      canvas.width = Math.round((img.naturalWidth || 1) * scale);
+      canvas.height = Math.round((img.naturalHeight || 1) * scale);
+      fitToWrap();
+      applyView();
+      redraw();
+    };
+    img.src = src;
+
+    /* 指の使い分け。**1本なら書き込み、2本なら拡大・移動。**
+       ここは2度作り直している。最初は `pointerId` を区別せず2本の座標を同じ線に
+       混ぜて「線がバーってなる」状態、次は2本目を無視して線は落ち着いたが
+       **拡大が誰も実装していないので、ピンチしても何も起きない**状態だった
+       （マスター報告「ピンチできない」）。`touch-action: none` でブラウザの拡大は
+       止まっているため、2本指を受けたらここで拡大するしかない。 */
+    const spanOf = (a, b) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    const centerOf = (a, b) => ({ x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 });
+
+    canvas.addEventListener('pointerdown', (event) => {
+      pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+      if (pointers.size === 1) {
+        /* 消しゴム（マスター指示 2026-09-07）。線は増やさず、触れた印を取り除く。 */
+        if (mode === '消しゴム') {
+          drawing = true;
+          activePointerId = event.pointerId;
+          erasing = true;
+          eraseAt(pointFromEvent(event));
+          return;
+        }
+        /* 文字。**何も打たなければ何も置かない**（空の印を残さない・`D-10`）。 */
+        if (mode === '文字') {
+          /* 説明の文は出さない（マスター指示 2026-09-12「入れる文字という説明は消せ」）。
+             犬体図側と同じ文言だったので、**こちらも合わせて消す**——片方だけ残すと、
+             同じ操作なのに画面によって出る言葉が違うことになる。 */
+          const typed = (globalThis.prompt && globalThis.prompt('')) || '';
+          if (!typed.trim()) return;
+          const at = pointFromEvent(event);
+          strokes.push({
+            text: typed.trim(),
+            x: at.x,
+            y: at.y,
+            color: this.penColor,
+            alpha: this.penAlpha,
+            size: Math.max(12, this.textSize() * (canvas.width / (availableWidth || canvas.width))),
+          });
+          redraw();
+          return;
+        }
+        drawing = true;
+        activePointerId = event.pointerId;
+        erasing = false;
+        strokes.push({
+          points: [pointFromEvent(event)],
+          color: this.penColor,
+          width: strokeWidth(),
+          alpha: this.penAlpha,
+        });
+        return;
+      }
+      /* 2本目が触れた時点で「さっきのは書き込みではなくピンチの1本目だった」と分かる。
+         1本目が引きかけた線は**消してから**拡大に移る。残すと、拡大するたびに
+         写真に線が1本ずつ増えていく。 */
+      if (drawing) {
+        /* 消しゴムのときは線を積んでいないので、**取り消す線が無い**。
+           ここで `pop()` すると、直前に引いた別の線が消える。 */
+        if (!erasing) strokes.pop();
+        drawing = false;
+        erasing = false;
+        activePointerId = null;
+        redraw();
+      }
+      if (pointers.size === 2) {
+        const [first, second] = [...pointers.values()];
+        pinch = {
+          span: spanOf(first, second),
+          center: centerOf(first, second),
+          scale: view.scale,
+          x: view.x,
+          y: view.y,
+        };
+      }
+    });
+
+    canvas.addEventListener('pointermove', (event) => {
+      if (!pointers.has(event.pointerId)) return;
+      pointers.set(event.pointerId, { clientX: event.clientX, clientY: event.clientY });
+      if (pinch && pointers.size >= 2) {
+        const [first, second] = [...pointers.values()];
+        const span = spanOf(first, second);
+        if (!pinch.span) return;
+        const rect = wrap.getBoundingClientRect();
+        const center = centerOf(first, second);
+        /* 指の間に挟んだ点が、指の間から逃げないようにする。
+           拡大前に中心が指していた写真上の点を、拡大後も同じ指の位置に置く。 */
+        view.scale = Math.min(ANNOTATE_MAX_SCALE, Math.max(1, pinch.scale * (span / pinch.span)));
+        const ratio = view.scale / pinch.scale;
+        view.x = (center.x - rect.left) - ratio * (pinch.center.x - rect.left - pinch.x);
+        view.y = (center.y - rect.top) - ratio * (pinch.center.y - rect.top - pinch.y);
+        applyView();
+        return;
+      }
+      if (!drawing || event.pointerId !== activePointerId) return;
+      if (erasing) {
+        eraseAt(pointFromEvent(event));
+        return;
+      }
+      strokes[strokes.length - 1].points.push(pointFromEvent(event));
+      redraw();
+    });
+
+    /* 指を離す。**2本指を離しても、残った1本で描き始めない**——
+       ピンチの途中で片方だけ離れたときに線が生えるのを防ぐ。
+       次の `pointerdown` が1本目になったときだけ、また書き込みが始まる。 */
+    const releasePointer = (event) => {
+      pointers.delete(event.pointerId);
+      if (pointers.size < 2) pinch = null;
+      if (event.pointerId === activePointerId) {
+        drawing = false;
+        activePointerId = null;
+      }
+    };
+    canvas.addEventListener('pointerup', releasePointer);
+    canvas.addEventListener('pointercancel', releasePointer);
+    canvas.addEventListener('pointerleave', releasePointer);
+
+    /* 道具は4面図と同じ1組（`penColor` / `penWidth`）を触る。
+       開いた時点の値を出し、動かしたらその場から新しい線に効く。 */
+    const modeButtons = overlay.querySelectorAll('.annotate-mode');
+    modeButtons.forEach((button) => {
+      button.onclick = () => {
+        mode = button.dataset.mode;
+        modeButtons.forEach((other) => other.classList.remove('is-active'));
+        button.classList.add('is-active');
+      };
+    });
+    const alphaInput = overlay.querySelector('.annotate-alpha');
+    const alphaValue = overlay.querySelector('.annotate-alpha-value');
+    if (alphaInput) {
+      alphaInput.value = String(this.penAlpha);
+      if (alphaValue) alphaValue.textContent = `${Math.round(this.penAlpha * 100)}%`;
+      alphaInput.oninput = () => {
+        this.setPenAlpha(alphaInput.value);
+        if (alphaValue) alphaValue.textContent = `${Math.round(this.penAlpha * 100)}%`;
+      };
+    }
+    const colorInput = overlay.querySelector('.annotate-color');
+    const widthInput = overlay.querySelector('.annotate-width');
+    const widthValue = overlay.querySelector('.annotate-width-value');
+    if (colorInput) {
+      colorInput.value = this.penColor;
+      colorInput.oninput = () => this.setPenColor(colorInput.value);
+    }
+    if (widthInput) {
+      widthInput.value = String(this.penWidth);
+      if (widthValue) widthValue.textContent = `${this.penWidth}`;
+      widthInput.oninput = () => {
+        this.setPenWidth(widthInput.value);
+        if (widthValue) widthValue.textContent = `${this.penWidth}`;
+      };
+    }
+
+    const close = () => overlay.remove();
+    overlay.querySelector('.annotate-cancel').onclick = close;
+    overlay.querySelector('.annotate-clear').onclick = () => { strokes = []; redraw(); };
+    overlay.querySelector('.annotate-save').onclick = () => {
+      /* 印を焼き込んだ1枚として保存し直す。書き込みは元の写真に**戻せない形で**
+         合成する——このリポジトリの犬体図と同じ「印は最終的に画像として出す」方式
+         （`exportBodyMarking()` と同型）。 */
+      this.photos[kind][index] = canvas.toDataURL('image/jpeg', 0.85);
+      this.renderPhotoThumbs(kind);
+      this.saveDraft();
+      close();
+    };
+  },
+
+  exportBodyMarking(n) {
+    const surface = this.surface(n);
+    if (this[surface.marks].length === 0) return null;
+    const canvas = document.getElementById(surface.canvas);
+    if (!canvas) throw new Error('犬体図が見つからないため、付けた印を保存できません');
+    /* 描画面が 0×0 のままだと `toDataURL()` は `data:,` を返す。**中身が無い。**
+       これを返すと「印を保存した」ことになってしまい、飼い主には空が届く
+       ——`#3` そのもの。測り直しても駄目なら、黙って空を返さずに投げる。 */
+    /* **選んでいる目印を焼き込まない。** ここは canvas をそのまま PNG にするので、
+       破線の枠が付いたまま飼い主に届く（`D-12`——届いたものが正）。 */
+    this.clearTextSelection();
+    this.resizeCanvas(n);
+    if (!canvas.width || !canvas.height) {
+      throw new Error('犬体図の大きさを取れないため、付けた印を保存できません');
+    }
+    return canvas.toDataURL('image/png');
+  },
+
+  drawCanvas(n) {
+    const surface = this.surface(n);
+    const canvas = document.getElementById(surface.canvas);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const img = document.getElementById(surface.bg);
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    } else {
+      ctx.fillStyle = '#faf9f6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#8c8c88';
+      /* Canvas の `font` は CSS の `var(--font-sans)` を参照できないので、
+         フォント統一（C-8）と同じシステムフォント列を直書きする。 */
+      ctx.font = '12px "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Times New Roman", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(surface.empty, canvas.width / 2, canvas.height / 2);
+    }
+
+    this[surface.marks].forEach(m => {
+      /* 透過度（マスター指示 2026-09-07）。持っていない古い印は 1（透けない）。
+         **1件ごとに戻す**——戻し忘れると、次の印まで一緒に薄くなる。 */
+      ctx.globalAlpha = typeof m.alpha === 'number' ? m.alpha : 1;
+
+      /* 文字（マスター指示 2026-09-07）。押した所を左上ではなく**中心**にする
+         ——人は押した所に文字が出ると思う。 */
+      if (m.text) {
+        const size = m.size || 16;
+        const px = m.x * canvas.width;
+        const py = m.y * canvas.height;
+        ctx.fillStyle = m.color || this.markColor(m.type);
+        ctx.font = this.textFont(size);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(m.text, px, py);
+
+        /* いま掴んでいる文字だけ、破線の枠で囲う（マスター指示 2026-09-12）。
+           **どれを動かすのか／どれの色が変わるのかが見えないと操作できない。**
+           この枠は `exportBodyMarking()` の前に必ず外す——飼い主に届く絵に
+           作業中の目印が入ってはいけない。 */
+        if (this.selectedText && this.selectedText.mark === m) {
+          const measured = ctx.measureText ? ctx.measureText(m.text) : null;
+          const textWidth = measured && Number.isFinite(measured.width)
+            ? measured.width
+            : m.text.length * size * 0.6;
+          const padX = (textWidth / 2) + (size * 0.25);
+          const padY = size * 0.75;
+          ctx.globalAlpha = 1;
+          ctx.setLineDash([4, 3]);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#121212';
+          ctx.strokeRect(px - padX, py - padY, padX * 2, padY * 2);
+          ctx.setLineDash([]);
+        }
+        ctx.globalAlpha = 1;
+        return;
+      }
+
+      /* なぞった線。**スタンプと同じ色**で引く——色が所見の種類を表しているので、
+         置き方が変わっても意味が変わってはいけない。 */
+      if (Array.isArray(m.points)) {
+        if (m.points.length < 2) return;
+        ctx.beginPath();
+        ctx.moveTo(m.points[0].x * canvas.width, m.points[0].y * canvas.height);
+        for (const p of m.points.slice(1)) ctx.lineTo(p.x * canvas.width, p.y * canvas.height);
+        /* **古い印はそのまま描ける。** 色と太さは 2026-09-07 に足したもので、
+           それ以前の下書き・確定済みカルテの印は持っていない。無ければ
+           これまでどおり「所見の色・太さ4」で描く（`D-6` の型——消す前に、
+           まだ使われているものが在るかを見る）。 */
+        ctx.strokeStyle = m.color || this.markColor(m.type);
+        ctx.lineWidth = m.width || 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        return;
+      }
+
+      const px = m.x * canvas.width;
+      const py = m.y * canvas.height;
+      ctx.beginPath();
+      /* スタンプの大きさも太さに連れて変わる（既定の太さ4のとき、これまでと同じ半径9）。 */
+      ctx.arc(px, py, Math.max(4, (m.width || 4) * 2.25), 0, Math.PI * 2);
+
+      ctx.fillStyle = m.color || this.markColor(m.type);
+
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      /* ここに乗るのは印の種類の頭文字（例:「赤み」→「赤」）で日本語なので、
+         ラテン文字専用の `Inter` ではなく（C-8）システムフォント列に揃える。 */
+      ctx.font = 'bold 8px "Hiragino Mincho ProN", "Yu Mincho", YuMincho, "Times New Roman", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.type.charAt(0), px, py + 3);
+      ctx.globalAlpha = 1;
+    });
+  },
+
+  /* 所見の種類ごとの色。**スタンプの丸と、なぞった線で同じものを使う**
+     ——ここが2か所に分かれると、同じ「赤み」が置き方によって別の色になる。 */
+  markColor(type) {
+    if (type === '赤み') return '#d32f2f';
+    if (type === 'しこり/イボ') return '#f57c00';
+    if (type === '毛玉') return '#1976d2';
+    return '#7b1fa2';
+  },
+
+  openLightbox(src) {
+    const modal = document.getElementById('lightbox-modal');
+    const img = document.getElementById('lightbox-img');
+    if (modal && img) {
+      img.src = src;
+      modal.classList.add('is-open');
+    }
+  },
+
+  closeLightbox() {
+    const modal = document.getElementById('lightbox-modal');
+    if (modal) modal.classList.remove('is-open');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => App.init());

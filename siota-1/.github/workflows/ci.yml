@@ -1,0 +1,387 @@
+# ci.yml — 検査を「一台の机の上」から出す（docs/ops/plan.md 4-0-b / D-20260825-44）
+#
+# なぜ要るか:
+#   このリポジトリで一番大事な検査（飼い主に何が届くか）は、`supabase start` が必要で
+#   Docker を要求する。マスターの環境は Windows、エージェントはコンテナの中で、
+#   **どちらでも動かない**。結果、その種の検査は9本とも消えたまま放置されていた。
+#   GitHub のランナーには Docker が在るので、ここに置けば誰の PC にも要らなくなる。
+#
+#   もう1つの理由は、**渡した後に壊れたと分かること**（plan.md 第7章 7-1）。
+#   人が思い出して叩く検査は、納品後には走らない。
+#
+# いまはまだ骨組み（build / check / test）。`supabase start` と verify:* は 4-0-c / 4-0-d で足す。
+
+name: check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      # **壊し方が増えるほど1往復が延びる**（11個で約9分・SQL 入りで約13分）。
+      # その回に足した分だけ走らせられるようにする。空なら従来どおり全部。
+      # 絞った回の結果は `mutate-run-partial.md` に書かれる（全体の記録を上書きしない）。
+      ids:
+        description: 'mutate で走らせる壊し方の id（空白区切り・空なら全部）'
+        required: false
+        default: ''
+
+# 同じ枝で新しい push が来たら、古い実行は止める（待たせない・無駄に回さない）。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # `ubuntu-latest` は 2026-11-18 に Ubuntu 26.04 へ切り替わり、Playwright 1.59.1 が未対応で
+    # `playwright install` が失敗した（F-20261118-89）。対応する版が出るまで 24.04 に固定する。
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # **浅いクローンにしない。**
+          # `scripts/guard/run.mjs` は「origin/master から何を変えたか」を見る（#11 の修正）。
+          # 既定の fetch-depth: 1 だと origin/master が無く、比較相手を見失って
+          # 「変更なし」で素通りする——**関所がある顔をして何も見ていない**状態になる。
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      # 手元と同じ条件にする。lockfile どおりに入れる（npm install ではない）。
+      - run: npm ci
+
+      - name: build
+        run: npm run build
+
+      # guard（逸脱監視・関所）/ 隔離 src+dist / src↔dist parity / design 隔離 /
+      # 削除の順序 / 画面と裏側の繋ぎ方
+      - name: check
+        run: npm run check
+
+      # 単体 / スキーマ / 移行 / backend / SQL を実際に流した記録との照合
+      - name: test
+        run: npm test
+
+      # 関所が本当に見ているかを、CI 自身が確かめる。
+      # ここが「変更なし」だけを出しているなら、上の check は素通りしている。
+      - name: guard が何を見たかを残す
+        if: always()
+        run: node scripts/guard/run.mjs || true
+
+  # 土台（実 Supabase）が要る検査。ランナーには Docker が在るので `supabase start` が動く
+  # ——マスターの Windows にもエージェントのコンテナにも Docker は要らない。
+  #
+  # 上の check とは別の job にしてある。こちらは分単位（イメージの取得）で、
+  # build/check/test の速さを巻き込みたくないため。
+  #
+  # いまは土台そのものの検査だけ。飼い主に届く中身を見る9本は 4-0-d で足す。
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # devDependency の supabase CLI を使う（新しく入れない・ルール①）。
+      # 絵を撮る・画面を操作する検査に要る。ランナーには入っていないので毎回入れる。
+      # `--with-deps` は chromium が要る OS 側のライブラリまで入れる。
+      - name: ブラウザを入れる
+        run: npx playwright install --with-deps chromium
+
+      # SQL を**実際の PostgreSQL に流す**（ランナーに入っている）。
+      #
+      # 手元では「流して通った記録」（supabase/.sql-verified）と突き合わせる形にしていたが、
+      # **札は手で書き換えられる**——CI が無いことの代用品だった（`#5` の限界）。
+      # ここで毎回本物を流すので、札は「手元で気づくための前倒し」に格下げになる。
+      - name: SQL を実際に流す
+        run: npm run verify:migrations
+
+      - name: Supabase を起こす
+        run: npx supabase start
+
+      # 起きたこと・マイグレーションが当たったこと・seed で実ログインできること・
+      # 鍵なしでは読めないこと。ここが緑でなければ verify:* を書いても意味がない。
+      - name: 土台を確かめる
+        run: npm run verify:stack
+
+      # **飼い主に届く中身を見る検査**（bad-scenarios-F3 #6 の1本目）。
+      # `/my` を実ブラウザで開き、ログイン前の起動・ログイン後に自分の犬だけが
+      # 見えること・他人の犬が見えないこと（RLS）・サインアウトまでを見る。
+      # 残り8本は `/edit` を開くので、結線（plan.md 4-1）とセットで戻す。
+      - name: 飼い主の画面を確かめる
+        run: npm run verify:portal
+
+      # トリマーの画面。502 のまま放置されていた /edit が正UI を配れているか
+      # （deferred #20）。残り8本の verify:* はここが通らないと戻せない。
+      - name: トリマーの画面を確かめる
+        run: npm run verify:edit
+
+      # **保存されたカルテが飼い主のブラウザで実行されないこと**（D-11 の機械強制）。
+      # `bad-scenarios-F3` #12。細工はスタッフ API で直接入れ、見るのは飼い主の画面だけ
+      # なので、`/edit` の結線を待たずに走る。
+      - name: 細工したカルテが実行されないことを確かめる
+        run: npm run verify:xss
+
+      # **このアプリが在る理由そのもの**（D-12）。トリマーが正UI で記入 → 確定 →
+      # 飼い主が /my で開く、の往復で1項目でも値が変わったら落ちる。
+      # `bad-scenarios-F3` #13。入力欄を足したら必ずこの検査にも足すこと。
+      - name: 書いたものが飼い主に同じ値で届くか確かめる
+        run: npm run verify:roundtrip
+
+      # カルテ0件の犬に、存在しない履歴を見せていないこと（D-10）。
+      # 確定していない下書きが飼い主に見えないことも見る。`bad-scenarios-F3` #16。
+      - name: 空のカルテが空として出ることを確かめる
+        run: npm run verify:empty
+
+      # 決め打ちの手順の**外**を見る唯一の検査。各画面に在るべきボタンが在るか。
+      # 過去2回「押すべきボタンが画面から消えた」事故を、5本の検査が揃って
+      # 見逃している（D-20260824-29 / D-20260823-06）。`bad-scenarios-F3` #19。
+      - name: 各画面に在るべきものが在るか確かめる
+        run: npm run verify:screens
+
+      # 削除したら写真も**本当に**消えること（`#2` の唯一の防波堤）。
+      # RLS 越しでは必ず合格するので service_role で実体を数える。
+      # `bad-scenarios-F3` #14。
+      - name: 削除したら写真も消えることを確かめる
+        run: npm run verify:delete
+
+      # 記入が黙って消えないこと（誤タップ1回で数十分が失われない）。#15。
+      - name: 記入が下書きとして残ることを確かめる
+        run: npm run verify:draft
+
+      # 新規のお客様が自分のカルテを見られるまで。招待は飾りではなく必須経路。#17。
+      - name: 招待から閲覧まで通ることを確かめる
+        run: npm run verify:invitation
+
+      # マスター指定の動線①〜⑥を実データで一気通貫。F3 の完了条件そのもの。#18。
+      # **人が使えるかの判定ではない**（それは D-14・npm run walk の絵で決める）。
+      - name: 動線が一気通貫で通ることを確かめる
+        run: npm run verify:m6
+
+      # 管理者画面（マスター指示 2026-08-26）。削除3種は**取り返しがつかない**ので、
+      # 「押せた」ではなく写真の実体が service_role で 0 になるところまで見る。
+      - name: 管理者画面の作成・修正・削除を確かめる
+        run: npm run verify:admin
+
+      - name: 写真の往復（撮った写真が飼い主に同じものとして届く）
+        run: npm run verify:photo
+
+      # **常連の6枚目を、前回の続きから書き始められるか**（マスター指示 2026-09-03・
+      # `D-20260903-64`）。確定カルテを5枚持つ犬をこの検査の中で作り、②一覧から
+      # カードを押して④に入り、6枚目を書いて確定し、7枚目まで引き継がれるかを見る。
+      #
+      # **`verify:first-run` より前に置くこと。** あちらは最初に DB を空にする。
+      - name: 常連の6枚目が、前回の続きから始まるか
+        run: npm run verify:carry-over
+
+      # **次回のおすすめご来店時期と「予約はこちら」**（`D-20260829-58` /
+      # マスター指示 2026-09-10）。店の既定日数で出した日付が⑤と⑥に同じ値で届くか、
+      # 日付の下の「予約はこちら」に行き先が入っているかを見る。
+      #
+      # **この1本だけ CI に入っていなかった**（2026-09-10 に気づいた）。
+      # `verify:*` の他は全部並んでいるのに、ここだけ抜けていたので、
+      # `scripts/verify-revisit-interval.mjs` は**どこでも走らない検査**になっていた
+      # ——足した検査が守っているつもりで何も守っていない形（`偽-5`）。
+      #
+      # **置く場所**: この検査は店の既定日数を 45 に書き換えるので、
+      # 日付を読む他の検査より後ろ。`verify:first-run` は DB を空にするので、
+      # それより前。ここがその両方を満たす。
+      - name: 次回のご来店時期と「予約はこちら」が、店にも飼い主にも同じで届くか
+        run: npm run verify:revisit
+
+      # **開店初日の店（犬が0件）から、人と同じ操作で最後まで行けるか。**
+      #
+      # ここより上の検査は**全部「犬が既に居る」状態から始めている**（fixture が
+      # 必ず犬を持っている）。そのため「店を開いた初日」を**どの検査も一度も
+      # 通っていなかった**——`verify:*` 15本と CI が全部緑、本番の `verify:prod` も
+      # 5/5 PASS の状態で、マスターがログインしたら**犬が0件で先へ進めなかった**
+      # （`F-20260902-66`・`AGENTS.md` D-23）。
+      #
+      # **この検査は最初に DB を空にする。**（犬・飼い主・カルテを全部消すので、
+      # 犬が在ることを前提にする検査より**必ず後ろ**に置くこと。ここが最後尾。）
+      - name: 開店初日の店から、人と同じ操作で最後まで行けるか
+        run: npm run verify:first-run
+
+      - name: Supabase を止める
+        if: always()
+        run: npx supabase stop || true
+
+  # D-14 の判定材料そのもの。**機械はここで合否を出さない**——絵を撮るだけで、
+  # 「最後まで行けるか」「間違えても2タッチで戻れるか」はマスターが絵を見て決める。
+  # 手元に Docker が無い環境では撮れないので、撮る場所は CI しか無い。
+  #
+  # **verify とは別の job にしてある。** はじめ verify の最後に足したところ、
+  # 一覧に `XSS7h2kj` `RTxoqqx` `<img src=x onerror=...>` といった**検査の残骸が
+  # 19頭並んだ絵**が撮れた。verify:* が同じ土台に作った犬をそのまま撮っていたためで、
+  # あの絵では「人が使えるか」を判断できない。土台ごと分けて、seed 直後の
+  # Q/X/Y/Z だけが居る状態を撮る。
+  # 「壊して赤になるか」を実際に確かめる（マスター判断 A・D-20260828-53）。
+  # 土台は本物のまま製品を1か所だけ壊し、**その壊しに気づいた項だけ**が赤になる。
+  # 気づかない項は、その壊しを検出できていない＝壊れている検査である。
+  #
+  # **手元では走らない**（Docker が無い）。ここが唯一の実行場所。
+  # PR ごとには回さない——1回が長く、証拠を採る作業であって門番ではないため。
+  # 証拠が採れたら docs/ops/proof-of-red.md へ人が移す。
+  mutate:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    # 結果を枝へコミットして戻すので、書ける権限が要る。
+    # 既定は読み取りだけで、push が `403 Write access to repository not granted` で落ちた
+    # （run 122）。**結果が10分かけて出たのに、記録が残らなかった。**
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: ブラウザを入れる
+        run: npx playwright install --with-deps chromium
+
+      - name: Supabase を起こす
+        run: npx supabase start
+
+      - name: 1件ずつ壊して、赤になるところを見る
+        run: node scripts/mutate-run.mjs ${{ github.event.inputs.ids }}
+
+      # 絞った回（ids 指定）は mutate-run-partial.md に書かれる（全体の記録を
+      # 上書きしないため）。どちらが書かれたかは走らせてみないと分からないので、
+      # 存在するほうを成果物として拾う。
+      - name: 結果を成果物として上げる
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutate-run-result
+          path: |
+            docs/ops/mutate-run-result.md
+            docs/ops/mutate-run-partial.md
+          if-no-files-found: ignore
+
+      # 結果を**リポジトリに残す**。成果物（artifact）は90日で消えるうえ、
+      # 中身を見るのに毎回ダウンロードが要る。台帳へ移す作業がやりにくいので、
+      # 走った枝へそのままコミットする（記録は手の届く所に置く）。
+      - name: 結果を枝にコミットする
+        if: always()
+        run: |
+          # **`git status --porcelain` は無視ファイルを黙って見せない。**
+          # `mutate-run-partial.md` は作業用として .gitignore に入れてあり、
+          # `-- <path>` を渡しても対象を絞るだけで無視は解除されない。
+          # run 133 はこれで「結果に差分なし」と誤判定し、走った10個ぶんの
+          # 結果を一度も枝にコミットせず捨てていた（本文を直したのはこの回）。
+          # `git add -f` で無視を上書きしてから、**ステージした差分**を見る
+          # （`git diff --cached` は無視設定と無関係に本当の差分を返す）。
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f docs/ops/mutate-run-result.md docs/ops/mutate-run-partial.md
+          if git diff --cached --quiet -- docs/ops/mutate-run-result.md docs/ops/mutate-run-partial.md; then
+            echo "結果に差分なし。コミットしない"
+            exit 0
+          fi
+          git commit -m "mutate の結果を記録する（run ${{ github.run_number }}）"
+          # **他から同じ枝に push が挟まると、素の push は拒否される**
+          # （run 139・セッション側が手元の作業を push した直後に起きた）。
+          # 拒否されたら中身は手元に残ったまま消える——成果物 zip から手で
+          # 復元する羽目になった。fetch して rebase してから retry する。
+          #
+          # **rebase が中身の衝突で止まることがある**（run 149・2回目の実行）。
+          # `docs/ops/mutate-run-result.md` はフル実行のたびに**丸ごと書き直す**
+          # ファイルなので、2つの実行がどちらもこのファイルを変えていれば
+          # 必ず衝突する——単純な「先を取られただけ」の空振りではない。
+          # マージする意味が無い（差分ではなく全体のスナップショット）ので、
+          # `-X theirs` で**今回生成した中身を無条件に勝たせる**。負けた側の
+          # 記録は git の履歴（前のコミット）に残るので消えはしない。
+          for i in 1 2 3; do
+            if git push origin HEAD:${{ github.ref_name }}; then
+              break
+            fi
+            echo "push が拒否された。fetch して rebase してから ${i}回目のやり直し"
+            git fetch origin ${{ github.ref_name }}
+            if ! git rebase origin/${{ github.ref_name }} -X theirs; then
+              echo "::error::rebase 自体が失敗した（-X theirs でも解決できない衝突）。docs/ops/mutate-run-partial.md を成果物から復元すること"
+              git rebase --abort
+              exit 1
+            fi
+            if [ "$i" = 3 ]; then
+              echo "::error::3回試しても push できなかった。docs/ops/mutate-run-partial.md を成果物から復元すること"
+              exit 1
+            fi
+          done
+
+      - name: 壊した跡が残っていないことを確かめる
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain -- backend/ src/ worker/)" ]; then
+            echo "::error::壊した跡が残っている（戻し切れていない）"
+            git status --porcelain -- backend/ src/ worker/
+            exit 1
+          fi
+          echo "製品のファイルに差分なし。すべて戻せている"
+
+      - name: Supabase を止める
+        if: always()
+        run: npx supabase stop
+
+  walk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: ブラウザを入れる
+        run: npx playwright install --with-deps chromium
+
+      - name: Supabase を起こす
+        run: npx supabase start
+
+      - name: 人が使えるかの写真を撮る（正解の手順）
+        run: npm run walk
+
+      # 撮影中に落ちたら、その時点までの絵を上げて**落ちたことも見せる**
+      # （撮れなかったことを「撮れた」と見せない）。
+      - name: 人が使えるかの写真を撮る（間違えたとき）
+        if: always()
+        run: npm run walk mistakes
+
+      - name: 写真を成果物として上げる
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: human-walk
+          path: .human/
+          # `.human/` は**ドット始まり**。upload-artifact は v4 以降、既定で隠しファイルを
+          # 除外するので、これが無いと「撮れているのに1枚も上がらない」。
+          include-hidden-files: true
+          if-no-files-found: error
+
+      - name: Supabase を止める
+        if: always()
+        run: npx supabase stop || true

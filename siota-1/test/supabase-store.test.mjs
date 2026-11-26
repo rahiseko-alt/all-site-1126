@@ -1,0 +1,754 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { createPetSchema, updatePetSchema, parseJson } from '../worker/src/api-schemas.js';
+import { StoreError, SupabaseDataStore } from '../worker/src/data-stores/supabase-data-store.js';
+import worker from '../worker/src/index.js';
+
+/* 偽のアクセストークンは JWT の形（`ヘッダ.中身.署名`・中身は {"exp":4102444800}＝2100年）にしてある。
+   Worker は Supabase に問い合わせる前に形と期限を見て、崩れたものを弾く（review R6）。 */
+
+function supabaseEnv(fetchImpl) {
+  return {
+    DATA_BACKEND: 'supabase',
+    SUPABASE_URL: 'https://project.supabase.co',
+    SUPABASE_PUBLISHABLE_KEY: 'publishable-key',
+    SUPABASE_REPORT_ASSETS_BUCKET: 'report-assets',
+    ASSETS: { fetch: async () => new Response('asset', { status: 200 }) },
+    FETCH: fetchImpl,
+  };
+}
+
+test('Zod parser rejects unknown fields and malformed UUIDs', async () => {
+  const unknown = await parseJson(new Request('https://test.local', {
+    method: 'POST',
+    body: JSON.stringify({ ownerId: '30000000-0000-0000-0000-0000000000a1', name: 'X', template: 'ponchi', admin: true }),
+  }), createPetSchema);
+  assert.deepEqual(unknown, { ok: false, status: 400, error: 'invalid request' });
+
+  const invalid = await parseJson(new Request('https://test.local', {
+    method: 'POST', body: JSON.stringify({ ownerId: '../owner-a', name: 'X', template: 'ponchi' }),
+  }), createPetSchema);
+  assert.equal(invalid.ok, false);
+});
+
+test('犬種（N-48）: 任意・前後の空白を落とす・空は null・60文字まで・文字列以外は拒む', () => {
+  const owner = '30000000-0000-0000-0000-0000000000a1';
+  const base = { ownerId: owner, name: 'X', template: 'ponchi' };
+  assert.equal(createPetSchema.parse(base).breed, undefined);
+  assert.equal(createPetSchema.parse({ ...base, breed: '  柴  ' }).breed, '柴');
+  assert.equal(createPetSchema.parse({ ...base, breed: '   ' }).breed, null);
+  assert.equal(createPetSchema.parse({ ...base, breed: 'あ'.repeat(60) }).breed, 'あ'.repeat(60));
+  assert.equal(createPetSchema.safeParse({ ...base, breed: 'あ'.repeat(61) }).success, false);
+  assert.equal(createPetSchema.safeParse({ ...base, breed: 3 }).success, false);
+
+  assert.equal(updatePetSchema.parse({ breed: 'ミックス' }).breed, 'ミックス');
+  assert.equal(updatePetSchema.parse({ breed: null }).breed, null);
+  assert.equal(updatePetSchema.parse({ breed: '' }).breed, null);
+  assert.equal(updatePetSchema.safeParse({ breed: { $ne: 1 } }).success, false);
+  /* 犬種だけを送る変更も「何も変えない」扱いにしない（refine）。 */
+  assert.equal(updatePetSchema.safeParse({}).success, false);
+});
+
+test('JSON parser rejects oversized report bodies before parsing', async () => {
+  const result = await parseJson(new Request('https://test.local', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': '1048577' },
+    body: JSON.stringify({ ownerId: '30000000-0000-0000-0000-0000000000a1', name: 'X', template: 'ponchi' }),
+  }), createPetSchema);
+  assert.deepEqual(result, { ok: false, status: 413, error: 'request too large' });
+});
+
+test('Supabase store forwards the user JWT and never a privileged key', async () => {
+  const calls = [];
+  const store = new SupabaseDataStore({
+    supabaseUrl: 'https://project.supabase.co',
+    publishableKey: 'publishable-key',
+    accessToken: 'e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt',
+    fetchImpl: async (url, init) => {
+      calls.push({ url, init });
+      return Response.json([]);
+    },
+  });
+  await store.listPets();
+  assert.equal(calls[0].init.headers.Authorization, 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt');
+  assert.equal(calls[0].init.headers.apikey, 'publishable-key');
+  assert.equal(JSON.stringify(calls).includes('service_role'), false);
+});
+
+test('Supabase store hides PostgREST response details', async () => {
+  const store = new SupabaseDataStore({
+    supabaseUrl: 'https://project.supabase.co', publishableKey: 'pk', accessToken: 'jwt',
+    fetchImpl: async () => Response.json({ message: 'sensitive SQL details' }, { status: 403 }),
+  });
+  await assert.rejects(
+    () => store.listPets(),
+    (error) => error instanceof StoreError && error.status === 403 && !error.message.includes('sensitive SQL details'),
+  );
+});
+
+test('Supabase mode rejects a missing bearer before data access', async () => {
+  let fetchCalls = 0;
+  const response = await worker.fetch(
+    new Request('https://test.local/api/session'),
+    supabaseEnv(async () => { fetchCalls += 1; return Response.json({}); }),
+  );
+  assert.equal(response.status, 401);
+  assert.equal(fetchCalls, 0);
+});
+
+test('Supabase session route validates Auth before querying RLS-scoped rows', async () => {
+  const calls = [];
+  const response = await worker.fetch(
+    new Request('https://test.local/api/session', { headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt' } }),
+    supabaseEnv(async (url, init) => {
+      calls.push({ url, init });
+      if (url.endsWith('/auth/v1/user')) {
+        return Response.json({ id: '20000000-0000-0000-0000-0000000000a1', email: 'owner-a@local.test' });
+      }
+      return Response.json([]);
+    }),
+  );
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.user.id, '20000000-0000-0000-0000-0000000000a1');
+  assert.deepEqual(body.memberships, []);
+  assert.deepEqual(body.ownerLinks, []);
+  assert.equal(calls.length, 3);
+  assert.ok(calls.slice(1).every((call) => call.init.headers.Authorization === 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt'));
+});
+
+test('public config exposes only browser-safe values', async () => {
+  const env = {
+    ...supabaseEnv(async () => Response.json({})),
+    SUPABASE_SERVICE_ROLE_KEY: 'must-not-leak',
+    GOOGLE_CLIENT_SECRET: 'must-not-leak',
+  };
+  const response = await worker.fetch(new Request('https://test.local/api/config'), env);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    backend: 'supabase',
+    supabaseUrl: 'https://project.supabase.co',
+    publishableKey: 'publishable-key',
+    assetsBucket: 'report-assets',
+  });
+});
+
+test('Supabase protected bookmarks always receive the customer portal shell', async () => {
+  const assetRequests = [];
+  const env = supabaseEnv(async () => Response.json({}));
+  env.ASSETS = {
+    fetch: async (request) => {
+      assetRequests.push(new URL(request.url).pathname);
+      return new Response('<body data-portal="customer"></body>', {
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      });
+    },
+  };
+
+  const response = await worker.fetch(new Request(
+    'https://test.local/my/pets/30000000-0000-0000-0000-0000000000a1/reports/40000000-0000-0000-0000-0000000000a1',
+  ), env);
+
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), '<body data-portal="customer"></body>');
+  assert.deepEqual(assetRequests, ['/my.html']);
+});
+
+test('Supabase mode has no unauthenticated public owner or report HTML routes', async () => {
+  const env = supabaseEnv(async () => Response.json({}));
+  const [reportPage, ownerPage, customerApi] = await Promise.all([
+    worker.fetch(new Request('https://test.local/p/pet-x/report-x'), env),
+    worker.fetch(new Request('https://test.local/o/owner-a'), env),
+    worker.fetch(new Request('https://test.local/api/my/pets'), env),
+  ]);
+  assert.equal(reportPage.status, 404);
+  assert.equal(ownerPage.status, 404);
+  assert.equal(customerApi.status, 401);
+});
+
+test('Supabase staff routes inject auth scripts without changing the KV template', async () => {
+  const env = supabaseEnv(async () => Response.json({}));
+  env.ASSETS = {
+    fetch: async () => new Response('<html><head></head><body>staff shell</body></html>'),
+  };
+
+  const response = await worker.fetch(new Request(
+    'https://test.local/edit/p/40000000-0000-0000-0000-0000000000a1',
+  ), env);
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  /* Supabase モードかどうかは、**注入した文字列ではなく配る部品で**見る。
+     `window.__BACKEND__` は読む側が1つも無かったので外した（`deferred` #21・`A-5`）。
+     見るべきは「Supabase 用のスクリプトが載っていること」のほう。 */
+  assert.ok(!html.includes('__BACKEND__'), '読む側の無い __BACKEND__ が戻っている');
+  assert.match(html, /\/js\/supabase-staff\.js/);
+  assert.equal((html.match(/supabase-staff\.js/g) || []).length, 1);
+});
+
+test('report creation rejects a route/body pet mismatch before any database write', async () => {
+  const calls = [];
+  const response = await worker.fetch(new Request(
+    'https://test.local/api/pets/30000000-0000-0000-0000-0000000000a1/reports',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        petId: '30000000-0000-0000-0000-0000000000b1',
+        reportDate: '2026-07-16',
+        data: {},
+      }),
+    },
+  ), supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000001', email: 'staff@local.test' });
+    }
+    return Response.json([], { status: 201 });
+  }));
+
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: 'pet mismatch' });
+  assert.equal(calls.length, 1);
+  assert.ok(calls[0].url.endsWith('/auth/v1/user'));
+});
+
+test('report creation derives shop and pet from the exact route pet context', async () => {
+  const petId = '40000000-0000-0000-0000-0000000000a1';
+  const calls = [];
+  const response = await worker.fetch(new Request(`https://test.local/api/pets/${petId}/reports`, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ petId, reportDate: '2026-07-16', data: { pet: 'X', memo: 'X only' } }),
+  }), supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/rest/v1/rpc/consume_rate_limit')) return Response.json(true);
+    if (init.method === 'POST' && url.includes('/rest/v1/reports?select=')) {
+      const body = JSON.parse(init.body);
+      return Response.json([{ id: '50000000-0000-0000-0000-0000000000a9', ...body, status: 'draft' }], { status: 201 });
+    }
+    if (url.includes('/rest/v1/pets?') && url.includes(`id=eq.${petId}`)) {
+      return Response.json([{
+        id: petId,
+        shop_id: '10000000-0000-0000-0000-000000000001',
+        owner_id: '30000000-0000-0000-0000-0000000000a1',
+        name: 'X',
+        template: 'ponchi',
+        active: true,
+      }]);
+    }
+    if (url.includes('/rest/v1/reports?')) return Response.json([]);
+    return Response.json({}, { status: 500 });
+  }));
+
+  assert.equal(response.status, 201);
+  const insert = calls.find((call) => call.init.method === 'POST' && call.url.includes('/rest/v1/reports?select='));
+  assert.ok(insert);
+  assert.deepEqual(JSON.parse(insert.init.body), {
+    shop_id: '10000000-0000-0000-0000-000000000001',
+    pet_id: petId,
+    report_date: '2026-07-16',
+    data: { pet: 'X', memo: 'X only' },
+    created_by: '20000000-0000-0000-0000-000000000002',
+  });
+  assert.equal(insert.init.body.includes('0000000000a2'), false);
+  assert.equal(insert.init.body.includes('0000000000a3'), false);
+});
+
+test('customer report denial is the same generic 404 for hidden and missing rows', async () => {
+  const response = await worker.fetch(new Request(
+    'https://test.local/api/my/pets/40000000-0000-0000-0000-0000000000a1/reports/50000000-0000-0000-0000-0000000000a1',
+    { headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.owner-b-jwt' } },
+  ), supabaseEnv(async (url) => {
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-0000000000b1', email: 'owner-b@local.test' });
+    }
+    return Response.json([]);
+  }));
+
+  assert.equal(response.status, 404);
+  assert.deepEqual(await response.json(), { error: 'not available' });
+});
+
+test('invitation claim rejects malformed tokens before rate-limit or database access', async () => {
+  const calls = [];
+  const response = await worker.fetch(new Request('https://test.local/api/invitations/claim', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: 'short-or-not-hex' }),
+  }), supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-0000000000f1', email: 'new@local.test' });
+    }
+    return Response.json(true);
+  }));
+
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: 'invalid request' });
+  assert.equal(calls.length, 1);
+});
+
+test('invitation claim rate limit returns 429 with Retry-After and never claims', async () => {
+  const token = 'a'.repeat(64);
+  const calls = [];
+  const response = await worker.fetch(new Request('https://test.local/api/invitations/claim', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  }), supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-0000000000f1', email: 'new@local.test' });
+    }
+    if (url.includes('/rest/v1/rpc/consume_rate_limit')) return Response.json(false);
+    return Response.json({ type: 'owner' });
+  }));
+
+  assert.equal(response.status, 429);
+  assert.equal(response.headers.get('Retry-After'), '600');
+  assert.deepEqual(await response.json(), { error: 'too many requests' });
+  assert.equal(calls.some((call) => call.url.includes('/rpc/claim_invitation')), false);
+});
+
+test('owner invitation returns the raw token once without exposing a stored hash', async () => {
+  const token = 'b'.repeat(64);
+  const calls = [];
+  const response = await worker.fetch(new Request('https://test.local/api/invitations', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      invitationType: 'owner',
+      ownerId: '30000000-0000-0000-0000-0000000000a1',
+    }),
+  }), supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/rpc/consume_rate_limit')) return Response.json(true);
+    if (url.includes('/shop_memberships?')) {
+      return Response.json([{ shop_id: '10000000-0000-0000-0000-000000000001' }]);
+    }
+    if (url.includes('/rpc/create_invitation')) {
+      return Response.json([{
+        invitation_id: '70000000-0000-0000-0000-000000000001',
+        raw_token: token,
+        expires_at: '2026-07-17T00:00:00Z',
+      }]);
+    }
+    return Response.json({}, { status: 500 });
+  }));
+
+  assert.equal(response.status, 201);
+  assert.deepEqual(await response.json(), {
+    invitation: {
+      id: '70000000-0000-0000-0000-000000000001',
+      token,
+      expiresAt: '2026-07-17T00:00:00Z',
+    },
+  });
+  const rpcCall = calls.find((call) => call.url.includes('/rpc/create_invitation'));
+  assert.equal(JSON.stringify(rpcCall).includes('token_hash'), false);
+});
+
+test('expired revoked claimed and missing invitation claims share one generic response', async () => {
+  const response = await worker.fetch(new Request('https://test.local/api/invitations/claim', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: 'c'.repeat(64) }),
+  }), supabaseEnv(async (url) => {
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-0000000000f1', email: 'new@local.test' });
+    }
+    if (url.includes('/rpc/consume_rate_limit')) return Response.json(true);
+    return Response.json({ message: 'database details must be hidden' }, { status: 404 });
+  }));
+
+  assert.equal(response.status, 404);
+  assert.deepEqual(await response.json(), { error: 'not available' });
+});
+
+test('valid invitation claim hashes the client IP with a server-only pepper', async () => {
+  const calls = [];
+  const env = supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-0000000000f1', email: 'new@local.test' });
+    }
+    if (url.includes('/rpc/consume_rate_limit')) return Response.json(true);
+    if (url.includes('/rpc/claim_invitation')) return Response.json({ type: 'owner' });
+    return Response.json({}, { status: 500 });
+  });
+  env.RATE_LIMIT_IP_PEPPER = 'server-only-pepper-with-at-least-32-characters';
+  const response = await worker.fetch(new Request('https://test.local/api/invitations/claim', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt',
+      'Content-Type': 'application/json',
+      'CF-Connecting-IP': '203.0.113.7',
+    },
+    body: JSON.stringify({ token: 'd'.repeat(64) }),
+  }), env);
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  const rateCall = calls.find((call) => call.url.includes('/rpc/consume_rate_limit'));
+  const rateBody = JSON.parse(rateCall.init.body);
+  assert.match(rateBody.ip_hash, /^[0-9a-f]{64}$/);
+  assert.equal(rateCall.init.body.includes('203.0.113.7'), false);
+});
+
+test('invitation listing requests only safe columns and never token material', async () => {
+  const calls = [];
+  const response = await worker.fetch(new Request('https://test.local/api/invitations', {
+    headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt' },
+  }), supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/shop_memberships?')) {
+      return Response.json([{ shop_id: '10000000-0000-0000-0000-000000000001' }]);
+    }
+    if (url.includes('/invitations?')) return Response.json([]);
+    return Response.json({}, { status: 500 });
+  }));
+
+  assert.equal(response.status, 200);
+  const listCall = calls.find((call) => call.url.includes('/rest/v1/invitations?'));
+  assert.ok(listCall);
+  assert.equal(listCall.url.includes('token_hash'), false);
+  assert.equal(listCall.url.includes('raw_token'), false);
+});
+
+/* スタッフ管理の画面を削除した（マスター指示 2026-09-06）。
+   `D-20260823-05`「とりあえず残す」のまま、**押す場所が1つも無い**状態で残っていた。
+   画面と一緒に `/api/staff` も落としたので、**その口が本当に閉じたこと**を見る
+   ——残っていると、誰も呼ばないのに membership を書き換えられる口になる。 */
+/* **仕様が変わった**（放置リスト `#76`・レビュー M1）。以前は「`/api/staff` が丸ごと無い」を
+   見ていたが、辞めた人を止める道が無いこと自体が穴だったので、`GET /api/staff` は
+   **管理者だけが通る RPC `list_shop_members` 経由**で戻した（`test/member-active.test.mjs`）。
+   ここで見続けるのは、消した側が戻っていないこと——誰でも書けた `PATCH /api/staff/{id}` と
+   `update_staff_membership`、そして一覧が店のメンバー表を直に読まないこと。 */
+test('the staff-management endpoints are gone (no way in)', async () => {
+  const seen = [];
+  const env = () => supabaseEnv(async (url) => {
+    seen.push(url);
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000001', email: 'staff@local.test' });
+    }
+    if (url.includes('/shop_memberships?')) {
+      return Response.json([{ shop_id: '10000000-0000-0000-0000-000000000001' }]);
+    }
+    return Response.json({}, { status: 500 });
+  });
+
+  const list = await worker.fetch(new Request('https://test.local/api/staff', {
+    headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt' },
+  }), env());
+  const patch = await worker.fetch(new Request(
+    'https://test.local/api/staff/20000000-0000-0000-0000-000000000001',
+    {
+      method: 'PATCH',
+      headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active: false }),
+    },
+  ), env());
+
+  assert.notEqual(list.status, 200, 'GET /api/staff が管理者の RPC を通らずに一覧を返した');
+  assert.equal(
+    seen.some((url) => url.includes('/rest/v1/shop_memberships?') && !url.includes('user_id=eq.')),
+    false,
+    'GET /api/staff が店のメンバー表を直に読んだ',
+  );
+  assert.equal(seen.some((url) => url.endsWith('/rest/v1/rpc/list_shop_members')), true,
+    'GET /api/staff が管理者だけの RPC を通っていない');
+  assert.equal(patch.status, 404, 'PATCH /api/staff/{id} がまだ在る');
+  assert.equal(
+    seen.some((url) => url.includes('update_staff_membership')),
+    false,
+    'membership を書き換える RPC が呼ばれた',
+  );
+});
+
+
+test('asset metadata rejects client storage paths and derives them inside the database RPC', async () => {
+  const petId = '40000000-0000-0000-0000-0000000000a1';
+  const reportId = '50000000-0000-0000-0000-0000000000a1';
+  const assetId = '60000000-0000-0000-0000-0000000000a1';
+  const calls = [];
+  const response = await worker.fetch(new Request(
+    `https://test.local/api/pets/${petId}/reports/${reportId}/assets`,
+    {
+      method: 'POST',
+      headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: assetId,
+        kind: 'heroPhotos.0',
+        mimeType: 'image/webp',
+        byteSize: 1200,
+        sortOrder: 0,
+      }),
+    },
+  ), supabaseEnv(async (url, init) => {
+    calls.push({ url, init });
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/rpc/consume_rate_limit')) return Response.json(true);
+    if (url.includes('/rest/v1/reports?')) {
+      return Response.json([{ id: reportId, pet_id: petId, shop_id: '10000000-0000-0000-0000-000000000001', status: 'draft', data: {} }]);
+    }
+    if (url.includes('/rest/v1/report_assets?')) return Response.json([]);
+    if (url.includes('/rpc/register_report_asset')) {
+      return Response.json({ id: assetId, report_id: reportId, storage_path: 'derived/in/sql.webp' });
+    }
+    return Response.json({}, { status: 500 });
+  }));
+
+  assert.equal(response.status, 201);
+  const rpcCall = calls.find((call) => call.url.includes('/rpc/register_report_asset'));
+  assert.deepEqual(JSON.parse(rpcCall.init.body), {
+    target_report: reportId,
+    target_asset: assetId,
+    target_kind: 'heroPhotos.0',
+    target_mime: 'image/webp',
+    target_size: 1200,
+    target_sort: 0,
+  });
+  assert.equal(rpcCall.init.body.includes('storage_path'), false);
+  assert.equal(rpcCall.init.body.includes(petId), false);
+});
+
+test('finalize keeps a report draft when storage metadata or objects are incomplete', async () => {
+  const petId = '40000000-0000-0000-0000-0000000000a1';
+  const reportId = '50000000-0000-0000-0000-0000000000a1';
+  const response = await worker.fetch(new Request(
+    `https://test.local/api/pets/${petId}/reports/${reportId}/finalize`,
+    { method: 'POST', headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt' } },
+  ), supabaseEnv(async (url) => {
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/rpc/consume_rate_limit')) return Response.json(true);
+    if (url.includes('/rest/v1/reports?')) {
+      return Response.json([{ id: reportId, pet_id: petId, shop_id: '10000000-0000-0000-0000-000000000001', status: 'draft', data: {} }]);
+    }
+    if (url.includes('/rest/v1/report_assets?')) return Response.json([]);
+    if (url.includes('/rpc/finalize_report')) return Response.json(null);
+    return Response.json({}, { status: 500 });
+  }));
+
+  assert.equal(response.status, 409);
+  assert.deepEqual(await response.json(), { error: 'report assets are incomplete' });
+});
+
+/* **本番で確定できなかった形**（2026-09-07・マスター実機報告 `F-20260907-75`）。
+
+   PostgREST は関数の戻りを「1件の行」で返すことも「行の配列」で返すこともある。
+   配列は truthy なので、素通りさせると `{ report: [ … ] }` という**器だけの 200**
+   になり、画面には「カルテを確定できませんでした」とだけ出て原因が残らない。
+   表を読む側は最初から `one(rows)` で均していたのに、**RPC を通る3本だけが
+   均しを通っていなかった**。 */
+test('finalize は配列で返ってきても、カルテ1件として返す（本番で確定できなかった形）', async () => {
+  const petId = '40000000-0000-0000-0000-0000000000a1';
+  const reportId = '50000000-0000-0000-0000-0000000000a1';
+  const response = await worker.fetch(new Request(
+    `https://test.local/api/pets/${petId}/reports/${reportId}/finalize`,
+    { method: 'POST', headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt' } },
+  ), supabaseEnv(async (url) => {
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/rpc/consume_rate_limit')) return Response.json(true);
+    if (url.includes('/rest/v1/reports?')) {
+      return Response.json([{ id: reportId, pet_id: petId, shop_id: '10000000-0000-0000-0000-000000000001', status: 'draft', data: {} }]);
+    }
+    if (url.includes('/rest/v1/report_assets?')) return Response.json([]);
+    /* ここが本番の形。**配列で1件**返る。 */
+    if (url.includes('/rpc/finalize_report')) {
+      return Response.json([{ id: reportId, pet_id: petId, status: 'final', data: {} }]);
+    }
+    return Response.json({}, { status: 500 });
+  }));
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.report.id, reportId, '器（配列）のまま返すと、画面は番号を見つけられない');
+  assert.equal(body.report.status, 'final');
+});
+
+test('finalize は空の配列を「確定できた」と言わない', async () => {
+  const petId = '40000000-0000-0000-0000-0000000000a1';
+  const reportId = '50000000-0000-0000-0000-0000000000a1';
+  const response = await worker.fetch(new Request(
+    `https://test.local/api/pets/${petId}/reports/${reportId}/finalize`,
+    { method: 'POST', headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt' } },
+  ), supabaseEnv(async (url) => {
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/rpc/consume_rate_limit')) return Response.json(true);
+    if (url.includes('/rest/v1/reports?')) {
+      return Response.json([{ id: reportId, pet_id: petId, shop_id: '10000000-0000-0000-0000-000000000001', status: 'draft', data: {} }]);
+    }
+    if (url.includes('/rest/v1/report_assets?')) return Response.json([]);
+    if (url.includes('/rpc/finalize_report')) return Response.json([]);
+    return Response.json({}, { status: 500 });
+  }));
+
+  assert.equal(response.status, 409);
+  assert.deepEqual(await response.json(), { error: 'report assets are incomplete' });
+});
+
+/* 本番の Cloudflare Workers では、fetch をレシーバ付きで呼ぶと
+   `TypeError: Illegal invocation` で落ちる。`this.fetchImpl(...)` と書いていたため
+   Supabase への REST 呼び出しが本番で全滅していた（`F-20260821-25`）。
+   テストが差し込む偽の fetch は `this` を見ないので、この不具合は
+   「テストは通るのに本番だけ落ちる」形になる。レシーバを直接検査する。 */
+test('the Supabase store never calls fetch with itself as the receiver', async () => {
+  const receivers = [];
+  const store = new SupabaseDataStore({
+    supabaseUrl: 'https://project.supabase.co',
+    publishableKey: 'publishable-key',
+    accessToken: 'e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt',
+    // アロー関数だと `this` が束縛済みで検査にならないので、通常の関数で受ける。
+    fetchImpl: function fake() {
+      receivers.push(this);
+      return Response.json([]);
+    },
+  });
+
+  await store.getSessionContext('20000000-0000-0000-0000-0000000000a1');
+
+  assert.ok(receivers.length >= 2, 'fetch が呼ばれていない');
+  for (const receiver of receivers) {
+    assert.notEqual(receiver, store, 'fetch のレシーバが store になっている（本番で Illegal invocation）');
+  }
+});
+
+/* **画面は `/api/session` の `role` で「管理者には5つ・スタッフには2つ」を出し分ける**
+   （店舗側を管理者とスタッフに分け直した・マスター指示 2026-11-19・`N-49`・`202611190017`）。
+   以前は `role` 列ごと消していた（`D-20260906-68`）ので、ここは何も見ていなかった。
+   役割を引かずに返すと、画面はスタッフにも削除の入口を出すか、管理者から隠す。
+   守るのは DB だが、人が迷わないために役割は必ず届ける。本人の行だけを引くことも見る。 */
+test('getSessionContext returns the caller own membership role (N-49)', async () => {
+  const urls = [];
+  const store = new SupabaseDataStore({
+    supabaseUrl: 'https://project.supabase.co',
+    publishableKey: 'publishable-key',
+    accessToken: 'e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt',
+    fetchImpl: (url) => {
+      urls.push(String(url));
+      if (String(url).includes('/shop_memberships?')) {
+        return Response.json([{ shop_id: '10000000-0000-0000-0000-000000000001', active: true, role: 'staff' }]);
+      }
+      return Response.json([]);
+    },
+  });
+
+  const context = await store.getSessionContext('20000000-0000-0000-0000-000000000003');
+  const membershipUrl = urls.find((u) => u.includes('/shop_memberships?'));
+  assert.ok(membershipUrl, 'shop_memberships を問い合わせていない');
+  const select = new URL(membershipUrl).searchParams.get('select') || '';
+  assert.ok(select.split(',').includes('role'), `役割を引いていない（select=${select}）`);
+  assert.match(membershipUrl, /user_id=eq\.20000000-0000-0000-0000-000000000003/, '本人の行で絞っていない');
+  assert.equal(context.memberships[0].role, 'staff', '引いた役割をそのまま返していない');
+});
+
+/* RLS の `memberships_authorized_select` は
+   `user_id = auth.uid() or private.is_shop_staff(shop_id)` なので、**同じ店のメンバーには
+   店舗の全メンバー行が返る**。getStaffShopId が user_id で絞っていないと、スタッフが2人に
+   なった瞬間に 409 になり、飼い主の新規作成・招待の発行と一覧・スタッフ管理
+   （退職者の停止）が全部使えなくなる。日々のカルテ作成はこの関数を通らないので気づけない。
+
+   （ここは「管理者かどうか」ではなく「この店の人か」だけを見る口。管理者だけに許す
+   削除・店舗設定・スタッフ招待は、DB の `is_shop_admin` が断る・`N-49`・2026-11-19。） */
+test('getStaffShopId asks only for the caller own membership', async () => {
+  const urls = [];
+  const store = new SupabaseDataStore({
+    supabaseUrl: 'https://project.supabase.co',
+    publishableKey: 'publishable-key',
+    accessToken: 'e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt',
+    userId: '20000000-0000-0000-0000-000000000001',
+    fetchImpl: (url) => {
+      urls.push(String(url));
+      // 自分で絞らずに問い合わせた場合に RLS が返すもの（店舗の全メンバー）
+      if (!String(url).includes('user_id=eq.')) {
+        return Response.json([
+          { shop_id: '10000000-0000-0000-0000-000000000001' },
+          { shop_id: '10000000-0000-0000-0000-000000000001' },
+        ]);
+      }
+      return Response.json([{ shop_id: '10000000-0000-0000-0000-000000000001' }]);
+    },
+  });
+
+  const shopId = await store.getStaffShopId();
+  assert.equal(shopId, '10000000-0000-0000-0000-000000000001');
+  const membershipUrl = urls.find((u) => u.includes('/shop_memberships?'));
+  assert.ok(membershipUrl, 'shop_memberships を問い合わせていない');
+  assert.match(
+    membershipUrl,
+    /user_id=eq\.20000000-0000-0000-0000-000000000001/,
+    'user_id で絞っていない。スタッフが2人になった瞬間に 409 で詰む',
+  );
+});
+
+test('getStaffShopId still reports 409 when the caller really belongs to two shops', async () => {
+  const store = new SupabaseDataStore({
+    supabaseUrl: 'https://project.supabase.co',
+    publishableKey: 'publishable-key',
+    accessToken: 'e30.eyJleHAiOjQxMDI0NDQ4MDB9.user-jwt',
+    userId: '20000000-0000-0000-0000-000000000001',
+    fetchImpl: () => Response.json([
+      { shop_id: '10000000-0000-0000-0000-000000000001' },
+      { shop_id: '10000000-0000-0000-0000-000000000002' },
+    ]),
+  });
+  await assert.rejects(() => store.getStaffShopId(), (e) => e instanceof StoreError && e.status === 409);
+});
+
+/* 体重の履歴を取るクエリの形。**`status=eq.final` は唯一の門**で、外すと
+   ⑤スタッフ確認のグラフに**下書きや削除待ちの体重**が混ざる。飼い主側は RLS
+   （`reports_customer_select` が `status = 'final'` を要求）が二重に守るが、
+   スタッフは `reports_staff_select` で店の全カルテが見えるので、**ここだけが門**。
+
+   見つけたきっかけ（2026-09-03・徹底調査）: この門を外して `npm test` と
+   `npm run check` を回すと**どちらも全部緑**だった。壊れても誰も気づけない。 */
+test('体重の履歴は、確定したカルテだけを、古い順に、体重の列だけ取る', async () => {
+  const calls = [];
+  const response = await worker.fetch(new Request(
+    'https://test.local/api/pets/30000000-0000-0000-0000-000000000001/reports/40000000-0000-0000-0000-000000000001',
+    { headers: { Authorization: 'Bearer e30.eyJleHAiOjQxMDI0NDQ4MDB9.staff-jwt' } },
+  ), supabaseEnv(async (url) => {
+    calls.push(url);
+    if (url.endsWith('/auth/v1/user')) {
+      return Response.json({ id: '20000000-0000-0000-0000-000000000002', email: 'staff@local.test' });
+    }
+    if (url.includes('/shop_memberships?')) {
+      return Response.json([{ shop_id: '10000000-0000-0000-0000-000000000001' }]);
+    }
+    if (url.includes('/reports?')) return Response.json([]);
+    if (url.includes('/pets?')) return Response.json([]);
+    return Response.json([]);
+  }));
+
+  /* **土台。** 経路そのものが通っていなければ、以下は何も見ていないことになる。 */
+  assert.ok(response.status < 500, `カルテ取得の経路が通っていない: ${response.status}`);
+  const weightCall = calls.find((url) => url.includes('/rest/v1/reports?') && url.includes('order='));
+  assert.ok(weightCall, `体重の履歴クエリが飛んでいない: ${JSON.stringify(calls)}`);
+  assert.ok(weightCall.includes('status=eq.final'),
+    `確定したカルテだけに絞っていない（下書きの体重が混ざる）: ${weightCall}`);
+  assert.ok(weightCall.includes('order=report_date.asc'),
+    `古い順に取っていない（線が前後する）: ${weightCall}`);
+  assert.ok(weightCall.includes('pet_id=eq.30000000-0000-0000-0000-000000000001'),
+    `この犬に絞っていない: ${weightCall}`);
+});

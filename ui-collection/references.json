@@ -1,0 +1,951 @@
+[
+ {
+  "id": 1,
+  "name": "three.js",
+  "url": "https://github.com/mrdoob/three.js",
+  "description": "WebGLで3Dを描く本体ライブラリ。全ての土台。",
+  "tags": [
+   "kind-library",
+   "tech-webgl",
+   "tech-threejs",
+   "tech-javascript"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 2,
+  "name": "React Three Fiber",
+  "url": "https://github.com/pmndrs/react-three-fiber",
+  "description": "three.jsをReactのコンポーネントとして書けるレンダラー。",
+  "tags": [
+   "kind-framework",
+   "tech-react",
+   "tech-threejs",
+   "tech-webgl"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 3,
+  "name": "drei",
+  "url": "https://github.com/pmndrs/drei",
+  "description": "React Three Fiber用の便利部品集。カメラ・環境・テキスト等のヘルパー。",
+  "tags": [
+   "kind-helper",
+   "tech-react",
+   "tech-threejs",
+   "tech-webgl"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 4,
+  "name": "use-gesture",
+  "url": "https://github.com/pmndrs/use-gesture",
+  "description": "ドラッグ・ピンチ・ホイール・ホバー等のジェスチャーをReactで扱うフック集。",
+  "tags": [
+   "kind-library",
+   "tech-react",
+   "move-drag",
+   "move-gesture",
+   "move-hover",
+   "move-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 5,
+  "name": "Codrops Depth Gallery（解説）",
+  "url": "https://tympanus.net/Tutorials/DepthGallery/",
+  "description": "奥行きのある画像ギャラリーの作り方を解説したCodropsチュートリアル。デモ付き。",
+  "tags": [
+   "kind-tutorial",
+   "source-codrops",
+   "tech-webgl",
+   "ui-gallery",
+   "ui-depth",
+   "pair-depth-gallery"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 6,
+  "name": "codrops-depth-gallery（コード）",
+  "url": "https://github.com/houmahani/codrops-depth-gallery",
+  "description": "Depth Galleryチュートリアルの実装コード。",
+  "tags": [
+   "kind-code",
+   "source-codrops",
+   "tech-webgl",
+   "ui-gallery",
+   "ui-depth",
+   "pair-depth-gallery"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 7,
+  "name": "pmndrs Image Gallery（デモ）",
+  "url": "https://pmndrs.github.io/examples/image-gallery/",
+  "description": "React Three Fiber製の画像ギャラリー例。実際に触れるデモ。",
+  "tags": [
+   "kind-demo",
+   "source-pmndrs",
+   "tech-react",
+   "tech-threejs",
+   "ui-gallery",
+   "ui-image-gallery"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 8,
+  "name": "pmndrs/examples（コード集）",
+  "url": "https://github.com/pmndrs/examples",
+  "description": "pmndrs公式の実装例をまとめたリポジトリ。image-gallery等の元コードが入る。",
+  "tags": [
+   "kind-code",
+   "kind-collection",
+   "source-pmndrs",
+   "tech-react",
+   "tech-threejs",
+   "ui-gallery"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 9,
+  "name": "GSAP × three.js（デモ）",
+  "url": "https://gsap-threejs-codrops.vercel.app/",
+  "description": "GSAPのアニメーションとthree.jsを組み合わせたCodrops系デモ。スクロール連動の見せ方の参考。",
+  "tags": [
+   "kind-demo",
+   "source-codrops",
+   "tech-threejs",
+   "tech-gsap",
+   "move-scroll",
+   "ui-showcase",
+   "pair-gsap-threejs"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 10,
+  "name": "gsap-threejs-codrops（コード）",
+  "url": "https://github.com/J0SUKE/gsap-threejs-codrops",
+  "description": "GSAP × three.jsデモの実装コード。",
+  "tags": [
+   "kind-code",
+   "source-codrops",
+   "tech-threejs",
+   "tech-gsap",
+   "move-scroll",
+   "pair-gsap-threejs"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 11,
+  "name": "Showcase Images（デモ）",
+  "url": "https://showcase-images.vercel.app/",
+  "description": "画像を主役に見せるショーケース型ギャラリーのデモ。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-demo",
+   "tech-webgl",
+   "ui-gallery",
+   "ui-showcase",
+   "ui-image-gallery",
+   "pair-showcase-images"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 12,
+  "name": "showcase-images（コード）",
+  "url": "https://github.com/cortiz2894/showcase-images",
+  "description": "Showcase Imagesデモの実装コード。",
+  "tags": [
+   "kind-code",
+   "tech-webgl",
+   "ui-gallery",
+   "ui-showcase",
+   "pair-showcase-images"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 13,
+  "name": "pmndrs Cards（デモ）",
+  "url": "https://pmndrs.github.io/examples/cards/",
+  "description": "3Dカードを並べる・動かすReact Three Fiberの例。カードUIの立体表現の参考。",
+  "tags": [
+   "kind-demo",
+   "source-pmndrs",
+   "tech-react",
+   "tech-threejs",
+   "ui-cards",
+   "ui-3d"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 14,
+  "name": "pmndrs Infinite Scroll（デモ）",
+  "url": "https://pmndrs.github.io/examples/infinite-scroll/",
+  "description": "無限に続くスクロールギャラリーのReact Three Fiber例。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-demo",
+   "source-pmndrs",
+   "tech-react",
+   "tech-threejs",
+   "ui-gallery",
+   "ui-infinite-scroll",
+   "move-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 15,
+  "name": "pmndrs Horizontal Tiles（デモ）",
+  "url": "https://pmndrs.github.io/examples/horizontal-tiles/",
+  "description": "横方向にタイル画像が流れるギャラリーのReact Three Fiber例。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-demo",
+   "source-pmndrs",
+   "tech-react",
+   "tech-threejs",
+   "ui-gallery",
+   "ui-horizontal",
+   "move-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 16,
+  "name": "pmndrs Portals（デモ）",
+  "url": "https://pmndrs.github.io/examples/portals/",
+  "description": "ポータル（窓の向こうに別シーン）表現のReact Three Fiber例。場面転換の参考。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-demo",
+   "source-pmndrs",
+   "tech-react",
+   "tech-threejs",
+   "ui-portals",
+   "ui-3d"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 17,
+  "name": "infinite-canvas",
+  "url": "https://github.com/edoardolunardi/infinite-canvas",
+  "description": "無限キャンバス上に画像を配置して移動できるギャラリー実装。",
+  "tags": [
+   "kind-code",
+   "tech-webgl",
+   "ui-gallery",
+   "ui-infinite-canvas",
+   "move-drag"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 18,
+  "name": "WebGL Rotating Image Gallery",
+  "url": "https://github.com/oluwadareseyi/webgl-rotating-image-gallery",
+  "description": "回転するWebGL画像ギャラリーの実装。",
+  "tags": [
+   "kind-code",
+   "tech-webgl",
+   "ui-gallery",
+   "ui-rotating",
+   "move-auto-rotate"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 19,
+  "name": "infinite-webl-gallery",
+  "url": "https://github.com/bizarro/infinite-webl-gallery",
+  "description": "無限に続くWebGLギャラリーの実装。",
+  "tags": [
+   "kind-code",
+   "tech-webgl",
+   "ui-gallery",
+   "ui-infinite-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 20,
+  "name": "Codrops 3D Carousel",
+  "url": "https://github.com/codrops/3DCarousel",
+  "description": "3DカルーセルのCodrops実装。立体的に回るカード／画像の参考。",
+  "tags": [
+   "kind-code",
+   "source-codrops",
+   "tech-webgl",
+   "ui-carousel",
+   "ui-3d",
+   "move-auto-rotate"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 21,
+  "name": "React Bits Infinite Menu",
+  "url": "https://reactbits.dev/components/infinite-menu",
+  "description": "球面状に無限に回るメニュー部品。React Bitsのコンポーネントページ（実物とコード）。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-component",
+   "source-reactbits",
+   "tech-react",
+   "ui-menu",
+   "ui-infinite",
+   "move-drag"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 22,
+  "name": "React Bits Dome Gallery",
+  "url": "https://reactbits.dev/components/dome-gallery",
+  "description": "ドーム状に画像を配置したギャラリー部品。React Bits。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-component",
+   "source-reactbits",
+   "tech-react",
+   "ui-gallery",
+   "ui-dome",
+   "ui-3d"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 23,
+  "name": "React Bits Circular Gallery",
+  "url": "https://reactbits.dev/components/circular-gallery",
+  "description": "円形に曲げて並べるギャラリー部品。OGLベース、React Bits。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-component",
+   "source-reactbits",
+   "tech-react",
+   "tech-ogl",
+   "ui-gallery",
+   "ui-circular",
+   "move-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 24,
+  "name": "React Bits Flying Posters",
+  "url": "https://reactbits.dev/components/flying-posters",
+  "description": "ポスターが飛ぶように動く3D表現の部品。React Bits。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-component",
+   "source-reactbits",
+   "tech-react",
+   "ui-posters",
+   "ui-3d",
+   "move-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 25,
+  "name": "React Bits Infinite Spiral",
+  "url": "https://reactbits.dev/components/infinite-spiral",
+  "description": "螺旋状に無限に続くギャラリー部品。React Bits。【注意：初回表示まで10〜25秒の真っ黒／真っ白あり（2026-11-15確認）】",
+  "tags": [
+   "kind-component",
+   "source-reactbits",
+   "tech-react",
+   "ui-gallery",
+   "ui-spiral",
+   "ui-infinite"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 26,
+  "name": "React Bits（部品集コード）",
+  "url": "https://github.com/DavidHDev/react-bits",
+  "description": "React Bits全コンポーネントの元コード集。上記6部品の実装はここ。",
+  "tags": [
+   "kind-code",
+   "kind-collection",
+   "source-reactbits",
+   "tech-react",
+   "ui-gallery",
+   "ui-carousel",
+   "ui-menu"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 27,
+  "name": "OGL",
+  "url": "https://github.com/oframe/ogl",
+  "description": "軽量なWebGLフレームワーク。three.jsより小さく、生WebGL寄りの実装向け。",
+  "tags": [
+   "kind-framework",
+   "tech-webgl",
+   "tech-ogl",
+   "tech-javascript"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 28,
+  "name": "curtains.js",
+  "url": "https://github.com/martinlaxenaire/curtainsjs",
+  "description": "画像・動画をWebGLプレーンとシェーダーで演出するライブラリ。",
+  "tags": [
+   "kind-library",
+   "tech-webgl",
+   "tech-javascript",
+   "ui-shader",
+   "move-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 29,
+  "name": "Lenis",
+  "url": "https://github.com/darkroomengineering/lenis",
+  "description": "滑らかなスクロール（スムーズスクロール）の標準ライブラリ。",
+  "tags": [
+   "kind-library",
+   "tech-javascript",
+   "move-scroll",
+   "move-smooth-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 30,
+  "name": "postprocessing (pmndrs)",
+  "url": "https://github.com/pmndrs/postprocessing",
+  "description": "three.js用のポストプロセス（ぼかし・光等の後処理エフェクト）ライブラリ。",
+  "tags": [
+   "kind-library",
+   "source-pmndrs",
+   "tech-threejs",
+   "ui-effects"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 31,
+  "name": "Codrops Elastic Grid Scroll",
+  "url": "https://github.com/codrops/ElasticGridScroll",
+  "description": "弾むようなグリッドスクロールのCodrops実装。",
+  "tags": [
+   "kind-code",
+   "source-codrops",
+   "tech-webgl",
+   "ui-grid",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 33,
+  "name": "Codrops（GitHub組織）",
+  "url": "https://github.com/codrops",
+  "description": "Codropsの全デモコードが集まるGitHub組織ページ。",
+  "tags": [
+   "kind-collection",
+   "kind-index",
+   "source-codrops",
+   "tech-webgl"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 34,
+  "name": "OGL Examples（デモ一覧）",
+  "url": "https://oframe.github.io/ogl/examples/",
+  "description": "OGL公式の実行例一覧。シェーダー・描画の小さい実例を探す入口。",
+  "tags": [
+   "kind-demo",
+   "kind-collection",
+   "tech-ogl",
+   "tech-webgl",
+   "ui-effects"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 35,
+  "name": "WebGL Fluid Simulation",
+  "url": "https://paveldogreat.github.io/WebGL-Fluid-Simulation/",
+  "description": "マウスでかき混ぜると流体が渦巻くWebGL流体シミュレーションのデモ。触って気持ちいい表現の代表例。",
+  "tags": [
+   "kind-demo",
+   "tech-webgl",
+   "ui-fluid",
+   "ui-simulation",
+   "move-drag",
+   "move-mouse"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 36,
+  "name": "Vanta.js",
+  "url": "https://www.vantajs.com/",
+  "description": "WebGLの動く背景（波・鳥・霧等）をサイトに付けるライブラリの公式サイト。全エフェクトの実物がその場で試せる。",
+  "tags": [
+   "kind-library",
+   "kind-demo",
+   "tech-webgl",
+   "tech-threejs",
+   "ui-background",
+   "ui-effects"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 37,
+  "name": "Paper Shaders",
+  "url": "https://shaders.paper.design/",
+  "description": "Paper社が公開するシェーダーエフェクト集。画像に掛ける質感・歪み等の実物カタログ。",
+  "tags": [
+   "kind-collection",
+   "kind-demo",
+   "tech-webgl",
+   "ui-shader",
+   "ui-effects",
+   "source-paper-design"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 39,
+  "name": "Codrops Rain Effect",
+  "url": "https://tympanus.net/Development/RainEffect/",
+  "description": "雨粒がガラスを伝う表現のCodropsデモ。天気・水滴系の演出の参考。",
+  "tags": [
+   "kind-demo",
+   "source-codrops",
+   "tech-webgl",
+   "ui-rain",
+   "ui-effects"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 41,
+  "name": "Codrops Particle Rain Effect 1",
+  "url": "https://tympanus.net/Development/ParticleRainEffect/",
+  "description": "パーティクルの雨が降る表現のCodropsデモ（バリエーション1）。",
+  "tags": [
+   "kind-demo",
+   "source-codrops",
+   "tech-webgl",
+   "ui-particles",
+   "ui-rain",
+   "pair-particle-rain"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 42,
+  "name": "Codrops Particle Rain Effect 2",
+  "url": "https://tympanus.net/Development/ParticleRainEffect/index2.html",
+  "description": "パーティクルの雨のCodropsデモ（バリエーション2）。",
+  "tags": [
+   "kind-demo",
+   "source-codrops",
+   "tech-webgl",
+   "ui-particles",
+   "ui-rain",
+   "pair-particle-rain"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 43,
+  "name": "Codrops Particle Rain Effect 3",
+  "url": "https://tympanus.net/Development/ParticleRainEffect/index3.html",
+  "description": "パーティクルの雨のCodropsデモ（バリエーション3）。",
+  "tags": [
+   "kind-demo",
+   "source-codrops",
+   "tech-webgl",
+   "ui-particles",
+   "ui-rain",
+   "pair-particle-rain"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 44,
+  "name": "PixiJS Examples",
+  "url": "https://pixijs.io/examples/",
+  "description": "2D WebGLライブラリPixiJSの公式サンプル一覧。スプライト・フィルター等の小さい実例集。",
+  "tags": [
+   "kind-collection",
+   "kind-demo",
+   "tech-pixijs",
+   "tech-webgl",
+   "ui-effects"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 45,
+  "name": "PlayCanvas Examples",
+  "url": "https://playcanvas.github.io/",
+  "description": "WebGLゲームエンジンPlayCanvasの公式サンプル入口。3D描画・物理等の実例集。",
+  "tags": [
+   "kind-collection",
+   "kind-demo",
+   "tech-playcanvas",
+   "tech-webgl",
+   "ui-3d"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 46,
+  "name": "Troika Examples（Text）",
+  "url": "https://troika-examples.netlify.app/#text",
+  "description": "three.jsで高品質な3Dテキストを描くTroikaのサンプル（テキスト例）。文字を立体で見せる時の参考。",
+  "tags": [
+   "kind-demo",
+   "tech-threejs",
+   "tech-troika",
+   "ui-text-3d",
+   "ui-3d"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 47,
+  "name": "Lamina 1x（デモ）",
+  "url": "https://pmndrs.github.io/examples/lamina-1x/",
+  "description": "three.jsのマテリアルを層で重ねるLaminaのpmndrs公式デモ。質感を重ねる表現の参考。",
+  "tags": [
+   "kind-demo",
+   "source-pmndrs",
+   "tech-threejs",
+   "tech-lamina",
+   "ui-shader",
+   "ui-effects"
+  ],
+  "added": "2026-11-15"
+ },
+ {
+  "id": 48,
+  "name": "Exo Ape",
+  "url": "https://www.exoape.com",
+  "description": "オランダのデジタルデザインスタジオExo Apeの公式サイト。大きな画像と映像で実績を見せるショーケース型の見せ方と滑らかなスクロールの参考。【採用候補（実機未実測）2026-11-17生存確認200、PSIは当日上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll",
+   "move-smooth-scroll"
+  ],
+  "added": "2026-11-17"
+ },
+ {
+  "id": 50,
+  "name": "Lusion",
+  "url": "https://lusion.co/",
+  "description": "3DとインタラクティブWebのスタジオLusionの公式サイト。3Dビジュアルストーリーテリングと没入型サイト表現の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "tech-webgl",
+   "ui-3d",
+   "ui-showcase",
+   "ui-effects"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 51,
+  "name": "Studio Freight",
+  "url": "https://studiofreight.com/",
+  "description": "ブランドとデジタル体験を作るStudio Freightの公式サイト。滑らかなスクロールで知られる制作会社の見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "move-scroll",
+   "move-smooth-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 52,
+  "name": "Cuberto",
+  "url": "https://cuberto.com/",
+  "description": "UI/UXデザインエージェンシーCubertoの公式サイト。実績ギャラリーと大胆なタイポグラフィの見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 54,
+  "name": "Bruno Simon",
+  "url": "https://bruno-simon.com/",
+  "description": "クリエイティブ開発者Bruno Simonの公式ポートフォリオ。three.jsの3Dワールドを車で走る表現の参考。【2026-11-15に読込不良で削除記録あり。今回ページ読込とタッチ操作の案内を確認し候補として再登録】",
+  "tags": [
+   "kind-demo",
+   "tech-threejs",
+   "tech-webgl",
+   "ui-3d",
+   "move-gesture"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 55,
+  "name": "Obys Agency",
+  "url": "https://obys.agency/",
+  "description": "EUのコンセプト主導デザインスタジオObysの公式サイト。ストーリーテリングと強いビジュアル体系の見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 56,
+  "name": "Moxy Studio",
+  "url": "https://moxy.studio/",
+  "description": "ポルトのソフトウェア・デザインスタジオMOXYの公式サイト。Web制作スタジオの見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 57,
+  "name": "Unseen Studio",
+  "url": "https://unseen.co/",
+  "description": "ブランド・デジタル・モーションの制作会社Unseen Studioの公式サイト。モーションを交えた実績の見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-effects",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 58,
+  "name": "MakeMePulse",
+  "url": "https://www.makemepulse.com/",
+  "description": "グローバルクリエイティブスタジオmakemepulseの公式サイト。没入型デジタルプラットフォーム表現の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "tech-webgl",
+   "ui-3d",
+   "ui-effects",
+   "ui-showcase"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 59,
+  "name": "Dogstudio",
+  "url": "https://dogstudio.co/",
+  "description": "アート・デザイン・技術の交差点を掲げるDogstudioの公式サイト。WebGL的な体験表現の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "tech-webgl",
+   "ui-3d",
+   "ui-showcase"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 60,
+  "name": "14islands",
+  "url": "https://14islands.com/",
+  "description": "クリエイティブデザインと技術のエージェンシー14islandsの公式サイト。WebGLとデザインを組み合わせた見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "tech-webgl",
+   "ui-3d",
+   "ui-showcase",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 61,
+  "name": "Antinomy Studio",
+  "url": "https://antinomy.studio/",
+  "description": "独立系デザインスタジオAntinomyの公式サイト。現代ブランドのビジュアルとサイトの見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 62,
+  "name": "Nudot Studio",
+  "url": "https://nudot.com.tw/",
+  "description": "台湾・台中の網頁設計スタジオ核點 Nudot Studioの公式サイト。動態特效とブランド視覚で作る没入型インタラクティブサイトの参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-effects",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 63,
+  "name": "Edison Fang Workshop",
+  "url": "https://edisonfangworkshop.com/",
+  "description": "台湾・台中の空間デザイン事務所Edison Fang Workshopの公式サイト。インテリア・展示・ビジュアルアイデンティティの実績の見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 64,
+  "name": "Joy from Africa",
+  "url": "https://joyfromafrica.co.za/",
+  "description": "南アフリカの職人と地元のクラフトを伝えるJoy from Africa to the Worldの公式サイト。ストーリーテリングで世界観を見せる表現の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-effects",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 65,
+  "name": "Hubtown",
+  "url": "https://hubtown.co.in/",
+  "description": "インドの不動産開発会社Hubtown Limitedの公式サイト。住宅・商業施設・ITパークの実績を大きく見せる企業サイトの参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 67,
+  "name": "newmix",
+  "url": "https://newmixcoffee.com/",
+  "description": "韓国のミックスコーヒーを再解釈するブランドnewmixの公式サイト。商品と店舗・プロジェクトの見せ方の参考。【採用候補（実機未実測）2026-11-18生存確認200、PSIは上限で数値未取得】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 68,
+  "name": "BASIC/DEPT",
+  "url": "https://www.basicagency.com/",
+  "description": "グローバルなブランディングとデジタルデザインのエージェンシーBASIC/DEPTの公式サイト。大手ブランドの実績を大きなビジュアルとドラッグ操作で見せるショーケース型の参考。【採用候補（実機未実測）2026-11-18生存確認200】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll",
+   "move-drag"
+  ],
+  "added": ""
+ },
+ {
+  "id": 69,
+  "name": "Programatório",
+  "url": "https://programatorio.com/",
+  "description": "ブラジルのWebデザイン・開発スタジオProgramatórioの公式サイト。デザイナーのための開発を掲げ、実績スタジオの一覧と顧客の声で信頼を見せる構成の参考。【採用候補（実機未実測）2026-11-18生存確認200】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": "2026-11-18"
+ },
+ {
+  "id": 70,
+  "name": "monopo london",
+  "url": "https://monopo.london/",
+  "description": "東京発でロンドン拠点のデザイン主導クリエイティブエージェンシーmonopo londonの公式サイト。ブランディングとデジタルの実績を大きく見せるショーケース型の参考。【採用候補（実機未実測）2026-11-18生存確認200】",
+  "tags": [
+   "kind-demo",
+   "tech-javascript",
+   "ui-showcase",
+   "ui-gallery",
+   "move-scroll"
+  ],
+  "added": ""
+ },
+ {
+  "id": 71,
+  "name": "ferro-toggle（デモ）",
+  "url": "https://argofowl.github.io/ferro-toggle/",
+  "description": "磁性流体のような黒い液体がうねるダークモード切替スイッチ。HTMLファイル1つだけで、液体はWebGL 2のシェーダー描画、音もブラウザ内生成。クリック・ドラッグ・スペースキーで切替。【採用候補（実機未実測）2026-11-19生存確認】",
+  "tags": [
+   "kind-demo",
+   "tech-webgl",
+   "ui-effects",
+   "pair-ferro-toggle"
+  ],
+  "added": "2026-11-19"
+ },
+ {
+  "id": 72,
+  "name": "ferro-toggle（コード）",
+  "url": "https://github.com/argofowl/ferro-toggle",
+  "description": "ferro-toggleデモの実装コード。index.htmlの1ファイル（約64KB）で、ライブラリなし・ビルドなし。MIT。",
+  "tags": [
+   "kind-code",
+   "tech-webgl",
+   "ui-effects",
+   "pair-ferro-toggle"
+  ],
+  "added": "2026-11-19"
+ }
+]

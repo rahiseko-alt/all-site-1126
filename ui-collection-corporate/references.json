@@ -1,0 +1,135 @@
+[
+ {
+  "added": "2026-11-20",
+  "category": "コーポレートサイト事例",
+  "description": "2026年7月に全面リニューアルされた総合空間カンパニーのコーポレートサイトで、スクロールエフェクトや英語切り替えに対応している。",
+  "id": 1,
+  "name": "UNION TEC（ユニオンテック株式会社）",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。スマホ実機の滑らかさは未実測のため採用候補。再現版は2026-11-20にKo指示で全て削除済み。",
+  "tags": [
+   "kind-corporate",
+   "ui-corporate",
+   "move-scroll",
+   "source-user"
+  ],
+  "url": "https://www.union-tec.jp/"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "コーポレートサイト事例",
+  "description": "2026年8月にリニューアルされたAI-CAE技術企業のBtoBサイトで、製品・技術・導入事例・FAQなどの複雑な情報を直感的に整理し、日英両言語で統一設計されている。",
+  "id": 2,
+  "name": "株式会社RICOS",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。スマホ実機の滑らかさは未実測のため採用候補。再現版は2026-11-20にKo指示で全て削除済み。",
+  "tags": [
+   "kind-corporate",
+   "ui-corporate",
+   "ui-btob",
+   "source-user"
+  ],
+  "url": "https://www.ricos.co.jp/ja/"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "コーポレートサイト事例",
+  "description": "ソフトバンクグループとOpenAIの合弁会社のコーポレートサイトで、IN FOCUSが制作し、MUUUUU.ORGのレスポンシブ対応カテゴリに掲載されている。",
+  "id": 3,
+  "name": "SB OAI Japan合同会社",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。スマホ実機の滑らかさは未実測のため採用候補。再現版は2026-11-20にKo指示で全て削除済み。",
+  "tags": [
+   "kind-corporate",
+   "ui-corporate",
+   "source-user"
+  ],
+  "url": "https://www.sb-oai.co.jp/"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "コーポレートサイト事例",
+  "description": "ミッション・プロダクト・IR・サステナビリティなど情報量の多い上場企業のサイト構成をシンプルに整理したコーポレートサイト。",
+  "id": 4,
+  "name": "ウォンテッドリー株式会社",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。スマホ実機の滑らかさは未実測のため採用候補。再現版は2026-11-20にKo指示で全て削除済み。",
+  "tags": [
+   "kind-corporate",
+   "ui-corporate",
+   "source-user"
+  ],
+  "url": "https://wantedlyinc.com/"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "コーポレートサイト事例",
+  "description": "エディトリアルエージェンシーのコーポレートサイトで、ファーストビューからスクロール連動の動きを取り入れ、視線を誘導する構成になっている。",
+  "id": 5,
+  "name": "株式会社WORDS",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。スマホ実機の滑らかさは未実測のため採用候補。再現版は2026-11-20にKo指示で全て削除済み。",
+  "tags": [
+   "kind-corporate",
+   "ui-corporate",
+   "move-scroll",
+   "source-user"
+  ],
+  "url": "https://words-inc.co.jp/"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "レスポンシブ専門ギャラリー",
+  "description": "国内のレスポンシブサイト専門ギャラリーで、一覧画面でPC版とスマホ版の表示を並べて確認できる。",
+  "id": 6,
+  "name": "Responsive Web Design JP",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。",
+  "tags": [
+   "kind-gallery",
+   "ui-gallery",
+   "ui-responsive",
+   "source-user"
+  ],
+  "url": "https://responsive-jp.com/"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "レスポンシブ専門ギャラリー",
+  "description": "国内のWeb制作参考サイト集SANKOU!のレスポンシブ絞り込みページ。",
+  "id": 7,
+  "name": "SANKOU!（レスポンシブ）",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。",
+  "tags": [
+   "kind-gallery",
+   "ui-gallery",
+   "ui-responsive",
+   "source-user"
+  ],
+  "url": "https://sankoudesign.com/category/responsive/"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "レスポンシブ専門ギャラリー",
+  "description": "縦長でオーソドックスな構成を中心に、3,400件以上のレスポンシブ対応サイトを掲載するギャラリーのレスポンシブ対応カテゴリ。",
+  "id": 8,
+  "name": "MUUUUU.ORG（レスポンシブ対応）",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。",
+  "tags": [
+   "kind-gallery",
+   "ui-gallery",
+   "ui-responsive",
+   "source-user"
+  ],
+  "url": "https://muuuuu.org/category/taglist/responsive"
+ },
+ {
+  "added": "2026-11-20",
+  "category": "レスポンシブ専門ギャラリー",
+  "description": "スマートフォン・レスポンシブデザインに特化したギャラリーサイト。",
+  "id": 9,
+  "name": "Web Design Clip [S]",
+  "status": "生存確認済み（2026-11-20、HTTP 200）。",
+  "tags": [
+   "kind-gallery",
+   "ui-gallery",
+   "ui-responsive",
+   "source-user"
+  ],
+  "url": "https://sp.webdesignclip.com/"
+ }
+]

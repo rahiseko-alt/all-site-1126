@@ -1,8 +1,12 @@
-# codex-site-1126
+# サイト一覧
 
-Carter Ogunsolaポートフォリオ再現が入るサイト再現の置き場。
+対象のサイトを選び、そのフォルダの README に沿って作業します。
 
-- 種別：静的集
-- 元リポ：https://github.com/rahiseko-alt/codex-site-1126
+| サイト | 再現ガイド |
+| --- | --- |
+| Carter Ogunsola ポートフォリオ | [sites/carter-ogunsola](sites/carter-ogunsola/README.md) |
+| Christen Dijoux ポートフォリオ | [sites/christen-dijoux](sites/christen-dijoux/README.md) |
+| Slate マーケティングサイト | [sites/slate-teams](sites/slate-teams/README.md) |
+| MindMarket | [sites/mindmarket](sites/mindmarket/README.md) |
 
-このフォルダは all-site-1126 の中でこのサイト専用の独立フォルダです。本体ファイルの移行状況は大元の README.md の移行表を見てください。
+[サイト追加のルール](docs/site-layout.md) · [開発テンプレートの資料](docs/development-template.md)

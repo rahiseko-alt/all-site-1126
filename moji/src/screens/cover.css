@@ -1,0 +1,77 @@
+.cover {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  inline-size: 100%;
+  background: var(--paper);
+}
+
+/*
+ * The artwork is never cropped: the seal, the enso and Mt Fuji all have to
+ * survive. The frame is exactly the picture's shape, so the controls below can
+ * be positioned against the painting rather than against the screen.
+ */
+.cover__frame {
+  position: relative;
+  container-type: size;
+  aspect-ratio: var(--cover-aspect);
+  inline-size: min(100cqw, calc(100cqh * var(--cover-aspect)));
+  max-block-size: 100cqh;
+  background-image: url('/cover.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* The band of still water below the wordmark: the only part of the painting
+   with nothing in it. Both rows are centred, so they stay clear of the seal. */
+.cover__controls {
+  position: absolute;
+  inset-inline: 6%;
+  inset-block-start: 71%;
+  display: grid;
+  justify-items: center;
+  gap: 3cqh;
+}
+
+/* One row, however many languages: a second row would push START off the
+   bottom of the painting. The row has to stay clear of the seal on the left
+   (its right edge is at 7.7% of the width), so it is sized to fit within 84%. */
+.cover__languages {
+  display: flex;
+  justify-content: center;
+  gap: 1.3cqw;
+}
+
+.cover__language {
+  padding: 0.9cqh 1.5cqw;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--paper-tint);
+  font-family: var(--serif);
+  font-size: 2.4cqw;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+.cover__language[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* The one way on. It reads as the seal does: filled vermilion on paper. */
+.cover__start {
+  min-inline-size: 17cqw;
+  padding: 1.2cqh 2.6cqw;
+  border: 1.5px solid var(--vermilion);
+  border-radius: 2px;
+  background: var(--vermilion);
+  font-family: var(--serif);
+  font-size: 3.3cqw;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  color: var(--on-vermilion);
+}

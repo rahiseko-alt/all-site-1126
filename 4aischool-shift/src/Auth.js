@@ -1,0 +1,591 @@
+// 認証・セッション・初期設定
+
+function setupInitial() {
+  var props = PropertiesService.getScriptProperties();
+  if (props.getProperty('SETUP_DONE') === 'true') {
+    Logger.log('ALREADY_SET_UP');
+    return;
+  }
+  // 管理者のいるデータの表がすでにあるなら作り直さない（やり直すと、学生の入った表とつながらない空の表ができる）。
+  // 表が開けない・管理者がいない（途中で失敗した）ときは、最初から作り直す。
+  if (setup_hasLiveShiftDb_()) {
+    Logger.log('SHIFT_DB_EXISTS: 初期設定は済んでいます（データの表に管理者がいます）');
+    return;
+  }
+
+  // 1. ShiftDB 作成（全シートを書式なしテキストにしてから見出しを書く）
+  var shiftDb = SpreadsheetApp.create('ShiftDB');
+  var tableNames = [
+    'STUDENTS', 'USERS', 'MONTHLY_SUBMISSIONS',
+    'SCHOOL_HOLIDAYS', 'DEADLINES', 'SETTINGS', 'SESSIONS', 'CLASSES'
+  ];
+  for (var i = 0; i < tableNames.length; i++) {
+    var tName = tableNames[i];
+    var s = shiftDb.getSheetByName(tName) || shiftDb.insertSheet(tName);
+    db_setPlainText_(s);
+    s.appendRow(DB_TABLES_[tName]);
+    s.setFrozenRows(1);
+  }
+  setup_removeOtherSheets_(shiftDb, tableNames);
+
+  // 2. AuditLog 作成
+  var auditDb = SpreadsheetApp.create('AuditLog');
+  var auditSheet = auditDb.getSheetByName('AUDIT_LOG') || auditDb.insertSheet('AUDIT_LOG');
+  db_setPlainText_(auditSheet);
+  auditSheet.appendRow(DB_AUDIT_LOG_HEADERS_);
+  auditSheet.setFrozenRows(1);
+  setup_removeOtherSheets_(auditDb, ['AUDIT_LOG']);
+
+  // 3. Script Properties 設定（SETUP_DONE は最後に置く。途中で失敗したら再実行できるように）
+  var pepper = util_generateSalt_() + util_generateSalt_();
+  props.setProperty('SHIFT_DB_ID', shiftDb.getId());
+  props.setProperty('AUDIT_LOG_ID', auditDb.getId());
+  props.setProperty('PASSWORD_PEPPER', pepper);
+
+  // 4. 初期管理者作成
+  var adminLoginId = util_generateLoginId_();
+  var adminPassword = util_generatePassword_(16);
+  var salt = util_generateSalt_();
+  db_insertRow_('USERS', {
+    login_id: adminLoginId,
+    role: 'admin',
+    student_id: '',
+    password_salt: salt,
+    password_hash: util_hashPassword_(adminPassword, salt, pepper, 10000),
+    hash_iterations: '10000',
+    force_password_change: 'true',
+    failed_login_count: '0',
+    locked_until: '',
+    created_at: util_nowJst_()
+  });
+
+  props.setProperty('SETUP_DONE', 'true');
+  Logger.log('INITIAL_ADMIN loginId=%s password=%s', adminLoginId, adminPassword);
+}
+
+// 管理者のパスワードを忘れたときの再発行（Apps Script のエディタから実行する）。
+// スクリプトのプロパティ ADMIN_RESET_LOGIN_ID に管理者のログインIDを入れたときだけ動き、1回動くとその許可を消す。
+// 新しいパスワードは実行ログに出る（次のログインで変更を求める）。
+function resetAdminPassword() {
+  var props = PropertiesService.getScriptProperties();
+  var loginId = props.getProperty('ADMIN_RESET_LOGIN_ID');
+  if (!loginId) {
+    Logger.log('NOT_ALLOWED: スクリプトのプロパティ ADMIN_RESET_LOGIN_ID に管理者のログインIDを入れてから実行してください');
+    return;
+  }
+  props.deleteProperty('ADMIN_RESET_LOGIN_ID');
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) { Logger.log('BUSY: しばらくしてからやり直してください（許可はもう一度入れる）'); return; }
+  try {
+    var user = db_readAllRows_('USERS').filter(function (u) { return u.login_id === loginId && u.role === 'admin'; })[0];
+    if (!user) { Logger.log('NOT_FOUND: その管理者はいません: ' + loginId); return; }
+    var password = util_generatePassword_(16);
+    var salt = util_generateSalt_();
+    user.password_salt = salt;
+    user.password_hash = util_hashPassword_(password, salt, props.getProperty('PASSWORD_PEPPER'), 10000);
+    user.hash_iterations = '10000';
+    user.force_password_change = 'true';
+    user.failed_login_count = '0';
+    user.locked_until = '';
+    db_updateRow_('USERS', user._rowNum, user);
+    db_logAudit_('ADMIN_PASSWORD_RESET', 'editor', 'admin', '', '', null, { loginId: loginId });
+    Logger.log('ADMIN_PASSWORD_RESET loginId=%s password=%s', loginId, password);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function setup_hasLiveShiftDb_() {
+  if (!PropertiesService.getScriptProperties().getProperty('SHIFT_DB_ID')) return false;
+  try {
+    return db_readAllRows_('USERS').some(function (u) { return u.role === 'admin'; });
+  } catch (e) {
+    return false;
+  }
+}
+
+// 新しいスプレッドシートに最初からある空のシート（言語により名前が違う）を消す。
+function setup_removeOtherSheets_(ss, keepNames) {
+  ss.getSheets().forEach(function (sh) {
+    if (keepNames.indexOf(sh.getName()) < 0 && ss.getSheets().length > 1) {
+      try { ss.deleteSheet(sh); } catch (e) {}
+    }
+  });
+}
+
+// 期限切れのセッションをまとめて消す（ロックの中で呼ぶ）。
+function auth_purgeExpiredSessions_(now) {
+  db_deleteRowsWhere_('SESSIONS', function (r) { return !r.expires_at || r.expires_at <= now; });
+}
+
+function auth_sessionTtlMinutes_() {
+  var n = Number(student_getSettings_().sessionTtlMinutes);
+  return n >= 5 && n <= 720 ? Math.floor(n) : 120;
+}
+
+// identityCheck が true のとき（画面はいつもこれ）、学籍番号で入る学生は本人確認が済むまで確認待ちのセッションになる（2026-10-14）。
+// 確認待ちのセッションは role を 'student_pending' で持ち、api_confirmIdentity か api_logout のほかは受け付けない。
+function api_login(loginId, password, identityCheck) {
+  try {
+    // 学生は学籍番号だけで入れる（パスワード不要。2026-10-01 利用者の判断。管理者は従来どおりパスワードが要る）
+    // パスワードが入っていて、管理者のID（大文字小文字は問わない）と同じなら、学籍番号より管理者を先に見る
+    // （学籍番号が管理者のIDと重なっても、管理者が学生の画面に入ってしまわないように。2026-10-07）
+    var hasPassword = typeof password === 'string' && password !== '';
+    var adminByCase = typeof loginId === 'string' && hasPassword ? auth_findAdminByLoginId_(loginId) : null;
+    if (typeof loginId === 'string' && loginId.trim() && !adminByCase) {
+      var byNumber = auth_loginByStudentNumber_(loginId, identityCheck === true);
+      if (byNumber) return byNumber;
+    }
+    if (!loginId || typeof loginId !== 'string' || !hasPassword) {
+      return { ok: false, error: 'LOGIN_FAILED' };
+    }
+
+    var lock = LockService.getScriptLock();
+    var hasLock = lock.tryLock(5000);
+    if (!hasLock) return { ok: false, error: 'BUSY' };
+
+    try {
+      var users = db_readAllRows_('USERS');
+      var user = null;
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].login_id === loginId) {
+          user = users[i];
+          break;
+        }
+      }
+      // 管理者は大文字小文字を違えて入れても同じ人として扱う（ロックの中で読み直したものを使う）
+      if (!user && adminByCase) user = auth_findAdminByLoginId_(loginId, users);
+
+      var now = util_nowJst_();
+
+      if (!user) {
+        db_logAudit_('LOGIN_FAIL', loginId, 'unknown', '', '', null, { reason: 'not_found' });
+        return { ok: false, error: 'LOGIN_FAILED' };
+      }
+
+      // ロック確認。ロックが切れていたら失敗回数も0から数え直す。
+      if (user.locked_until && user.locked_until > now) {
+        return { ok: false, error: 'LOGIN_LOCKED', details: { lockedUntil: user.locked_until } };
+      }
+      if (user.locked_until) {
+        user.locked_until = '';
+        user.failed_login_count = '0';
+      }
+
+      // パスワード照合
+      var pepper = PropertiesService.getScriptProperties().getProperty('PASSWORD_PEPPER');
+      var iter = Number(user.hash_iterations) || 10000;
+      var computedHash = util_hashPassword_(password, user.password_salt, pepper, iter);
+
+      if (!util_constantTimeEquals_(computedHash, user.password_hash)) {
+        var fails = (Number(user.failed_login_count) || 0) + 1;
+        var lockedUntil = '';
+        if (fails >= 5) {
+          lockedUntil = util_addMinutesToJst_(now, 15);
+        }
+        user.failed_login_count = String(fails);
+        user.locked_until = lockedUntil;
+        db_updateRow_('USERS', user._rowNum, user);
+
+        db_logAudit_('LOGIN_FAIL', loginId, user.role, user.student_id, '', null, { fails: fails });
+        if (fails >= 5) {
+          return { ok: false, error: 'LOGIN_LOCKED', details: { lockedUntil: lockedUntil } };
+        }
+        return { ok: false, error: 'LOGIN_FAILED' };
+      }
+
+      // ログイン成功: 失敗回数・ロックをリセット
+      user.failed_login_count = '0';
+      user.locked_until = '';
+      db_updateRow_('USERS', user._rowNum, user);
+
+      // セッション発行（有効期限は設定の分数）。ついでに期限切れのセッションを片付ける。
+      auth_purgeExpiredSessions_(now);
+      var token = util_generateToken_();
+      var tokenHash = util_sha256Hex_(token);
+      var expiresAt = util_addMinutesToJst_(now, auth_sessionTtlMinutes_());
+
+      db_insertRow_('SESSIONS', {
+        token_hash: tokenHash,
+        login_id: user.login_id,
+        role: user.role,
+        expires_at: expiresAt,
+        created_at: now
+      });
+
+      db_logAudit_('LOGIN_OK', user.login_id, user.role, user.student_id, '', null, {});
+
+      return {
+        ok: true,
+        data: {
+          token: token,
+          role: user.role,
+          mustChangePassword: user.force_password_change === 'true',
+          studentId: user.student_id || null
+        }
+      };
+    } finally {
+      lock.releaseLock();
+    }
+  } catch (err) {
+    util_logError_(err);
+    return { ok: false, error: 'INTERNAL' };
+  }
+}
+
+// 管理者のログインID（前後の空白・大文字小文字は問わない）に当たる管理者の行。いなければ null。users を渡せば読み直さない
+function auth_findAdminByLoginId_(id, users) {
+  if (typeof id !== 'string' || !id.trim()) return null;
+  var key = id.trim().toUpperCase();
+  var rows = users || db_readAllRows_('USERS');
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].role === 'admin' && String(rows[i].login_id).toUpperCase() === key) return rows[i];
+  }
+  return null;
+}
+
+// 学籍番号として使えないID（管理者のログインIDと大文字小文字を問わず同じ）か。学生の追加・名簿の一括登録で使う
+function auth_isAdminLoginId_(id) {
+  return !!auth_adminLoginIdAmong_([id]);
+}
+
+// ids のうち、管理者のログインIDと同じ（大文字小文字を問わない）最初のもの。無ければ null（管理者の行は1回だけ読む）
+function auth_adminLoginIdAmong_(ids) {
+  var users = db_readAllRows_('USERS');
+  for (var i = 0; i < ids.length; i++) {
+    if (auth_findAdminByLoginId_(ids[i], users)) return ids[i];
+  }
+  return null;
+}
+
+// 学生の追加・名簿の一括登録で、学籍番号が管理者のIDと重なるときの返事
+function auth_idTakenError_(studentId) {
+  return { ok: false, error: 'BAD_REQUEST', details: { reason: 'ID_TAKEN', studentId: studentId } };
+}
+
+// ログイン中の本人確認（今のパスワード）。ログインと同じく失敗を数え、5回でロックする。成功すれば数を0に戻す。
+// ロックの中で、読み直した user を渡す。合っていれば null、違えば返すエラーを返す（行の更新もここでする）
+function auth_checkCurrentPassword_(user, password) {
+  var now = util_nowJst_();
+  if (user.locked_until && user.locked_until > now) {
+    return { ok: false, error: 'LOGIN_LOCKED', details: { lockedUntil: user.locked_until } };
+  }
+  if (user.locked_until) {
+    user.locked_until = '';
+    user.failed_login_count = '0';
+  }
+  var pepper = PropertiesService.getScriptProperties().getProperty('PASSWORD_PEPPER');
+  var iter = Number(user.hash_iterations) || 10000;
+  if (util_constantTimeEquals_(util_hashPassword_(password, user.password_salt, pepper, iter), user.password_hash)) {
+    if (user.failed_login_count && user.failed_login_count !== '0') {
+      user.failed_login_count = '0';
+      db_updateRow_('USERS', user._rowNum, user);
+    }
+    return null;
+  }
+  var fails = (Number(user.failed_login_count) || 0) + 1;
+  user.failed_login_count = String(fails);
+  user.locked_until = fails >= 5 ? util_addMinutesToJst_(now, 15) : '';
+  db_updateRow_('USERS', user._rowNum, user);
+  db_logAudit_('LOGIN_FAIL', user.login_id, user.role, user.student_id, '', null, { fails: fails, via: 'current_password' });
+  if (fails >= 5) return { ok: false, error: 'LOGIN_LOCKED', details: { lockedUntil: user.locked_until } };
+  return { ok: false, error: 'LOGIN_FAILED' };
+}
+
+// 新しいパスワードの形の確認。よければ null、だめなら返すエラー（details.reason 付き）
+function auth_newPasswordError_(currentPassword, newPassword) {
+  if (newPassword.trim() === '') return { ok: false, error: 'BAD_REQUEST', details: { reason: 'PASSWORD_BLANK' } };
+  if (newPassword.length < 10) return { ok: false, error: 'BAD_REQUEST', details: { reason: 'PASSWORD_SHORT' } };
+  if (newPassword === currentPassword) return { ok: false, error: 'BAD_REQUEST', details: { reason: 'SAME_PASSWORD' } };
+  return null;
+}
+
+// 学籍番号（前後の空白・大文字小文字は問わない）に当たる学生がいれば、その学生のセッションを出す。いなければ null
+// ログインの短い番号（2026-10-06 利用者の判断）: クラス名に含む語 → 頭文字。番号は 頭文字＋学籍番号の下2桁（例 K01・S21）
+var AUTH_LOGIN_PREFIXES_ = [{ prefix: 'K', classWord: '国際' }, { prefix: 'S', classWord: '総合' }];
+
+// その学生の短いログイン番号。クラスが対象外なら null
+function auth_loginCodeOf_(student) {
+  var cls = String(student['class'] || '');
+  var p = AUTH_LOGIN_PREFIXES_.filter(function (x) { return cls.indexOf(x.classWord) >= 0; })[0];
+  return p ? p.prefix + String(student.student_id).slice(-2) : null;
+}
+
+// 短い番号で数える学生: 在籍・休学で、卒業日・退学日を過ぎていない学生だけ（卒業生と新入生が重ならないように。2026-10-07）
+function auth_isCurrentForCode_(student, today) {
+  if (student.status !== '在籍' && student.status !== '休学') return false;
+  if (student.withdrawal_date && student.withdrawal_date < today) return false;
+  if (student.graduation_date && student.graduation_date < today) return false;
+  return true;
+}
+
+// 短い番号に当たる、いまの学生の一覧
+function auth_studentsWithCode_(students, code, today) {
+  return students.filter(function (s) { return auth_loginCodeOf_(s) === code && auth_isCurrentForCode_(s, today); });
+}
+
+// その学生の短い番号と、使えるか。{ code: 'K01'|null, usable: 1人に決まるか, conflict: ほかの学生と重なって使えないか }
+function auth_loginCodeStatus_(student, students) {
+  var code = auth_loginCodeOf_(student);
+  var today = util_todayJst_();
+  if (!code || !auth_isCurrentForCode_(student, today)) return { code: code, usable: false, conflict: false };
+  var hits = auth_studentsWithCode_(students, code, today);
+  return { code: code, usable: hits.length === 1, conflict: hits.length > 1 };
+}
+
+// 学籍番号、または短いログイン番号に当たる学生。短い番号で2人以上当たるときは、取り違えを防ぐため null
+function auth_findStudentForLogin_(input) {
+  var number = input.trim().toUpperCase();
+  var students = db_readAllRows_('STUDENTS');
+  var exact = students.filter(function (s) { return String(s.student_id).toUpperCase() === number; });
+  if (exact.length) return exact[0];
+  if (!/^[A-Z]\d{2}$/.test(number)) return null;
+  var hits = auth_studentsWithCode_(students, number, util_todayJst_());
+  return hits.length === 1 ? hits[0] : null;
+}
+
+function auth_loginByStudentNumber_(input, identityCheck) {
+  var student = auth_findStudentForLogin_(input);
+  if (!student) return null;
+  var user = null;
+  db_readAllRows_('USERS').forEach(function (u) { if (u.role === 'student' && u.student_id === student.student_id) user = u; });
+  if (!user) return null;
+
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(5000)) return { ok: false, error: 'BUSY' };
+  try {
+    var now = util_nowJst_();
+    auth_purgeExpiredSessions_(now);
+    // 学籍番号で入る学生には初回のパスワード変更を求めない
+    if (user.force_password_change === 'true') {
+      user.force_password_change = 'false';
+      db_updateRow_('USERS', user._rowNum, user);
+    }
+    var token = util_generateToken_();
+    db_insertRow_('SESSIONS', {
+      token_hash: util_sha256Hex_(token),
+      login_id: user.login_id,
+      role: identityCheck ? 'student_pending' : 'student',
+      expires_at: util_addMinutesToJst_(now, auth_sessionTtlMinutes_()),
+      created_at: now
+    });
+    db_logAudit_('LOGIN_OK', user.login_id, 'student', user.student_id, '', null, { via: 'student_number' });
+    var data = { token: token, role: 'student', mustChangePassword: false, studentId: user.student_id };
+    if (identityCheck) {
+      data.identityPending = true;
+      data.identity = { name: student.name, className: student['class'] };
+    }
+    return { ok: true, data: data };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function api_logout(token) {
+  try {
+    if (!token || typeof token !== 'string') return { ok: false, error: 'AUTH_REQUIRED' };
+
+    var auth = auth_verifySession_(token, null, false, true); // 本人確認の待ちでもログアウトできる
+    if (!auth.ok) return { ok: false, error: 'AUTH_REQUIRED' };
+
+    var lock = LockService.getScriptLock();
+    if (!lock.tryLock(5000)) return { ok: false, error: 'BUSY' };
+    try {
+      // ロックの中で読み直してから消す（他の人の削除で行番号がずれるのを防ぐ）
+      var sessions = db_readAllRows_('SESSIONS');
+      var tokenHash = util_sha256Hex_(token);
+      for (var i = 0; i < sessions.length; i++) {
+        if (sessions[i].token_hash === tokenHash) {
+          db_deleteRow_('SESSIONS', sessions[i]._rowNum);
+          break;
+        }
+      }
+    } finally {
+      lock.releaseLock();
+    }
+    return { ok: true, data: null };
+  } catch (err) {
+    util_logError_(err);
+    return { ok: false, error: 'INTERNAL' };
+  }
+}
+
+// 本人確認の答え。true（YES）で確認待ちを解いて先へ進める。false（NO）はログインを取り消す（セッションを消す）。
+function api_confirmIdentity(token, answer) {
+  try {
+    if (answer !== true && answer !== false) return { ok: false, error: 'BAD_REQUEST' };
+    var auth = auth_verifySession_(token, 'student', false, true);
+    if (!auth.ok) return auth;
+
+    var lock = LockService.getScriptLock();
+    if (!lock.tryLock(5000)) return { ok: false, error: 'BUSY' };
+    try {
+      var sessions = db_readAllRows_('SESSIONS');
+      var tokenHash = util_sha256Hex_(token);
+      var session = null;
+      for (var i = 0; i < sessions.length; i++) {
+        if (sessions[i].token_hash === tokenHash) { session = sessions[i]; break; }
+      }
+      if (!session) return { ok: false, error: 'AUTH_REQUIRED' };
+      if (answer) {
+        if (session.role === 'student_pending') {
+          session.role = 'student';
+          db_updateRow_('SESSIONS', session._rowNum, session);
+        }
+        return { ok: true, data: { confirmed: true } };
+      }
+      db_deleteRow_('SESSIONS', session._rowNum);
+      return { ok: true, data: { confirmed: false } };
+    } finally {
+      lock.releaseLock();
+    }
+  } catch (err) {
+    util_logError_(err);
+    return { ok: false, error: 'INTERNAL' };
+  }
+}
+
+function api_changePassword(token, currentPassword, newPassword) {
+  try {
+    if (!token || typeof token !== 'string') return { ok: false, error: 'AUTH_REQUIRED' };
+    if (!currentPassword || typeof currentPassword !== 'string') return { ok: false, error: 'BAD_REQUEST' };
+    if (!newPassword || typeof newPassword !== 'string') return { ok: false, error: 'BAD_REQUEST', details: { reason: 'PASSWORD_SHORT' } };
+    var bad = auth_newPasswordError_(currentPassword, newPassword);
+    if (bad) return bad;
+
+    var auth = auth_verifySession_(token, null, true); // パスワード変更画面なので mustChangePassword を許容
+    if (!auth.ok) return auth;
+
+    var lock = LockService.getScriptLock();
+    if (!lock.tryLock(5000)) return { ok: false, error: 'BUSY' };
+    try {
+      // ロックの中で読み直す（失敗の回数を数えるため）
+      var user = db_readAllRows_('USERS').filter(function (u) { return u.login_id === auth.user.login_id; })[0];
+      if (!user) return { ok: false, error: 'AUTH_REQUIRED' };
+      var wrong = auth_checkCurrentPassword_(user, currentPassword);
+      if (wrong) return wrong;
+
+      var pepper = PropertiesService.getScriptProperties().getProperty('PASSWORD_PEPPER');
+      var iter = Number(user.hash_iterations) || 10000;
+      var newSalt = util_generateSalt_();
+      user.password_salt = newSalt;
+      user.password_hash = util_hashPassword_(newPassword, newSalt, pepper, iter);
+      user.force_password_change = 'false';
+      db_updateRow_('USERS', user._rowNum, user);
+
+      db_logAudit_('PASSWORD_CHANGE', user.login_id, user.role, user.student_id, '', null, {});
+    } finally {
+      lock.releaseLock();
+    }
+
+    return { ok: true, data: null };
+  } catch (err) {
+    util_logError_(err);
+    return { ok: false, error: 'INTERNAL' };
+  }
+}
+
+// 管理者が自分のログインIDとパスワードを変える（2026-10-06）。params: { currentPassword, newLoginId|null, newPassword|null }。
+// 空欄の項目はそのまま。新しいパスワードは10文字以上・空白だけでない・今と違うこと。今のパスワード違いはログインと同じく数え、5回でロック。
+// IDは英数字と . _ - の4〜32文字で、他の管理者のIDや学籍番号（大文字小文字を問わない）と重ねない
+// （学籍番号のログインが先に効くため、重なると管理者が入れなくなる）。今のログインは切らない。
+function api_adminChangeCredentials(token, params) {
+  try {
+    var auth = auth_verifySession_(token, 'admin');
+    if (!auth.ok) return auth;
+    var p = params || {};
+    var newId = typeof p.newLoginId === 'string' && p.newLoginId.trim() ? p.newLoginId.trim() : null;
+    var newPw = typeof p.newPassword === 'string' && p.newPassword ? p.newPassword : null;
+    if (!p.currentPassword || typeof p.currentPassword !== 'string') return { ok: false, error: 'BAD_REQUEST' };
+    if (!newId && !newPw) return { ok: false, error: 'BAD_REQUEST' };
+    if (newId && !/^[A-Za-z0-9._-]{4,32}$/.test(newId)) return { ok: false, error: 'BAD_REQUEST', details: { reason: 'ID_FORMAT' } };
+    if (newPw) {
+      var badPw = auth_newPasswordError_(p.currentPassword, newPw);
+      if (badPw) return badPw;
+    }
+
+    var lock = LockService.getScriptLock();
+    if (!lock.tryLock(5000)) return { ok: false, error: 'BUSY' };
+    try {
+      var users = db_readAllRows_('USERS');
+      var user = users.filter(function (u) { return u.login_id === auth.user.login_id; })[0];
+      if (!user) return { ok: false, error: 'AUTH_REQUIRED' };
+      var pepper = PropertiesService.getScriptProperties().getProperty('PASSWORD_PEPPER');
+      var wrong = auth_checkCurrentPassword_(user, p.currentPassword);
+      if (wrong) return wrong;
+      var oldId = user.login_id;
+      if (newId && newId !== oldId) {
+        var key = newId.toUpperCase();
+        var taken = users.some(function (u) { return u !== user && String(u.login_id).toUpperCase() === key; }) ||
+          db_readAllRows_('STUDENTS').some(function (st) { return String(st.student_id).toUpperCase() === key; });
+        if (taken) return { ok: false, error: 'BAD_REQUEST', details: { reason: 'ID_TAKEN' } };
+        user.login_id = newId;
+      }
+      if (newPw) {
+        user.password_salt = util_generateSalt_();
+        user.password_hash = util_hashPassword_(newPw, user.password_salt, pepper, 10000);
+        user.hash_iterations = '10000';
+        user.force_password_change = 'false';
+      }
+      db_updateRow_('USERS', user._rowNum, user);
+      // ログイン中の記録もIDを付け替える（今の画面のログインを切らない）
+      if (user.login_id !== oldId) {
+        db_readAllRows_('SESSIONS').forEach(function (s) {
+          if (s.login_id === oldId) { s.login_id = user.login_id; db_updateRow_('SESSIONS', s._rowNum, s); }
+        });
+      }
+      db_logAudit_('ADMIN_CREDENTIALS_CHANGE', user.login_id, 'admin', '', '', null, { oldLoginId: oldId, idChanged: user.login_id !== oldId, passwordChanged: !!newPw });
+      return { ok: true, data: { loginId: user.login_id } };
+    } finally {
+      lock.releaseLock();
+    }
+  } catch (err) {
+    util_logError_(err);
+    return { ok: false, error: 'INTERNAL' };
+  }
+}
+
+function auth_verifySession_(token, requiredRole, allowMustChange, allowPending) {
+  if (!token || typeof token !== 'string') return { ok: false, error: 'AUTH_REQUIRED' };
+
+  var tokenHash = util_sha256Hex_(token);
+  var sessions = db_readAllRows_('SESSIONS');
+  var now = util_nowJst_();
+  var session = null;
+
+  for (var i = 0; i < sessions.length; i++) {
+    if (sessions[i].token_hash === tokenHash) {
+      session = sessions[i];
+      break;
+    }
+  }
+
+  if (!session) return { ok: false, error: 'AUTH_REQUIRED' };
+  if (session.expires_at <= now) {
+    return { ok: false, error: 'AUTH_REQUIRED' };
+  }
+
+  var users = db_readAllRows_('USERS');
+  var user = null;
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].login_id === session.login_id) {
+      user = users[i];
+      break;
+    }
+  }
+
+  if (!user) return { ok: false, error: 'AUTH_REQUIRED' };
+
+  // 本人確認の待ち（学生が「あなたは〇〇さんですか」に答える前）は、確認かログアウトのほかは受け付けない
+  if (session.role === 'student_pending' && !allowPending) return { ok: false, error: 'IDENTITY_REQUIRED' };
+
+  if (requiredRole && user.role !== requiredRole) {
+    return { ok: false, error: 'FORBIDDEN' };
+  }
+
+  if (!allowMustChange && user.force_password_change === 'true') {
+    return { ok: false, error: 'PASSWORD_CHANGE_REQUIRED' };
+  }
+
+  return { ok: true, user: user, session: session };
+}

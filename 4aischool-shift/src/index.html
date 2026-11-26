@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>外国人留学生アルバイト申告システム</title>
+  <?!= include_('client_css') ?>
+</head>
+<body>
+<div id="app">
+  <!-- ログイン画面 -->
+  <div id="login-screen">
+    <div class="login-lang-bar">
+      <select class="lang-select" aria-label="Language">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+        <option value="ne">नेपाली</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="my">မြန်မာ</option>
+        <option value="si">සිංහල</option>
+        <option value="bn">বাংলা</option>
+      </select>
+    </div>
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="login-emblem" role="img" aria-label="アルバイト申告">アルバイト申告</div>
+        <h1 id="app-title">アルバイト申告</h1>
+        <p class="login-subtitle">留学生アルバイト予定・実績管理システム</p>
+      </div>
+      <div class="field">
+        <label id="lbl-loginId" data-i18n="label.loginNumber">学籍番号</label>
+        <input type="text" id="inp-loginId" autocomplete="username" placeholder="K01">
+      </div>
+      <!-- パスワード欄は管理者だけが使うので、ふだんは出さない（下の「管理者の方はこちら」で出す） -->
+      <div class="field" id="field-password" hidden>
+        <label id="lbl-password" data-i18n="label.passwordAdminOnly">パスワード（管理者のみ）</label>
+        <input type="password" id="inp-password" autocomplete="current-password" placeholder="">
+      </div>
+      <p id="login-error" class="error-msg" hidden></p>
+      <button id="btn-login" class="btn-primary" style="width: 100%; margin-top: 0.5rem;" data-i18n="button.login">ログイン</button>
+      <p class="login-admin-link"><a href="#" id="btn-show-password" data-i18n="label.adminLogin">管理者の方はこちら</a></p>
+    </div>
+  </div>
+
+  <!-- 本人確認: ログイン直後に氏名とクラスを出し、本人かどうかを答えさせる -->
+  <div id="identity-screen" hidden>
+    <div class="login-lang-bar">
+      <select class="lang-select" aria-label="Language">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+        <option value="ne">नेपाली</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="my">မြန်မာ</option>
+        <option value="si">සිංහල</option>
+        <option value="bn">বাংলা</option>
+      </select>
+    </div>
+    <div class="login-card">
+      <p id="identity-question" class="identity-question"></p>
+      <p id="identity-error" class="error-msg" hidden></p>
+      <button id="btn-identity-yes" class="btn-primary" style="width: 100%; margin-top: 0.5rem;" data-i18n="button.identityYes">YES</button>
+      <button id="btn-identity-no" class="btn-outline" style="width: 100%; margin-top: 0.5rem;" data-i18n="button.identityNo">NO</button>
+    </div>
+  </div>
+
+  <!-- 初回パスワード変更画面（Enter キーでも変更できる） -->
+  <div id="change-password-screen" hidden>
+    <div class="login-card">
+      <div class="login-brand">
+        <h2 id="lbl-change-password-title" data-i18n="label.changePasswordTitle" style="font-size: 1.2rem; color: var(--navy); margin-bottom: 0.25rem;">パスワードの変更</h2>
+        <p class="login-subtitle" data-i18n="label.changePasswordLead">初期パスワードを変更して利用を開始してください</p>
+      </div>
+      <div class="field">
+        <label id="lbl-cur-password" for="inp-cur-password" data-i18n="label.currentPassword">現在のパスワード</label>
+        <input type="password" id="inp-cur-password" autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label id="lbl-new-password" for="inp-new-password" data-i18n="label.newPassword">新しいパスワード（10文字以上）</label>
+        <input type="password" id="inp-new-password" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label id="lbl-new-password2" for="inp-new-password2" data-i18n="label.newPasswordConfirm">新しいパスワード（確認）</label>
+        <input type="password" id="inp-new-password2" autocomplete="new-password">
+      </div>
+      <p id="change-password-error" class="error-msg" hidden></p>
+      <button id="btn-change-password" class="btn-primary" style="width: 100%; margin-top: 0.5rem;" data-i18n="button.changePassword">変更してログイン</button>
+    </div>
+  </div>
+
+  <!-- 学生画面 -->
+  <div id="student-screen" hidden>
+    <header class="top-bar">
+      <div class="brand-section">
+        <div class="brand-logo-mark" aria-hidden="true"></div>
+        <span class="brand-name">アルバイト申告</span>
+      </div>
+      <select class="lang-select" aria-label="Language">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+        <option value="ne">नेपाली</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="my">မြန်မာ</option>
+        <option value="si">සිංහල</option>
+        <option value="bn">বাংলা</option>
+      </select>
+      <div class="user-info">
+        <span id="st-name" class="user-badge"></span>
+        <button id="btn-back-admin" class="btn-outline btn-sm" style="color: #ffffff; border-color: rgba(255,255,255,0.4);" hidden>管理者に戻る</button>
+        <button id="btn-logout-st" class="btn-outline btn-sm" style="color: #ffffff; border-color: rgba(255,255,255,0.4);" data-i18n="button.logout">ログアウト</button>
+      </div>
+    </header>
+
+    <main class="student-content">
+      <!-- 月ナビゲーション・締切表示 -->
+      <div class="month-hero">
+        <div class="month-nav">
+          <button id="btn-prev-month" aria-label="前月">&lt;</button>
+          <span id="st-year-month" class="month-nav-title"></span>
+          <button id="btn-next-month" aria-label="翌月">&gt;</button>
+        </div>
+        <div class="month-meta">
+          <div id="st-deadline-info" class="deadline-pill"></div>
+        </div>
+      </div>
+      <div id="st-closed-notice" class="warn-bar" hidden></div>
+
+      <!-- シフト予定申告セクション -->
+      <section id="shifts-section">
+        <div class="card shift-card">
+          <div class="section-head">
+            <h2 class="card-title" data-i18n="label.shiftSection">シフト予定</h2>
+            <span id="st-confirm-state" class="confirm-state"></span>
+          </div>
+          <div id="st-codes"></div>
+          <!-- 勤務先（月に1つ。店が複数なら改行して書く。2026-11-04） -->
+          <div class="workplace-field">
+            <label for="inp-workplace" data-i18n="label.workplace">勤務先</label>
+            <textarea id="inp-workplace" rows="2" maxlength="200" autocomplete="off"></textarea>
+            <p class="workplace-hint" data-i18n="label.workplaceHint">店が2つ以上あるときは、改行して書いてください</p>
+          </div>
+          <div id="shifts-table" class="shift-table-wrap"></div>
+          <p id="shift-error" class="error-msg" hidden></p>
+        </div>
+        <div id="shift-actions" class="actions-card">
+          <div class="actions-buttons">
+            <button id="btn-confirm-shift" class="btn-gold" data-i18n="button.confirm">確定</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 実績確認セクション -->
+      <section id="actual-section" class="card shift-card" hidden>
+        <h2 class="card-title" data-i18n="label.actualSection">実績確認</h2>
+        <div id="actual-codes"></div>
+        <div id="actual-table" class="shift-table-wrap"></div>
+        <p id="actual-error" class="error-msg" hidden></p>
+        <div style="display:flex; gap:0.6rem; justify-content:flex-end; margin-top:1rem;">
+          <button id="btn-save-actual" class="btn-secondary" data-i18n="button.saveActual">実績を保存</button>
+          <button id="btn-confirm-actual" class="btn-gold" data-i18n="button.confirmActual">実績を確定</button>
+        </div>
+      </section>
+
+      <!-- 提出履歴セクション -->
+      <section id="history-section" class="card">
+        <h2 id="lbl-history" class="card-title" data-i18n="label.history">提出履歴</h2>
+        <div id="history-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 管理者画面 -->
+  <div id="admin-screen" hidden>
+    <!-- 上の帯: 名前・月の切替・ログアウト -->
+    <header class="adm-bar">
+      <div class="adm-brand"><div class="brand-logo-mark" aria-hidden="true"></div><span>アルバイト申告 管理</span></div>
+      <div class="month-nav adm-month">
+        <button id="btn-admin-prev-month" aria-label="前月">&lt;</button>
+        <span id="admin-year-month" class="month-nav-title"></span>
+        <button id="btn-admin-next-month" aria-label="翌月">&gt;</button>
+      </div>
+      <button id="btn-logout-admin" class="btn-outline btn-sm adm-logout">ログアウト</button>
+    </header>
+
+    <main class="adm-main">
+      <!-- 集計（押すとその状態で絞り込む） -->
+      <div id="admin-counts" class="adm-counts"></div>
+      <!-- バックアップが無い・古いときだけ赤で出す -->
+      <div id="admin-backup" class="error-msg" hidden></div>
+
+      <!-- 絞り込みと印刷 -->
+      <div class="adm-toolbar">
+        <select id="admin-class-filter"><option value="">全クラス</option></select>
+        <select id="admin-status-filter">
+          <option value="">全状態</option>
+          <option value="確定済">確定済</option>
+          <option value="確定済（本人未入力）">確定済（本人未入力）</option>
+          <option value="未提出">未提出</option>
+          <option value="エラー">エラー</option>
+          <option value="対象外">対象外</option>
+        </select>
+        <input type="text" id="admin-query" placeholder="学籍番号・氏名">
+        <button id="btn-admin-search" class="btn-primary btn-sm adm-btn">検索</button>
+        <button id="btn-print-board" class="btn-outline btn-sm adm-btn">表示中を印刷</button>
+      </div>
+      <!-- 選んだ学生の月をまとめて締める・再開する（2026-11-04） -->
+      <div id="admin-bulk" class="adm-bulk" hidden>
+        <span id="admin-bulk-count"></span>
+        <button id="btn-bulk-close" class="btn-outline btn-sm adm-btn">締める（確定済にする）</button>
+        <button id="btn-bulk-reopen" class="btn-outline btn-sm adm-btn">再開（3日後の23:59まで直せる）</button>
+        <button id="btn-bulk-clear" class="adm-link">選ぶのをやめる</button>
+      </div>
+
+      <!-- 学生一覧（行を押すと詳細） -->
+      <div class="adm-table-wrap">
+        <div id="admin-board"></div>
+      </div>
+
+      <!-- 設定 -->
+      <section class="adm-tools">
+        <h2 class="adm-tools-title">設定</h2>
+        <div class="adm-tools-row">
+          <button id="btn-open-classes" class="adm-link">クラス設定</button>
+          <button id="btn-open-student-form" class="adm-link">学生を追加</button>
+          <button id="btn-open-roster" class="adm-link">名簿から一括登録</button>
+          <button id="btn-open-deadline" class="adm-link">入力期限設定</button>
+          <button id="btn-open-holiday" class="adm-link">長期休業設定</button>
+          <button id="btn-open-settings" class="adm-link">その他 設定</button>
+          <button id="btn-open-credentials" class="adm-link">管理者のID・パスワード変更</button>
+          <button id="btn-purge-expired" class="adm-link adm-danger">保存期限を過ぎたデータを削除</button>
+        </div>
+      </section>
+
+      <!-- 生徒モード（試用の生徒Aの画面にすぐ入る） -->
+      <div class="adm-bottom">
+        <button id="btn-student-mode" class="btn-primary adm-btn">生徒モード</button>
+      </div>
+    </main>
+
+    <!-- 管理者詳細ダイアログ -->
+    <div id="admin-dialog-overlay" hidden>
+      <div class="admin-dialog">
+        <div class="dialog-header">
+          <h3 id="admin-dialog-title" style="color:var(--navy); font-size:1.15rem;">学生詳細・操作</h3>
+          <button id="btn-dialog-close" class="btn-outline btn-sm">閉じる</button>
+        </div>
+        <div id="admin-dialog-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- グローバルスピナー -->
+  <div id="global-spinner" hidden>
+    <div class="spinner-card">
+      <div class="spinner-ring"></div>
+      <span>処理中…</span>
+    </div>
+  </div>
+</div>
+
+  <!-- 手書き署名の画面（確定の前に大きく開く。2026-11-04） -->
+  <div id="sign-overlay" class="sign-overlay" hidden>
+    <div class="sign-box">
+      <p class="sign-title" data-i18n="label.signTitle">署名してください</p>
+      <p class="sign-hint" data-i18n="label.signHint">枠の中に、指で自分の名前を書いてください</p>
+      <canvas id="sign-canvas" class="sign-canvas"></canvas>
+      <div class="sign-buttons">
+        <button type="button" id="btn-sign-clear" class="btn-secondary" data-i18n="button.signClear">書き直す</button>
+        <button type="button" id="btn-sign-cancel" class="btn-secondary" data-i18n="button.signCancel">やめる</button>
+        <button type="button" id="btn-sign-ok" class="btn-gold" data-i18n="button.signOk" disabled>決定</button>
+      </div>
+    </div>
+  </div>
+<?!= include_('client_js') ?>
+</body>
+</html>

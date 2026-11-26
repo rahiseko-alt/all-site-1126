@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="data:," />
+    <title>飲食店向けデジタルLP｜飲食20年 × AI</title>
+
+    <!-- Noto Sans JP (SIL OFL) via Fontsource: weights 500 / 700 / 900 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/500.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/700.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/900.css" />
+
+    <style>
+      :root{
+        --navy:#051a3a;
+        --navy-deep:#030f27;
+        --navy-mid:#0a2a5c;
+        --blue:#0b4ea2;
+        --blue-bright:#3b82d6;
+        --sky:#e9f2fc;
+        --sky-2:#d3e4f8;
+        --sky-soft:#f2f7fd;
+        --ink:#152740;
+        --ink-soft:#47617f;
+        --muted:#8aa0b8;
+        --white:#ffffff;
+        --shadow-2:0 2px 10px rgba(5,26,58,.10), 0 10px 28px rgba(5,26,58,.07);
+        --shadow-3:0 4px 16px rgba(5,26,58,.14), 0 18px 44px rgba(5,26,58,.12);
+        --radius-2:10px;
+        --radius-3:18px;
+
+        --step--1:clamp(0.85rem, 0.82rem + 0.16vw, 0.95rem);
+        --step-0: clamp(1.00rem, 0.96rem + 0.22vw, 1.13rem);
+        --step-1: clamp(1.20rem, 1.12rem + 0.42vw, 1.45rem);
+        --step-2: clamp(1.55rem, 1.38rem + 0.85vw, 2.05rem);
+        --step-3: clamp(2.05rem, 1.75rem + 1.60vw, 3.10rem);
+        --step-4: clamp(2.80rem, 2.10rem + 3.40vw, 5.00rem);
+        --step-5: clamp(3.40rem, 2.20rem + 6.20vw, 7.40rem);
+        --step-6: clamp(5.20rem, 2.90rem + 11.0vw, 11.0rem);
+
+        --space-3xs:clamp(0.25rem, 0.24rem + 0.06vw, 0.31rem);
+        --space-2xs:clamp(0.50rem, 0.48rem + 0.11vw, 0.63rem);
+        --space-xs: clamp(0.75rem, 0.71rem + 0.17vw, 0.94rem);
+        --space-s:  clamp(1.00rem, 0.95rem + 0.22vw, 1.25rem);
+        --space-m:  clamp(1.50rem, 1.43rem + 0.34vw, 1.88rem);
+        --space-l:  clamp(2.00rem, 1.90rem + 0.45vw, 2.50rem);
+        --space-xl: clamp(3.00rem, 2.86rem + 0.67vw, 3.75rem);
+        --space-2xl:clamp(4.50rem, 4.20rem + 1.40vw, 6.50rem);
+        --space-3xl:clamp(6.00rem, 5.40rem + 2.80vw, 9.50rem);
+      }
+      *{ box-sizing:border-box; }
+      html{ scroll-behavior:smooth; }
+      body{
+        margin:0;
+        font-family:"Noto Sans JP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
+        font-weight:500;
+        font-size:var(--step-0);
+        letter-spacing:.02em;
+        line-height:1.8;
+        color:var(--ink);
+        background:var(--white);
+        -webkit-font-smoothing:antialiased;
+      }
+      img{ max-width:100%; display:block; }
+      h1,h2,h3{
+        font-feature-settings:"palt";
+        letter-spacing:.02em;
+        line-height:1.35;
+        margin:0;
+        text-wrap:balance;
+      }
+      p{ text-wrap:pretty; }
+      .wrap{ max-width:1120px; margin:0 auto; padding-inline:var(--space-m); }
+      .keep{ white-space:nowrap; }
+
+      /* ---------- Buttons ---------- */
+      .btn{
+        display:inline-flex; align-items:center; justify-content:center;
+        min-height:58px; padding:var(--space-xs) var(--space-l);
+        border-radius:999px; border:2px solid transparent;
+        font-size:var(--step-0); font-weight:700; line-height:1.4; text-decoration:none;
+        transition:background-color .15s ease, color .15s ease, border-color .15s ease;
+      }
+      .btn-line{ background:var(--blue); color:#fff; box-shadow:var(--shadow-3); }
+      .btn-line:hover{ background:var(--navy-mid); }
+      .btn-mail{ background:#fff; color:var(--navy); }
+      .btn-mail:hover{ background:var(--sky); }
+      .btn-outline{ background:transparent; color:var(--blue); border-color:var(--blue); box-shadow:none; }
+      .btn-outline:hover{ background:var(--sky); }
+      .cta-row{ display:flex; flex-wrap:wrap; gap:var(--space-xs); }
+
+      /* ---------- Hero (desktop: split layout, navy text panel + white illustration panel) ---------- */
+      .hero{
+        display:flex; align-items:stretch;
+        color:#fff;
+        background:var(--navy-deep);
+      }
+      .hero-text{ display:flex; align-items:center; flex:0 0 44%; min-width:0; }
+      .hero-inner{
+        width:100%; max-width:none; margin:0;
+        padding-block:var(--space-2xl);
+        padding-right:var(--space-l);
+        padding-left:max(var(--space-m), calc((100vw - 1120px) / 2 + var(--space-m)));
+      }
+      .hero-media{
+        display:flex; align-items:center; justify-content:center;
+        flex:1 1 auto; min-width:0; min-height:0;
+        margin:0; background:#fff;
+        border:none; border-radius:0;
+        overflow:hidden; box-shadow:none;
+      }
+      .hero-photo{
+        width:100%; height:100%;
+        object-fit:contain; object-position:center; background:#fff;
+      }
+      .hero-brand{
+        font-size:var(--step-1); font-weight:900; letter-spacing:.08em; margin:0 0 var(--space-m);
+        line-height:1.4;
+      }
+      .hero-brand .x{ color:var(--blue-bright); }
+      .hero-brand-name{ font-weight:500; letter-spacing:.06em; }
+      .hero h1{
+        font-size:clamp(2.05rem, 1.70rem + 2.20vw, 3.60rem); font-weight:900; line-height:1.28; margin:0 0 var(--space-m);
+        max-width:16em;
+      }
+      .hero-price-row{
+        display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-s) var(--space-m);
+        margin:0 0 var(--space-m);
+      }
+      .hero-price{
+        font-size:clamp(2.60rem, 1.60rem + 3.00vw, 3.90rem); font-weight:900; line-height:1;
+        margin:0; font-feature-settings:"palt"; white-space:nowrap; letter-spacing:.01em;
+      }
+      .hero-price-unit{ font-size:.38em; font-weight:900; }
+      .hero-trial{
+        margin:0; display:inline-flex; align-items:center;
+        background:#fff; color:var(--navy); font-weight:700; line-height:1.4;
+        padding:var(--space-2xs) var(--space-s); border-radius:999px;
+        font-size:var(--step-0); white-space:nowrap; box-shadow:var(--shadow-3);
+      }
+      .hero-trial strong{ font-weight:900; color:var(--blue); font-size:1.25em; margin-left:.3em; }
+      .hero-sub{
+        font-size:var(--step-1); font-weight:500; line-height:1.8;
+        margin:0 0 var(--space-xl); max-width:34em; color:#fff;
+      }
+
+      /* ---------- Sections ---------- */
+      section{ padding-block:var(--space-3xl); }
+      .sec-head{ margin-bottom:var(--space-xl); max-width:44em; }
+      .sec-head h2{ font-size:var(--step-3); font-weight:700; color:var(--navy); margin-bottom:var(--space-xs); }
+      .sec-head p{ margin:0; font-size:var(--step-1); font-weight:500; color:var(--ink-soft); line-height:1.65; }
+
+      /* ---------- Worries ---------- */
+      .worry-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--space-m); }
+      .worry{
+        background:var(--sky); border-radius:var(--radius-3);
+        padding:var(--space-l); box-shadow:var(--shadow-2);
+      }
+      .worry .num{ font-size:var(--step-1); font-weight:900; color:var(--blue-bright); line-height:1.2; margin:0 0 var(--space-2xs); font-feature-settings:"palt"; }
+      .worry p.body{ margin:0; font-size:var(--step-1); font-weight:500; line-height:1.65; }
+      .worry p.body strong{ font-weight:900; color:var(--navy); }
+      .worry-answer{
+        margin-top:var(--space-xl); background:var(--navy); color:#fff;
+        border-radius:var(--radius-3); padding:var(--space-xl); text-align:center;
+        box-shadow:var(--shadow-3);
+      }
+      .worry-answer p{ margin:0; font-size:var(--step-2); font-weight:700; line-height:1.55; }
+      .worry-answer p span{ display:block; margin-top:var(--space-2xs); font-size:var(--step-0); font-weight:500; color:var(--sky-2); }
+
+      /* ---------- Support range ---------- */
+      .range{ background:var(--sky); }
+      .range-list{ display:grid; grid-template-columns:1fr; gap:var(--space-m); }
+      .range-item{
+        background:#fff; border-radius:var(--radius-3); box-shadow:var(--shadow-2);
+        padding:var(--space-l);
+      }
+      .range-item .num{ font-size:var(--step-1); font-weight:900; color:var(--blue-bright); letter-spacing:.08em; margin:0 0 var(--space-2xs); font-feature-settings:"palt"; }
+      .range-item h3{ font-size:var(--step-1); font-weight:700; color:var(--navy); line-height:1.45; margin-bottom:var(--space-2xs); }
+      .range-item p.body{ margin:0; font-size:var(--step--1); font-weight:500; color:var(--ink-soft); line-height:1.75; }
+      .range-shots{ display:grid; gap:var(--space-s); margin-top:var(--space-m); }
+      .range-shots.two{ grid-template-columns:1fr 1fr; align-items:start; }
+      .range-shots.single-wide{ max-width:760px; }
+      .range-shots.single-portrait{ max-width:420px; }
+      .shot{
+        width:100%; height:auto; display:block;
+        border:1px solid var(--sky-2); border-radius:var(--radius-2);
+        box-shadow:var(--shadow-2); background:#fff;
+      }
+      .range-extra{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-s); margin-top:var(--space-m); }
+      .range-extra figure{
+        margin:0; background:#fff; border-radius:var(--radius-3); box-shadow:var(--shadow-2);
+        padding:var(--space-s);
+      }
+      .range-extra figcaption{
+        margin-top:var(--space-xs); text-align:center;
+        font-size:var(--step--1); font-weight:700; color:var(--navy); line-height:1.5;
+      }
+      .range-note{ margin:var(--space-l) 0 0; text-align:center; font-weight:500; color:var(--ink-soft); }
+
+      /* ---------- Trial band ---------- */
+      .trial{ background:var(--navy-deep); color:#fff; }
+      .trial-top{ text-align:center; margin-bottom:var(--space-xl); }
+      .trial-label{ font-size:var(--step-2); font-weight:700; margin:0; }
+      .trial-zero{
+        font-size:var(--step-6); font-weight:900; line-height:1.05; margin:0;
+        font-feature-settings:"palt"; white-space:nowrap;
+      }
+      .trial-zero small{ font-size:.32em; font-weight:900; }
+      .trial-lead{ margin:var(--space-s) auto 0; max-width:36em; font-weight:500; color:var(--sky-2); }
+      .trial-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-m); }
+      .trial-card{
+        background:#fff; color:var(--ink); border-radius:var(--radius-3);
+        padding:var(--space-l); box-shadow:var(--shadow-3);
+        background-size:cover; background-position:center; background-repeat:no-repeat;
+      }
+      .trial-card--pop{
+        background-image:linear-gradient(rgba(255,255,255,.86), rgba(255,255,255,.90)), url("assets/trial-pop.jpg");
+      }
+      .trial-card--sns{
+        background-image:linear-gradient(rgba(255,255,255,.86), rgba(255,255,255,.90)), url("assets/trial-sns.jpg");
+      }
+      .trial-card--web{
+        background-image:linear-gradient(rgba(255,255,255,.86), rgba(255,255,255,.90)), url("assets/trial-web.jpg");
+      }
+      .trial-card .num{ font-size:var(--step-1); font-weight:900; color:var(--blue-bright); line-height:1.2; margin:0 0 var(--space-2xs); font-feature-settings:"palt"; }
+      .trial-card h3{ font-size:var(--step-1); font-weight:700; color:var(--navy); line-height:1.5; margin-bottom:var(--space-2xs); }
+      .trial-card p{ margin:0; font-size:var(--step--1); font-weight:500; color:var(--ink-soft); }
+      .trial-note{ margin:var(--space-l) 0 0; text-align:center; color:var(--sky-2); font-size:var(--step--1); font-weight:500; }
+
+      /* ---------- Plan comparison table ---------- */
+      .plan-scroll{ border-radius:var(--radius-3); box-shadow:var(--shadow-3); }
+      .plan-table{
+        width:100%; border-collapse:collapse; table-layout:fixed;
+        background:#fff; border-radius:var(--radius-3); overflow:hidden;
+        font-size:var(--step-0); line-height:1.5;
+      }
+      .plan-table col.c-f{ width:44%; }
+      .plan-table col.c-p{ width:18.66%; }
+      .plan-table th, .plan-table td{
+        border-bottom:1px solid var(--sky-2);
+        padding:var(--space-xs) var(--space-s);
+        vertical-align:middle;
+      }
+      .plan-table thead th{
+        background:var(--navy); color:#fff; border-bottom:none;
+        padding:var(--space-s);
+      }
+      .plan-table thead th.col-lite{ background:var(--blue); }
+      .plan-table thead th.col-name{ text-align:left; font-size:var(--step--1); font-weight:500; color:var(--sky-2); }
+      .plan-table .pname{ display:block; font-size:var(--step-1); font-weight:700; line-height:1.35; white-space:nowrap; }
+      .plan-table .pprice{ display:block; font-size:var(--step--1); font-weight:500; color:var(--sky-2); margin-top:var(--space-3xs); white-space:nowrap; }
+      .plan-table thead th.col-lite .pprice{ color:#fff; font-weight:700; }
+      .plan-table tbody th[scope="row"]{ text-align:left; font-weight:500; }
+      .plan-table .fname{ display:block; font-weight:700; color:var(--navy); word-break:keep-all; overflow-wrap:normal; }
+      .plan-table .fsub{ word-break:keep-all; overflow-wrap:normal; }
+      .plan-table .pname{ word-break:keep-all; overflow-wrap:normal; }
+      .plan-table .fsub{ display:block; font-size:.82em; font-weight:500; color:var(--ink-soft); margin-top:2px; }
+      .plan-table td.cell{ text-align:center; font-weight:700; color:var(--navy); font-size:1.25em; }
+      .plan-table td.cell.no{ color:var(--muted); font-weight:500; }
+      .plan-table td.cell.lite{ background:var(--sky-soft); }
+      .plan-table tbody th.lite{ background:var(--sky-soft); }
+      .plan-table tr.group-row td{
+        background:var(--sky); color:var(--navy);
+        font-weight:700; font-size:var(--step--1); letter-spacing:.06em;
+        padding:var(--space-2xs) var(--space-s);
+      }
+      .plan-table tbody tr:last-child th, .plan-table tbody tr:last-child td{ border-bottom:none; }
+      .plan-note{ margin:var(--space-m) 0 0; font-weight:500; color:var(--ink-soft); }
+      .plan-cta{ margin-top:var(--space-l); display:flex; flex-wrap:wrap; gap:var(--space-xs); }
+
+      /* ---------- Steps ---------- */
+      .steps{ background:var(--sky); }
+      .step-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-m); }
+      .step{ background:#fff; border-radius:var(--radius-3); box-shadow:var(--shadow-2); padding:var(--space-l); }
+      .step .step-num{ font-size:var(--step-3); font-weight:900; color:var(--blue-bright); line-height:1.1; margin:0 0 var(--space-2xs); font-feature-settings:"palt"; }
+      .step h3{ font-size:var(--step-1); font-weight:700; color:var(--navy); margin-bottom:var(--space-2xs); }
+      .step p{ margin:0; font-size:var(--step--1); font-weight:500; color:var(--ink-soft); }
+
+      /* ---------- Profile ---------- */
+      .profile-card{
+        display:flex; gap:var(--space-l); align-items:center;
+        background:var(--sky); border-radius:var(--radius-3);
+        padding:var(--space-xl); box-shadow:var(--shadow-2);
+      }
+      .profile-photo{
+        flex:0 0 auto; width:200px; height:248px; max-width:100%;
+        object-fit:cover; object-position:62% 50%;
+        border-radius:var(--radius-3); box-shadow:var(--shadow-2);
+      }
+      .profile-card h3{ font-size:var(--step-2); font-weight:700; color:var(--navy); }
+      .profile-card .role{ margin:0 0 var(--space-2xs); font-size:var(--step-1); font-weight:500; color:var(--blue); }
+      .profile-card p.body{ margin:0; font-weight:500; color:var(--ink-soft); }
+
+      /* ---------- Final CTA ---------- */
+      .final{ background:var(--blue); color:#fff; text-align:center; }
+      .final h2{ font-size:var(--step-3); font-weight:700; margin-bottom:var(--space-s); }
+      .final p{ margin:0 auto var(--space-xl); max-width:38em; font-weight:500; color:var(--sky); }
+      .final .cta-row{ justify-content:center; }
+      .final .mail-address{ margin:var(--space-m) 0 0; color:var(--sky); }
+      .final .mail-address a{ color:#fff; font-weight:700; }
+
+      footer{ padding:var(--space-l) 0 var(--space-xl); text-align:center; color:var(--ink-soft); font-size:var(--step--1); font-weight:500; }
+      footer p{ margin:0; }
+
+      /* ---------- Responsive ---------- */
+      .br-sp{ display:none; }
+      @media (max-width:1020px){
+        .hero{ display:flex; flex-direction:column; min-height:0; background:var(--navy-deep); }
+        .hero-media{
+          display:block;
+          order:-1; flex:0 0 auto; width:100%;
+          height:auto; min-height:0; margin:0;
+          border:none; border-radius:0; box-shadow:none;
+        }
+        .hero-photo{ width:100%; height:auto; aspect-ratio:1179 / 658; object-fit:cover; object-position:center; }
+        .hero-text{ display:block; flex:none; }
+        .hero-inner{ max-width:none; margin:0; padding:var(--space-xl) var(--space-m) var(--space-2xl); }
+      }
+      @media (max-width:720px){
+        .hero h1{ font-size:clamp(1.85rem, 8.2vw, 2.45rem); line-height:1.35; }
+        .hero-price{ font-size:clamp(3.10rem, 15.5vw, 4.20rem); }
+        .hero-price-row{ gap:var(--space-xs); }
+        .hero-brand{ font-size:1rem; letter-spacing:.05em; }
+        .hero-sub{ font-size:1rem; }
+        .worry-grid{ grid-template-columns:1fr; }
+        .range-item{ padding:var(--space-m); }
+        .range-shots.two{ grid-template-columns:1fr; }
+        .range-shots.single-wide, .range-shots.single-portrait{ max-width:none; }
+        .range-extra{ grid-template-columns:1fr; }
+        .trial-grid{ grid-template-columns:1fr; }
+        .step-grid{ grid-template-columns:1fr; }
+        .profile-card{ flex-direction:column; text-align:center; padding:var(--space-l); }
+        .cta-row .btn{ flex:1 1 100%; }
+        .plan-cta .btn{ flex:1 1 100%; }
+
+        .plan-table{ font-size:0.82rem; letter-spacing:0; }
+        .plan-table col.c-f{ width:40%; }
+        .plan-table col.c-lite{ width:18%; }
+        .plan-table col.c-std{ width:24%; }
+        .plan-table col.c-pro{ width:18%; }
+        .plan-table th, .plan-table td{ padding:0.55rem 0.45rem; }
+        .plan-table thead th{ padding:0.65rem 0.4rem; }
+        .plan-table .pname{ font-size:0.78rem; white-space:normal; }
+        .plan-table .pprice{ font-size:0.66rem; white-space:normal; word-break:keep-all; }
+        .br-sp{ display:inline; }
+        .br-pc{ display:none; }
+        .plan-table thead th.col-name{ font-size:0.72rem; }
+        .plan-table tr.group-row td{ font-size:0.74rem; padding:0.5rem 0.45rem; }
+        .plan-table .fsub{ font-size:.78em; }
+      }
+      @media (prefers-reduced-motion: reduce){
+        html{ scroll-behavior:auto; }
+        .btn{ transition:none; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ================= Hero ================= -->
+    <header class="hero">
+      <div class="hero-text">
+        <div class="hero-inner">
+          <p class="hero-brand">飲食20年<span class="x">×</span>AI <span class="hero-brand-name">｜ 小齊平 恒平</span></p>
+          <h1>飲食店のデジタル仕事、<br />月15,000円で全部。</h1>
+          <div class="hero-price-row">
+            <p class="hero-price"><span class="hero-price-unit">月</span>15,000<span class="hero-price-unit">円（税別）</span></p>
+            <p class="hero-trial">初回お試し<strong>0円</strong></p>
+          </div>
+          <p class="hero-sub">SNSの運用、メニューPOP、<br />ホームページ、注文と会計。<br />面倒なデジタル仕事を、<br />まとめて引き受けます。<br />初回お試しは0円です。</p>
+          <div class="cta-row">
+            <a class="btn btn-line" href="https://line.me/ti/p/LDiBgsPsvN" target="_blank" rel="noopener">LINEで相談する</a>
+            <a class="btn btn-mail" href="mailto:info@kouheikosehira.com">メールで相談する</a>
+          </div>
+        </div>
+      </div>
+      <figure class="hero-media">
+        <img class="hero-photo" src="assets/hero-bg.jpg" alt="白い背景にカラフルな吹き出しが集まったイラスト。注文・会計・予約・集客などデジタル機能のアイコン入り" width="1179" height="658" />
+      </figure>
+    </header>
+
+    <!-- ================= Worries ================= -->
+    <section aria-labelledby="worries-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="worries-title">こんなお困り事、<br />ありませんか</h2>
+          <p>日々のお店の仕事の中で、<span class="keep">こんな声をよく聞きます。</span></p>
+        </div>
+        <div class="worry-grid">
+          <div class="worry">
+            <p class="num">01</p>
+            <p class="body"><strong>美味しい料理と接客に集中したい</strong>のに、<br />販促や事務の仕事に<br />時間を取られてしまう</p>
+          </div>
+          <div class="worry">
+            <p class="num">02</p>
+            <p class="body"><strong>集客に困っている</strong>。<br />ネットでお店を見つけてもらう<br />方法が分からない</p>
+          </div>
+          <div class="worry">
+            <p class="num">03</p>
+            <p class="body"><strong>人手不足をなんとかしたい</strong>。<br />少ない人数でも回せる<br />仕組みがほしい</p>
+          </div>
+          <div class="worry">
+            <p class="num">04</p>
+            <p class="body"><strong>メニュー表やSNSなどの<br />販促を楽にしたい</strong>。<br />作る時間も、続ける余裕もない</p>
+          </div>
+        </div>
+        <div class="worry-answer">
+          <p>その面倒な仕事、<br />お引き受けします。
+            <span>集客から販促、日々の管理まで。お店の状況に合わせて、リーズナブルにご対応しております。</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Support range ================= -->
+    <section class="range" aria-labelledby="range-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="range-title">支援の内容</h2>
+          <p>集客から日々の仕事まで、<br />お店のデジタル仕事を<br />まとめて支援します。</p>
+        </div>
+        <div class="range-list">
+          <div class="range-item">
+            <p class="num">01</p>
+            <h3>集客</h3>
+            <p class="body">Google検索とマップ、AI検索で、<br />店の情報を正しく出します。<br />今の状態を診断して、<br />直すところから始めます。</p>
+            <div class="range-shots single-wide">
+              <img class="shot" src="assets/scr-lz-analyze.jpg" alt="Localyzerの新規分析画面。店舗名や所在地を入力して、お店の集客の状態を診断する画面" width="1919" height="962" />
+            </div>
+          </div>
+          <div class="range-item">
+            <p class="num">02</p>
+            <h3>ホームページ</h3>
+            <p class="body">店の顔になるページを作ります。<br />メニューや営業時間の変更も、<br />こちらで直します。</p>
+            <div class="range-shots single-portrait">
+              <img class="shot" src="assets/scr-site.png" alt="DX-TABLEで作る公式サイトのトップ画面。カフェの店内写真と店名、予約ボタンが表示されている" width="935" height="1210" />
+            </div>
+          </div>
+          <div class="range-item">
+            <p class="num">03</p>
+            <h3>注文と会計</h3>
+            <p class="body">QRコードで注文を受け、<br />会計まで1つの仕組みにします。<br />混む時間の注文ミスと<br />待ち時間を減らします。</p>
+            <div class="range-shots two">
+              <img class="shot" src="assets/scr-qr-menu.jpg" alt="DX-TABLEのお客様側QRメニュー。料理の写真と価格が一覧で並ぶ注文画面" width="1919" height="998" />
+              <img class="shot" src="assets/scr-orders.jpg" alt="DX-TABLEの店側の注文管理画面。注文、調理済み、配膳済みの状態がテーブルごとに表示される" width="1919" height="947" />
+            </div>
+          </div>
+          <div class="range-item">
+            <p class="num">04</p>
+            <h3>売上と発注</h3>
+            <p class="body">売上の数字を<br />毎日見える形にします。<br />発注書と仕入れ先の管理まで<br />まとめて、無駄な仕入れを<br />減らします。</p>
+            <div class="range-shots two">
+              <img class="shot" src="assets/scr-sales.png" alt="DX-TABLEの売上分析画面。売上の推移がグラフで表示される" width="935" height="1106" />
+              <img class="shot" src="assets/scr-aiorder.png" alt="DX-TABLEの発注管理画面。AI発注書を生成する画面" width="935" height="1106" />
+            </div>
+          </div>
+          <div class="range-item">
+            <p class="num">05</p>
+            <h3>SNSとメニューPOP</h3>
+            <p class="body">SNSの投稿を代行します。<br />メニューPOPのデザインは、<br />毎月1種類まで無料です。<br />印刷や郵送は別料金です。</p>
+            <div class="range-shots single-portrait">
+              <img class="shot" src="assets/trial-pop.jpg" alt="店内のテーブルに置かれたメニューPOP（メニュースタンド）の写真" width="735" height="1030" />
+            </div>
+          </div>
+        </div>
+        <div class="range-extra">
+          <figure>
+            <img class="shot" src="assets/scr-tables.jpg" alt="DX-TABLEのフロアマップ画面" width="1919" height="947" />
+            <figcaption>フロアマップ</figcaption>
+          </figure>
+          <figure>
+            <img class="shot" src="assets/scr-reserve.jpg" alt="DX-TABLEの予約カレンダー画面" width="1919" height="947" />
+            <figcaption>予約カレンダー</figcaption>
+          </figure>
+          <figure>
+            <img class="shot" src="assets/scr-home.jpg" alt="DX-TABLEの経営ダッシュボード画面" width="1919" height="947" />
+            <figcaption>経営ダッシュボード</figcaption>
+          </figure>
+          <figure>
+            <img class="shot" src="assets/scr-menu.png" alt="DX-TABLEのメニュー管理画面" width="935" height="1106" />
+            <figcaption>メニュー管理</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Trial ================= -->
+    <section class="trial" aria-labelledby="trial-title">
+      <div class="wrap">
+        <div class="trial-top">
+          <h2 class="trial-label" id="trial-title">初回お試し</h2>
+          <p class="trial-zero">0<small>円</small></p>
+          <p class="trial-lead">いきなりの契約ではなく、<br />まずは0円のお試しで<br />「どんなものができるか」を<br />ご確認ください。</p>
+        </div>
+        <div class="trial-grid">
+          <div class="trial-card trial-card--pop">
+            <p class="num">01</p>
+            <h3>メニューPOP<br />1枚デザイン</h3>
+            <p>おすすめメニューなどを伝える<br />POPを1枚デザインします。<br />店頭や店内でそのまま<br />お使いいただけます。</p>
+          </div>
+          <div class="trial-card trial-card--sns">
+            <p class="num">02</p>
+            <h3>1週間<br />SNSの運用代行</h3>
+            <p>1週間、SNSの運用を<br />お試しで代行します。<br />忙しくて手が回らない発信を、<br />まず体験してみてください。</p>
+          </div>
+          <div class="trial-card trial-card--web">
+            <p class="num">03</p>
+            <h3>ホームページ制作</h3>
+            <p>お店のホームページ制作も<br />お試しの対象です。<br />ホームページがないお店はもちろん、<br />見直しのご相談もどうぞ。</p>
+          </div>
+        </div>
+        <p class="trial-note">お試しの進め方や範囲は、お店の状況を伺ってからご案内します。まずはお気軽にご相談ください。</p>
+      </div>
+    </section>
+
+    <!-- ================= Plans ================= -->
+    <section aria-labelledby="plans-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="plans-title">料金プラン</h2>
+        </div>
+
+        <div class="plan-scroll">
+          <table class="plan-table">
+            <colgroup>
+              <col class="c-f" />
+              <col class="c-p c-lite" />
+              <col class="c-p c-std" />
+              <col class="c-p c-pro" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="col-name" scope="col">機能</th>
+                <th class="col-lite" scope="col"><span class="pname">ライト<wbr />プラン</span><span class="pprice">月15,000円（税別）</span></th>
+                <th scope="col"><span class="pname">スタンダード<wbr />プラン</span><span class="pprice">月30,000円（税別）</span></th>
+                <th scope="col"><span class="pname">プロ<wbr />プラン</span><span class="pprice">月50,000円（税別）</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="group-row"><td colspan="4">すべてのプランに含む</td></tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">SNS運用代行</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">メニューPOP制作</span><span class="fsub">月1種類</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">集客診断</span><span class="fsub">SEO・MEO・AIO</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">ホームページ</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">QRコード注文</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">テーブル管理・<wbr />フロアマップ</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">注文管理</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">会計・精算</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">厨房ダッシュボード</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">メニュー管理</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">デザイン<wbr />カスタマイズ</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row" class="lite"><span class="fname">多言語対応</span><span class="fsub">日本語・英語</span></th>
+                <td class="cell lite">○</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="4">スタンダードプランとプロプランに含む</td></tr>
+              <tr>
+                <th scope="row"><span class="fname">売上分析</span><span class="fsub">売上推移・商品別分析</span></th>
+                <td class="cell lite no">―</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="fname">予約管理・<wbr />カレンダー</span></th>
+                <td class="cell lite no">―</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="fname">スタッフ管理・<wbr />権限設定</span></th>
+                <td class="cell lite no">―</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="fname">日次精算レポート</span></th>
+                <td class="cell lite no">―</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="fname">CSVエクスポート</span></th>
+                <td class="cell lite no">―</td><td class="cell">○</td><td class="cell">○</td>
+              </tr>
+
+              <tr class="group-row"><td colspan="4">プロプランだけに含む</td></tr>
+              <tr>
+                <th scope="row"><span class="fname">AIメニュー<wbr />自動生成・提案</span></th>
+                <td class="cell lite no">―</td><td class="cell no">―</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="fname">発注管理</span><span class="fsub">発注書・<wbr />仕入れ先・<wbr />食材マスター</span></th>
+                <td class="cell lite no">―</td><td class="cell no">―</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="fname">デリバリー連携</span></th>
+                <td class="cell lite no">―</td><td class="cell no">―</td><td class="cell">○</td>
+              </tr>
+              <tr>
+                <th scope="row"><span class="fname">優先サポート</span></th>
+                <td class="cell lite no">―</td><td class="cell no">―</td><td class="cell">○</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="plan-note">まずはライトプランや<br />初回お試しから始められます。</p>
+        <div class="plan-cta">
+          <a class="btn btn-outline" href="dpartner.html">詳細を見る</a>
+          <a class="btn btn-line" href="https://line.me/ti/p/LDiBgsPsvN" target="_blank" rel="noopener">LINEでプランを相談する</a>
+          <a class="btn btn-outline" href="mailto:info@kouheikosehira.com">メールでプランを相談する</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Steps ================= -->
+    <section class="steps" aria-labelledby="steps-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="steps-title">ご利用の流れ</h2>
+        </div>
+        <div class="step-grid">
+          <div class="step">
+            <p class="step-num">01</p>
+            <h3>ご相談</h3>
+            <p>メールまたはLINEで、<br />お店のお困り事をお聞かせください。<br />小さなことでも構いません。</p>
+          </div>
+          <div class="step">
+            <p class="step-num">02</p>
+            <h3>初回お試し（0円）</h3>
+            <p>メニューPOP 1枚デザイン、<br />1週間 SNSの運用代行、<br />ホームページ制作のお試しから<br />始められます。</p>
+          </div>
+          <div class="step">
+            <p class="step-num">03</p>
+            <h3>プランで継続支援</h3>
+            <p>お試しの内容が合えば、<br />月額プランで継続的に支援します。<br />合わなければ、お試しだけで<br />終わっていただいて構いません。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Profile ================= -->
+    <section aria-labelledby="profile-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="profile-title">担当のご紹介</h2>
+        </div>
+        <div class="profile-card">
+          <div>
+            <h3>小齊平 恒平</h3>
+            <p class="role">現場10年、本部10年</p>
+            <p class="body">
+              店長やエリア長を10年、<br />
+              その後は本部で現場を<br />
+              サポートして参りました。<br />
+              現場の忙しさも、<br />
+              店主の困り事も分かる<br />
+              立場から、<br />
+              AIとデジタルを使って<br />
+              お店の面倒な仕事を<br />
+              お手伝いします。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Final CTA ================= -->
+    <section class="final" aria-labelledby="contact-title">
+      <div class="wrap">
+        <h2 id="contact-title">その他ご要望・<br class="br-sp" />ご相談も、<br class="br-pc" />お気軽に<br class="br-sp" />お声掛けください</h2>
+        <p>「こんなことも頼める？」という段階で<br />構いません。お店の状況を伺い、<br />できることを正直にご案内します。</p>
+        <div class="cta-row">
+          <a class="btn btn-mail" href="https://line.me/ti/p/LDiBgsPsvN" target="_blank" rel="noopener">LINEで相談する</a>
+          <a class="btn btn-outline" href="mailto:info@kouheikosehira.com" style="background:#fff;color:var(--navy);border-color:#fff;">メールで相談する</a>
+        </div>
+        <p class="mail-address">メールアドレス：<a href="mailto:info@kouheikosehira.com">info@kouheikosehira.com</a></p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <p>小齊平 恒平｜飲食20年 × AI ― 飲食店向けデジタル支援</p>
+      </div>
+    </footer>
+
+  </body>
+</html>

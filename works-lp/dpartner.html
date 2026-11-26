@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="data:," />
+    <title>dパートナー取扱サービスのご案内｜JTBC 正規代理店 小齊平 恒平</title>
+
+    <!-- Noto Sans JP (SIL OFL) via Fontsource: weights 500 / 700 / 900 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/500.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/700.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/900.css" />
+
+    <style>
+      :root{
+        --navy:#051a3a;
+        --navy-deep:#030f27;
+        --navy-mid:#0a2a5c;
+        --blue:#0b4ea2;
+        --blue-bright:#3b82d6;
+        --sky:#e9f2fc;
+        --sky-2:#d3e4f8;
+        --sky-soft:#f2f7fd;
+        --ink:#152740;
+        --ink-soft:#47617f;
+        --muted:#8aa0b8;
+        --white:#ffffff;
+        --shadow-2:0 2px 10px rgba(5,26,58,.10), 0 10px 28px rgba(5,26,58,.07);
+        --shadow-3:0 4px 16px rgba(5,26,58,.14), 0 18px 44px rgba(5,26,58,.12);
+        --radius-2:10px;
+        --radius-3:18px;
+
+        --step--1:clamp(0.85rem, 0.82rem + 0.16vw, 0.95rem);
+        --step-0: clamp(1.00rem, 0.96rem + 0.22vw, 1.13rem);
+        --step-1: clamp(1.20rem, 1.12rem + 0.42vw, 1.45rem);
+        --step-2: clamp(1.55rem, 1.38rem + 0.85vw, 2.05rem);
+        --step-3: clamp(2.05rem, 1.75rem + 1.60vw, 3.10rem);
+
+        --space-3xs:clamp(0.25rem, 0.24rem + 0.06vw, 0.31rem);
+        --space-2xs:clamp(0.50rem, 0.48rem + 0.11vw, 0.63rem);
+        --space-xs: clamp(0.75rem, 0.71rem + 0.17vw, 0.94rem);
+        --space-s:  clamp(1.00rem, 0.95rem + 0.22vw, 1.25rem);
+        --space-m:  clamp(1.50rem, 1.43rem + 0.34vw, 1.88rem);
+        --space-l:  clamp(2.00rem, 1.90rem + 0.45vw, 2.50rem);
+        --space-xl: clamp(3.00rem, 2.86rem + 0.67vw, 3.75rem);
+        --space-2xl:clamp(4.50rem, 4.20rem + 1.40vw, 6.50rem);
+        --space-3xl:clamp(6.00rem, 5.40rem + 2.80vw, 9.50rem);
+      }
+      *{ box-sizing:border-box; }
+      html{ scroll-behavior:smooth; }
+      body{
+        margin:0;
+        font-family:"Noto Sans JP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
+        font-weight:500;
+        font-size:var(--step-0);
+        letter-spacing:.02em;
+        line-height:1.8;
+        color:var(--ink);
+        background:var(--white);
+        -webkit-font-smoothing:antialiased;
+      }
+      img{ max-width:100%; display:block; }
+      h1,h2,h3{
+        font-feature-settings:"palt";
+        letter-spacing:.02em;
+        line-height:1.35;
+        margin:0;
+        text-wrap:balance;
+      }
+      p{ text-wrap:pretty; }
+      .wrap{ max-width:1120px; margin:0 auto; padding-inline:var(--space-m); }
+
+      /* ---------- Buttons ---------- */
+      .btn{
+        display:inline-flex; align-items:center; justify-content:center;
+        min-height:58px; padding:var(--space-xs) var(--space-l);
+        border-radius:999px; border:2px solid transparent;
+        font-size:var(--step-0); font-weight:700; line-height:1.4; text-decoration:none;
+        transition:background-color .15s ease, color .15s ease, border-color .15s ease;
+      }
+      .btn-line{ background:var(--blue); color:#fff; box-shadow:var(--shadow-3); }
+      .btn-line:hover{ background:var(--navy-mid); }
+      .btn-mail{ background:#fff; color:var(--navy); }
+      .btn-mail:hover{ background:var(--sky); }
+      .btn-outline{ background:transparent; color:var(--blue); border-color:var(--blue); box-shadow:none; }
+      .btn-outline:hover{ background:var(--sky); }
+      .cta-row{ display:flex; flex-wrap:wrap; gap:var(--space-xs); }
+
+      /* ---------- Sub hero ---------- */
+      .subhero{ background:var(--navy-deep); color:#fff; padding-block:var(--space-2xl); }
+      .back-link{
+        display:inline-block; color:var(--sky-2); font-size:var(--step--1); font-weight:700;
+        text-decoration:none; margin-bottom:var(--space-l);
+      }
+      .back-link:hover{ color:#fff; text-decoration:underline; }
+      .subhero-brand{
+        font-size:var(--step-1); font-weight:900; letter-spacing:.08em; margin:0 0 var(--space-m);
+        line-height:1.4;
+      }
+      .subhero-brand .x{ color:var(--blue-bright); }
+      .subhero-brand-name{ font-weight:500; letter-spacing:.06em; }
+      .subhero h1{
+        font-size:var(--step-3); font-weight:900; line-height:1.3; margin:0 0 var(--space-m);
+        max-width:18em;
+      }
+      .subhero .lead{
+        font-size:var(--step-1); font-weight:500; line-height:1.8;
+        margin:0; max-width:36em; color:#fff;
+      }
+
+      /* ---------- Sections ---------- */
+      section{ padding-block:var(--space-3xl); }
+      .sec-head{ margin-bottom:var(--space-xl); max-width:44em; }
+      .sec-head h2{ font-size:var(--step-3); font-weight:700; color:var(--navy); margin-bottom:var(--space-xs); }
+      .sec-head p{ margin:0; font-size:var(--step-1); font-weight:500; color:var(--ink-soft); line-height:1.65; }
+      .sec-sky{ background:var(--sky); }
+      .sec-note{ margin:var(--space-m) 0 0; font-weight:500; color:var(--ink-soft); }
+      .sec-note a{ color:var(--blue); font-weight:700; }
+
+      /* ---------- Price / tier cards ---------- */
+      .price-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-s); }
+      .price-card{
+        background:#fff; border:2px solid var(--sky-2); border-radius:var(--radius-3);
+        padding:var(--space-l); box-shadow:var(--shadow-2); text-align:center;
+      }
+      .price-card.mid{ border-color:var(--blue); }
+      .price-card .pname2{ font-size:var(--step-1); font-weight:700; color:var(--navy); margin:0 0 var(--space-2xs); }
+      .price-card .pprice2{
+        font-size:var(--step-2); font-weight:900; color:var(--navy); line-height:1.2; margin:0;
+        font-feature-settings:"palt"; white-space:nowrap;
+      }
+      .price-card .pprice2 small{ font-size:.5em; font-weight:900; }
+      .price-card .ptax{ font-size:var(--step--1); font-weight:500; color:var(--ink-soft); margin:var(--space-3xs) 0 0; }
+      .price-card .pdiff{
+        margin:var(--space-s) 0 0;
+        font-size:var(--step--1); font-weight:500; color:var(--ink-soft); line-height:1.7; text-align:left;
+      }
+      .price-note{ margin:var(--space-m) 0 0; font-weight:500; color:var(--ink-soft); }
+
+      /* ---------- dmobile body ---------- */
+      .plain-body{ max-width:44em; }
+      .plain-body p{ margin:0 0 var(--space-s); font-size:var(--step-1); font-weight:500; color:var(--ink-soft); line-height:1.8; }
+      .plain-body p:last-child{ margin-bottom:0; }
+      .plain-body a{ color:var(--blue); font-weight:700; }
+
+      /* ---------- Steps ---------- */
+      .steps{ background:var(--sky); }
+      .flow-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-m); }
+      .step{ background:#fff; border-radius:var(--radius-3); box-shadow:var(--shadow-2); padding:var(--space-l); }
+      .step .step-num{ font-size:var(--step-3); font-weight:900; color:var(--blue-bright); line-height:1.1; margin:0 0 var(--space-2xs); font-feature-settings:"palt"; }
+      .step h3{ font-size:var(--step-1); font-weight:700; color:var(--navy); margin-bottom:var(--space-2xs); }
+      .step p{ margin:0; font-size:var(--step--1); font-weight:500; color:var(--ink-soft); }
+
+      /* ---------- Final CTA ---------- */
+      .final{ background:var(--blue); color:#fff; text-align:center; }
+      .final h2{ font-size:var(--step-3); font-weight:700; margin-bottom:var(--space-s); }
+      .final p{ margin:0 auto var(--space-xl); max-width:38em; font-weight:500; color:var(--sky); }
+      .final .cta-row{ justify-content:center; }
+      .final .mail-address{ margin:var(--space-m) 0 0; color:var(--sky); }
+      .final .mail-address a{ color:#fff; font-weight:700; }
+      .final .back-link{ color:#fff; margin:var(--space-l) 0 0; }
+      .final .back-link:hover{ color:var(--sky); }
+
+      footer{ padding:var(--space-l) 0 var(--space-xl); text-align:center; color:var(--ink-soft); font-size:var(--step--1); font-weight:500; }
+      footer p{ margin:0; }
+      footer .agent-note{ font-size:.82em; color:var(--muted); margin-bottom:var(--space-2xs); }
+
+      /* ---------- Responsive ---------- */
+      .br-sp{ display:none; }
+      @media (max-width:1020px){
+        .flow-grid{ grid-template-columns:repeat(2,1fr); }
+      }
+      @media (max-width:720px){
+        .subhero h1{ font-size:clamp(1.85rem, 8.2vw, 2.45rem); line-height:1.35; }
+        .subhero-brand{ font-size:1rem; letter-spacing:.05em; }
+        .subhero .lead{ font-size:1rem; }
+        .price-grid{ grid-template-columns:1fr; }
+        .flow-grid{ grid-template-columns:1fr; }
+        .cta-row .btn{ flex:1 1 100%; }
+        .br-sp{ display:inline; }
+        .br-pc{ display:none; }
+      }
+      @media (prefers-reduced-motion: reduce){
+        html{ scroll-behavior:auto; }
+        .btn{ transition:none; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ================= Sub hero ================= -->
+    <header class="subhero">
+      <div class="wrap">
+        <a class="back-link" href="index.html">← 1ページ目へ戻る</a>
+        <p class="subhero-brand">飲食20年<span class="x">×</span>AI <span class="subhero-brand-name">｜ 小齊平 恒平</span></p>
+        <h1>dパートナー<br />取扱サービスのご案内</h1>
+        <p class="lead">JTBCの dパートナーで取り扱う、注文と会計の「DX-TABLE」、集客の「Localyzer」、通信の「dmobile」について、料金とプランの違いをご案内します。</p>
+      </div>
+    </header>
+
+    <!-- ================= DX-TABLE ================= -->
+    <section aria-labelledby="dxtable-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="dxtable-title">DX-TABLE（注文と会計）</h2>
+          <p>お客様がテーブルのQRコードから注文し、<br />会計まで進められる仕組みです。</p>
+        </div>
+
+        <div class="price-grid">
+          <div class="price-card">
+            <p class="pname2">ライトプラン</p>
+            <p class="pprice2"><small>月</small>15,000<small>円</small></p>
+            <p class="ptax">税別</p>
+            <p class="pdiff">注文と会計の基本機能がそろいます。</p>
+          </div>
+          <div class="price-card mid">
+            <p class="pname2">スタンダードプラン</p>
+            <p class="pprice2"><small>月</small>30,000<small>円</small></p>
+            <p class="ptax">税別</p>
+            <p class="pdiff">売上分析・予約管理・スタッフ管理などが加わります。</p>
+          </div>
+          <div class="price-card">
+            <p class="pname2">プロプラン</p>
+            <p class="pprice2"><small>月</small>50,000<small>円</small></p>
+            <p class="ptax">税別</p>
+            <p class="pdiff">AIメニュー自動生成・発注管理・デリバリー連携・優先サポートが加わります。</p>
+          </div>
+        </div>
+        <p class="price-note">料金は1店舗あたりの月額（税別）です。お申し込みの月は、末日まで無料でお使いいただけます。</p>
+        <p class="sec-note">プランごとの詳しい機能の比較は、<a href="index.html#plans-title">1ページ目の料金プラン</a>でご確認いただけます。</p>
+      </div>
+    </section>
+
+    <!-- ================= Localyzer ================= -->
+    <section class="sec-sky" aria-labelledby="localyzer-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="localyzer-title">Localyzer（集客）</h2>
+          <p>Google検索とマップ、AI検索で、<br />お店の情報がどう出ているかを診断し、<br />集客を整えるサービスです。</p>
+        </div>
+
+        <div class="price-grid">
+          <div class="price-card">
+            <p class="pname2">ライトプラン</p>
+            <p class="pdiff" style="margin-top:0;">投稿文の生成は月4回まで。</p>
+          </div>
+          <div class="price-card mid">
+            <p class="pname2">スタンダードプラン</p>
+            <p class="pdiff" style="margin-top:0;">投稿文の生成は週次、集客レポートと口コミ返信の自動化が加わります。</p>
+          </div>
+          <div class="price-card">
+            <p class="pname2">プレミアムプラン</p>
+            <p class="pdiff" style="margin-top:0;">AIO構造化データの最適化と専任サポート担当者が加わります。</p>
+          </div>
+        </div>
+        <p class="sec-note">Localyzerは1契約につき1店舗です。料金はお問い合わせの際にご案内します。</p>
+      </div>
+    </section>
+
+    <!-- ================= dmobile ================= -->
+    <section aria-labelledby="dmobile-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="dmobile-title">dmobile（通信）</h2>
+        </div>
+        <div class="plain-body">
+          <p>携帯回線（SIM）の取り扱いがあります。店舗やスタッフの回線の見直しにご利用いただけます。</p>
+          <p>サービスの内容は、<a href="https://www.dmobile.jp/" target="_blank" rel="noopener">dmobile公式サイト</a>でもご確認いただけます。料金は回線の内容によって変わりますので、まずはご相談ください。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Flow ================= -->
+    <section class="steps" aria-labelledby="flow-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 id="flow-title">お申し込みの流れ</h2>
+        </div>
+        <div class="flow-grid">
+          <div class="step">
+            <p class="step-num">01</p>
+            <h3>ご相談</h3>
+            <p>LINEまたはメールで、お店の状況とお困り事をお聞かせください。</p>
+          </div>
+          <div class="step">
+            <p class="step-num">02</p>
+            <h3>内容の確認とご提案</h3>
+            <p>お店に合うサービスとプランを確認し、内容と料金をご提案します。</p>
+          </div>
+          <div class="step">
+            <p class="step-num">03</p>
+            <h3>お申し込み</h3>
+            <p>ご提案の内容でよければ、お申し込みの手続きに進みます。</p>
+          </div>
+          <div class="step">
+            <p class="step-num">04</p>
+            <h3>初期設定の支援</h3>
+            <p>使い始めの設定をお手伝いします。分からないところは、その都度ご相談ください。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Final CTA ================= -->
+    <section class="final" aria-labelledby="contact-title">
+      <div class="wrap">
+        <h2 id="contact-title">まずはお気軽に<br />ご相談ください</h2>
+        <p>「うちの店にはどれが合う？」という段階で構いません。お店の状況を伺い、必要なものをご案内します。</p>
+        <div class="cta-row">
+          <a class="btn btn-mail" href="https://line.me/ti/p/LDiBgsPsvN" target="_blank" rel="noopener">LINEで相談する</a>
+          <a class="btn btn-outline" href="mailto:info@kouheikosehira.com" style="background:#fff;color:var(--navy);border-color:#fff;">メールで相談する</a>
+        </div>
+        <p class="mail-address">メールアドレス：<a href="mailto:info@kouheikosehira.com">info@kouheikosehira.com</a></p>
+        <a class="back-link" href="index.html">← 1ページ目へ戻る</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <p class="agent-note">小齊平 恒平は、JTBC 正規代理店です。</p>
+        <p>小齊平 恒平｜飲食20年 × AI ― 飲食店向けデジタル支援</p>
+      </div>
+    </footer>
+
+  </body>
+</html>

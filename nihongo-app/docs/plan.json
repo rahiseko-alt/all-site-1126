@@ -1,0 +1,533 @@
+{
+  "goal": "docs/decisions.md「15.」に確定した5手段の未実装部分が全て配線され、非エンジニアが進捗・完了判定・見送りを実物で確認できる状態",
+  "items": [
+    {
+      "id": "T001",
+      "title": "並列実行の手順をAGENTS.mdに追記する",
+      "deliverable": "並列にしてよい条件、Workflowのparallel()の呼び方、isolation: worktreeの指定方法がAGENTS.mdに書かれている状態",
+      "verify": [
+        "AGENTS.mdを開き、並列実行に関する節があることを確認する",
+        "書かれた手順どおりにWorkflowを呼び出せることを目視で確認する"
+      ],
+      "dependsOn": [],
+      "files": ["AGENTS.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T002",
+      "title": "canRunInParallelを呼ぶCLIコマンドを追加する",
+      "deliverable": "コマンドを実行すると、今並列に進めてよい項目の組がdocs/plan.jsonから一覧できる状態",
+      "verify": [
+        "依存関係が無くファイルも重ならない2項目を含むdocs/plan.jsonを用意する",
+        "コマンドを実行し、その2項目が組として表示されることを確認する",
+        "依存関係やファイル重複がある項目は組として出ないことを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["src/plan-cli/parallel.ts", "package.json"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T003",
+      "title": "並列候補コマンドのテストを書く",
+      "deliverable": "T002のコマンドを検証する単体テストがある状態",
+      "verify": ["pnpm run testを実行し、新しいテストが通ることを確認する"],
+      "dependsOn": ["T002"],
+      "files": ["src/plan-cli/parallel.test.ts"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T004",
+      "title": "/checkinに並列候補の提示を追加する",
+      "deliverable": "/checkinを実行すると、並列に進められる組み合わせがあれば提示される状態",
+      "verify": [
+        "並列候補がある状態で/checkinを実行し、候補が提示されることを確認する",
+        "候補が無いdocs/plan.jsonでは何も提示されないことを確認する"
+      ],
+      "dependsOn": ["T002"],
+      "files": [".claude/skills/checkin/SKILL.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T005",
+      "title": "実際に2項目を並列で走らせて動作確認する",
+      "deliverable": "Workflowのparallel()で実際に2つの独立項目を同時に完了させた記録がある状態",
+      "verify": [
+        "依存もファイル重複も無い2項目をparallel()で同時に実行する",
+        "両方完了後、git statusでファイルが衝突していないことを確認する",
+        "結果をdocs/decisions.mdに記録する"
+      ],
+      "dependsOn": ["T001"],
+      "files": ["docs/decisions.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T006",
+      "title": "/goalの使い方をAGENTS.mdに追記する",
+      "deliverable": "1項目に着手する際、完了条件を/goalで宣言する手順が書かれている状態",
+      "verify": [
+        "AGENTS.mdに手順があることを確認する",
+        "実際に1項目で試し、/goalが正しく「満たした」と判定することを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["AGENTS.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T007",
+      "title": "「/checkoutでcompletion-checkerを呼ぶ」フローが実際に機能することを確認する",
+      "deliverable": ".claude/skills/checkout/SKILL.mdに既に書かれている完了判定フロー（completion-checker呼び出し→判定結果でstatus更新）が、書かれたとおりに動くことを実地で確認した記録がある状態",
+      "verify": [
+        "docs/plan.jsonの適当な項目を1つ完了させた状態で/checkoutを実行する",
+        "completion-checkerが自動的に呼ばれ、verify手順をなぞった証拠が出力されることを確認する",
+        "判定が通った場合はstatusがdoneに、通らない場合はtodoのままになることを確認する",
+        "automationがhumanの項目ではawaiting_humanになることを確認する"
+      ],
+      "dependsOn": [],
+      "files": [".claude/skills/checkout/SKILL.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T009",
+      "title": "verifyの書き方を機械的にチェックする関数を追加する",
+      "deliverable": "「テストが通る」のように対象コマンドや期待結果を示さない書き方のverifyをvalidatePlanが拒否する状態。ただし『pnpm run testを実行し、〜が通ることを確認する』のように対象と期待結果を示すものは許容する（テスト追加そのものが目的の項目まで拒否しない）",
+      "verify": [
+        "対象コマンドも期待結果も書かれていない曖昧な書き方のverifyを含むdocs/plan.jsonでpnpm run testを実行し、エラーになることを確認する",
+        "docs/plan.jsonのT003・T010・T012のような『pnpm run testを実行し、〜を確認する』という書き方は通ることを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["src/plan.ts"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T010",
+      "title": "verifyチェックのテストを書く",
+      "deliverable": "T009のチェックを検証するテストケースがある状態",
+      "verify": ["pnpm run testで新しいテストが通ることを確認する"],
+      "dependsOn": ["T009"],
+      "files": ["src/plan.test.ts"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T011",
+      "title": "countProgressを呼ぶCLIコマンドを追加する",
+      "deliverable": "コマンドを実行すると、初期/追加項目それぞれの完了数と人間確認待ちの一覧が表示される状態",
+      "verify": [
+        "完了・未完了・人間確認待ちが混在するdocs/plan.jsonを用意する",
+        "コマンドを実行し、正しい数値と一覧が表示されることを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["src/plan-cli/progress.ts", "package.json"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T012",
+      "title": "進捗表示コマンドのテストを書く",
+      "deliverable": "T011のコマンドを検証する単体テストがある状態",
+      "verify": ["pnpm run testで新しいテストが通ることを確認する"],
+      "dependsOn": ["T011"],
+      "files": ["src/plan-cli/progress.test.ts"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T013",
+      "title": "進捗表示から専門用語を無くす",
+      "deliverable": "表示にidやstatusのような内部用語がそのまま出ず、「終わった」「まだ」等の日本語の文章で進み具合が表現される状態",
+      "verify": [
+        "表示結果にsrc/plan.tsの内部フィールド名がそのまま出ていないことを確認する",
+        "完了数・全体数・残り数が日本語の文章として表示されていることを確認する"
+      ],
+      "dependsOn": ["T011"],
+      "files": ["src/plan-cli/progress.ts"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T014",
+      "title": "非エンジニアに実際に見せて理解できるか確認する",
+      "deliverable": "実在の非エンジニアがこの画面を見て、今の進み具合を自分の言葉で説明できる状態",
+      "verify": ["実際に画面を見せ、進み具合を説明してもらう", "説明できなければT013に戻って直す"],
+      "dependsOn": ["T013"],
+      "files": ["src/plan-cli/progress.ts"],
+      "automation": "human",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T015",
+      "title": "/checkinがnextItemを実際に呼ぶよう書き換える",
+      "deliverable": "「次の1件を選ぶ」手順が、文章の指示ではなくnextItem関数の呼び出しになっている状態",
+      "verify": [
+        "依存を満たしたtodo項目が複数あるdocs/plan.jsonで/checkinを実行する",
+        "nextItemの結果がそのまま次の1件として提示されることを確認する"
+      ],
+      "dependsOn": ["T027"],
+      "files": [".claude/skills/checkin/SKILL.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T016",
+      "title": "追記手順にnextIdの利用を明記する",
+      "deliverable": "新しい項目を追記するとき、AIが手で番号を決めずnextIdの結果を使うことがAGENTS.mdに明記されている状態",
+      "verify": [
+        "AGENTS.mdの記述を確認する",
+        "実際に追記してみて番号が既存最大値+1になることを確認する"
+      ],
+      "dependsOn": ["T017"],
+      "files": ["AGENTS.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T017",
+      "title": "nextIdを呼ぶCLIコマンドを追加する",
+      "deliverable": "コマンドを実行すると、次に振るべき番号がわかる状態",
+      "verify": ["コマンドを実行し、既存最大値+1が表示されることを確認する"],
+      "dependsOn": [],
+      "files": ["src/plan-cli/next-id.ts", "package.json"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T018",
+      "title": "進捗と見送り件数を確認するRoutineを作成する",
+      "deliverable": "定期的にdocs/plan.jsonとdocs/neglected-log.mdを確認するRoutineが実在する状態",
+      "verify": ["claude.ai/code/routinesまたは/scheduleでRoutineが作成されていることを確認する"],
+      "dependsOn": ["T011"],
+      "files": ["AGENTS.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T019",
+      "title": "Routineを手動実行して通知が届くことを確認する",
+      "deliverable": "Routineを1回実行すると、通知が実際に届く状態",
+      "verify": ["Run nowでRoutineを実行し、通知が届くことを目視で確認する"],
+      "dependsOn": ["T018"],
+      "files": ["AGENTS.md"],
+      "automation": "human",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T020",
+      "title": "全項目done時の通知内容を確認する",
+      "deliverable": "ゴール到達時に通知の文言がそれとわかる内容に変わる状態",
+      "verify": [
+        "全項目をdoneにした状態でRoutineを実行し、通知文言がゴール到達を示すことを確認する"
+      ],
+      "dependsOn": ["T019"],
+      "files": ["AGENTS.md"],
+      "automation": "human",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T021",
+      "title": "Gate抵触検出の設計メモを書く",
+      "deliverable": "test-policy.mdのGateに触れたがヒヤリハットで済んだ場面を、何をトリガーに何を見て検出するかの設計メモがある状態",
+      "verify": ["設計メモを読み、検出方法が具体的に書かれていることを確認する"],
+      "dependsOn": [],
+      "files": ["docs/decisions.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T022",
+      "title": "Gate抵触検出フックを実装する",
+      "deliverable": "設計どおりのフックが実際に動き、.claude/settings.jsonに登録されて自動発火する状態",
+      "verify": [
+        "わざとGateに触れる状況を再現し、フックが反応することを確認する",
+        ".claude/settings.jsonのhooksにneglect-check.shが登録されていることを確認する"
+      ],
+      "dependsOn": ["T021"],
+      "files": [".claude/hooks/neglect-check.sh", ".claude/settings.json"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T023",
+      "title": "台帳に書かれないまま/checkoutが進むのを止める",
+      "deliverable": "neglected-log.mdへの記入が無いまま/checkoutしようとすると警告される状態",
+      "verify": [
+        "記入せずに/checkoutを試し、警告が出ることを確認する",
+        "記入後は警告が出ないことを確認する"
+      ],
+      "dependsOn": ["T022"],
+      "files": [".claude/hooks/handoff-check.sh"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T024",
+      "title": "AskUserQuestionの使用をAGENTS.mdに明記する",
+      "deliverable": "専門的な内容を聞くときは選択肢付きで聞く、という実践がAGENTS.mdに明文化されている状態",
+      "verify": ["AGENTS.mdの該当節を確認する"],
+      "dependsOn": [],
+      "files": ["AGENTS.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T025",
+      "title": "質問スタイル検査の設計メモを書く",
+      "deliverable": "何をもって「非エンジニアに答えられない聞き方」と判定するかの設計メモがある状態",
+      "verify": ["設計メモを読み、具体的な判定基準が書かれていることを確認する"],
+      "dependsOn": [],
+      "files": ["docs/decisions.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T026",
+      "title": "質問スタイルを検査するフックを実装する",
+      "deliverable": "設計どおりのフックが実際に動き、.claude/settings.jsonに登録されて自動発火する状態",
+      "verify": [
+        "専門用語だけの質問をさせてみて、フックが反応することを確認する",
+        "平易な説明＋選択肢の質問は通ることを確認する",
+        ".claude/settings.jsonのhooksにquestion-style-check.shが登録されていることを確認する"
+      ],
+      "dependsOn": ["T025", "T024"],
+      "files": [".claude/hooks/question-style-check.sh", ".claude/settings.json"],
+      "automation": "human",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T027",
+      "title": "nextItemを呼ぶCLIコマンドを追加する",
+      "deliverable": "コマンドを実行すると、依存を満たしたtodo項目の中から次に着手すべき1件がわかる状態",
+      "verify": [
+        "依存関係を満たしたtodo項目が複数あるdocs/plan.jsonでコマンドを実行する",
+        "正しい1件が表示されることを確認する",
+        "依存先が未完了の項目が選ばれないことを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["src/plan-cli/next-item.ts", "package.json"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "initial"
+    },
+    {
+      "id": "T028",
+      "title": "確かめ方の書き方が機械で弾かれることを/plan-initに明記する",
+      "deliverable": ".claude/skills/plan-init/SKILL.md に、確かめ方の書き方が機械で検査され、条件を満たさないと検証が落ちることと、その条件が書かれている状態",
+      "verify": [
+        ".claude/skills/plan-init/SKILL.md を開き、確かめ方が機械で検査されると書かれていることを確認する",
+        "書かれている条件が、src/plan.ts の validateVerifySteps の実際の判定と一致していることを確認する"
+      ],
+      "dependsOn": [],
+      "files": [".claude/skills/plan-init/SKILL.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "added"
+    },
+    {
+      "id": "T029",
+      "title": "引継ぎ本文に自動記録の目印を書かない注意を/handoffに入れる",
+      "deliverable": ".claude/skills/handoff/SKILL.md に、docs/handoff.md の本文へ自動記録の目印そのものを書いてはいけないことが書かれている状態",
+      "verify": [
+        ".claude/skills/handoff/SKILL.md を開き、目印を本文に書かない注意があることを確認する",
+        "その注意が、書いた場合に何が起きるか（本文が切り落とされる）まで説明していることを確認する"
+      ],
+      "dependsOn": [],
+      "files": [".claude/skills/handoff/SKILL.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "added"
+    },
+    {
+      "id": "T030",
+      "title": "都道府県名セット26字の意味欄が空欄になる不具合を直す",
+      "deliverable": "「愛知県」「北海道」など都道府県名セットで使われている26字（app/src/lib/data/kanji/ai.js等）に、選んだ言語ごとの意味を持つmeaningsが追加され、練習画面・選択画面の意味欄が空欄にならない状態",
+      "verify": [
+        "app/ で pnpm run build の後 pnpm run preview を起動し、/select で「愛知県」のセットを開く",
+        "「愛」を開き、読みバッジの意味欄（日本語・英語・選んだ言語）が空欄でなく意味が表示されることを確認する",
+        "pnpm run test を実行し、26字全部にmeaningsがあることを確かめる新しいテストが通ることを確認する"
+      ],
+      "dependsOn": [],
+      "files": [
+        "app/src/lib/data/kanji/ai.js",
+        "app/src/lib/data/kanji/chi.js",
+        "app/src/lib/data/kanji/dou.js",
+        "app/src/lib/data/kanji/fei.js",
+        "app/src/lib/data/kanji/fu.js",
+        "app/src/lib/data/kanji/gi.js",
+        "app/src/lib/data/kanji/higashi.js",
+        "app/src/lib/data/kanji/ibara.js",
+        "app/src/lib/data/kanji/ji.js",
+        "app/src/lib/data/kanji/jou.js",
+        "app/src/lib/data/kanji/ka.js",
+        "app/src/lib/data/kanji/kai.js",
+        "app/src/lib/data/kanji/kami.js",
+        "app/src/lib/data/kanji/kawa.js",
+        "app/src/lib/data/kanji/ken.js",
+        "app/src/lib/data/kanji/kita.js",
+        "app/src/lib/data/kanji/kyou.js",
+        "app/src/lib/data/kanji/na.js",
+        "app/src/lib/data/kanji/oka.js",
+        "app/src/lib/data/kanji/oo.js",
+        "app/src/lib/data/kanji/saka.js",
+        "app/src/lib/data/kanji/shika.js",
+        "app/src/lib/data/kanji/shima.js",
+        "app/src/lib/data/kanji/to.js",
+        "app/src/lib/data/kanji/wa.js",
+        "app/src/lib/data/kanji/yama.js"
+      ],
+      "automation": "ci",
+      "status": "todo",
+      "origin": "added",
+      "note": "app/監査中に判明。KANJI_AI等は旧形式でmeaningsを持たず、getMeaningのフォールバック表(EN_MEANING等)にも該当字が無いため空欄になる"
+    },
+    {
+      "id": "T031",
+      "title": "未使用の書き順コンポーネントKanjiStrokes.svelteを削除する",
+      "deliverable": "app内のどこからもimportされていない静止表示コンポーネントapp/src/lib/components/KanjiStrokes.svelteが削除され、削除後もビルドとテストが通る状態",
+      "verify": [
+        "app/src 全体を検索し、KanjiStrokesのimportが他に無いことを確認する",
+        "ファイルを削除した後 pnpm run build を実行し、成功することを確認する",
+        "pnpm run test を実行し、既存のテストが通ることを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["app/src/lib/components/KanjiStrokes.svelte"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "added",
+      "note": "app/監査中に判明。実際の書き順アニメーションはTraceCanvas.svelteが担っており、KanjiStrokes.svelteはどこからも参照されていない"
+    },
+    {
+      "id": "T032",
+      "title": "app/README.mdのGetting startedをnpmからpnpmの表記に直す",
+      "deliverable": "app/README.md のGetting startedとScripts節のコマンドが全てpnpm表記になり、AGENTS.mdの『npmとyarnは使わない』という前提と一致する状態",
+      "verify": [
+        "app/README.md を開き、Getting startedとScripts節のコマンドが全てpnpm表記であることを確認する",
+        "書かれたとおりに app/ で pnpm install の後 pnpm run dev を実行し、開発サーバーが起動することを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["app/README.md"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "added",
+      "note": "app/監査中に判明。README単体の記載ミスで、実際のpackage.jsonやCIはpnpm前提"
+    },
+    {
+      "id": "T033",
+      "title": "都道府県名セット（愛知県・北海道など26セット）をUIから選べるようにする",
+      "deliverable": "app/src/lib/data/sets.jsのSET_ORDERに都道府県名26セットが加わり、/selectの画面からこれらのセットを開いて練習できる状態",
+      "verify": [
+        "app/ で pnpm run build の後 pnpm run preview を起動し、/select を開く",
+        "いずれかのカテゴリタブで「愛知県」「北海道」など都道府県名セットが一覧に表示され、開けることを確認する",
+        "都道府県名セットにしか出現しない字（岐・茨・奈・阜・阪・鹿）が、そのセットを開いた練習画面で表示されることを確認する",
+        "pnpm run test を実行し、既存のテストが通ることを確認する"
+      ],
+      "dependsOn": [],
+      "files": ["app/src/lib/data/sets.js"],
+      "automation": "ci",
+      "status": "todo",
+      "origin": "added",
+      "note": "T030の完了判定（completion-checker）中に判明。都道府県名26セット（category: basic/regions/cities）はSETSオブジェクトには定義されているが、SET_ORDERに含まれないため/selectの画面のどのタブにも表示されず、getSetsByCategoryの対象外。KANJI_INDEXもSET_ORDER由来のためgetKanjiByCharでも引けない。26字中20字（愛知知飛府...）は基本500字セットにも重複して含まれるため通常フローで表示されるが、岐・茨・奈・阜・阪・鹿の6字はこのセット以外に出現せず、セットが選べない限り一切表示されない。T030で意味データ（meanings/EN_MEANING等）は26字全て埋めた（PR待ち）ため、本項目が解消すればすぐに意味も表示される"
+    },
+    {
+      "id": "T034",
+      "title": "漢字データにJLPT級（まずN5のみ）と代表単語を追加し、練習画面に表示する",
+      "deliverable": "独立した2つの公開N5漢字リストが一致した71字について、app/src/lib/data/kanji内の該当ファイルにjlptLevel: 'N5'と実在の熟語（wordフィールド）が設定され、/playの練習画面にN5バッジと代表単語が表示される状態。ホーム画面の帰属表示に、参考にした教材（新完全マスター漢字・日本語総まとめ）を明記する",
+      "verify": [
+        "app/src/lib/data/kanji/u065e5.js（日）を開き、jlptLevel: 'N5'とword: '日曜日'が設定されていることを確認する",
+        "app/ で pnpm run build の後 pnpm run preview を起動し、/play?kanji=日 を開く。読み仮名バッジの下に「N5」バッジと「例: 日曜日」が表示されることを確認する",
+        "/play?kanji=教 のようなN5対象外の字を開き、N5バッジや代表単語の行が表示されない（wordが字自身のままの字には出さない）ことを確認する",
+        "ホーム画面（/）を開き、帰属表示の欄に「新完全マスター漢字」「日本語総まとめ」の参考表記が表示されることを確認する",
+        "pnpm run test を実行し、既存テストと新規テスト（jlptLevel.test.ts）が通ることを確認する"
+      ],
+      "dependsOn": [],
+      "files": [
+        "app/src/lib/data/kanji",
+        "app/src/routes/play/+page.svelte",
+        "app/src/routes/+page.svelte",
+        "app/src/lib/data/translations.ts",
+        "app/tests/unit/jlptLevel.test.ts"
+      ],
+      "automation": "ci",
+      "status": "done",
+      "origin": "added",
+      "note": "ユーザーから『単語ベースの登録にしてほしい（例: コではなくコンビニ）』という提案があり調査した結果、公式のJLPT出題基準は2010年以降非公開で機械的に読み取れる一次データが無いことが判明。ユーザーの希望で、まずN5のみを試験的に対応。文化庁の常用漢字表が単漢字ではなく熟語（語例）込みの構成である点、WaniKani等の競合アプリも単漢字+関連単語の併用設計である点を根拠に、既存のword フィールド（従来は字自身を入れるだけの死んだデータだった）を実在の熟語で埋める設計にした。N5の71字は、jlptsensei.comとlangoal.comという独立した2つの公開リスト（それぞれ80字・113字）の積集合として選定（両方が一致する字のみを採用し、片方にしかない字は今回見送り）。代表単語（word）は基礎的な語のため個別の一次資料検証はしていない[曖昧]。N4以降は本項目とは別に、対象漢字の選定から改めて行うこと"
+    },
+    {
+      "id": "T035",
+      "title": "T034の代表単語を、バッジのテキストではなく書き取り欄（書くスペース）自体に表示する",
+      "deliverable": "app/src/routes/play/+page.svelteの書き取りキャンバス（canvas-host）が、代表単語（word）を持つ字では、書いている字を中央に、単語の残りの字（例: 日曜日なら『曜日』）を前後に静的な文字として同じ枠内に並べて表示する状態。単語を持たない字（約950字）は今まで通り単独表示のまま変わらない",
+      "verify": [
+        "app/ で pnpm run build の後 pnpm run preview を起動し、/play?kanji=日 を開く",
+        "書き取り枠と同じ金色の枠の中に、書き取り用の白い正方形（練習キャンバス）と、その右側に静止した文字『曜日』が並んで表示され、全体で『日曜日』と読めることを確認する",
+        "/play?kanji=山 を開き、今度は書き取り用の正方形の左側に『富士』が並び、全体で『富士山』と読めることを確認する（wordの中で書いている字が先頭以外にある場合の確認）",
+        "/play?kanji=教 のようなN5対象外の字を開き、金色の枠や周囲の静止文字が表示されず、これまで通り単独の字だけが表示されることを確認する",
+        "スタートを押して書き取りを開始し、正方形が縮んだ状態でもお手本アニメーションと実際の書き込みが正しく機能する（座標がズレない）ことを確認する",
+        "pnpm run test を実行し、既存テストが通ることを確認する"
+      ],
+      "dependsOn": ["T034"],
+      "files": ["app/src/routes/play/+page.svelte"],
+      "automation": "ci",
+      "status": "done",
+      "origin": "added",
+      "note": "T034で追加した『例: 日曜日』というバッジ内のテキスト表示に対し、ユーザーから『書くスペースの中に3文字同時に表示しろ、バッジでの表示は認めない』という明確な指示があり対応。書き取り用の正方形（1文字ぶんのTraceCanvas）はそのまま残し、単語の残りの字はwordの中でのchar出現位置（word.indexOf(char)）から前後に分割して静的なテキストとして正方形の外側・同じ金枠の中に並べる設計にした。単語全体を1つのキャンバスで手書き練習させる設計（多文字ストローク認識）は、実装規模が大きく既存のKanjiVGデータ構造とも合わないため採用していない[曖昧]——この判断で良いかはユーザー確認が要る可能性がある"
+    },
+    {
+      "id": "T036",
+      "title": "T034の代表単語を、装飾文字ではなく実際に全文字書かせる練習モードにする",
+      "deliverable": "/selectに新カテゴリー『語』が追加され、N5代表単語69語（友達・富士山は構成文字のストロークデータ欠落のため対象外）から選ぶと、/playで単語の全文字を1文字ずつ順番に実際に書く練習ができる状態。日曜日のように単語内で文字が重複する語（日が2回）でも省略されず3ステップとも書かされる。単語を書き終えるたびに完了の一言が表示され、最後の単語まで終えると完了画面に練習した単語名が表示される",
+      "verify": [
+        "app/ で pnpm run build の後 pnpm run preview を起動し、/select を開いて新しい『語』タブが（試験漢字等の既存タブと重複しない正しいラベルで）表示されることを確認する",
+        "『語』タブで日曜日のカードを1つだけ選んでスタートし、日→曜→日の順に3回書くことを求められる（2回目の日が省略されない）ことを確認する。1文字目・2文字目を書き終えた直後は完了の一言がまだ出ないが、3文字目（2回目の日）を書き終えると出ることを確認する",
+        "書いている文字の前後に、単語の残りの文字が正しい位置で表示される（1文字目では後ろに『曜日』、3文字目では前に『日曜』）ことを確認する",
+        "『語』タブで学校・大学のように異なる複数の単語を選んでスタートし、1つ目の単語を書き終えるごとに完了の一言が出て次の単語に進み、全部書き終えると完了画面に練習した単語名が表示されることを確認する",
+        "『保存済み』『人気』『かな』の既存タブが、これまで通り件数・ラベルとも変わらず表示されることを確認する（既存カテゴリーへの回帰が無いこと）",
+        "pnpm run test を実行し、既存テストと新規テストが全て通ることを確認する"
+      ],
+      "dependsOn": ["T034", "T035"],
+      "files": [
+        "app/src/lib/data/kanji/words-n5.js",
+        "app/src/lib/data/sets.js",
+        "app/src/lib/utils/wordMeaning.ts",
+        "app/src/lib/data/translations.ts",
+        "app/src/routes/select/+page.svelte",
+        "app/src/routes/play/+page.svelte",
+        "app/scripts/generate-words-n5.mjs"
+      ],
+      "automation": "ci",
+      "status": "done",
+      "origin": "added",
+      "note": "T035完了後、ユーザーから『日曜日と表示されているだけで実際に書いているのは日の1字だけ。書くもの＝日曜日、という理解に改めろ』という明確な指摘があり、装飾表示ではなく実際に全文字を書かせる機能として作り直すことになった。着手前にユーザーから『厳密に計画し、サブエージェントに敵対検証を繰り返させ、3体とも100点になるまで計画を練り直せ』という指示を受け、round6（18体のサブエージェント、Architecture/UX/AC厳密性の3レンズ×6ラウンド）にわたり計画を敵対検証した。スコアは35〜73点の間で往復し3体とも100点には到達しなかった（新しいバグを直すたびに新設コード自体が別のバグを生む状態が繰り返された）ため、ユーザーに状況を報告し『重大な指摘が残っていなければ確定』という基準に切り替える判断を仰いだ結果、v7（round6の全指摘に対処済み）で実装に進む方針の了承を得た。設計面の主な判断: (1) SETS/SET_ORDER/KANJI_INDEXには一切触れず単語データを専用ファイルに閉じ込め、都道府県名セット（T033）とのKANJI_INDEX衝突リスクを構造的に排除、(2) 単語1つ=既存の複数セット順次学習エンジン（activeSets/stageIndex）の1ステージとして扱い、独自の完了判定メタデータを作らずcurrentIndexの位置比較だけで日曜日のような文字重複語も正しく扱えるようにした、(3) 単語間の遷移に演出付きモーダルを追加することは既存の共通ロジック（goNextPage/doneAll/nextStage、単語機能に限らず全セット選択機能に影響する）への変更が必要になるためスコープ外とし、テンプレートのみの軽量な完了キャプションで代替、(4) 新規UI文言は全て6言語の翻訳キー（関数型含む）経由とし、日本語の直書きを一切残さない。新規翻訳キーの非日本語5言語ぶんの訳文は実装時の下訳であり母語話者によるレビューを経ていない[曖昧]。実装後、completion-checkerにverifyの6手順全てをなぞらせ、実際にPlaywrightで書き順データをなぞって日曜日単体・大学+学校の複数選択の両方を最後まで完走させたうえで6手順とも『通った』と判定された（PR #26、CI green）"
+    }
+  ]
+}

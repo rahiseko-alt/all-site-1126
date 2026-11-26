@@ -1,0 +1,27 @@
+packages:
+  - "apps/*"
+overrides:
+  "postcss@<8.5.23": ">=8.5.23"
+  "sharp@<0.35.4": ">=0.35.4 <1.0.0"
+  "fast-uri@<3.1.6": ">=3.1.6 <4.0.0"
+  "js-yaml@>=4.0.0 <4.3.2": ">=4.3.2 <5.0.0"
+  "qs@<6.16.0": ">=6.16.0 <7.0.0"
+  "devalue@<5.9.2": ">=5.9.2 <6.0.0"
+  "undici@>=7.0.0 <7.29.0": "7.29.0"
+  "nanoid@>=4.0.0 <5.1.16": "5.1.16"
+allowBuilds:
+  '@swc/core': false
+  '@google/genai': false
+  cbor-extract: false
+  esbuild: true
+  protobufjs: false
+  sharp: true
+  workerd: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@supabase/auth-js@2.112.4'
+  - '@supabase/functions-js@2.112.4'
+  - '@supabase/postgrest-js@2.112.4'
+  - '@supabase/realtime-js@2.112.4'
+  - '@supabase/storage-js@2.112.4'
+  - '@supabase/supabase-js@2.112.4'

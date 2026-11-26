@@ -1,0 +1,181 @@
+import { FetchedPage, FetchOptions, FetchProvider } from "./types";
+import { recordFailure } from "../diagnostics";
+import { attemptSignal, stoppedByCaller } from "../call-limit";
+
+export interface HTTPFetchProviderOptions {
+  defaultTimeoutMs?: number;
+  maxContentLength?: number;
+  userAgent?: string;
+}
+
+export class HTTPFetchProvider implements FetchProvider {
+  /** What went wrong with the real service during this run, for the reader. */
+  failureCount = 0;
+  lastError?: string;
+  private defaultTimeoutMs: number;
+  private maxContentLength: number;
+  private userAgent: string;
+
+  constructor(options: HTTPFetchProviderOptions = {}) {
+    this.defaultTimeoutMs = options.defaultTimeoutMs || 10000;
+    this.maxContentLength = options.maxContentLength || 50000;
+    this.userAgent =
+      options.userAgent ||
+      "Mozilla/5.0 (compatible; JevWriteFactCheck/1.0; +https://github.com/wonderful-galileo)";
+  }
+
+  async fetchUrl(url: string, options: FetchOptions = {}): Promise<FetchedPage> {
+    const timeout = options.timeoutMs || this.defaultTimeoutMs;
+    const maxLen = options.maxContentLength || this.maxContentLength;
+
+    // Its own time limit, or the page-fetch stage's cut-off, whichever comes first (ADR-0021).
+    const attempt = attemptSignal(timeout, options.signal);
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "User-Agent": this.userAgent,
+          Accept: "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.8",
+          "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+          ...options.headers,
+        },
+        signal: attempt.signal,
+      });
+
+      const statusCode = response.status;
+      if (!response.ok) {
+        console.warn(`HTTPFetchProvider fetch failed with ${statusCode} for ${url}`);
+        // An empty page, never someone else's prose under this URL.
+        return {
+          url,
+          title: "",
+          content: "",
+          text: "",
+          statusCode,
+        };
+      }
+
+      const html = await response.text();
+      const extracted = this.extractFromHtml(html, url);
+      const textSlice = extracted.text.slice(0, maxLen);
+
+      return {
+        url,
+        title: extracted.title,
+        content: textSlice,
+        text: textSlice,
+        publishedAt: extracted.publishedAt,
+        author: extracted.author,
+        siteName: extracted.siteName,
+        statusCode,
+      };
+    } catch (err) {
+      // The caller's time ran out: not a page that failed (ADR-0021).
+      if (stoppedByCaller(options)) throw err;
+      console.warn(`HTTPFetchProvider fetch failed with error for ${url}:`, err);
+      recordFailure(this, err);
+      return {
+        url,
+        title: "",
+        content: "",
+        text: "",
+        statusCode: 500,
+      };
+    } finally {
+      attempt.release();
+    }
+  }
+
+  async fetch(url: string, options: FetchOptions = {}): Promise<FetchedPage> {
+    return this.fetchUrl(url, options);
+  }
+
+  private extractFromHtml(html: string, url: string): {
+    title: string;
+    text: string;
+    publishedAt?: string;
+    author?: string;
+    siteName?: string;
+  } {
+    let title = "";
+    const ogTitleMatch = html.match(/<meta\s+[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/<meta\s+[^>]*content=["']([^"']+)["'][^>]*property=["']og:title["']/i);
+    if (ogTitleMatch) {
+      title = this.decodeHtmlEntities(ogTitleMatch[1]);
+    } else {
+      const titleTagMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      if (titleTagMatch) {
+        title = this.decodeHtmlEntities(titleTagMatch[1]);
+      }
+    }
+
+    let publishedAt: string | undefined;
+    const dateMatch =
+      html.match(/<meta\s+[^>]*property=["']article:published_time["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/<meta\s+[^>]*name=["']pubdate["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/<meta\s+[^>]*name=["']date["'][^>]*content=["']([^"']+)["']/i);
+    if (dateMatch) {
+      publishedAt = dateMatch[1];
+    }
+
+    let author: string | undefined;
+    const authorMatch =
+      html.match(/<meta\s+[^>]*name=["']author["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/<meta\s+[^>]*property=["']article:author["'][^>]*content=["']([^"']+)["']/i);
+    if (authorMatch) {
+      author = this.decodeHtmlEntities(authorMatch[1]);
+    }
+
+    let siteName: string | undefined;
+    const siteMatch =
+      html.match(/<meta\s+[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["']/i);
+    if (siteMatch) {
+      siteName = this.decodeHtmlEntities(siteMatch[1]);
+    } else {
+      try {
+        siteName = new URL(url).hostname;
+      } catch {}
+    }
+
+    let clean = html;
+    clean = clean.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+    clean = clean.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "");
+    clean = clean.replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, "");
+    clean = clean.replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, "");
+    clean = clean.replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, "");
+    clean = clean.replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, "");
+    clean = clean.replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, "");
+
+    clean = clean.replace(/<\/(p|div|h[1-6]|li|tr|article|section)>/gi, "\n");
+    clean = clean.replace(/<br\s*[\/]?>/gi, "\n");
+    clean = clean.replace(/<[^>]+>/g, " ");
+    clean = this.decodeHtmlEntities(clean);
+
+    const text = clean
+      .split("\n")
+      .map((line) => line.replace(/\s+/g, " ").trim())
+      .filter((line) => line.length > 0)
+      .join("\n");
+
+    return {
+      title: title.trim(),
+      text,
+      publishedAt,
+      author,
+      siteName,
+    };
+  }
+
+  private decodeHtmlEntities(str: string): string {
+    return str
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&apos;/g, "'")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
+  }
+}

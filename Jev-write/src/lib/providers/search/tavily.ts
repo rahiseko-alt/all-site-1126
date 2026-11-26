@@ -1,0 +1,125 @@
+import { SearchOptions, SearchProvider, SearchResponse, SearchResultItem } from "./types";
+import { recordFailure } from "../diagnostics";
+import { attemptSignal, stoppedByCaller } from "../call-limit";
+
+export interface TavilySearchOptions {
+  apiKey?: string;
+  baseUrl?: string;
+  defaultMaxResults?: number;
+  timeoutMs?: number;
+}
+
+function createSearchResponse(query: string, results: SearchResultItem[]): SearchResponse {
+  const response = Object.assign(
+    {
+      query,
+      results,
+      length: results.length,
+      [Symbol.iterator]() {
+        return results[Symbol.iterator]();
+      },
+    },
+    results
+  ) as SearchResponse;
+
+  return response;
+}
+
+export class TavilySearchProvider implements SearchProvider {
+  /** What went wrong with the real service during this run, for the reader. */
+  failureCount = 0;
+  lastError?: string;
+  private apiKey: string;
+  private baseUrl: string;
+  private defaultMaxResults: number;
+  private timeoutMs: number;
+
+  constructor(options: TavilySearchOptions = {}) {
+    this.apiKey =
+      options.apiKey ||
+      process.env.TAVILY_API_KEY ||
+      process.env.tavily ||
+      process.env.NEXT_PUBLIC_TAVILY_API_KEY ||
+      "";
+    this.baseUrl = (options.baseUrl || process.env.TAVILY_BASE_URL || "https://api.tavily.com").replace(/\/$/, "");
+    this.defaultMaxResults = options.defaultMaxResults || 5;
+    this.timeoutMs = options.timeoutMs || 10000;
+  }
+
+  async search(query: string, options: SearchOptions = {}): Promise<SearchResponse> {
+    // A search nobody can run is a search that failed. ADR-0003 turns that
+    // into an INSUFFICIENT verdict upstream; it must not become invented
+    // Evidence down here.
+    if (!this.apiKey) {
+      const missing = new Error("Tavily search is not configured: no API key");
+      recordFailure(this, missing);
+      throw missing;
+    }
+
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
+      return createSearchResponse("", []);
+    }
+
+    // Its own time limit, or the search stage's cut-off, whichever comes first (ADR-0021).
+    const timeout = options.timeoutMs || this.timeoutMs;
+    const attempt = attemptSignal(timeout, options.signal);
+
+    try {
+      const payload: Record<string, any> = {
+        api_key: this.apiKey,
+        query: trimmedQuery,
+        max_results: options.maxResults || this.defaultMaxResults,
+        search_depth: options.searchDepth || "basic",
+      };
+
+      if (options.includeDomains && options.includeDomains.length > 0) {
+        payload.include_domains = options.includeDomains;
+      }
+      if (options.excludeDomains && options.excludeDomains.length > 0) {
+        payload.exclude_domains = options.excludeDomains;
+      }
+
+      const response = await fetch(`${this.baseUrl}/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: attempt.signal,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        throw new Error(`Tavily search API error (${response.status} ${response.statusText}): ${errorText}`);
+      }
+
+      const data = await response.json();
+      const rawResults = Array.isArray(data.results) ? data.results : [];
+
+      if (rawResults.length === 0) {
+        return createSearchResponse(trimmedQuery, []);
+      }
+
+      const results: SearchResultItem[] = rawResults.map((item: any) => ({
+        title: String(item.title || ""),
+        url: String(item.url || ""),
+        content: String(item.content || ""),
+        score: typeof item.score === "number" ? item.score : undefined,
+        publishedDate: item.published_date ? String(item.published_date) : undefined,
+        sourceType: "secondary",
+      }));
+
+      return createSearchResponse(trimmedQuery, results);
+    } catch (err) {
+      // Stopped at the stage's cut-off, the search did not fail: the run
+      // records it as 時間切れ (ADR-0021).
+      if (stoppedByCaller(options)) throw err;
+      console.warn("Tavily search failed:", err);
+      recordFailure(this, err);
+      throw err;
+    } finally {
+      attempt.release();
+    }
+  }
+}

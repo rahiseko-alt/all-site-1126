@@ -1,0 +1,191 @@
+import { Claim, ExtractionTrace } from "@/types";
+import { LLMProvider } from "./types";
+import { recordFailure, recordRetry } from "../diagnostics";
+import { sendWithRetry } from "../retry";
+import { CallLimit, stoppedByCaller } from "../call-limit";
+import { extractClaimsFrom } from "./claim-extraction";
+import {
+  CLAIM_QUERY_SYSTEM_PROMPT,
+  ClaimQueryPlan,
+  DOCUMENT_QUERY_SYSTEM_PROMPT,
+  DocumentQueryPlan,
+  buildClaimQueryUserPrompt,
+  buildDocumentQueryUserPrompt,
+  readClaimQueries,
+  readDocumentQueries,
+} from "./search-queries";
+
+export interface AnthropicLLMOptions {
+  apiKey?: string;
+  model?: string;
+  maxTokens?: number;
+  baseUrl?: string;
+}
+
+export class AnthropicLLMProvider implements LLMProvider {
+  private apiKey: string;
+  private model: string;
+  private baseUrl: string;
+  private maxTokens: number;
+  /** What went wrong with the real service during this run, for the reader. */
+  failureCount = 0;
+  lastError?: string;
+  /** How many times a busy Anthropic (429/529) was asked the same thing again. */
+  retryCount = 0;
+  /** What the last extraction made of every sentence (ADR-0020). */
+  lastExtraction?: ExtractionTrace;
+
+  constructor(options: AnthropicLLMOptions = {}) {
+    this.apiKey =
+      options.apiKey ||
+      process.env.ANTHROPIC_API_KEY ||
+      process.env.CLAUDE_API_KEY ||
+      "";
+    // Pinned to Sonnet on the user's order: no option or environment variable
+    // may switch the run to a costlier model.
+    this.model = "claude-sonnet-5";
+    this.maxTokens = Number(
+      options.maxTokens || process.env.ANTHROPIC_MAX_TOKENS || 16384
+    );
+    this.baseUrl = (
+      options.baseUrl ||
+      process.env.ANTHROPIC_BASE_URL ||
+      "https://api.anthropic.com/v1"
+    ).replace(/\/$/, "");
+  }
+
+  private async callMessages(
+    systemPrompt: string,
+    userPrompt: string,
+    limit: CallLimit = {}
+  ): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error(
+        "Anthropic API key is missing. Set ANTHROPIC_API_KEY or CLAUDE_API_KEY in environment."
+      );
+    }
+
+    const body: Record<string, any> = {
+      model: this.model,
+      max_tokens: this.maxTokens,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
+    };
+
+    // 429 (rate_limit_error) and 529 (overloaded_error) mean "busy", not
+    // "wrong": the same request goes to Anthropic again. Still busy after the
+    // last try, the error below reports it as before. The whole of it, the
+    // retries and their waits included, ends when the stage's time does
+    // (ADR-0021).
+    const response = await sendWithRetry(
+      () =>
+        fetch(`${this.baseUrl}/messages`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": this.apiKey,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify(body),
+          signal: limit.signal,
+        }),
+      { retryStatuses: [429, 529], onRetry: () => recordRetry(this), signal: limit.signal }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      throw new Error(
+        `Anthropic API error (${response.status} ${response.statusText}): ${errorText}`
+      );
+    }
+
+    const data = await response.json();
+
+    // An answer cut off at the length limit is not an answer: parsed as JSON
+    // it fails somewhere in the middle, which reads like a syntax error
+    // rather than what it is.
+    if (data.stop_reason === "max_tokens") {
+      throw new Error(
+        `Anthropic の応答が長さ上限（max_tokens=${this.maxTokens}）で打ち切られました。文章を短くするか ANTHROPIC_MAX_TOKENS を上げてください。`
+      );
+    }
+
+    const textBlock = data.content?.find((c: any) => c.type === "text");
+    return textBlock?.text || "";
+  }
+
+  /** Reads the answer as JSON, and says which step's answer it could not read. */
+  private parseJson(raw: string, step: string): any {
+    const cleaned = this.cleanJson(raw);
+    try {
+      return JSON.parse(cleaned);
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `${step}の応答をJSONとして読み取れませんでした（${reason}）。応答の長さ: ${cleaned.length}文字。`
+      );
+    }
+  }
+
+  private cleanJson(raw: string): string {
+    const trimmed = raw.trim();
+    if (trimmed.startsWith("```")) {
+      return trimmed
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/, "")
+        .trim();
+    }
+    return trimmed;
+  }
+
+  // A call stopped because its stage's time ran out is not Anthropic
+  // failing (ADR-0021): it is recorded as 時間切れ by the run, not here.
+
+  async extractClaims(text: string, limit?: CallLimit): Promise<Claim[]> {
+    this.lastExtraction = undefined;
+    try {
+      const { claims, trace } = await extractClaimsFrom(text, async (system, user) =>
+        this.parseJson(await this.callMessages(system, user, limit), "主張の抽出")
+      );
+      this.lastExtraction = trace;
+      return claims;
+    } catch (err) {
+      if (!stoppedByCaller(limit)) recordFailure(this, err);
+      throw err;
+    }
+  }
+
+  async generateClaimQueries(
+    claims: Claim[],
+    limit?: CallLimit
+  ): Promise<Map<string, ClaimQueryPlan>> {
+    if (claims.length === 0) return new Map();
+    try {
+      const rawContent = await this.callMessages(
+        CLAIM_QUERY_SYSTEM_PROMPT,
+        buildClaimQueryUserPrompt(claims),
+        limit
+      );
+      return readClaimQueries(this.parseJson(rawContent, "検索の問いの作成"), claims);
+    } catch (err) {
+      if (!stoppedByCaller(limit)) recordFailure(this, err);
+      throw err;
+    }
+  }
+
+  async generateDocumentQueries(text: string, limit?: CallLimit): Promise<DocumentQueryPlan[]> {
+    try {
+      const rawContent = await this.callMessages(
+        DOCUMENT_QUERY_SYSTEM_PROMPT,
+        buildDocumentQueryUserPrompt(text),
+        limit
+      );
+      return readDocumentQueries(this.parseJson(rawContent, "資料を集める検索クエリの作成"));
+    } catch (err) {
+      if (!stoppedByCaller(limit)) recordFailure(this, err);
+      throw err;
+    }
+  }
+
+
+}

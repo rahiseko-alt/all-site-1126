@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "deny": [
+      "mcp__Claude_Code_Remote__send_later",
+      "mcp__Claude_Code_Remote__create_trigger",
+      "mcp__claude-code-remote__send_later",
+      "mcp__claude-code-remote__create_trigger"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/session-start.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1261 @@
+<script>
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
+  import { untrack } from 'svelte';
+  import TraceCanvas from '$lib/components/TraceCanvas.svelte';
+  import AssetSettings from '$lib/components/AssetSettings.svelte';
+  import { SETS, getSetById } from '$lib/data/sets.js';
+
+  // Session 267 v5: 複数 sets= 対応（カンマ区切り）/ 単数 ?set= 互換も維持
+  let rawSetIds = $derived(
+    ($page.url.searchParams.get('sets') ?? $page.url.searchParams.get('set') ?? 'fei')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+  let activeSets = $derived(rawSetIds.map((id) => SETS[id]).filter(Boolean));
+  // Session 273: 1 セット = 1 ステージ。複数選択時はセット毎にステージを進める
+  let stageIndex = $state(0);
+  let activeSet = $derived(activeSets[stageIndex] ?? activeSets[0] ?? getSetById('fei'));
+  let kanjis = $derived(activeSet.kanji);
+  // お題のひらがな（Session 273: セット熟語の正しい読みを優先 / 単漢字セットは個別 reading の結合）
+  let activeReading = $derived(activeSet.reading ?? kanjis.map((k) => k.reading || '').join(''));
+  // 表示用セット名（現ステージのみ）
+  let activeSetNames = $derived(activeSet.name);
+  // 次ステージの有無（praise overlay の動線分岐）
+  let hasNextStage = $derived(stageIndex < activeSets.length - 1);
+
+  function goHome() {
+    goto(`${base}/`);
+  }
+  let currentIndex = $state(0);
+  let activeKanji = $derived(kanjis[currentIndex] ?? kanjis[0]);
+  // 井上氏要望: 「つぎの字」ボタンの出現回数（currentIndex）ごとに別画像。3 回目（4 文字目への遷移）まで対応
+  let nextSkinKey = $derived(['next1', 'next2', 'next3'][currentIndex] ?? null);
+
+  let phase = $state('start');
+  let traceComps = $state([]);
+  let animationStarted = $state(false);
+  let showPraise = $state(false);
+  // Session 267 v4: お祝いアニメ（花火 + 踊る動物 + 紙吹雪）を 3 秒間ページ全体で発火
+  let showPraiseAnim = $state(false);
+
+  // Session 271 v2: 花火アニメ完全刷新（emoji 廃止 → 粒子放射）
+  // ①打ち上げ球 → ②0.3s 静止 → ③炸裂（5 パターン × 3 サイズ × 多色）
+  let fireworks = $state([]);
+  let fwSeq = 0;
+  function patternParticles(pattern, count) {
+    const ps = [];
+    for (let i = 0; i < count; i++) {
+      const t = i / count;
+      const angle = t * Math.PI * 2;
+      let dx = 0, dy = 0, gravity = false;
+      if (pattern === 'kiku') {
+        // 菊：円形・等間隔の長い尾
+        dx = Math.cos(angle);
+        dy = Math.sin(angle);
+      } else if (pattern === 'botan') {
+        // 牡丹：円形・コンパクト
+        dx = Math.cos(angle) * 0.78;
+        dy = Math.sin(angle) * 0.78;
+      } else if (pattern === 'yanagi') {
+        // 柳：上半球 + 重力で垂れ下がる
+        const a = t * Math.PI;
+        dx = Math.cos(a) * 0.92;
+        dy = -Math.sin(a) * 0.88;
+        gravity = true;
+      } else if (pattern === 'heart') {
+        // ハート：r = 16sin³θ, -(13cosθ - 5cos2θ - 2cos3θ - cos4θ)
+        const s = Math.sin(angle);
+        dx = (16 * s * s * s) / 17;
+        dy = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) / 17;
+      } else if (pattern === 'palm') {
+        // パルム：6 方向の太い枝（粒子を 6 グループに振り分け、層ごとに距離を伸ばす）
+        const branches = 6;
+        const branchIdx = i % branches;
+        const layer = Math.floor(i / branches);
+        const layers = Math.max(1, Math.ceil(count / branches));
+        const branchAngle = (branchIdx / branches) * Math.PI * 2 - Math.PI / 2;
+        const len = 0.55 + (layer / Math.max(1, layers - 1)) * 0.55;
+        dx = Math.cos(branchAngle) * len;
+        dy = Math.sin(branchAngle) * len;
+      }
+      ps.push({ dx, dy, gravity });
+    }
+    return ps;
+  }
+  function spawnFirework() {
+    const patterns = ['kiku', 'botan', 'yanagi', 'heart', 'palm'];
+    const sizes = ['s', 'm', 'l'];
+    const sizeRadius = { s: 13, m: 18, l: 24 };
+    const sizeCount = { s: 16, m: 22, l: 30 };
+    // 黄色背景 (~50°) を避ける差色パレット：赤・ピンク・紫・青・水色・緑・橙
+    const huePalette = [350, 320, 285, 240, 210, 180, 140, 25];
+    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+    const size = sizes[Math.floor(Math.random() * sizes.length)];
+    const baseHue = huePalette[Math.floor(Math.random() * huePalette.length)];
+    const id = ++fwSeq;
+    // 打ち上げ距離拡大（peakY を画面上 1/4 に上げた分、距離 +60% 増）→ launchDur も延長
+    const launchDur = 0.85 + Math.random() * 0.35;
+    const fw = {
+      id,
+      x: 16 + Math.random() * 68,
+      // praise-card と被らないよう画面上 1/4（6-22vh）で炸裂させる
+      peakY: 6 + Math.random() * 16,
+      launchY: 92,
+      pattern,
+      size,
+      hue: (baseHue + Math.floor(Math.random() * 20) - 10 + 360) % 360,
+      launchDur,
+      radius: sizeRadius[size],
+      particles: patternParticles(pattern, sizeCount[size]),
+    };
+    fireworks = [...fireworks, fw];
+    setTimeout(() => {
+      fireworks = fireworks.filter((f) => f.id !== id);
+    }, (launchDur + 0.3 + 1.8) * 1000);
+  }
+  $effect(() => {
+    // showPraiseAnim だけを依存に。fireworks の読み書きは untrack で隔離（自己依存ループ回避）
+    const visible = showPraiseAnim;
+    if (!visible) {
+      untrack(() => {
+        fireworks = [];
+      });
+      return;
+    }
+    let alive = true;
+    let timeoutId = null;
+    const tick = () => {
+      if (!alive) return;
+      untrack(() => spawnFirework());
+      timeoutId = setTimeout(tick, 220 + Math.random() * 240);
+    };
+    untrack(() => tick());
+    return () => {
+      alive = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  });
+  let showSettings = $state(false);
+  let showDoneBtn = $state(false);
+  let countdown = $state(0); // 0 = 非表示 / 3,2,1 = カウントダウン中
+  let cdEl = $state();
+  // Session 266 v2: 各枠の「スタート押下済み」「できた!押下済み」を独立管理
+  // → 全枠で最初からスタートボタンが表示され、押された枠だけ個別に start
+  let startedFlags = $state([]);
+  let completedFlags = $state([]);
+
+  // kanjis 変化時にフラグ配列を初期化
+  $effect(() => {
+    const len = kanjis.length;
+    startedFlags = Array(len).fill(false);
+    completedFlags = Array(len).fill(false);
+  });
+
+  // sets 変化時に currentIndex / stageIndex リセット（セット切替時の状態クリア）
+  $effect(() => {
+    rawSetIds.join(','); // 依存追跡
+    currentIndex = 0;
+    stageIndex = 0;
+    showPraise = false;
+    animationStarted = false;
+    phase = 'start';
+  });
+
+  // countdown 変更ごとにアニメ再起動（要素は破棄せず animation だけリセット）
+  $effect(() => {
+    const v = countdown;
+    if (!cdEl || v <= 0) return;
+    cdEl.style.animation = 'none';
+    void cdEl.offsetWidth; // reflow を強制してアニメをリセット
+    cdEl.style.animation = '';
+  });
+
+  // ユーザーカスタマイズ可能アセット
+  let assets = $state({
+    character: null, // null = デフォルト🐱 / DataURL = アップロード画像
+    emoji: null,
+    icon: null, // Session 267 v4: ホーム画面アイコン（user upload 時 apple-touch-icon を JS で差替）
+    // 井上氏要望: 「次へ進む系」ボタンの背景画像。next1/2/3 = つぎの字（出現1/2/3回目）、doneButton = 最後の「できた！」
+    next1: null,
+    next2: null,
+    next3: null,
+    doneButton: null
+  });
+  // Session 267 v3: 各画像の位置/拡大縮小調整（character/emoji = transform translate+scale 用）
+  let adjustments = $state({
+    character: { x: 0, y: 0, scale: 1 },
+    emoji: { x: 0, y: 0, scale: 1 },
+    icon: { x: 0, y: 0, scale: 1 },
+    // 着せ替え UI のプレビュー/もどすが参照（調整は使わない）
+    next1: { x: 0, y: 0, scale: 1 },
+    next2: { x: 0, y: 0, scale: 1 },
+    next3: { x: 0, y: 0, scale: 1 },
+    doneButton: { x: 0, y: 0, scale: 1 },
+    sensitivity: 30
+  });
+
+  const STORAGE_KEY = 'learning-suite:kanji:assets';
+  const ADJ_KEY = 'learning-suite:kanji:adjustments';
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.character) assets.character = data.character;
+        if (data.emoji) assets.emoji = data.emoji;
+        for (const k of ['next1', 'next2', 'next3', 'doneButton']) {
+          if (data[k]) assets[k] = data[k];
+        }
+      }
+      const savedAdj = localStorage.getItem(ADJ_KEY);
+      if (savedAdj) {
+        const data = JSON.parse(savedAdj);
+        for (const key of ['character', 'emoji']) {
+          if (data[key]) Object.assign(adjustments[key], data[key]);
+        }
+      }
+    } catch (e) {}
+  });
+
+  function saveAssets() {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
+      localStorage.setItem(ADJ_KEY, JSON.stringify(adjustments));
+    } catch (e) {}
+  }
+
+  // Session 267 v4: user upload icon があれば apple-touch-icon を動的に差し替え
+  $effect(() => {
+    if (typeof document === 'undefined') return;
+    const link = document.getElementById('apple-touch-icon');
+    if (!link) return;
+    if (assets.icon) {
+      link.href = assets.icon;
+    }
+  });
+
+  function start() {
+    phase = 'practice';
+    animationStarted = false;
+    showPraise = false;
+    showDoneBtn = false;
+    stageIndex = 0;
+    currentIndex = 0;
+    startedFlags = Array(kanjis.length).fill(false);
+    completedFlags = Array(kanjis.length).fill(false);
+  }
+
+  // Session 273: 次ステージへ進む（複数選択時のセット間遷移）
+  function nextStage() {
+    if (!hasNextStage) return;
+    showPraise = false;
+    showPraiseAnim = false;
+    showDoneBtn = false;
+    animationStarted = false;
+    currentIndex = 0;
+    traceComps.forEach((t) => t?.clearAll?.());
+    stageIndex = stageIndex + 1;
+    startedFlags = Array(kanjis.length).fill(false);
+    completedFlags = Array(kanjis.length).fill(false);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  // Session 273: 最終ステージ完了後の「もういっかい」= 全選択を最初のステージから
+  function restartAll() {
+    showPraise = false;
+    showPraiseAnim = false;
+    showDoneBtn = false;
+    animationStarted = false;
+    currentIndex = 0;
+    traceComps.forEach((t) => t?.clearAll?.());
+    stageIndex = 0;
+    startedFlags = Array(kanjis.length).fill(false);
+    completedFlags = Array(kanjis.length).fill(false);
+  }
+
+  async function runCountdownThen(action) {
+    // Session 265: カウントダウン音声は削除（マスター指示）。視覚のみで 3-2-1 表示
+    // 数字表示 970ms × 3 = 2.91 秒
+    for (let i = 3; i >= 1; i--) {
+      countdown = i;
+      await new Promise((r) => setTimeout(r, 970));
+      if (!animationStarted) {
+        countdown = 0;
+        return;
+      }
+    }
+    countdown = 0;
+    // 余韻 300ms → ナビスタート
+    await new Promise((r) => setTimeout(r, 300));
+    if (!animationStarted) return;
+    action?.();
+  }
+
+  // Session 267 B1 修正: 配列要素直接代入を spread (.with) に統一して reactivity を確実発火
+  //   → completedFlags.every() が done 後に再評価されず praise が出ないバグを解消
+  async function startKanji(i) {
+    // iOS/Android: ユーザージェスチャー中に音声を解放（rAF内再生を可能にする）
+    traceComps.forEach((t) => t?.primeAudio?.());
+    currentIndex = i;
+    // 1ページ1文字方式: 押された枠のみアンロック
+    startedFlags = startedFlags.with(i, true);
+    animationStarted = true;
+    showDoneBtn = false;
+    await runCountdownThen(() => traceComps[i]?.replayDemo?.());
+  }
+
+  // onRestart prop で呼ばれるエイリアス（TraceCanvas 内のやりなおしキャッチアップ）
+  async function startAnimation() {
+    await startKanji(currentIndex);
+  }
+
+  // Session 267 S1+S3: 各枠ローカル「できた!」（per-i）。全枠完了で praise overlay 発火
+  function doneKanji(i) {
+    traceComps[i]?.freezeCompleted?.();
+    completedFlags = completedFlags.with(i, true);
+    if (completedFlags.every((f) => f)) {
+      showPraise = true;
+      // Session 267 v4: 全画面お祝いアニメを 3 秒間発火
+      showPraiseAnim = true;
+      // 6 秒：launchDur 0.85-1.2s + burst-delay 0.3s + 粒子 1.6s = 約 3 秒の単発寿命
+      // 最後に発射した花火の炸裂を最後まで見せるため、終端 1.5 秒は新規 spawn が走っても OK
+      setTimeout(() => { showPraiseAnim = false; }, 6000);
+    } else {
+      animationStarted = false;
+    }
+  }
+
+  // 「もういっかい」: praise から最初に戻す（全枠リセット・スタートボタン復活）
+  function retry() {
+    showPraise = false;
+    showDoneBtn = false;
+    currentIndex = 0;
+    traceComps.forEach((t) => t?.clearAll?.());
+    startedFlags = Array(kanjis.length).fill(false);
+    completedFlags = Array(kanjis.length).fill(false);
+    animationStarted = false;
+  }
+
+  // Session 267 S1+S2+B2: 各枠ローカル「やりなおし」（per-i）。その枠のみリセット
+  async function replayKanji(i) {
+    currentIndex = i;
+    animationStarted = true;
+    traceComps[i]?.clearAll?.();
+    completedFlags = completedFlags.with(i, false);
+    startedFlags = startedFlags.with(i, true);
+    await runCountdownThen(() => traceComps[i]?.replayDemo?.());
+  }
+
+  function closeSettings() {
+    saveAssets();
+    showSettings = false;
+  }
+
+  async function handleNaviDone(i) {
+    // 井上氏指示（2026-05-25・修正v2）: ナビ完了時の「勝手に次の字に行く」を禁止
+    //   ナビが終わっても自動遷移しない。次の字へは右下「つぎの字 →」ボタン操作のみ
+    //   児童は最後の動作語を書き終わるまで自分のペースで書字できる
+    animationStarted = false;
+  }
+
+  function doneAll() {
+    // 最終ページの文字も完了マーク（次の字遷移を経ないため明示的に freeze）
+    traceComps[currentIndex]?.freezeCompleted?.();
+    completedFlags = completedFlags.with(currentIndex, true);
+    showDoneBtn = false;
+    showPraise = true;
+    showPraiseAnim = true;
+    setTimeout(() => { showPraiseAnim = false; }, 6000);
+  }
+
+  // 井上氏指示（2026-05-25）: 1ページ1文字 + 「つぎの字」ボタンで次ページへ
+  function nextKanji() {
+    if (currentIndex >= kanjis.length - 1) return;
+    // 現在の文字を完了マーク（書字途中でも freeze して次へ）
+    traceComps[currentIndex]?.freezeCompleted?.();
+    completedFlags = completedFlags.with(currentIndex, true);
+    currentIndex = currentIndex + 1;
+    // 次ページは「スタート」ボタンから始める
+    animationStarted = false;
+    showDoneBtn = false;
+    startedFlags = startedFlags.with(currentIndex, false);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+</script>
+
+<svelte:head>
+  <title>「{activeSet.name}」をかこう</title>
+</svelte:head>
+
+<main class="page">
+  <!-- 背景装飾（子供向けポップアート風の雲） -->
+  <div class="bg-decor" aria-hidden="true">
+    <span class="cloud cloud-1">☁</span>
+    <span class="cloud cloud-2">☁</span>
+    <span class="cloud cloud-3">☁</span>
+    <span class="star star-1">⭐</span>
+    <span class="star star-2">✨</span>
+    <span class="star star-3">🌟</span>
+  </div>
+
+  <!-- 設定ボタン（start phase のみ左上・practice phase では topbar 内に配置） -->
+  {#if phase === 'start'}
+    <button
+      class="btn btn--icon settings-pos"
+      onclick={() => (showSettings = true)}
+      aria-label="設定"
+    >⚙</button>
+  {/if}
+
+  <!-- 応援キャラクター（右上 floating・Session 267 v3 で位置・スケール調整可。char-bob は inner に分離） -->
+  <div
+    class="character"
+    aria-hidden="true"
+    style:transform={`translate(${adjustments.character.x}%, ${adjustments.character.y}%) scale(${adjustments.character.scale})`}
+  >
+    <div class="character-inner">
+      {#if assets.character}
+        <img src={assets.character} alt="" />
+      {:else}
+        <div class="default-char">🐱</div>
+      {/if}
+    </div>
+  </div>
+
+  {#if phase === 'start'}
+    <div class="start-screen">
+      <div class="kanji-display">{activeSetNames}</div>
+      <h1>「{activeReading}」を かこう！</h1>
+      <button class="btn btn--primary big" onclick={start}>▶ はじめる</button>
+    </div>
+
+  {:else if phase === 'practice'}
+    <div class="topbar topbar-sticky">
+      <button class="btn btn--icon home-btn" onclick={goHome} aria-label="ホームへ">🏠</button>
+      <div class="title-small">「{activeSetNames}」</div>
+      <button class="btn btn--icon settings-btn" onclick={() => (showSettings = true)} aria-label="設定">⚙</button>
+    </div>
+
+    <!-- Session 267 S4: 上部グローバルボタン撤去（各枠ボタンが代替） -->
+
+    <div class="play-area">
+      <div class="canvas-area">
+        {#each kanjis as k, i (k.char)}
+          {#if i === currentIndex}
+            <div class="canvas-wrap">
+              <div class="canvas-host" class:locked={!startedFlags[i] || completedFlags[i]} aria-disabled={!startedFlags[i] || completedFlags[i]}>
+                {#if !startedFlags[i]}
+                  <div class="start-overlay">
+                    <button
+                      class="btn btn--primary frame-btn frame-btn--pulse"
+                      onclick={() => startKanji(i)}
+                    >▶ スタート</button>
+                  </div>
+                {/if}
+                <div class="reading-badge" aria-hidden="true">{activeSet.kanjiReadings?.[i] ?? k.reading ?? ''}</div>
+                <div class="page-indicator" aria-hidden="true">{i + 1} / {kanjis.length}</div>
+                <TraceCanvas
+                  bind:this={traceComps[i]}
+                  kanji={k}
+                  onRestart={() => startKanji(i)}
+                  onNaviDone={() => handleNaviDone(i)}
+                  sensitivity={adjustments.sensitivity ?? 30}
+                />
+                {#if countdown > 0}
+                  <div class="countdown-overlay" aria-live="assertive">
+                    <div class="countdown-num" bind:this={cdEl}>{countdown}</div>
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {/if}
+        {/each}
+      </div>
+    </div>
+
+    <!-- 井上氏指示（2026-05-25）: 1ページ1文字 + 枠外右下ナビボタン -->
+    <!-- 井上氏要望（2026-06-02）: ボタンは丸、文字はボタンの上にホワンホワン浮かせる。
+         つぎの字は出現回数ごと（next1/2/3）、最後は doneButton で別画像 -->
+    <div class="page-nav">
+      {#if currentIndex < kanjis.length - 1}
+        <div class="pagenav-wrap">
+          <div class="pagenav-btnbox">
+            <button
+              class="btn btn--primary pagenav-circle"
+              class:btn--skinned={nextSkinKey && assets[nextSkinKey]}
+              style:--skin-img={nextSkinKey && assets[nextSkinKey] ? `url("${assets[nextSkinKey]}")` : null}
+              onclick={nextKanji}
+              aria-label="つぎの字"
+            ></button>
+          </div>
+          <span class="pagenav-label pagenav-label--touch">できたらタッチ！</span>
+        </div>
+      {:else}
+        <div class="pagenav-wrap">
+          <div class="pagenav-btnbox">
+            <button
+              class="btn btn--primary pagenav-circle"
+              class:btn--skinned={assets.doneButton}
+              style:--skin-img={assets.doneButton ? `url("${assets.doneButton}")` : null}
+              onclick={doneAll}
+              aria-label="できた！"
+            ></button>
+          </div>
+          <span class="pagenav-label pagenav-label--touch">できた！</span>
+        </div>
+      {/if}
+    </div>
+
+    {#if showPraiseAnim}
+      <div class="praise-bg-anim" aria-hidden="true">
+        <!-- Session 271 v2: 花火（連発・①打ち上げ→②0.3s 静止→③炸裂・5 パターン×3 サイズ） -->
+        {#each fireworks as fw (fw.id)}
+          <div
+            class="fw-shell"
+            style="--x:{fw.x}vw; --launch-y:{fw.launchY}vh; --peak-y:{fw.peakY}vh; --launch-dur:{fw.launchDur}s; --burst-delay:{fw.launchDur + 0.3}s; --hue:{fw.hue}; --radius:{fw.radius}vmin;"
+          >
+            <span class="fw-rocket fw-size-{fw.size}"></span>
+            <span class="fw-flash fw-size-{fw.size}"></span>
+            {#each fw.particles as p, j (j)}
+              <span
+                class="fw-particle fw-{fw.pattern} fw-size-{fw.size}"
+                class:fw-gravity={p.gravity}
+                style="--dx:{p.dx}; --dy:{p.dy}; --idx:{j};"
+              ></span>
+            {/each}
+          </div>
+        {/each}
+        <!-- 踊る動物（画面下に並ぶ） -->
+        {#each ['🐶','🐱','🐰','🐻','🦁','🐼','🐯','🦊'] as a, i (a)}
+          <span class="dancer" style="left:{8 + i * 11}%; animation-delay:{i * 0.08}s;">{a}</span>
+        {/each}
+        <!-- 紙吹雪（24 個・天井から落下） -->
+        {#each Array(24) as _, i (i)}
+          <span class="confetti-piece" style="left:{(i * 71) % 100}vw; animation-delay:{(i * 0.05) % 0.6}s; color:hsl({(i * 47) % 360}, 90%, 60%);">✨</span>
+        {/each}
+      </div>
+    {/if}
+
+    {#if showPraise}
+      <div class="praise-overlay" role="dialog" aria-modal="true">
+        <div class="praise-card">
+          <div class="confetti">
+            <span class="conf c1">🎉</span>
+            <span class="conf c2">⭐</span>
+            <span class="conf c3">✨</span>
+            <span class="conf c4">💫</span>
+            <span class="conf c5">🌟</span>
+          </div>
+          <div
+            class="praise-emoji"
+            style:transform={`translate(${adjustments.emoji.x}%, ${adjustments.emoji.y}%) scale(${adjustments.emoji.scale})`}
+          >
+            <div class="praise-emoji-inner">
+              {#if assets.emoji}
+                <img src={assets.emoji} alt="" />
+              {:else}
+                🎉
+              {/if}
+            </div>
+          </div>
+          <h2>やったね！！</h2>
+          <p>{kanjis.length > 1 ? `「${activeSetNames}」ぜんぶかけたね！` : 'かんぺきにかけたね！'}</p>
+          <div class="praise-actions">
+            {#if hasNextStage}
+              <button class="btn btn--primary big next-btn" onclick={nextStage}>つぎへ →</button>
+              <button class="btn btn--secondary big" onclick={retry}>もういっかい</button>
+            {:else}
+              <button class="btn btn--primary big" onclick={restartAll}>もういっかい</button>
+              <button class="btn btn--secondary big" onclick={() => goto(`${base}/`)}>ホームへ</button>
+            {/if}
+          </div>
+        </div>
+      </div>
+    {/if}
+  {/if}
+
+  {#if showSettings}
+    <AssetSettings bind:assets bind:adjustments onclose={closeSettings} />
+  {/if}
+</main>
+
+<style>
+  .page {
+    min-height: 100vh;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    background-color: #fef3c7;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* === 背景装飾（雲・星 ふわふわ漂う・デフォルト時のみ） === */
+  .bg-decor {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .bg-decor > * {
+    position: absolute;
+    opacity: 0.45;
+  }
+  .cloud {
+    font-size: 3rem;
+    color: #ffffff;
+    animation: drift 14s ease-in-out infinite alternate;
+  }
+  .cloud-1 { top: 8%;  left: 5%; }
+  .cloud-2 { top: 30%; right: 8%; animation-delay: 4s; font-size: 2.4rem; }
+  .cloud-3 { bottom: 15%; left: 15%; animation-delay: 8s; font-size: 2.8rem; }
+  .star {
+    font-size: 1.6rem;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  .star-1 { top: 22%; left: 20%; animation-delay: 0.5s; }
+  .star-2 { top: 50%; right: 22%; animation-delay: 1.5s; }
+  .star-3 { bottom: 25%; right: 10%; animation-delay: 2.2s; }
+
+  @keyframes drift {
+    0%   { transform: translateX(0) translateY(0); }
+    100% { transform: translateX(20px) translateY(-8px); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 0.7; transform: scale(1.15); }
+  }
+
+  /* === 設定ボタンの位置（立体感は global .btn--icon） === */
+  .settings-pos {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.7rem;
+    z-index: 4;
+  }
+
+  /* === 応援キャラクター（右上 floating・Session 267 v3 で +50% 拡大 + 位置/スケール調整可） === */
+  /* .character には user の transform、char-bob アニメは .character-inner に分離（衝突回避） */
+  .character {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.8rem;
+    z-index: 3;
+    width: clamp(5.25rem, 18vw, 7.5rem);
+    height: clamp(5.25rem, 18vw, 7.5rem);
+  }
+  .character-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: char-bob 2.6s ease-in-out infinite;
+  }
+  .character img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+  }
+  .default-char {
+    font-size: clamp(4.2rem, 15vw, 6rem);
+    line-height: 1;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+  }
+  @keyframes char-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+
+  /* === start phase === */
+  .start-screen {
+    position: relative;
+    z-index: 1;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .kanji-display {
+    font-size: clamp(4.5rem, 18vw, 7.5rem);
+    line-height: 1;
+    color: #1f2937;
+    text-shadow: 0 4px 0 rgba(255, 255, 255, 0.6), 0 8px 20px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 1.5rem;
+    padding: 0.5rem 2rem;
+  }
+  .start-screen h1 {
+    font-size: clamp(1.4rem, 5vw, 1.9rem);
+    color: #1f2937;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 1rem;
+    padding: 0.5rem 1.2rem;
+  }
+
+  /* === practice phase === */
+  /* Session 267 v3: topbar を sticky 化 + 左 home / 中央 title / 右 settings */
+  .topbar {
+    z-index: 10;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  /* Session 273: 親 flex/scroll コンテキストに依存しない fixed 固定に変更
+     → スクロール時も常に画面最上部に張り付く */
+  .topbar-sticky {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(254, 243, 199, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 0 1rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+  .home-btn,
+  .settings-btn {
+    flex: 0 0 auto;
+  }
+  .title-small {
+    flex: 1;
+    text-align: center;
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-weight: 700;
+    color: #1f2937;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 999px;
+    padding: 0.3rem 1.2rem;
+  }
+  /* Session 267 v3: 各記入枠の左上に永続表示するひらがなラベル */
+  .reading-badge {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+    z-index: 4;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    font-weight: 800;
+    color: #1f2937;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #f59e0b;
+    border-radius: 0.6rem;
+    padding: 0.1rem 0.5rem;
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  /* Session 266: 複数文字横並び対応 — 単漢字は max-width 480px、複数は 800px に拡張 */
+  /* Session 273: topbar fixed 化に伴い上方向スペース確保（topbar 高 ≒ 4.25rem） */
+  .play-area {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+    margin-top: 4.5rem;
+  }
+  /* Session 266 v3: マスター指示「枠の大きさはいつも全部同じ」 → 動的サイズ変化を撤回し常に均等表示 */
+  .canvas-area {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  /* Session 267 S1+S2: 各枠は flex column（上=スタート/やりなおし、中=Canvas、下=できた!） */
+  .canvas-wrap {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .canvas-host {
+    position: relative;
+    width: 100%;
+  }
+  /* スタート押下前は記入を受け付けない（誤記入防止・見た目は維持） */
+  .canvas-host.locked {
+    pointer-events: none;
+    touch-action: none;
+  }
+  .frame-action {
+    display: flex;
+    justify-content: center;
+  }
+  .frame-action :global(.frame-btn) {
+    width: 100%;
+    padding: 0.55rem 0.6rem;
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    white-space: nowrap;
+  }
+  .frame-action :global(.frame-btn[disabled]) {
+    opacity: 0.5;
+    cursor: default;
+    filter: brightness(0.97);
+  }
+  .frame-action :global(.frame-btn--pulse) {
+    animation: frame-start-pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes frame-start-pulse {
+    0%, 100% {
+      transform: scale(1);
+      filter: brightness(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    }
+    50% {
+      transform: scale(1.08);
+      filter: brightness(1.08) drop-shadow(0 4px 10px rgba(255, 165, 0, 0.55));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .frame-action :global(.frame-btn--pulse) {
+      animation: none;
+    }
+  }
+
+  .start-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    pointer-events: auto;
+  }
+
+  .done-area {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  /* 井上氏指示（2026-05-25）: 1ページ1文字 + 枠外右下ナビボタン */
+  .page-nav {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 15;
+  }
+  /* 井上氏要望（2026-06-02）: 丸ボタン + 文字をボタンの上にホワンホワン浮かせる（つぎの字・できた共通） */
+  .pagenav-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .pagenav-btnbox {
+    position: relative;
+  }
+  .pagenav-label {
+    font-size: clamp(1.15rem, 5.5vw, 1.6rem);
+    font-weight: 900;
+    /* 淡い黄色背景になじまないよう、鮮やかな赤＋太い白フチで高コントラスト化 */
+    color: #e11d48;
+    -webkit-text-stroke: 1px #fff;
+    paint-order: stroke fill; /* フチの内側に塗りを残し、文字が痩せないように */
+    text-shadow: 0 0 4px #fff, 0 0 8px #fff, 0 2px 5px rgba(0, 0, 0, 0.35);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  /* ナビボタンのラベル（つぎの字「できたらタッチ！」/ 最後「できた！」共通）:
+     ボタンの下・ゆったり点滅（井上氏要望で最後のページも前ページと同処理に統一） */
+  .pagenav-label.pagenav-label--touch {
+    animation: blink-soft 2.2s ease-in-out infinite;
+  }
+  @keyframes blink-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .pagenav-circle {
+    width: clamp(78px, 22vw, 108px);
+    height: clamp(78px, 22vw, 108px);
+    border-radius: 50%;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+  /* ページインジケーター（右上「1 / 3」表示） */
+  .page-indicator {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    z-index: 4;
+    font-size: clamp(0.95rem, 3.5vw, 1.2rem);
+    font-weight: 800;
+    color: #1f2937;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #60a5fa;
+    border-radius: 0.6rem;
+    padding: 0.1rem 0.6rem;
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* === カウントダウンオーバーレイ（背景透明・数字だけ） === */
+  .countdown-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    pointer-events: none;
+    background: transparent;
+  }
+  .countdown-num {
+    font-size: clamp(6rem, 26vw, 10rem);
+    font-weight: 900;
+    color: #f59e0b;
+    text-shadow:
+      0 4px 0 #c2750c,
+      0 8px 0 rgba(146, 64, 14, 0.5),
+      0 14px 30px rgba(0, 0, 0, 0.3);
+    /* setTimeout(970ms) と完全同期 → 数字切替時の空白フレームをゼロに */
+    animation: countdown-pop 0.97s ease-out forwards;
+    line-height: 1;
+  }
+  @keyframes countdown-pop {
+    0%   { transform: scale(0.3); opacity: 0; }
+    18%  { transform: scale(1.35); opacity: 1; }
+    80%  { transform: scale(1.0); opacity: 1; }
+    100% { transform: scale(1.0); opacity: 1; } /* 終端で消えない・次の値に上書きされて再生 */
+  }
+
+  /* === Session 267 v4: 全画面お祝いアニメ === */
+  .praise-bg-anim {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 19;
+    overflow: hidden;
+  }
+  /* === 花火（Session 271 v2 完全刷新・粒子放射式） === */
+  .fw-shell {
+    position: absolute;
+    left: var(--x);
+    top: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+  .fw-rocket {
+    position: absolute;
+    top: var(--launch-y);
+    left: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: hsl(var(--hue), 90%, 82%);
+    box-shadow:
+      0 0 32px hsl(var(--hue), 95%, 78%),
+      0 0 60px hsl(var(--hue), 95%, 60%),
+      0 0 12px white;
+    transform: translate(-50%, 0);
+    opacity: 0;
+    animation: fw-launch var(--launch-dur) cubic-bezier(0.45, 0.1, 0.55, 1) forwards;
+  }
+  .fw-rocket.fw-size-s { width: 11px; height: 11px; }
+  .fw-rocket.fw-size-l { width: 19px; height: 19px; }
+  /* 炸裂瞬間の白フラッシュ（球が爆発した直後の閃光） */
+  .fw-flash {
+    position: absolute;
+    top: var(--peak-y);
+    left: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: white;
+    box-shadow:
+      0 0 50px white,
+      0 0 100px hsl(var(--hue), 95%, 75%),
+      0 0 180px hsl(var(--hue), 95%, 60%);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    animation: fw-flash-burst 0.55s ease-out forwards;
+    animation-delay: var(--burst-delay);
+  }
+  .fw-flash.fw-size-s { width: 20px; height: 20px; }
+  .fw-flash.fw-size-l { width: 36px; height: 36px; }
+  @keyframes fw-flash-burst {
+    0%   { transform: translate(-50%, -50%) scale(0);   opacity: 0; }
+    20%  { transform: translate(-50%, -50%) scale(3.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(6);   opacity: 0; }
+  }
+  @keyframes fw-launch {
+    0%   { top: var(--launch-y); opacity: 0; transform: translate(-50%, 0) scale(0.5); }
+    8%   { opacity: 1; transform: translate(-50%, 0) scale(1.05); }
+    88%  { opacity: 1; }
+    100% { top: var(--peak-y); opacity: 0; transform: translate(-50%, 0) scale(0.7); }
+  }
+  .fw-particle {
+    position: absolute;
+    top: var(--peak-y);
+    left: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: hsl(calc(var(--hue) + var(--idx) * 6), 95%, 60%);
+    box-shadow:
+      0 0 22px hsl(calc(var(--hue) + var(--idx) * 6), 95%, 70%),
+      0 0 44px hsl(var(--hue), 95%, 55%),
+      0 0 12px white;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    animation: fw-particle-fly 1.6s cubic-bezier(0.15, 0.75, 0.4, 1) forwards;
+    animation-delay: var(--burst-delay);
+  }
+  .fw-particle.fw-size-s { width: 12px; height: 12px; }
+  .fw-particle.fw-size-l { width: 21px; height: 21px; }
+  /* パルムは粒子を一回り大きく（太い枝感） */
+  .fw-particle.fw-palm { width: 20px; height: 20px; }
+  .fw-particle.fw-palm.fw-size-s { width: 15px; height: 15px; }
+  .fw-particle.fw-palm.fw-size-l { width: 27px; height: 27px; }
+  @keyframes fw-particle-fly {
+    0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+    8%   { transform: translate(-50%, -50%) scale(1.8); opacity: 1; }
+    60%  { transform: translate(calc(-50% + var(--dx) * var(--radius)), calc(-50% + var(--dy) * var(--radius))) scale(1.0); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--dx) * var(--radius) * 1.05), calc(-50% + var(--dy) * var(--radius) * 1.05)) scale(0.2); opacity: 0; }
+  }
+  .fw-particle.fw-gravity {
+    animation-name: fw-particle-fall;
+    animation-duration: 1.8s;
+  }
+  @keyframes fw-particle-fall {
+    0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+    8%   { transform: translate(-50%, -50%) scale(1.8); opacity: 1; }
+    35%  { transform: translate(calc(-50% + var(--dx) * var(--radius)), calc(-50% + var(--dy) * var(--radius))) scale(1.1); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--dx) * var(--radius) * 1.1), calc(-50% + var(--dy) * var(--radius) + 28vmin)) scale(0.4); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fw-shell { display: none; }
+  }
+  .dancer {
+    position: absolute;
+    bottom: 3%;
+    font-size: clamp(2.5rem, 9vw, 4.5rem);
+    animation: dance 0.55s ease-in-out infinite alternate;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+  }
+  @keyframes dance {
+    0%   { transform: translateY(0)     rotate(-15deg) scale(1); }
+    100% { transform: translateY(-40px) rotate(15deg)  scale(1.18); }
+  }
+  .confetti-piece {
+    position: absolute;
+    top: -3rem;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    animation: confetti-fall 2.6s linear infinite;
+  }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0)     rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0.3; }
+  }
+
+  /* === 評価オーバーレイ === */
+  .praise-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    animation: fadeIn 0.25s ease-out;
+  }
+  .praise-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    max-width: 88vw;
+    animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: visible;
+  }
+  /* Session 267 v3: user transform 効くように .praise-emoji-inner に bounce 分離 */
+  .praise-emoji {
+    font-size: clamp(3.5rem, 14vw, 5rem);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .praise-emoji-inner {
+    display: inline-block;
+    animation: bounce 0.7s ease-in-out infinite alternate;
+  }
+  .praise-emoji img {
+    width: clamp(4.5rem, 18vw, 6rem);
+    height: clamp(4.5rem, 18vw, 6rem);
+    object-fit: contain;
+  }
+  .praise-card h2 {
+    font-size: clamp(2rem, 7vw, 2.8rem);
+    color: #b91c1c;
+    margin: 0 0 0.5rem;
+  }
+  .praise-card p {
+    font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+    color: #1f2937;
+    margin: 0 0 1.5rem;
+  }
+  /* Session 265: praise overlay 内に「もういっかい」+「つぎへ」or「ホームへ」を縦並び */
+  .praise-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: stretch;
+  }
+  .confetti {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .conf {
+    position: absolute;
+    font-size: 1.8rem;
+    opacity: 0;
+    animation: confetti-pop 1.6s ease-out infinite;
+  }
+  .c1 { top: -10px; left: 12%; animation-delay: 0.1s; }
+  .c2 { top: -5px; right: 14%; animation-delay: 0.4s; }
+  .c3 { top: 30%; left: -10px; animation-delay: 0.7s; }
+  .c4 { top: 28%; right: -10px; animation-delay: 1.0s; }
+  .c5 { bottom: -10px; left: 40%; animation-delay: 1.3s; }
+
+  @keyframes confetti-pop {
+    0% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+    20% { opacity: 1; transform: scale(1.2) rotate(20deg); }
+    60% { opacity: 1; transform: scale(1) rotate(-10deg); }
+    100% { opacity: 0; transform: scale(0.6) rotate(30deg); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-12px); }
+  }
+
+  /* === ボタン統一デザイン（全ファイル共通の立体感） === */
+  /* base */
+  :global(.btn) {
+    font-family: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    border-radius: 999px;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: transform 0.08s, box-shadow 0.08s, filter 0.08s;
+    position: relative;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+    line-height: 1.2;
+  }
+  /* primary（メイン CTA・黄色立体） */
+  :global(.btn--primary) {
+    background: linear-gradient(180deg, #fde047 0%, #fbbf24 55%, #f59e0b 100%);
+    color: #1f2937;
+    padding: 0.75rem 2.2rem;
+    font-size: clamp(1.05rem, 4.2vw, 1.3rem);
+    box-shadow:
+      inset 0 -4px 0 rgba(146, 64, 14, 0.15),
+      0 6px 0 #c2750c,
+      0 8px 14px rgba(194, 117, 12, 0.25);
+  }
+  :global(.btn--primary.big) {
+    padding: 1rem 3rem;
+    font-size: clamp(1.3rem, 5vw, 1.7rem);
+    box-shadow:
+      inset 0 -5px 0 rgba(146, 64, 14, 0.18),
+      0 7px 0 #c2750c,
+      0 10px 18px rgba(194, 117, 12, 0.3);
+  }
+  :global(.btn--primary:hover) {
+    filter: brightness(1.05);
+  }
+  :global(.btn--primary:active) {
+    transform: translateY(4px);
+    box-shadow:
+      inset 0 -2px 0 rgba(146, 64, 14, 0.18),
+      0 2px 0 #c2750c,
+      0 3px 6px rgba(194, 117, 12, 0.2);
+  }
+  /* secondary（補助・白〜灰立体） */
+  :global(.btn--secondary) {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #e2e8f0 100%);
+    color: #334155;
+    padding: 0.55rem 1.3rem;
+    font-size: clamp(0.95rem, 3.6vw, 1.1rem);
+    box-shadow:
+      inset 0 -3px 0 rgba(100, 116, 139, 0.12),
+      0 4px 0 #94a3b8,
+      0 5px 10px rgba(100, 116, 139, 0.2);
+  }
+  :global(.btn--secondary:hover) {
+    filter: brightness(1.03);
+  }
+  :global(.btn--secondary:active) {
+    transform: translateY(3px);
+    box-shadow:
+      inset 0 -1px 0 rgba(100, 116, 139, 0.15),
+      0 1px 0 #94a3b8,
+      0 2px 4px rgba(100, 116, 139, 0.15);
+  }
+  /* icon（円形・小型立体・Session 267 v3 で +25% 拡大） */
+  :global(.btn--icon) {
+    width: 3.25rem;
+    height: 3.25rem;
+    padding: 0;
+    border-radius: 999px;
+    font-size: 1.5rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+    color: #475569;
+    box-shadow:
+      inset 0 -2px 0 rgba(100, 116, 139, 0.12),
+      0 3px 0 #94a3b8,
+      0 4px 8px rgba(100, 116, 139, 0.18);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  :global(.btn--icon:active) {
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 -1px 0 rgba(100, 116, 139, 0.12),
+      0 1px 0 #94a3b8,
+      0 2px 4px rgba(100, 116, 139, 0.15);
+  }
+  :global(.btn--disabled),
+  :global(.btn[disabled]) {
+    cursor: default;
+    filter: brightness(0.97);
+  }
+</style>

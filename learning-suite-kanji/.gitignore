@@ -1,0 +1,19 @@
+node_modules/
+build/
+.svelte-kit/
+.env
+.env.*
+!.env.example
+.DS_Store
+package-lock.json
+
+# vibe-base 司令塔が管理する保管庫・パイプライン（本リポにはコミットしない）
+/CLAUDE.md
+/pc-progress.html
+/runbook.md
+/docs/
+/scripts/
+/.claude/
+
+# Playwright MCP の一時出力（スクショ・コンソールログ）
+.playwright-mcp/

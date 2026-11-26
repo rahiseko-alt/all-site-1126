@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vercel/
+.env
+.env.*
+!.env.example
+ops.local.md
+apps-script/.clasp.json
+__pycache__/
+*.zip

@@ -1,0 +1,3 @@
+export function ProjectBody({project,children}){
+ return <div className="project-images"><img src={project.image} alt={project.title+'の画面'}/><section className={'project-story story-'+project.id} style={{background:project.color}}><span>{project.category}</span><h2>{project.tagline.split('\n').map((line,i)=><span key={i}>{i>0&&<br/>}{line}</span>)}</h2><p>{project.detail}</p></section>{project.detailImage?<img src={project.detailImage} alt={project.title+'の画面'}/>:<div className={'project-triptych triptych-'+project.id}>{[0,1,2].map(i=><div key={i}><img src={project.image} alt={project.title+'の画面ディテール '+(i+1)} style={{objectPosition:`${i*50}% center`}}/></div>)}</div>}{children}</div>;
+}

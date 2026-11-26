@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg: #080808;
+    --bg2: #0e0e0e;
+    --bg3: #141414;
+    --fg: #f0ede8;
+    --fg2: rgba(240, 237, 232, 0.85);
+    --fg3: rgba(240, 237, 232, 0.65);
+    --line: rgba(240, 237, 232, 0.09);
+    --gold: #c8a45a;
+    --gold2: rgba(200, 164, 90, 0.15);
+    --gold3: rgba(200, 164, 90, 0.35);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* 固定ナビの高さぶんアンカー位置をずらす(モバイルは64px、md:以上は68px) */
+    scroll-padding-top: 64px;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
+  @media (min-width: 768px) {
+    html {
+      scroll-padding-top: 68px;
+    }
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+    width: 100%;
+    position: relative;
+  }
+
+  ::selection {
+    background: var(--gold);
+    color: #080808;
+  }
+}
+
+/* Touch-optimized, accessible interactive buttons (min 44px height) */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-size: 0.825rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: rgba(240, 237, 232, 0.04);
+  color: var(--fg);
+  border: 1px solid rgba(240, 237, 232, 0.18);
+  backdrop-filter: blur(8px);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-family: var(--font-geist-mono), monospace;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btn-ghost:hover,
+.btn-ghost:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200, 164, 90, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200, 164, 90, 0.15);
+}
+
+.btn-ghost:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.btn-ghost:active {
+  transform: translateY(0);
+}
+
+.btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-size: 0.825rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--fg);
+  color: var(--bg);
+  border: 1px solid transparent;
+  padding: 0.75rem 1.75rem;
+  cursor: pointer;
+  font-family: var(--font-geist-mono), monospace;
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btn-solid:hover,
+.btn-solid:focus-visible {
+  background: var(--gold);
+  color: #080808;
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200, 164, 90, 0.25);
+}
+
+.btn-solid:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.btn-solid:active {
+  transform: translateY(0);
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(240, 237, 232, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.65rem 0.75rem;
+  color: var(--fg);
+  font: inherit;
+  outline: none;
+  /* 日付・時刻の欄はブラウザ内蔵のカレンダーで選べる。ただし color-scheme を
+     暗く指定しないと、カレンダーのアイコンが黒いまま暗い背景に描かれて
+     見えず、手で打つしかないように見える。ポップアップ自体も明るいテーマの
+     ままになる。2026-09-10、利用者から「日付はカレンダーから選べるように
+     しろ」と指摘を受けて追加した（機能は元からあり、見えていなかった）。 */
+  color-scheme: dark;
+}
+
+.form-control:focus {
+  border-color: var(--gold);
+}
+
+/* カレンダーのアイコンを押しやすくする。既定は小さく端に寄っていて気づきにくい。 */
+.form-control::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.85;
+  padding-left: 0.5rem;
+  transform: scale(1.15);
+}
+
+.form-control::-webkit-calendar-picker-indicator:hover,
+.form-control::-webkit-calendar-picker-indicator:focus-visible {
+  opacity: 1;
+}
+
+/* Fluid Typography Utilities */
+.sec-eyebrow {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.65rem;
+}
+
+.sec-title {
+  font-size: clamp(1.85rem, 4vw + 0.5rem, 3.25rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  min-width: 0;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Responsive Section Spacing */
+.section-padding {
+  padding-top: clamp(3.5rem, 7vw, 6rem);
+  padding-bottom: clamp(3.5rem, 7vw, 6rem);
+}
+
+/* Hide scrollbar utility for smooth mobile pill navigation */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,49 @@
+// 出題用データを作り、アプリが読むファイルに書き出す
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { buildKanjiData } from '../src/data/buildKanjiData.ts'
+import { readRawInputs } from './rawInputs.ts'
+
+const data = buildKanjiData(readRawInputs())
+const out = new URL('../src/generated/', import.meta.url)
+mkdirSync(out, { recursive: true })
+writeFileSync(
+  new URL('kanji-data.json', out),
+  JSON.stringify({
+    _credits:
+      'Generated from joyo-json (MIT), kanji-frequency (CC BY 4.0, https://github.com/scriptin/kanji-frequency), kanjidist-visualiser (MIT; dkanjistat derived from KanjiVG; dstrokedit from Lars Yencken, CC BY 3.0) and KanjiVG (c) Ulrich Apel, https://kanjivg.tagaini.net/ (stroke counts and the two-part component structure in the parts field; modified data, distributed under CC BY-SA 3.0, https://creativecommons.org/licenses/by-sa/3.0/). See the Credits screen.',
+    ...data,
+  }),
+)
+const padded = data.order.filter((c) => data.kanji[c].distractors.length === 7).length
+console.log(`kanji-data.json: ${data.order.length} kanji (${padded} with exactly 7 distractors)`)
+
+// 出典画面から開く、取り込んだデータの公開条件の全文
+const thirdParty = new URL('../third_party/', import.meta.url)
+const notices: [string, string][] = [
+  [
+    'KanjiVG (https://kanjivg.tagaini.net/) (c) Ulrich Apel - modified data (stroke counts and two-part component structure bundled in the kanji data), distributed under CC BY-SA 3.0',
+    'kanjivg/COPYING',
+  ],
+  ['kanjidist-visualiser (https://github.com/lennart-finke/kanjidist-visualiser)', 'kanjidist-visualiser/LICENSE'],
+  ['kanji-frequency (https://github.com/scriptin/kanji-frequency) (c) Dmitry Shpika - CC BY 4.0', 'kanji-frequency/LICENSE.txt'],
+  ['joyo-json (https://github.com/hoffmannjp/joyo-json)', 'joyo-json/LICENSE'],
+  ['Noto Serif JP (subset) - SIL Open Font License 1.1', 'noto-serif-jp/OFL.txt'],
+]
+const publicDir = new URL('../public/', import.meta.url)
+mkdirSync(publicDir, { recursive: true })
+writeFileSync(
+  new URL('third-party-notices.txt', publicDir),
+  [
+    'Third-party notices for Kanji Shape Trainer',
+    '',
+    'Stroke edit distances (distributed via kanjidist-visualiser): Lars Yencken, "Orthographic support for passing the reading hurdle in Japanese" (PhD thesis, University of Melbourne, 2010), https://lars.yencken.org/datasets/kanji-confusion, CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/).',
+    '',
+    ...notices.flatMap(([title, path]) => [
+      '='.repeat(72),
+      title,
+      '='.repeat(72),
+      readFileSync(new URL(path, thirdParty), 'utf8'),
+      '',
+    ]),
+  ].join('\n'),
+)

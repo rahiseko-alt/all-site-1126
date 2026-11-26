@@ -1,0 +1,305 @@
+@font-face {
+  font-family: 'Noto Serif JP';
+  src: url('./assets/fonts/NotoSerifJP-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Serif JP';
+  src: url('./assets/fonts/NotoSerifJP-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+:root {
+  --bg: #f5f4f0;
+  --fg: #232221;
+  --card: #fbfaf7;
+  --line: #d4d1ca;
+  --accent: #2e2d2b;
+  --accent-soft: #e6e3dd;
+  --ink: #2e2d2b url('./assets/cover/button.webp') center / cover;
+  /* 薄墨: 取り違えた字に使う */
+  --usuzumi: #cdc8bf;
+  color-scheme: light dark;
+  font-family: 'Noto Serif JP', serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1a18;
+    --fg: #ece8e1;
+    --card: #252320;
+    --line: #3d3a35;
+    --accent: #e4e1db;
+    --accent-soft: #34322f;
+    --usuzumi: #4a4640;
+  }
+}
+* { box-sizing: border-box; }
+/* 画面の文言も問題の漢字も明朝体（利用者の指定） */
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: 'Noto Serif JP', serif; }
+button { font-family: inherit; }
+.practice { max-width: 560px; margin: 0 auto; padding: 24px 16px; text-align: center; }
+.target {
+  font-size: clamp(96px, 30vw, 160px);
+  line-height: 1.2;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+.choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.choice {
+  font-size: clamp(40px, 12vw, 64px);
+  min-height: 88px;
+  background: var(--card);
+  color: var(--fg);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.feedback { margin-top: 20px; font-size: 20px; }
+.next {
+  font-size: 18px;
+  padding: 12px 32px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.progress { margin: 0 0 12px; opacity: 0.7; }
+.choice { position: relative; }
+.choice .key {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+.result { max-width: 560px; margin: 0 auto; padding: 48px 16px; text-align: center; }
+.result .session-correct { font-size: 56px; margin: 16px 0; }
+.compare { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; }
+.compare figure { margin: 0; }
+.compare-char {
+  font-size: clamp(72px, 24vw, 120px);
+  line-height: 1.2;
+  width: clamp(120px, 38vw, 180px);
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 14px;
+}
+.compare figcaption { font-size: 15px; margin-top: 6px; }
+.choices-6 { grid-template-columns: repeat(3, 1fr); }
+.choices-8 { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.choices-6 .choice, .choices-8 .choice { font-size: clamp(34px, 10vw, 56px); min-height: 76px; }
+.page { max-width: 560px; margin: 0 auto; padding: 16px; }
+.page h1 { font-size: 22px; }
+.empty { opacity: 0.7; }
+.instruction { margin: 0 0 12px; font-size: 16px; }
+.credits ul { padding-left: 20px; }
+.credits li { margin-bottom: 14px; line-height: 1.5; }
+.credits .license { font-size: 14px; }
+.credits .note { font-size: 13px; opacity: 0.75; }
+a { color: var(--accent); }
+.target-small { font-size: clamp(64px, 20vw, 110px); margin-bottom: 16px; }
+.board { display: grid; gap: 8px; margin-bottom: 16px; }
+.board-9 { grid-template-columns: repeat(3, 1fr); }
+.board-12, .board-16 { grid-template-columns: repeat(4, 1fr); }
+.cell {
+  font-size: clamp(30px, 9vw, 48px);
+  min-height: 64px;
+  background: var(--card);
+  color: var(--fg);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.cell.is-selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+.cell.is-dim { opacity: 0.45; }
+.next:disabled { opacity: 0.4; cursor: default; }
+.legend { list-style: none; display: flex; justify-content: center; gap: 14px; padding: 0; margin: 0 0 14px; font-size: 14px; flex-wrap: wrap; }
+.legend li { display: flex; align-items: center; gap: 6px; }
+.swatch { display: inline-block; width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--line); }
+.target.is-hidden { color: var(--line); }
+.choices.is-concealed { visibility: hidden; }
+/* Lv5: 部品2つを左右（row）か上下（column）に並べる */
+.target.parts { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: clamp(64px, 20vw, 110px); padding: 8px 0; }
+.target.parts-column { flex-direction: column; gap: 0; line-height: 1.1; }
+.target.parts .plus { font-size: 0.4em; opacity: 0.5; }
+/* ホーム */
+
+/* 画面全体。下のタブの分だけ余白をとる */
+.app { min-height: 100vh; }
+.app.has-tabs { padding-bottom: 72px; }
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; justify-content: space-around;
+  background: var(--bg); border-top: 1px solid var(--line);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+}
+.tabbar button {
+  flex: 1; max-width: 180px; background: none; border: 0; color: var(--fg);
+  font-size: 16px; padding: 10px 4px; cursor: pointer; opacity: 0.75;
+  border-bottom: 3px solid transparent;
+}
+.practice-top { max-width: 560px; margin: 0 auto; padding: 8px 16px 0; }
+.back { background: none; border: 0; color: var(--fg); font-size: 15px; padding: 6px 0; cursor: pointer; opacity: 0.8; }
+
+/* ホーム（和紙と墨） */
+.home { position: relative; max-width: 560px; margin: 0 auto; padding: 16px 20px 0; text-align: center; overflow: hidden; }
+/* 表示言語: どの画面でも右上に出す */
+.lang-switch {
+  position: fixed; top: 10px; right: 14px; z-index: 20;
+  padding: 4px 10px; border-radius: 999px; background: var(--bg);
+  font-size: 17px; letter-spacing: 0.04em;
+}
+.lang-switch select { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.home-hero { padding-top: 4px; }
+.home-hero h1 { font-size: clamp(28px, 8vw, 38px); margin: 6px 0 4px; font-weight: 700; letter-spacing: 0.02em; }
+.home-subtitle { margin: 0; font-size: 16px; letter-spacing: 0.08em; opacity: 0.85; }
+.home-start h2 { font-size: clamp(22px, 6.4vw, 28px); margin: 26px 0 6px; letter-spacing: 0.06em; }
+.brush-line {
+  width: 72px; height: 5px; margin: 0 auto 16px; border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--fg) 20%, var(--fg) 70%, transparent);
+  opacity: 0.35;
+}
+.start-cards { display: grid; gap: 10px; }
+.start-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; padding: 13px 20px 13px 28px; text-align: left; cursor: pointer;
+  background: var(--card); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 12px;
+}
+.start-card-text { display: flex; flex-direction: column; gap: 4px; }
+.start-card-name { font-size: clamp(20px, 5.6vw, 24px); font-weight: 700; letter-spacing: 0.04em; }
+.start-card-desc { font-size: 14px; opacity: 0.75; letter-spacing: 0.04em; }
+.chevron { font-size: 30px; line-height: 1; opacity: 0.6; }
+.ink-button {
+  display: flex; align-items: center; justify-content: center; gap: 28px;
+  width: min(100%, 420px); margin: 20px auto 8px; padding: 14px 28px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  background: radial-gradient(ellipse at 30% 40%, #3a3836, #1d1c1b 70%); color: #fff;
+  font-size: clamp(20px, 5.6vw, 24px); letter-spacing: 0.08em;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+}
+.ink-button .chevron { opacity: 0.9; color: #fff; }
+@media (prefers-color-scheme: dark) {
+}
+
+/* 表紙（利用者のデザイン: 石組みの図、認字、NINJI、START） */
+.cover {
+  min-height: 100vh; max-width: 480px; margin: 0 auto; padding: 25vh 24px 8vh;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.cover-stones { width: min(54vw, 280px); height: auto; }
+.cover-title { margin: 0; font-size: 1em; font-weight: 400; letter-spacing: 0.12em; line-height: 1.1; }
+.cover-heading {
+  display: flex; align-items: flex-start; justify-content: center; margin-top: 7vh;
+  font-size: clamp(56px, 17vw, 84px);
+}
+.cover-name { display: flex; flex-direction: column; align-items: center; }
+/* 開発元の印: 題字の字の高さにそろえ、題字との間は字の高さの約1/3（題字の字間 0.12em と合わせて） */
+.cover-seal { width: 0.9em; height: 0.9em; margin: 0.15em 0 0 0.2em; flex: none; }
+.cover-reading { margin: 12px 0 0; font-size: clamp(15px, 4.4vw, 19px); letter-spacing: 0.6em; padding-left: 0.6em; }
+.cover-start {
+  margin-top: 9vh; width: min(63vw, 300px); padding: 16px 0; padding-left: 0.4em;
+  border: 0; cursor: pointer; color: #f4f1ec; font-size: clamp(18px, 5vw, 22px); letter-spacing: 0.4em;
+  background: #2b2a29 url('./assets/cover/button.webp') center / cover;
+}
+@media (prefers-color-scheme: dark) {
+  .cover-start { outline: 1px solid var(--line); }
+}
+
+/* モード選択 */
+.modes { padding-top: 0; }
+.modes .practice-top { padding: 8px 0 0; text-align: left; }
+.modes .home-start h2 { margin-top: 12px; }
+.start-card[aria-current='true'] { border-color: var(--accent); }
+
+/* アプリ説明: 文章が下から上へ流れる */
+/* アプリ説明: 1枚のページとして普通にスクロールして読む */
+.intro-roll { max-width: 480px; margin: 0 auto; padding: 48px 24px 100px; text-align: center; }
+.intro-block { margin: 0 0 56px; }
+.intro-block p { margin: 0; font-size: clamp(18px, 5vw, 22px); line-height: 1.9; letter-spacing: 0.04em; word-break: keep-all; overflow-wrap: anywhere; }
+.intro-block img { display: block; width: min(46vw, 180px); height: auto; margin: 0 auto 10px; }
+.intro-block.is-bullet { margin-bottom: 36px; }
+.intro-glyphs { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 14px; }
+.intro-glyphs span { font-size: clamp(34px, 10vw, 44px); letter-spacing: 0.3em; line-height: 1.4; }
+.intro-block.is-bullet p { font-weight: 700; }
+.intro-block.is-bullet img { width: min(36vw, 140px); }
+.intro-next { margin: 8px auto 0; }
+.intro-skip {
+  position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 5;
+  background: var(--bg); color: var(--fg); border: 1px solid var(--fg); border-radius: 0;
+  padding: 8px 20px; font-size: 15px; letter-spacing: 0.2em; cursor: pointer;
+}
+@media (prefers-color-scheme: dark) {
+  .intro-block img { filter: invert(0.9); }
+}
+
+/* ===== 表紙に合わせた全体の見た目: 紙の白、墨の四角、角のない形、字間を空けた明朝 ===== */
+.target, .choice, .compare-char, .cell, .start-card, .swatch, .lang-switch { border-radius: 0; }
+.target, .choice, .cell { border-width: 1px; }
+.cell.is-selected { border-color: transparent; box-shadow: none; background: var(--ink); color: #f4f1ec; }
+/* 墨のボタン（表紙の START と同じ） */
+.next, .ink-button {
+  border-radius: 0; background: var(--ink); color: #f4f1ec;
+  letter-spacing: 0.3em; padding-left: calc(32px + 0.3em); box-shadow: none;
+}
+.ink-button { justify-content: center; gap: 0; }
+.ink-button .chevron { display: none; }
+@media (prefers-color-scheme: dark) { .next, .ink-button { outline: 1px solid var(--line); } }
+/* 選んでいるもの（出題範囲・モード・盤面の字）は、どれも墨で塗って示す */
+.start-card { border-color: var(--line); }
+.start-card[aria-current='true'] { background: var(--ink); border-color: transparent; color: #f4f1ec; }
+.start-card[aria-current='true'] .chevron { color: #f4f1ec; opacity: 0.9; }
+/* 答えの正誤も墨で示す（利用者の指示）: 正解・見つけた字は墨で塗る、取り違えた字は薄墨、見落とした字は墨の破線 */
+.choice.is-correct, .cell.is-found, .compare-char.is-correct, .swatch.is-found {
+  background: var(--ink); border-color: transparent; box-shadow: none; color: #f4f1ec; opacity: 1;
+}
+.choice.is-wrong, .cell.is-wrong, .compare-char.is-wrong, .swatch.is-wrong {
+  background: var(--usuzumi); border-color: transparent; box-shadow: none; color: var(--fg); opacity: 1;
+}
+.cell.is-missed, .swatch.is-missed { border: 2px dashed var(--fg); background: var(--card); }
+.choice.is-correct .key { color: #f4f1ec; }
+.brush-line { width: 40px; height: 2px; border-radius: 0; background: var(--fg); opacity: 0.5; }
+/* 見出しと下のタブは字間を空ける */
+.home-hero h1, .home-start h2, .page h1 { letter-spacing: 0.14em; font-weight: 400; }
+.start-card-name { font-weight: 400; letter-spacing: 0.1em; }
+.tabbar { border-top-color: var(--line); }
+.tabbar button { letter-spacing: 0.12em; }
+a { color: var(--fg); }
+/* ホームの上部: 表紙の石組みを小さく */
+.home-stones { width: min(46vw, 200px); height: auto; margin-top: 28px; }
+.home-start { margin-top: 28px; }
+.result-actions { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 24px; }
+.result-back { background: none; border: 1px solid var(--fg); color: var(--fg); padding: 10px 24px; font-size: 16px; letter-spacing: 0.2em; cursor: pointer; }
+
+/* 表紙・ホーム・練習中の背景は和紙（利用者の図案）。スマホでも動かないよう、画面に固定した下地として敷く */
+.app.is-paper::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background: var(--bg) url('./assets/practice-paper.webp') center / cover no-repeat;
+}
+/* 和紙の上では、カードも塗りも少しだけ透かして和紙を見せる（利用者の指示） */
+.app.is-paper { --card: rgba(251, 250, 247, 0.6); --usuzumi: rgba(205, 200, 191, 0.8); }
+@media (prefers-color-scheme: dark) {
+  .app.is-paper { --card: rgba(37, 35, 32, 0.6); --usuzumi: rgba(74, 70, 64, 0.8); }
+}
+.app.is-paper .choice.is-correct, .app.is-paper .cell.is-found, .app.is-paper .cell.is-selected,
+.app.is-paper .compare-char.is-correct, .app.is-paper .swatch.is-found, .app.is-paper .next:enabled,
+.app.is-paper .start-card[aria-current='true'] {
+  opacity: 0.88;
+}
+/* ホーム（利用者の見本 2026-09-27 に合わせた寸法）。モード選択は同じ部品を使うので含めない */
+.home:not(.modes) .home-stones { width: min(49vw, 240px); margin-top: calc(15vh - 16px); }
+.home:not(.modes) .home-hero h1 { font-size: clamp(32px, 9.4vw, 46px); margin: 20px 0 6px; }
+.home:not(.modes) .home-subtitle { letter-spacing: 0.24em; padding-left: 0.24em; }
+.home:not(.modes) .home-start { margin-top: 5.5vh; }
+/* 表示言語の切り替えは、下線つきの文字にする（見本） */
+.lang-switch { border-radius: 0; background: none; padding: 4px 2px; border-bottom: 1px solid var(--line); }
+.home:not(.modes) { padding-left: 26px; padding-right: 26px; }
+.home:not(.modes) .start-cards { gap: 16px; }
+/* 和紙の上では、下のバーも地を塗らず線だけにする */
+.app.is-paper .tabbar { background: none; }
+/* デーヴァナーガリー・ミャンマー・シンハラ・ベンガル文字は、字間を空けると字の組み立てが崩れて読みにくいので、字間を詰める */
+:lang(ne), :lang(my), :lang(si), :lang(bn) { letter-spacing: normal !important; }
